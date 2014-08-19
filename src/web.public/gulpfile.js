@@ -119,7 +119,6 @@ gulp.task('build:copy', ['build:clean'], function() {
 	var filesToCopy = 
 	    [
 	    './node_modules/**/*.*',
-		'./bin/www',
 		'./routes/**/*.*',
 		'./views/**/*.*',
 		'./*.*',
