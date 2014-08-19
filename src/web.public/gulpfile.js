@@ -145,10 +145,9 @@ gulp.task('build:cdnify', ['build:index-html', 'build:stylesheets'], function() 
 });
 
 gulp.task('dev:watch', ['dev:stylesheets', 'dev:templates', 'dev:javascripts'], function() {
-    // javascripts don't need to be gulp.watch'ed as they are watched using watchify.
-	
 	plugins.livereload.listen();
 	
+	// javascripts don't need to be gulp.watch'ed as they are watched using watchify.
 	gulp.watch(['./public/stylesheets/**/*'], ['dev:stylesheets']);
 	gulp.watch(['./public/templates/**/*'], ['dev:templates']);
 	gulp.watch(['./index.html']).on('change', plugins.livereload.changed);

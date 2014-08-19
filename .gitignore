@@ -31,3 +31,6 @@ public-generated/
 
 # Ignore development dependencies
 /node_modules/
+
+# IDE Settings
+.idea/
