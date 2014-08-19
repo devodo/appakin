@@ -1,3 +1,5 @@
+'use strict';
+
 var debug = require('debug')('web.public');
 var app = require('./app');
 
