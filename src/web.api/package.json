@@ -1,0 +1,21 @@
+{
+  "name": "web-api",
+  "version": "0.0.1",
+  "private": true,
+  "scripts": {
+    "start": "nodemon --debug server.js"
+  },
+  "dependencies": {
+    "body-parser": "~1.0.0",
+    "bunyan": "^1.0.0",
+    "cookie-parser": "~1.0.1",
+    "debug": "~0.7.4",
+    "express": "~4.2.0",
+    "express-bunyan-logger": "^1.0.0",
+    "morgan": "~1.0.0"
+  },
+  "devDependencies": {},
+  "engines": {
+    "node": ">=0.10.30"
+  }
+}

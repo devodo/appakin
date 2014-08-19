@@ -1,0 +1,8 @@
+{
+  "development": {
+      "test": "test dev"
+  },
+  "production": {
+      "test": "test production"
+  }
+}
