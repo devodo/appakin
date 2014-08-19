@@ -3,13 +3,12 @@
 ## Developer setup
 
 1. Use npm to install the following packages globally:
-* - express
-* - nodemon
-* - bower
-* - browserify
-* - watchify
-* - gulp
-
+  * express
+  * nodemon
+  * bower
+  * browserify
+  * watchify
+  * gulp
 2. Cd to the appakin repo root directory and run 'npm install' to install the dev dependencies.  (All dev dependencies should be installed at the root level so that they are shared amongst all the projects in the repo.)
 
 ## web.public
@@ -35,11 +34,12 @@ TODO
 
 ### JSHint 
 
-TODO
+Cd to the /src/web.api directory and run 'gulp jshint'.
 
 ### Build
 
-TODO
+Cd to the /src/web.api directory and run 'gulp build'.
+You can check the build by cding to /build.output/web.api and running 'npm start'. Browse to http://localhost:3002/
 
 ### Running locally while developing
 
