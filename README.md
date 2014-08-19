@@ -18,7 +18,17 @@ You can check the build by cding to /build.output/web.public and running 'npm st
 
 ### Running locally while developing
 
-TODO
+1. Install the livereload extension in Chrome.
+2. Set up a build configuration in WebStorm/IntelliJ that is configured as follows:
+  - Node interpreter: Path of node.exe, e.g., C:\Program Files\nodejs\node.exe on Windows.
+  - Node parameters: empty
+  - Working directory: Path to /src/web.public directory in your appakin repo.
+  - Javascript file: Path to nodemon, e.g., something like 'C:\Users\Steve\AppData\Roaming\npm\node_modules\nodemon\bin\nodemon.js' on Windows.
+  - Application parameters: server.js
+  - Open browser after launch, Default, with the path 'http://localhost:3000/'.
+3. In a command line window, cd to the /src/web.public directory and run 'gulp dev'.
+4. Debug the Web site.
+5. In Chrome, connect the opened browser window to livereload.
 
 ## Application: web.rating
 

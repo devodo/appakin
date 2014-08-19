@@ -1,9 +1,9 @@
 <!DOCTYPE html>
-<html> <!-- ng-app="appakinApp" ng-strict-di ng-controller="AppCtrl"> -->
+<html ng-app="appAkin" ng-strict-di ng-controller="AppCtrl">
 <head>
     <meta charset="utf-8">
 	<meta name="language" content="english">
-	<title>AppAkin</title> <!-- bind title -->
+	<title>AppAkin | {{pageTitle}}</title>
 	
 	<meta name="description" content="Search by category for great apps.">
 	<!-- TODO: add Open Graph meta tags, and possibly Twitter and Google+ too. -->
@@ -14,7 +14,11 @@
 </head>
 <body>
     <header ui-view="header"></header>
-	<main ui-view="content"><p>Test page. Hello</p></main>
+	<main ui-view="content"><p>Test page. Hello</p>
+	<div>
+I can add: {{a}} + {{b}} =  {{ a+b }}
+</div>
+	</main>
     <footer ui-view="footer"></footer>
     
 	<!--[if lt IE 9]><!-- inject:shim:js --><!-- endinject --><![endif]-->
