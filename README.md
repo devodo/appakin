@@ -33,4 +33,14 @@ TODO
 
 ## web.api
 
+### JSHint 
+
 TODO
+
+### Build
+
+TODO
+
+### Running locally while developing
+
+If you're not wanting to run the API Web site in an IDE, just cd to the /src/web.api directory and run 'npm start'. Browse to http://localhost:3002/api/test/ping
