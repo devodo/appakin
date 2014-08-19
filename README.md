@@ -1,6 +1,6 @@
 # App Akin
 
-## Developer Setup
+## Developer setup
 
 1. Use npm to install the following packages globally:
 * - express
@@ -11,3 +11,26 @@
 * - gulp
 
 2. Cd to the appakin repo root directory and run 'npm install' to install the dev dependencies.  (All dev dependencies should be installed at the root level so that they are shared amongst all the projects in the repo.)
+
+## web.public
+
+### JSHint
+
+Cd to the /src/web.public directory and run 'gulp jshint'.
+
+### Build
+
+Cd to the /src/web.public directory and run 'gulp build'.
+You can check the build by cding to /build.output/web.public and running 'npm start'. Browse to http://localhost:3000/
+
+### Running locally while developing
+
+TODO
+
+## web.rating
+
+TODO
+
+## web.api
+
+TODO
