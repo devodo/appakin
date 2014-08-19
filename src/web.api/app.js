@@ -8,6 +8,7 @@ var bodyParser = require('body-parser');
 var fs = require('fs');
 var log = require('./logger');
 var config = require('./config');
+var S = require('string');
 
 // ================================
 
@@ -27,10 +28,10 @@ log.info("Started Web site");
 // ================================
 
 function configureApp(app) {
-	// TODO: test this on linux.
+    // TODO: test this on linux.
     process.on('SIGTERM', function() {
         console.log('Got SIGTERM.');
-	    // TODO: add shutdown code.
+        // TODO: add shutdown code.
         process.exit(0);
     });
 }
@@ -39,10 +40,17 @@ function initApiRoutes(app) {
     var apiDir = path.resolve(__dirname, 'routes');
     var files = fs.readdirSync(apiDir);
 
+    var isRouteFile = function(filePath) {
+        var isValid = S(filePath.toLowerCase()).endsWith('.js');
+        return isValid;
+    }
+
     files.forEach(function (file) {
         var filePath = path.resolve(apiDir, file);
-        var route = require(filePath);
-        route.init(app);
+        if (isRouteFile(filePath)) {
+            var route = require(filePath);
+            route.init(app);
+        }
     });
 }
 
@@ -54,11 +62,11 @@ function notFoundHandler(req, res, next) {
 
 function notFoundErrorHandler(err, req, res, next) {
     if (err.status !== 404) {
-	    return next(err);
-	}
-	
-	res.status(404);
-	res.send(err.message || '404');
+        return next(err);
+    }
+
+    res.status(404);
+    res.send(err.message || '404');
 }
 
 function serverErrorHandler(err, req, res, next) {

@@ -32,5 +32,8 @@ public-generated/
 # Ignore development dependencies
 /node_modules/
 
-# IDE Settings
-.idea/
+#IDE project files
+.idea
+
+#Stupid OSX files
+.DS_Store
