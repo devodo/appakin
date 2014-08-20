@@ -1,9 +1,9 @@
 (function () {'use strict';
 
-    var appAkin = require('./app.js');
+    var appAkin = require('./appakin.js');
 
     appAkin.factory('appService', function() {
-        var appService = {pageTitle: 'Ham'};
+        var appService = {pageTitle: 'AppAkin | Ham'};
         return appService;
     });
 

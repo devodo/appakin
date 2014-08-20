@@ -3,26 +3,37 @@
 <head>
     <meta charset="utf-8">
 	<meta name="language" content="english">
-	<title>AppAkin | {{pageTitle}}</title>
+	<title ng-bind="pageTitle">AppAkin</title>
+    <base href="/">
 	
 	<meta name="description" content="Search by category for great apps.">
 	<!-- TODO: add Open Graph meta tags, and possibly Twitter and Google+ too. -->
 	
-	<!-- inject:app-styles:css --><link rel="stylesheet" href="/public/stylesheets/app-styles.css"><!-- endinject -->
-	
-	<script src="/bower_components/angular/angular.js"></script>
+	<!-- inject:appakin-styles:css --><link rel="stylesheet" href="/public/stylesheets/app-styles.css"><!-- endinject -->
+
+    <!--[if lt IE 9]>
+    <script src="/bower_components/html5shiv/dist/html5shiv.js"></script>
+    <![endif]-->
 </head>
 <body>
-    <header ui-view="header"></header>
-	<main ui-view="content"><p>Test page. Hello</p>
-	<div>
-I can add: {{a}} + {{b}} =  {{ a+b }}
-</div>
+    <header>App ~ Akin</header>
+	<main>
+        <div ng-view></div>
 	</main>
-    <footer ui-view="footer"></footer>
-    
-	<!--[if lt IE 9]><!-- inject:shim:js --><!-- endinject --><![endif]-->
-    <!-- inject:app-scripts:js --><script src="/public/javascripts/app-scripts.js"></script><!-- endinject -->
-    <!-- inject:app-templatesDISABLED:js --><!--<script src="/public/html/app-templates.js"></script>--><!-- endinject -->
+    <footer>
+        <div>
+            <ul>
+                <li><a href="/">Home</a></li>
+                <li><a href="/about">About</a></li>
+                <li><a href="/raters">Raters</a></li>
+                <li><a href="/terms">Terms</a></li>
+            </ul>
+        </div>
+    </footer>
+
+    <script src="/bower_components/angular/angular.js"></script>
+    <script src="/bower_components/angular-route/angular-route.js"></script>
+    <!-- inject:appakin-scripts:js --><script src="/public/javascripts/app-scripts.js"></script><!-- endinject -->
+    <!-- inject:appakin-templates:js --><script src="/public/templates/app-templates.js"></script><!-- endinject -->
 </body>
 </html>

@@ -97,7 +97,7 @@ gulp.task('build:templates', ['build:clean'], function() {
 	return gulp
 	    .src(['./public/templates/**/*.html'])
         .pipe(minifyHtml({quotes: true}))
-		.pipe(templateCache('app-templates.js'))
+		.pipe(templateCache('app-templates.js', {module: 'appAkin'}))
         .pipe(plugins.size({ showFiles: true }))
         .pipe(plugins.rev())
         .pipe(gulp.dest(buildRoot + '/public/templates/'))
@@ -166,7 +166,7 @@ gulp.task('dev:stylesheets', function() {
 gulp.task('dev:templates', function() {
 	return gulp
 	    .src(['./public/templates/**/*.html'])
-		.pipe(templateCache('app-templates.js'))
+		.pipe(templateCache('app-templates.js', {module: 'appAkin'}))
         .pipe(gulp.dest(publicGeneratedRoot + '/public/templates/'))
         .on('end', gutil.log.bind(gutil, 'Templates built for dev'))
 		.on('end', plugins.livereload.changed)
