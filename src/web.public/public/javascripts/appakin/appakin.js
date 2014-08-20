@@ -1,7 +1,8 @@
 (function () {'use strict';
 
     var appAkin = angular.module('appAkin', [
-        'ngRoute'
+        'ngRoute',
+        'ngCookies'
     ]);
 
     module.exports = appAkin;
@@ -29,11 +30,11 @@
                 templateUrl: 'search.html',
                 controller: 'SearchCtrl'
             })
-            .when('/category', {
+            .when('/category/:platform/:categoryName', {
                 templateUrl: 'category.html',
                 controller: 'CategoryCtrl'
             })
-            .when('/app', {
+            .when('/app/:platform/:platformName', {
                 templateUrl: 'app.html',
                 controller: 'AppCtrl'
             })

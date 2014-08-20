@@ -4,7 +4,9 @@
     require('./appakin-service.js');
 
     appAkin.controller('AppAkinCtrl', ['$scope', 'appService', function($scope, appService) {
-        $scope.pageTitle = appService.pageTitle;
+        $scope.$watch(
+            function(){return appService.pageTitle},
+            function(newVal){$scope.pageTitle = newVal;});
     }]);
 
 }()); // use strict

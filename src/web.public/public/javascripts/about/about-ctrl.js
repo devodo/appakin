@@ -4,7 +4,9 @@
     require('../appakin/appakin-service.js');
 
     appAkin.controller('AboutCtrl', ['$scope', 'appService', function($scope, appService) {
-        //$scope.pageTitle = appService.pageTitle;
+        appService.setPageTitleSection('About us!');
+        appService.setSection('about');
+
         $scope.message = 'About this app';
     }]);
 

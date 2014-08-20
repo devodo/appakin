@@ -1,12 +1,12 @@
 <!DOCTYPE html>
-<html ng-app="appAkin" ng-strict-di ng-controller="AppCtrl">
+<html ng-app="appAkin" ng-strict-di ng-controller="AppAkinCtrl">
 <head>
     <meta charset="utf-8">
 	<meta name="language" content="english">
+    <meta name="description" content="Search by category for great apps.">
 	<title ng-bind="pageTitle">AppAkin</title>
     <base href="/">
-	
-	<meta name="description" content="Search by category for great apps.">
+
 	<!-- TODO: add Open Graph meta tags, and possibly Twitter and Google+ too. -->
 	
 	<!-- inject:appakin-styles:css --><link rel="stylesheet" href="/public/stylesheets/app-styles.css"><!-- endinject -->
@@ -16,23 +16,15 @@
     <![endif]-->
 </head>
 <body>
-    <header>App ~ Akin</header>
+    <div header></div>
 	<main>
         <div ng-view></div>
 	</main>
-    <footer>
-        <div>
-            <ul>
-                <li><a href="/">Home</a></li>
-                <li><a href="/about">About</a></li>
-                <li><a href="/raters">Raters</a></li>
-                <li><a href="/terms">Terms</a></li>
-            </ul>
-        </div>
-    </footer>
+    <div footer></div>
 
     <script src="/bower_components/angular/angular.js"></script>
     <script src="/bower_components/angular-route/angular-route.js"></script>
+    <script src="/bower_components/angular-cookies/angular-cookies.js"></script>
     <!-- inject:appakin-scripts:js --><script src="/public/javascripts/app-scripts.js"></script><!-- endinject -->
     <!-- inject:appakin-templates:js --><script src="/public/templates/app-templates.js"></script><!-- endinject -->
 </body>

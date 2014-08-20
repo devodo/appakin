@@ -4,7 +4,9 @@
     require('../appakin/appakin-service.js');
 
     appAkin.controller('HomeCtrl', ['$scope', 'appService', function($scope, appService) {
-        //$scope.pageTitle = appService.pageTitle;
+        appService.setPageTitleSection('Home');
+        appService.setSection('home');
+
         $scope.message = 'A search box.';
     }]);
 

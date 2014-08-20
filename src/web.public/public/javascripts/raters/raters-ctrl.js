@@ -4,8 +4,12 @@
     require('../appakin/appakin-service.js');
 
     appAkin.controller('RatersCtrl', ['$scope', 'appService', function($scope, appService) {
-        //$scope.pageTitle = appService.pageTitle;
+        appService.setPageTitleSection('Raters');
+        appService.setSection('raters');
+        
         $scope.message = 'Info for raters';
+        //$scope.aa.pageTitle = 'App Akin | Raters';
+
     }]);
 
 }()); // use strict
