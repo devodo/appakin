@@ -1,6 +1,9 @@
 {
   "development": {
-      "test": "test dev"
+      "test": "test dev",
+      "connectionString": {
+          "appakin": "postgres://localhost/appakin"
+      }
   },
   "production": {
       "test": "test production"
