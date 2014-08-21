@@ -46,12 +46,12 @@ CREATE TABLE paypal_link
   CONSTRAINT paypal_link_user_id_fkey FOREIGN KEY (user_id)
       REFERENCES "user" (id) MATCH SIMPLE
       ON UPDATE NO ACTION ON DELETE NO ACTION,
-  CONSTRAINT paypal_link_account_id_key UNIQUE (account_id)
+  CONSTRAINT paypal_link_account_id_unique UNIQUE (account_id)
 );
 
 CREATE TABLE store
 (
-  id serial NOT NULL,
+  id integer NOT NULL,
   name character varying(256) NOT NULL,
   description text,
   date_created timestamp without time zone NOT NULL,
@@ -59,9 +59,13 @@ CREATE TABLE store
   CONSTRAINT store_pkey PRIMARY KEY (id)
 );
 
+INSERT INTO store(id, name, description, date_created, date_modified)
+VALUES (1, 'App Store', 'Apple iTunes App Store', NOW(), NOW());
+
 CREATE TABLE category
 (
   id serial NOT NULL,
+  ext_id uuid NOT NULL,
   store_id integer NOT NULL,
   title character varying(512) NOT NULL,
   alt_title character varying(512)[],
@@ -73,20 +77,25 @@ CREATE TABLE category
   CONSTRAINT category_pkey PRIMARY KEY (id),
   CONSTRAINT category_store_id_fkey FOREIGN KEY (store_id)
       REFERENCES store (id) MATCH SIMPLE
-      ON UPDATE NO ACTION ON DELETE NO ACTION
+      ON UPDATE NO ACTION ON DELETE NO ACTION,
+  CONSTRAINT category_ext_id_unique UNIQUE (ext_id)
 );
 
 CREATE TABLE item
 (
   id serial NOT NULL,
+  ext_id uuid NOT NULL,
   store_id integer NOT NULL,
+  store_item_id character varying(64) NOT NULL,
   name character varying(256) NOT NULL,
   date_created timestamp without time zone NOT NULL,
   date_modified timestamp without time zone NOT NULL,
   CONSTRAINT item_pkey PRIMARY KEY (id),
   CONSTRAINT item_store_id_fkey FOREIGN KEY (store_id)
-      REFERENCES store (id) MATCH SIMPLE
-      ON UPDATE NO ACTION ON DELETE NO ACTION
+  REFERENCES store (id) MATCH SIMPLE
+  ON UPDATE NO ACTION ON DELETE NO ACTION,
+  CONSTRAINT item_ext_id_unique UNIQUE (ext_id),
+  CONSTRAINT item_store_item_id_unique UNIQUE (store_id, store_item_id)
 );
 
 CREATE TABLE rating
@@ -114,12 +123,43 @@ CREATE TABLE appstore_item
 (
   item_id integer NOT NULL,
   name character varying(256) NOT NULL,
+  censored_name character varying(256),
   description text NOT NULL,
+  appstore_url character varying(256) NOT NULL,
+  dev_id integer NOT NULL,
+  dev_name character varying(64) NOT NULL,
+  dev_url character varying(256),
+  features character varying(64)[],
+  supported_devices character varying(64)[] NOT NULL,
+  is_game_center_enabled boolean NOT NULL,
+  screenshot_urls character varying(256)[],
+  ipad_screenshot_urls character varying(256)[],
+  artwork_small_url character varying(256) NOT NULL,
+  artwork_medium_url character varying(256) NOT NULL,
+  artwork_large_url character varying(256) NOT NULL,
+  price integer NOT NULL,
+  currency character varying(5) NOT NULL,
+  version character varying(32),
+  primary_genre character varying(64) NOT NULL,
+  genres character varying(64)[] NOT NULL,
+  release_date timestamp without time zone NOT NULL,
+  bundle_id character varying(256) NOT NULL,
+  seller_name character varying(256),
+  release_notes text,
+  min_os_version character varying(10),
+  language_codes character(2)[],
+  file_size_bytes character varying(64),
+  advisory_rating character varying(12),
+  content_rating character varying(12),
+  user_rating_current character varying(10),
+  rating_count_current integer,
+  user_rating character varying(10),
+  rating_count integer,
   date_created timestamp without time zone NOT NULL,
   date_modified timestamp without time zone NOT NULL,
   CONSTRAINT appstore_item_pkey PRIMARY KEY (item_id),
   CONSTRAINT appstore_item_item_id_fkey FOREIGN KEY (item_id)
-      REFERENCES item (id) MATCH SIMPLE
-      ON UPDATE NO ACTION ON DELETE NO ACTION
-);
+  REFERENCES item (id) MATCH SIMPLE
+  ON UPDATE NO ACTION ON DELETE NO ACTION
+)
 
