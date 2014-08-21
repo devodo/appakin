@@ -1,12 +1,12 @@
 (function () {'use strict';
 
     var appAkin = require('./appakin.js');
-    require('./appakin-service.js');
 
-    appAkin.controller('AppAkinCtrl', ['$scope', 'appService', function($scope, appService) {
-        $scope.$watch(
-            function(){return appService.pageTitle},
-            function(newVal){$scope.pageTitle = newVal;});
-    }]);
+    appAkin.controller('AppAkinCtrl', ['$scope', 'navigationService',
+        function($scope, navigationService) {
+            $scope.$watch(
+                function(){return navigationService.getPageTitle();},
+                function(newValue){$scope.pageTitle = newValue;});
+        }]);
 
 }()); // use strict

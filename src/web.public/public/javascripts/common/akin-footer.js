@@ -1,12 +1,12 @@
 (function () {'use strict';
 
-    var appAkin = require('./appakin.js');
+    var appAkin = require('./../appakin/appakin.js');
 
-    appAkin.directive('footer', function () {
+    appAkin.directive('akinFooter', function () {
         return {
-            restrict: 'A', // as attribute
+            restrict: 'A',
             replace: true,
-            templateUrl: "directives/footer.html",
+            templateUrl: "directives/akin-footer.html",
             controller: ['$scope', '$filter', function ($scope, $filter) {
                 // Behaviour here.
             }]

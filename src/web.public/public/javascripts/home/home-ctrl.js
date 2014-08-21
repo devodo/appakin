@@ -1,13 +1,12 @@
 (function () {'use strict';
 
     var appAkin = require('../appakin/appakin.js');
-    require('../appakin/appakin-service.js');
 
-    appAkin.controller('HomeCtrl', ['$scope', 'appService', function($scope, appService) {
-        appService.setPageTitleSection('Home');
-        appService.setSection('home');
+    appAkin.controller('HomeCtrl', ['$scope', 'navigationService',
+        function($scope, navigationService) {
+            navigationService.setPageTitle('Search for apps');
 
-        $scope.message = 'A search box.';
-    }]);
+            $scope.message = 'The home page!';
+        }]);
 
 }()); // use strict

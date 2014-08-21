@@ -9,3 +9,25 @@ a {
   color: #00B7FF;
 }
 
+input.watermarked {
+    color: #bbb;
+}
+
+input[type="radio"]{
+    display:none;
+}
+
+input[type="radio"] + img
+{
+    border: 2px #fff;
+    padding: 10px;
+    display:inline-block;
+    -moz-border-radius: 15px;
+    border-radius: 15px;
+}
+
+input[type="radio"]:checked + img
+{
+    border: 2px solid;
+    padding: 10px;
+}

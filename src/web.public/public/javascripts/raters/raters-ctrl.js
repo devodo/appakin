@@ -1,15 +1,12 @@
 (function () {'use strict';
 
     var appAkin = require('../appakin/appakin.js');
-    require('../appakin/appakin-service.js');
 
-    appAkin.controller('RatersCtrl', ['$scope', 'appService', function($scope, appService) {
-        appService.setPageTitleSection('Raters');
-        appService.setSection('raters');
-        
-        $scope.message = 'Info for raters';
-        //$scope.aa.pageTitle = 'App Akin | Raters';
+    appAkin.controller('RatersCtrl', ['$scope', 'navigationService',
+        function($scope, navigationService) {
+            navigationService.setPageTitle('Raters');
 
-    }]);
+            $scope.message = 'Info for raters';
+        }]);
 
 }()); // use strict
