@@ -161,5 +161,38 @@ CREATE TABLE appstore_item
   CONSTRAINT appstore_item_item_id_fkey FOREIGN KEY (item_id)
   REFERENCES item (id) MATCH SIMPLE
   ON UPDATE NO ACTION ON DELETE NO ACTION
+);
+
+CREATE TABLE appstore_category
+(
+  id serial NOT NULL,
+  appstore_id character varying(32) NOT NULL,
+  name character varying(64) NOT NULL,
+  store_url character varying(256) NOT NULL,
+  parent_id integer,
+  date_created timestamp without time zone NOT NULL,
+  date_modified timestamp without time zone NOT NULL,
+  CONSTRAINT appstore_category_pkey PRIMARY KEY (id),
+  CONSTRAINT appstore_category_parent_id_fkey FOREIGN KEY (parent_id)
+  REFERENCES appstore_category (id) MATCH SIMPLE
+  ON UPDATE NO ACTION ON DELETE NO ACTION,
+  CONSTRAINT appstore_category_appstore_id_key UNIQUE (appstore_id)
+);
+
+CREATE TABLE appstore_item_src
+(
+  id serial NOT NULL,
+  appstore_category_id integer NOT NULL,
+  appstore_id character varying(64) NOT NULL,
+  name character varying(512) NOT NULL,
+  letter character(1) NOT NULL,
+  page_number integer NOT NULL,
+  date_created timestamp without time zone NOT NULL,
+  date_modified timestamp without time zone NOT NULL,
+  CONSTRAINT appstore_item_src_pkey PRIMARY KEY (id),
+  CONSTRAINT appstore_item_src_appstore_category_id_fkey FOREIGN KEY (appstore_category_id)
+  REFERENCES appstore_category (id) MATCH SIMPLE
+  ON UPDATE NO ACTION ON DELETE NO ACTION,
+  CONSTRAINT appstore_item_src_appstore_id_key UNIQUE (appstore_id)
 )
 

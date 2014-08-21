@@ -65,11 +65,36 @@ exports.group = {
     testRetrieveApp: function(test) {
         test.done();
         return; //ignore test
-        
+
         appStore.retrieveApp('284910350', function(err, itemId) {
             test.expect(2);
             test.ok(err === null, err);
             test.ok(itemId > 0, "Item not inserted");
+            test.done();
+        });
+    },
+
+    testRetrieveCategories: function(test) {
+        test.done();
+        return; //ignore test
+
+        appStore.retrieveCategories(function(err, results) {
+            test.expect(2);
+            test.ok(err === null, err);
+            test.ok(results.length > 0, "No results returned");
+            test.done();
+        });
+    },
+
+    testRetrieveItemSources: function(test) {
+        var category = {
+            id: 1,
+            storeUrl: 'https://itunes.apple.com/us/genre/ios-books/id6018?mt=8'
+        };
+
+        appStore.retrieveItemSources(category, 'A', 1, function(err) {
+            test.expect(1);
+            test.ok(err === null, err);
             test.done();
         });
     }

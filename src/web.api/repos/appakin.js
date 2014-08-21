@@ -192,6 +192,57 @@ var Repository = function(client, done) {
             });
         });
     };
+
+    this.insertAppStoreCategory = function(category, next) {
+        var queryStr =
+            "INSERT INTO appstore_category(" +
+            "appstore_id, name, store_url, date_created, date_modified) " +
+            "VALUES ($1, $2, $3, NOW(), NOW()) " +
+            "RETURNING id;";
+
+        var queryParams = [
+            category.id,
+            category.name,
+            category.url
+        ];
+
+        client.query(queryStr, queryParams, function (err, result) {
+            if (err) {
+                return repo.rollback(next, err);
+            }
+
+            next(null, result.rows[0].id);
+        });
+    };
+
+    this.insertAppStoreItemSrc = function(item, next) {
+        var queryStr =
+            "INSERT INTO appstore_item_src(" +
+            "appstore_category_id, appstore_id, name, letter, page_number, " +
+            "date_created, date_modified) " +
+            "VALUES ($1, $2, $3, $4, $5, NOW(), NOW()) " +
+            "RETURNING id;";
+
+        var queryParams = [
+            item.categoryId,
+            item.appStoreId,
+            item.name,
+            item.letter,
+            item.pageNumber
+        ];
+
+        client.query(queryStr, queryParams, function (err, result) {
+            if (err) {
+                if (err.code === UNIQUE_VIOLATION_CODE) {
+                    return next(null, -1);
+                }
+
+                return repo.rollback(next, err);
+            }
+
+            next(null, result.rows[0].id);
+        });
+    };
 };
 
 exports.connect = connect;
@@ -227,6 +278,42 @@ exports.insertAppStoreItem = function(app, next) {
 
             repo.close(function() {
                 next(err, itemId);
+            });
+        });
+    });
+};
+
+exports.insertAppStoreCategory = function(category, next) {
+    connect(function(err, repo) {
+        if (err) {
+            next(err);
+        }
+
+        repo.insertAppStoreCategory(category, function(err, itemId) {
+            if (err) {
+                next(err);
+            }
+
+            repo.close(function() {
+                next(err, itemId);
+            });
+        });
+    });
+};
+
+exports.insertAppStoreItemSrc = function(item, next) {
+    connect(function(err, repo) {
+        if (err) {
+            next(err);
+        }
+
+        repo.insertAppStoreItemSrc(item, function(err, id) {
+            if (err) {
+                next(err);
+            }
+
+            repo.close(function() {
+                next(err, id);
             });
         });
     });

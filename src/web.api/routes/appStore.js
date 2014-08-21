@@ -1,6 +1,7 @@
 'use strict';
 var https = require('https');
 var cheerio = require('cheerio');
+var async = require('async');
 var appakinRepo = require("../repos/appakin.js");
 
 exports.init = function init(app) {
@@ -171,10 +172,140 @@ var retrieveApp = function(id, next) {
     });
 };
 
+var retrieveCategories = function(next) {
+    var options = {
+        hostname: 'itunes.apple.com',
+        port: 443,
+        path: '/us/genre/ios/id36?mt=8',
+        method: 'GET'
+    };
+
+    var callback = function(err, pageSrc) {
+        if (err) {
+            return next(err);
+        }
+
+        var idRegex = /id([\d]+)/;
+        var $ = cheerio.load(pageSrc);
+        var tasks = $('#genre-nav a').map(function(i, el) {
+            var url = $(this).attr('href');
+            var name = $(this).text();
+            var match = idRegex.exec(url);
+            var id = match[1];
+
+            var category = {
+                id: id,
+                url: url,
+                name: name
+            };
+
+            return function(callback) {
+                appakinRepo.insertAppStoreCategory(category, function(err, id) {
+                    callback(err, id);
+                });
+            };
+        });
+
+        async.series(tasks, function(err, results) {
+            next(err, results);
+        });
+    };
+
+    getRequest(options, callback);
+};
+
+var retrieveItemSources = function(category, startLetter, startPageNumber, next) {
+    var idRegex = /id([\d]+)/;
+
+    var retrievePage = function(letterCode, pageNumber) {
+        var letter = String.fromCharCode(letterCode);
+        var url = category.storeUrl + '&letter=' + letter + '&page=' + pageNumber;
+
+        var options = {
+            hostname: 'itunes.apple.com',
+            port: 443,
+            path: url,
+            method: 'GET'
+        };
+
+        var callback = function(err, pageSrc) {
+            if (err) {
+                return next(err);
+            }
+
+            var $ = cheerio.load(pageSrc);
+
+            var itemSources = $('#selectedcontent a').map(function(i, el) {
+                var url = $(this).attr('href');
+                var name = $(this).text();
+                var match = idRegex.exec(url);
+                var id = match[1];
+
+                var itemSrc = {
+                    categoryId: category.id,
+                    appStoreId: id,
+                    name: name,
+                    letter: letter,
+                    pageNumber: pageNumber
+                };
+
+                return itemSrc;
+            });
+
+            var tasksMap = itemSources.map(function(i, itemSrc) {
+                return function(callback) {
+                    console.log(itemSrc.name);
+                    appakinRepo.insertAppStoreItemSrc(itemSrc, function(err, id) {
+                        callback(err, id);
+                    });
+                };
+            });
+
+            var tasks = [];
+
+            for (var i = 0; i < tasksMap.length; i++) {
+                tasks.push(tasksMap[i]);
+            }
+
+            async.series(tasks, function(err, results) {
+                if (err) {
+                    return next(err);
+                }
+
+                var hasNew = false;
+                for (var i = 0; i < results.length; i++) {
+                    if (results[i] > 0) {
+                        hasNew = true;
+                        break;
+                    }
+                }
+
+                if (hasNew) {
+                    return retrievePage(letterCode, pageNumber+1);
+                }
+
+                if (letterCode < 90) {
+                    return retrievePage(letterCode+1, 1);
+                }
+
+                next();
+            });
+        };
+
+        getRequest(options, callback);
+    };
+
+    var startLetterCode = startLetter.charCodeAt(0);
+
+    retrievePage(startLetterCode, startPageNumber);
+};
+
 exports.getPageSrc = getPageSrc;
 exports.parseHtml = parseHtml;
 exports.getLookup = getLookup;
 exports.parseLookup = parseLookup;
 exports.retrieveApp = retrieveApp;
+exports.retrieveCategories = retrieveCategories;
+exports.retrieveItemSources = retrieveItemSources;
 
 
