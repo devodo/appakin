@@ -5,6 +5,7 @@ var path = require('path');
 var logger = require('express-bunyan-logger');
 var cookieParser = require('cookie-parser');
 var bodyParser = require('body-parser');
+var cors = require('cors');
 var fs = require('fs');
 var log = require('./logger');
 var config = require('./config');
@@ -18,6 +19,7 @@ config.environment !== 'production' && app.use(logger({logger: log}));
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded());
 app.use(cookieParser());
+app.use(cors()); // TODO: what are the correct cors options to use?
 initApiRoutes(app);
 app.use(notFoundHandler);
 app.use(logger.errorLogger({logger: log}));

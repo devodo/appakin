@@ -1,6 +1,8 @@
 "use strict";
+var isWin = /^win/.test(process.platform);
+
 var config = require('../config');
-var pg = require("pg").native;
+var pg = isWin ? require("pg") : require("pg").native;
 var uuid = require('node-uuid');
 
 var UNIQUE_VIOLATION_CODE = '23505';

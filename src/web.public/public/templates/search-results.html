@@ -1,0 +1,14 @@
+<div>
+    <ul>
+        <li ng-repeat="category in categories">
+            <p>
+                <a href="/category/{{platform}}/{{category.urlName}}">{{category.name}}</a>
+                <br/>
+                {{category.shortDesc}}
+            </p>
+        </li>
+    </ul>
+    <div ng-if="categories.length == 0">
+        No results found.
+    </div>
+</div>

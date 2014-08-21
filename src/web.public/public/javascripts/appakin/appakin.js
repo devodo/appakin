@@ -27,7 +27,7 @@
                 controller: 'TermsCtrl'
             })
             .when('/search', {
-                templateUrl: 'search.html',
+                templateUrl: 'search-results.html',
                 controller: 'SearchCtrl'
             })
             .when('/category/:platform/:categoryName', {
