@@ -1,15 +1,10 @@
 'use strict';
 
 var gulp = require('gulp');
-var gutil = require('gulp-util')
+var gutil = require('gulp-util');
 var plugins = require('gulp-load-plugins')({config: '../../package.json'});
 var path = require('path');
-var del = require('del');
-var browserify = require('browserify');
-var source = require('vinyl-source-stream');
-var watchify = require('watchify');
 var templateCache = require('gulp-angular-templatecache');
-var minifyHtml = require('gulp-minify-html');
 var stylish = require('jshint-stylish');
 
 var publicGeneratedRoot = path.resolve('./public-generated');
@@ -20,7 +15,7 @@ gulp.task('build',
     [
     'build:clean',
 	'build:copy',
-	'build:javascripts',
+	'build:scripts',
 	'build:stylesheets',
 	'build:templates',
 	'build:minify-images',
@@ -33,7 +28,7 @@ gulp.task('dev',
     [
 	'dev:stylesheets',
 	'dev:templates', 
-	'dev:javascripts', 
+	'dev:scripts',
 	'dev:watch'
 	]
 );
@@ -41,11 +36,15 @@ gulp.task('dev',
 // http://jshint.com/docs/options/
 gulp.task('jshint', function() {
     return gulp
-	    .src(['./public/javascripts/**/*.js', './routes/**/*.js'])
+	    .src([
+            './public/scripts/**/*.js',
+            './routes/**/*.js',
+            '!./public/scripts/angular-ui/**/*',
+            '!./public/scripts/vendor/**/*'
+        ])
 	    .pipe(plugins.jshint({ globalstrict: true, node: true }))
 		.pipe(plugins.jshint.reporter(stylish))
 		.pipe(plugins.jshint.reporter('fail'))
-		.on('end', gutil.log.bind(gutil, 'JSHint was happy'))
 		.on('error', handleError);
 });
 
@@ -53,55 +52,49 @@ gulp.task('build:clean', ['jshint'], function() {
     return gulp
 	    .src(buildRoot, { read: false })
         .pipe(plugins.rimraf({ force: true }))
-		.on('end', gutil.log.bind(gutil, 'Build cleaned'))
 		.on('error', handleError);
 });
 
-gulp.task('build:javascripts', ['build:clean'], function() {
-    return browserify('./public/javascripts/main.js', { debug: false })
-        .bundle()
-        .pipe(source('app-scripts.js'))
-        .pipe(plugins.streamify(plugins.uglify({ mangle: true })))
-        .pipe(plugins.streamify(plugins.size({ showFiles: true })))
-        .pipe(plugins.buffer())
+gulp.task('build:scripts', ['build:clean'], function() {
+    return gulp
+        .src(['./public/scripts/**/module.js', './public/scripts/**/*.js'])
+        .pipe(plugins.concat('app-scripts.js'))
+        .pipe(plugins.ngAnnotate())
+        .pipe(plugins.uglify())
         .pipe(plugins.rev())
-        .pipe(gulp.dest(buildRoot + '/public/javascripts/'))
-		.on('end', gutil.log.bind(gutil, 'Scripts built'))
-		.on('error', handleError);
+        .pipe(gulp.dest(buildRoot + '/public/scripts/'))
+        .on('error', handleError);
 });
 
 gulp.task('build:stylesheets', ['build:clean'], function() {
     return gulp
-	    .src('./public/stylesheets/main.css')
-	    .pipe(plugins.rename('app-styles.css'))
+        .src(['./public/stylesheets/main.css', './public/stylesheets/**/*.css'])
+        .pipe(plugins.concat('app-styles.css'))
 		.pipe(plugins.minifyCss())
 		.pipe(plugins.size({ showFiles: true }))
         .pipe(plugins.rev())
         .pipe(gulp.dest(buildRoot + '/public/stylesheets/'))
-		.on('end', gutil.log.bind(gutil, 'Styles built'))
 		.on('error', handleError);
 });
 
-gulp.task('build:index-html', ['build:javascripts', 'build:stylesheets', 'build:templates'], function() {
+gulp.task('build:index-html', ['build:scripts', 'build:stylesheets', 'build:templates'], function() {
     return gulp
 	    .src(indexHtmlPath)
-        .pipe(inject('./public/stylesheets/app-styles*.css', buildRoot, 'app-styles'))
-        .pipe(inject('./public/javascripts/app-scripts*.js', buildRoot, 'app-scripts'))
-        .pipe(inject('./public/templates/app-templates*.js', buildRoot, 'app-templates'))
+        .pipe(inject('./public/stylesheets/app-styles*.css', buildRoot, 'appakin-styles'))
+        .pipe(inject('./public/scripts/app-scripts*.js', buildRoot, 'appakin-scripts'))
+        .pipe(inject('./public/templates/app-templates*.js', buildRoot, 'appakin-templates'))
         .pipe(gulp.dest(buildRoot))
-		.on('end', gutil.log.bind(gutil, 'index.html built'))
 		.on('error', handleError);
 });
 
 gulp.task('build:templates', ['build:clean'], function() {
 	return gulp
-	    .src(['./public/templates/**/*.html'])
-        .pipe(minifyHtml({quotes: true}))
+	    .src(['./public/scripts/**/*.html'])
+        .pipe(plugins.minifyHtml({quotes: true}))
 		.pipe(templateCache('app-templates.js', {module: 'appAkin'}))
         .pipe(plugins.size({ showFiles: true }))
         .pipe(plugins.rev())
         .pipe(gulp.dest(buildRoot + '/public/templates/'))
-        .on('end', gutil.log.bind(gutil, 'Templates built'))
 		.on('error', handleError);		
 });
 
@@ -111,7 +104,6 @@ gulp.task('build:minify-images', ['build:clean'], function() {
         .pipe(plugins.imagemin())
         .pipe(plugins.size({ showFiles: true }))
         .pipe(gulp.dest(buildRoot + '/public/images'))
-		.on('end', gutil.log.bind(gutil, 'Images minified'))
 		.on('error', handleError);
 });
 
@@ -128,7 +120,6 @@ gulp.task('build:copy', ['build:clean'], function() {
 	return gulp
 	    .src(filesToCopy, {base: './'})
 	    .pipe(gulp.dest(buildRoot))
-		.on('end', gutil.log.bind(gutil, 'Files copied'))
 		.on('error', handleError);
 });
 
@@ -137,61 +128,75 @@ gulp.task('build:cdnify', ['build:index-html', 'build:stylesheets'], function() 
 	    .src(buildRoot + '/index.html')
         .pipe(plugins.cdnizer(
 		    {
-		        files: ['google:angular']
+		        files: [
+                    {
+                        file: '/bower_components/angular/angular.js',
+                        package: 'angular',
+                        cdn: '//ajax.googleapis.com/ajax/libs/angularjs/${ version }/angular.min.js'
+                    },
+                    {
+                        file: '/bower_components/angular-route/angular-route.js',
+                        package: 'angular-route',
+                        cdn: '//ajax.googleapis.com/ajax/libs/angularjs/${ version }/angular-route.min.js'
+                    },
+                    {
+                        file: '/bower_components/angular-resource/angular-resource.js',
+                        package: 'angular-resource',
+                        cdn: '//ajax.googleapis.com/ajax/libs/angularjs/${ version }/angular-resource.min.js'
+                    },
+                    {
+                        file: '/bower_components/angular-cookies/angular-cookies.js',
+                        package: 'angular-cookies',
+                        cdn: '//ajax.googleapis.com/ajax/libs/angularjs/${ version }/angular-cookies.min.js'
+                    },
+                    {
+                        file: '/bower_components/html5shiv/dist/html5shiv.js',
+                        package: 'html5shiv',
+                        cdn: '//cdnjs.cloudflare.com/ajax/libs/html5shiv/${ version }/html5shiv.min.js'
+                    }
+                ]
 			}))
         .pipe(gulp.dest(buildRoot))
-		.on('end', gutil.log.bind(gutil, 'index.html cdnified'))
 		.on('error', handleError);
 });
 
-gulp.task('dev:watch', ['dev:stylesheets', 'dev:templates', 'dev:javascripts'], function() {
+gulp.task('dev:watch', ['dev:stylesheets', 'dev:templates', 'dev:scripts'], function() {
 	plugins.livereload.listen();
-	
-	// javascripts don't need to be gulp.watch'ed as they are watched using watchify.
+
 	gulp.watch(['./public/stylesheets/**/*'], ['dev:stylesheets']);
-	gulp.watch(['./public/templates/**/*'], ['dev:templates']);
+	gulp.watch(['./public/scripts/**/*.html'], ['dev:templates']);
+	gulp.watch(['./public/scripts/**/*.js'], ['dev:scripts']);
 	gulp.watch(['./index.html']).on('change', plugins.livereload.changed);
 });
 
 gulp.task('dev:stylesheets', function() {
     return gulp
-	    .src('./public/stylesheets/main.css')
-		.pipe(plugins.rename('app-styles.css'))
+	    .src(['./public/stylesheets/main.css', './public/stylesheets/**/*.css'])
+        .pipe(plugins.concat('app-styles.css'))
         .pipe(gulp.dest(publicGeneratedRoot + '/public/stylesheets/'))
-		.on('end', gutil.log.bind(gutil, 'Styles rebuild for dev'))
 		.on('end', plugins.livereload.changed)
 		.on('error', handleError);
 });
 
 gulp.task('dev:templates', function() {
 	return gulp
-	    .src(['./public/templates/**/*.html'])
+	    .src(['./public/scripts/**/*.html'])
 		.pipe(templateCache('app-templates.js', {module: 'appAkin'}))
         .pipe(gulp.dest(publicGeneratedRoot + '/public/templates/'))
-        .on('end', gutil.log.bind(gutil, 'Templates built for dev'))
 		.on('end', plugins.livereload.changed)
 		.on('error', handleError);		
 });
 
-gulp.task('dev:javascripts', function() {
-	watchify.args.debug = true;
-	
-	var bundler = watchify(
-	    browserify('./public/javascripts/main.js', watchify.args));
-		
-	bundler.on('update', rebundle);
-	
-	function rebundle() {
-	    return bundler
-		    .bundle()
-			.pipe(source('app-scripts.js'))
-            .pipe(gulp.dest(publicGeneratedRoot + '/public/javascripts/'))
-			.on('end', gutil.log.bind(gutil, 'Scripts built (watchify) for dev'))
-			.on('end', plugins.livereload.changed)
-			.on('error', handleError);
-	};
-	
-    return rebundle();
+gulp.task('dev:scripts', function() {
+    return gulp
+        .src(['./public/scripts/**/module.js', './public/scripts/**/*.js'])
+        .pipe(plugins.sourcemaps.init())
+        .pipe(plugins.concat('app-scripts.js'))
+        .pipe(plugins.ngAnnotate())
+        .pipe(plugins.sourcemaps.write())
+        .pipe(gulp.dest(publicGeneratedRoot + '/public/scripts/'))
+        .on('end', plugins.livereload.changed)
+        .on('error', handleError);
 });
 
 // ----------------
@@ -200,11 +205,11 @@ gulp.task('dev:javascripts', function() {
 
 function handleError(error) {
     gutil.log(error.Message);
-};
+}
 
 function inject(glob, path, tag) {
     return plugins.inject(
-        gulp.src(glob, {cwd: path}),
-        {starttag: '<!-- inject:' + tag + ':{{ext}} -->'}
+        gulp.src(glob, {cwd: path, read: false}),
+        {starttag: '<!-- inject:' + tag + ' -->'}
     );
 }

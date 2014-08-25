@@ -16,6 +16,7 @@
             }
 
             $rootScope.$on('$locationChangeSuccess', function () {
+
                 onHomePage = getOnHomePage();
             });
 

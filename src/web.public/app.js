@@ -6,7 +6,6 @@ var favicon = require('static-favicon');
 var logger = require('express-bunyan-logger');
 var cookieParser = require('cookie-parser');
 var bodyParser = require('body-parser');
-var fs = require('fs');
 var log = require('./logger');
 var routes = require('./routes/index');
 var config = require('./config');

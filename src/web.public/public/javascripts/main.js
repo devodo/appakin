@@ -4,11 +4,13 @@
     require('./appakin/appakin-ctrl.js');
     require('./appakin/configuration.js');
     require('./appakin/navigation-service.js');
+    require('./appakin/persistence-service.js');
 
     require('./common/akin-footer.js');
     require('./common/akin-header.js');
     require('./common/akin-searchbox.js');
     require('./common/akin-watermark.js');
+    require('./../scripts/vendor/ui-pagination.js');
 
     require('./app/app-ctrl.js');
     require('./home/home-ctrl.js');

@@ -1,31 +1,30 @@
 <!DOCTYPE html>
-<html ng-app="appAkin" ng-strict-di ng-controller="AppAkinCtrl">
+<html data-ng-app="appAkin" data-ng-strict-di data-ng-controller="AppAkin">
 <head>
     <meta charset="utf-8">
 	<meta name="language" content="english">
-    <meta name="description" content="Search by category for great apps.">
-	<title ng-bind="pageTitle">AppAkin</title>
+    <meta name="description" content="Search by category for great iOS apps.">
+	<title data-ng-bind="pageTitle.pageTitle">app Akin</title>
     <base href="/">
 
 	<!-- TODO: add Open Graph meta tags, and possibly Twitter and Google+ too. -->
 	
-	<!-- inject:appakin-styles:css --><link rel="stylesheet" href="/public/stylesheets/app-styles.css"><!-- endinject -->
+	<!-- inject:appakin-styles --><link rel="stylesheet" href="/public/stylesheets/app-styles.css"><!-- endinject -->
 
     <!--[if lt IE 9]>
     <script src="/bower_components/html5shiv/dist/html5shiv.js"></script>
     <![endif]-->
 </head>
 <body>
-    <div akin-header></div>
-	<main>
-        <div ng-view></div>
-	</main>
-    <div akin-footer></div>
+    <header data-akin-header></header>
+	<main data-ng-view></main>
+    <footer data-akin-footer></footer>
 
     <script src="/bower_components/angular/angular.js"></script>
     <script src="/bower_components/angular-route/angular-route.js"></script>
+    <script src="/bower_components/angular-resource/angular-resource.js"></script>
     <script src="/bower_components/angular-cookies/angular-cookies.js"></script>
-    <!-- inject:appakin-scripts:js --><script src="/public/javascripts/app-scripts.js"></script><!-- endinject -->
-    <!-- inject:appakin-templates:js --><script src="/public/templates/app-templates.js"></script><!-- endinject -->
+    <!-- inject:appakin-scripts --><script src="/public/scripts/app-scripts.js"></script><!-- endinject -->
+    <!-- inject:appakin-templates --><script src="/public/templates/app-templates.js"></script><!-- endinject -->
 </body>
 </html>

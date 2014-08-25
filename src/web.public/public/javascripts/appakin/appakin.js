@@ -2,7 +2,8 @@
 
     var appAkin = angular.module('appAkin', [
         'ngRoute',
-        'ngCookies'
+        'ngCookies',
+        'ui.bootstrap.pagination'
     ]);
 
     module.exports = appAkin;
@@ -28,7 +29,8 @@
             })
             .when('/search', {
                 templateUrl: 'search-results.html',
-                controller: 'SearchCtrl'
+                controller: 'SearchCtrl',
+                reloadOnSearch: false
             })
             .when('/category/:platform/:categoryName', {
                 templateUrl: 'category.html',

@@ -1,5 +1,8 @@
 <div>
-    <ul>
+    <p ng-if="categories.length == 0">
+        No results found.
+    </p>
+    <ul ng-if="categories.length > 0">
         <li ng-repeat="category in categories">
             <p>
                 <a href="/category/{{platform}}/{{category.urlName}}">{{category.name}}</a>
@@ -8,7 +11,5 @@
             </p>
         </li>
     </ul>
-    <div ng-if="categories.length == 0">
-        No results found.
-    </div>
+    <pagination total-items="totalItems" max-size="numPages" ng-model="currentPage" ng-change="pageChanged()"></pagination>
 </div>

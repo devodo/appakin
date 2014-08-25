@@ -3,8 +3,8 @@
 
     var appAkin = require('../appakin/appakin.js');
 
-    appAkin.factory('searchService', ['$cookies', '$routeParams', '$location', '$http', 'configuration',
-        function($cookies, $routeParams, $location, $http, configuration) {
+    appAkin.factory('searchService', ['$cookies', '$routeParams', '$route', '$location', '$http', 'configuration',
+        function($cookies, $routeParams, $route, $location, $http, configuration) {
 
             var platform = getInitialPlatform();
 
@@ -68,6 +68,7 @@
                     }
                 },
                 redirectToSearch : function() {
+                    // TODO: trimming of search term
                     if (this.searchTerm === '') {
                         return;
                     }
@@ -79,8 +80,30 @@
 
                     $location.replace();
                 },
-                search : function(callback, errorCallback) {
-                    var url = configuration.apiBaseUrl + 'search';
+                search : function(page, callback, errorCallback) {
+
+                    var search = $location.search();
+
+                    $location.search(
+                        {
+                            q: search.q,
+                            platform: search.platform,
+                            page: page,
+                            take: (search.take || 10)
+                        }
+                    );
+
+                    search = $location.search();
+
+                    console.log($location);
+                    console.log($route.current.params.page + ' ' + page + ' ' + search.page);
+
+                    var url = configuration.apiBaseUrl + 'search?q=' + (search.q || '') +
+                        '&platform=' + (search.platform || '') +
+                        '&page=' + search.page +
+                        '&take=' + (search.take || 10);
+
+                    console.log('request: ' + url);
 
                     $http({method: 'GET', url: url}).
                         success(function(data, status, headers, config) {
