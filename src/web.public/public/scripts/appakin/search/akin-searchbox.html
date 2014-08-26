@@ -16,7 +16,8 @@
         </div>
         <div>
             <autocomplete ng-model="search.searchTerm" attr-placeholder="Search for categories or apps"
-                          click-activation="true" data="search.autoCompleteTerms" on-type="updateAutoCompleteTerms"></autocomplete>
+                          click-activation="true" data="search.autoCompleteTerms"
+                          on-type="search.updateAutoCompleteTerms"></autocomplete>
             <button type="submit">Submit</button>
         </div>
     </form>

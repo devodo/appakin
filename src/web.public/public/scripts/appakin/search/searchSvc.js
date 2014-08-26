@@ -25,8 +25,6 @@
                 console.log('redirecting to search');
             },
             updateAutoCompleteTerms: function(typed) {
-                //console.log('updating autocomplete terms: [' + typed + '] [' + self.service.searchTerm + ']');
-
                 if (typed.length === 0) {
                     self.service.autoCompleteTerms = [];
                     return;
@@ -66,21 +64,6 @@
                         }
                     );
                 }, debounceTimeoutMs);
-
-
-
-//                return autoComplete
-//                    .query({ q: self.service.searchTerm, p: self.service.platform })
-//                    .$promise
-//                    .then(function(data) {
-//                        if (currentSearchTerm !== self.service.searchTerm)
-//                        {
-//                            console.log('discarding autocomplete results')
-//                            return $q.reject();
-//                        }
-//
-//                        self.service.autoCompleteTerms = data;
-//                    });
             }
         };
 
