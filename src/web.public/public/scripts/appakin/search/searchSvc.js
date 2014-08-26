@@ -1,7 +1,7 @@
 (function () {
     'use strict';
 
-    angular.module('appAkin').factory('search', function(autoComplete) {
+    angular.module('appAkin').factory('search', function(autoComplete, $rootScope, $q) {
         var self = this;
         var defaultItemsPerPage = 10;
 
@@ -15,50 +15,29 @@
             itemsPerPage: defaultItemsPerPage,
             totalItems: 0,
             redirectToSearch: function() {
+                self.service.autoCompleteTerms = [];
+
+                // TODO: cancel incoming autocompletes?
+
                 console.log('redirecting to search');
             },
             updateAutoCompleteTerms: function(typed) {
-                console.log('updating autocomplete terms: [' + typed + '] [' + self.service.searchTerm + ']');
-
-                if (typed.length < 2) {
-                    if (self.service.autoCompleteTerms.length > 0) {
-                        self.service.autoCompleteTerms = [];
-                    }
-
-                    return;
-                }
+                //console.log('updating autocomplete terms: [' + typed + '] [' + self.service.searchTerm + ']');
 
                 var currentSearchTerm = self.service.searchTerm;
 
-                autoComplete.query(
-                    { q: self.service.searchTerm, p: self.service.platform },
-                    function(data) {
-                        setTimeout(function() {
-                            console.log(currentSearchTerm + ' ' + self.service.searchTerm);
+                return autoComplete
+                    .query({ q: self.service.searchTerm, p: self.service.platform })
+                    .$promise
+                    .then(function(data) {
+                        if (currentSearchTerm !== self.service.searchTerm)
+                        {
+                            console.log('discarding autocomplete results')
+                            return $q.reject();
+                        }
 
-                            if (currentSearchTerm !== self.service.searchTerm)
-                            {
-                                console.log('too late');
-                                return;
-                            }
-
-                            self.service.autoCompleteTerms = data;
-                            console.log(data);
-                        }, 3000);
-                    }
-
-
-//                    function(data) {
-//                        if (currentSearchTerm !== self.service.searchTerm)
-//                        {
-//                            console.log('too late');
-//                            return;
-//                        }
-//
-//                        self.service.autoCompleteTerms = data;
-//                        console.log(data);
-//                    }
-                );
+                        self.service.autoCompleteTerms = data;
+                    });
             }
         };
 

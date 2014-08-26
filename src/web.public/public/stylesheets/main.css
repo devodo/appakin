@@ -38,8 +38,8 @@ ul.disabled {
 }
 
 main .akin-logo {
-    width: 349px;
-    height: 97px;
-    background-image: url('/public/images/logo.png');
-    background-size: 349px 97px;
+    width: 354px;
+    height: 100px;
+    background-image: url('/public/images/logo-2.png');
+    background-size: 354px 100px;
 }

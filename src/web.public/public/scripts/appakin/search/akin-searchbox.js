@@ -5,10 +5,23 @@
             restrict: 'A',
             replace: true,
             templateUrl: 'appakin/search/akin-searchbox.html',
-            controller: function ($scope, search) {
+            controller: function ($scope, $timeout, search) {
                 $scope.search = search;
 
-                $scope.states = ['Alabama', 'Alaska', 'Arizona', 'Arkansas'];
+                $scope.updateAutoCompleteTerms = function(typed) {
+                    if (typed.length === 0) {
+                        self.service.autoCompleteTerms = [];
+                        return;
+                    }
+
+                    search.updateAutoCompleteTerms(typed)
+                        .then(function () {
+                            $timeout(function () {
+                                $scope.$apply();
+                                console.log('fully processed.')
+                            }, 0);
+                        });
+                }
             }
         };
     });
