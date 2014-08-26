@@ -66,7 +66,7 @@ exports.group = {
         test.done();
         return; //ignore test
 
-        appStore.retrieveApp('284910350', function(err, itemId) {
+        appStore.retrieveApp('575588416', function(err, itemId) {
             test.expect(2);
             test.ok(err === null, err);
             test.ok(itemId > 0, "Item not inserted");
@@ -86,13 +86,52 @@ exports.group = {
         });
     },
 
-    testRetrieveItemSources: function(test) {
+    testRetrieveAppSources: function(test) {
+        test.done();
+        return; //ignore test
+
         var category = {
             id: 1,
             storeUrl: 'https://itunes.apple.com/us/genre/ios-books/id6018?mt=8'
         };
 
-        appStore.retrieveItemSources(category, 'A', 1, function(err) {
+        appStore.retrieveAppSources(category, 'A', 1, function(err) {
+            test.expect(1);
+            test.ok(err === null, err);
+            test.done();
+        });
+    },
+
+    testRetrieveAllAppSources: function(test) {
+        test.done();
+        return; //ignore test
+
+        appStore.retrieveAllAppSources(function(err) {
+            test.expect(1);
+            test.ok(err === null, err);
+            test.done();
+        });
+    },
+
+    testRetrieveAllApps: function(test) {
+        //test.done();
+        //return; //ignore test
+
+        var mainLoop = function(startId, batchSize, next) {
+            appStore.lookupAppsBatched(startId, batchSize, function(err, lastId) {
+                if (err) {
+                    return next(err);
+                }
+
+                if (lastId) {
+                    return mainLoop(lastId, batchSize, next);
+                }
+
+                next();
+            });
+        };
+
+        mainLoop(0, 200, function(err) {
             test.expect(1);
             test.ok(err === null, err);
             test.done();

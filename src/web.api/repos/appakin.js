@@ -175,6 +175,10 @@ var Repository = function(client, done) {
 
             repo.insertItem(APP_STORE_ID, app, function(err, itemId) {
                 if (err) {
+                    if (err.code === UNIQUE_VIOLATION_CODE) {
+                        return next(null, -1);
+                    }
+
                     return next(err);
                 }
 
@@ -243,6 +247,71 @@ var Repository = function(client, done) {
             }
 
             next(null, result.rows[0].id);
+        });
+    };
+
+    this.getAppStoreCategories = function(next) {
+        var queryStr =
+            "SELECT id, appstore_id, name, store_url, parent_id, date_created, date_modified " +
+            "FROM appstore_category where id = 69" +
+            "order by id";
+
+        client.query(queryStr, [], function (err, result) {
+            if (err) {
+                return repo.rollback(next, err);
+            }
+
+
+            var categories = result.rows.map(function(item) {
+                return {
+                    id: item.id,
+                    appStoreId: item.appstore_id,
+                    name: item.name,
+                    storeUrl: item.store_url,
+                    parentId: item.parent_id,
+                    dateCreated: item.date_created,
+                    dateModified: item.date_modified
+                };
+            });
+
+            next(null, categories);
+        });
+    };
+
+    this.getAppStoreSourceItemBatch = function(startId, batchSize, next) {
+        var queryStr =
+            "SELECT id, appstore_category_id, appstore_id, name, letter, page_number, " +
+            "date_created, date_modified " +
+            "FROM appstore_item_src " +
+            "where id > $1 " +
+            "order by id " +
+            "limit $2;";
+
+        var queryParams = [
+            startId,
+            batchSize
+        ];
+
+        client.query(queryStr, queryParams, function (err, result) {
+            if (err) {
+                return repo.rollback(next, err);
+            }
+
+
+            var items = result.rows.map(function(item) {
+                return {
+                    id: item.id,
+                    appStoreCategoryId: item.appstore_category_id,
+                    appStoreId: item.appstore_id,
+                    name: item.name,
+                    letter: item.letter,
+                    pageNumber: item.page_number,
+                    dateCreated: item.date_created,
+                    dateModified: item.date_modified
+                };
+            });
+
+            next(null, items);
         });
     };
 };
@@ -320,3 +389,39 @@ exports.insertAppStoreItemSrc = function(item, next) {
         });
     });
 };
+
+exports.getAppStoreCategories = function(next) {
+    connect(function(err, repo) {
+        if (err) {
+            next(err);
+        }
+
+        repo.getAppStoreCategories(function(err, results) {
+            if (err) {
+                next(err);
+            }
+
+            repo.close(function() {
+                next(null, results);
+            });
+        });
+    });
+};
+
+exports.getAppStoreSourceItemBatch = function(startId, batchSize, next) {
+    connect(function(err, repo) {
+        if (err) {
+            next(err);
+        }
+
+        repo.getAppStoreSourceItemBatch(startId, batchSize, function(err, results) {
+            if (err) {
+                next(err);
+            }
+
+            repo.close(function() {
+                next(null, results);
+            });
+        });
+    });
+}
