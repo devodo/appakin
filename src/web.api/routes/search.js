@@ -8,7 +8,7 @@ exports.init = function init(app) {
 
         if (query === '' || platform === '') {
             res.status(400).send('Bad query string');
-            return
+            return;
         }
 
         if (/^no/.test(query)) {
@@ -18,6 +18,8 @@ exports.init = function init(app) {
         res.json([
             'Apple',
             'Banana',
+            'Happle',
+            'mmm apples',
             'Coconut',
             'Facet'
             ]);

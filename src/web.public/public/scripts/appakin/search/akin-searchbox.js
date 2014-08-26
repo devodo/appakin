@@ -9,18 +9,19 @@
                 $scope.search = search;
 
                 $scope.updateAutoCompleteTerms = function(typed) {
-                    if (typed.length === 0) {
-                        self.service.autoCompleteTerms = [];
-                        return;
-                    }
+//                    if (typed.length === 0) {
+//                        $scope.search.autoCompleteTerms = [];
+//                        return;
+//                    }
 
-                    search.updateAutoCompleteTerms(typed)
-                        .then(function () {
-                            $timeout(function () {
-                                $scope.$apply();
-                                console.log('fully processed.')
-                            }, 0);
-                        });
+                    search.updateAutoCompleteTerms(typed);
+
+//                        .then(function () {
+//                            $timeout(function () {
+//                                $scope.$apply();
+//                                console.log('fully processed.')
+//                            }, 0);
+//                        });
                 }
             }
         };

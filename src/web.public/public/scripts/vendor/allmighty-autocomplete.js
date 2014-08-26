@@ -224,9 +224,18 @@ app.directive('autocomplete', function() {
 });
 
 app.filter('highlight', ['$sce', function ($sce) {
+
+    var escapedRegexValue = /[-\/\\^$*+?.()|[\]{}]/g;
+
+    var escapeRegex = function(value) {
+        return value.replace(escapedRegexValue, '\\$&');
+    };
+
     return function (input, searchParam) {
         if (typeof input === 'function') return '';
         if (searchParam) {
+            searchParam = escapeRegex(searchParam);
+
             var words = '(' +
                     searchParam.split(/\ /).join(' |') + '|' +
                     searchParam.split(/\ /).join('|') +
