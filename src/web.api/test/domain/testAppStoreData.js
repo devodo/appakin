@@ -131,7 +131,7 @@ exports.group = {
             });
         };
 
-        mainLoop(29000, 200, function(err) {
+        mainLoop(539764, 200, function(err) {
             test.expect(1);
             test.ok(err === null, err);
             test.done();

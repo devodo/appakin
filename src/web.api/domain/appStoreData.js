@@ -408,6 +408,8 @@ var retrieveAllAppSources = function(next) {
 
 var lookupAppsBatched = function(startId, batchSize, next) {
     appakinRepo.getAppStoreSourceItemBatch(startId, batchSize, function(err, results) {
+        log.debug("Batch lookup start id: " + startId);
+
         if (err) {
             return next(err);
         }

@@ -194,5 +194,17 @@ CREATE TABLE appstore_item_src
   REFERENCES appstore_category (id) MATCH SIMPLE
   ON UPDATE NO ACTION ON DELETE NO ACTION,
   CONSTRAINT appstore_item_src_appstore_id_key UNIQUE (appstore_id)
-)
+);
+
+CREATE TABLE xyo_category
+(
+  id serial NOT NULL,
+  name text NOT NULL,
+  link_text text NOT NULL,
+  description text NOT NULL,
+  url text NOT NULL unique,
+  date_created timestamp without time zone NOT NULL,
+  date_modified timestamp without time zone NOT NULL,
+  CONSTRAINT xyo_category_pkey PRIMARY KEY (id)
+);
 

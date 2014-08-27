@@ -314,6 +314,49 @@ var Repository = function(client, done) {
             next(null, items);
         });
     };
+
+    this.insertXyoCategory = function(category, next) {
+        var queryStr =
+            "INSERT INTO xyo_category(" +
+            "name, link_text, description, url, date_created, date_modified) " +
+            "VALUES ($1, $2, $3, $4, NOW(), NOW()) " +
+            "RETURNING id;";
+
+        var queryParams = [
+            category.name,
+            category.linkText,
+            category.description,
+            category.url
+        ];
+
+        client.query(queryStr, queryParams, function (err, result) {
+            if (err) {
+                if (err.code === UNIQUE_VIOLATION_CODE) {
+                    return next(null, -1);
+                }
+
+                return repo.rollback(next, err);
+            }
+
+            next(null, result.rows[0].id);
+        });
+    };
+
+    this.insertAppMonstaItem = function(appId, next) {
+        var queryStr =
+            "INSERT INTO appmonsta_item(appstore_id) " +
+            "VALUES ($1);";
+
+        var queryParams = [appId];
+
+        client.query(queryStr, queryParams, function (err) {
+            if (err) {
+                return repo.rollback(next, err);
+            }
+
+            next();
+        });
+    };
 };
 
 exports.connect = connect;
@@ -325,7 +368,7 @@ exports.end = function() {
 exports.testArray = function(next) {
     connect(function(err, repo) {
         if (err) {
-            next(err);
+            return next(err);
         }
 
         repo.testArray(function(err, result) {
@@ -339,14 +382,10 @@ exports.testArray = function(next) {
 exports.insertAppStoreItem = function(app, next) {
     connect(function(err, repo) {
         if (err) {
-            next(err);
+            return next(err);
         }
 
         repo.insertAppStoreItem(app, function(err, itemId) {
-            if (err) {
-                next(err);
-            }
-
             repo.close(function() {
                 next(err, itemId);
             });
@@ -357,14 +396,10 @@ exports.insertAppStoreItem = function(app, next) {
 exports.insertAppStoreCategory = function(category, next) {
     connect(function(err, repo) {
         if (err) {
-            next(err);
+            return next(err);
         }
 
         repo.insertAppStoreCategory(category, function(err, itemId) {
-            if (err) {
-                next(err);
-            }
-
             repo.close(function() {
                 next(err, itemId);
             });
@@ -375,14 +410,10 @@ exports.insertAppStoreCategory = function(category, next) {
 exports.insertAppStoreItemSrc = function(item, next) {
     connect(function(err, repo) {
         if (err) {
-            next(err);
+            return next(err);
         }
 
         repo.insertAppStoreItemSrc(item, function(err, id) {
-            if (err) {
-                next(err);
-            }
-
             repo.close(function() {
                 next(err, id);
             });
@@ -393,16 +424,12 @@ exports.insertAppStoreItemSrc = function(item, next) {
 exports.getAppStoreCategories = function(next) {
     connect(function(err, repo) {
         if (err) {
-            next(err);
+            return next(err);
         }
 
         repo.getAppStoreCategories(function(err, results) {
-            if (err) {
-                next(err);
-            }
-
             repo.close(function() {
-                next(null, results);
+                next(err, results);
             });
         });
     });
@@ -411,17 +438,41 @@ exports.getAppStoreCategories = function(next) {
 exports.getAppStoreSourceItemBatch = function(startId, batchSize, next) {
     connect(function(err, repo) {
         if (err) {
-            next(err);
+            return next(err);
         }
 
         repo.getAppStoreSourceItemBatch(startId, batchSize, function(err, results) {
-            if (err) {
-                next(err);
-            }
-
             repo.close(function() {
-                next(null, results);
+                next(err, results);
             });
         });
     });
-}
+};
+
+exports.insertXyoCategory = function(category, next) {
+    connect(function(err, repo) {
+        if (err) {
+            return next(err);
+        }
+
+        repo.insertXyoCategory(category, function(err, id) {
+            repo.close(function() {
+                next(err, id);
+            });
+        });
+    });
+};
+
+exports.insertAppMonstaItem = function(appId, next) {
+    connect(function(err, repo) {
+        if (err) {
+            return next(err);
+        }
+
+        repo.insertXyoCategory(appId, function(err) {
+            repo.close(function() {
+                next(err);
+            });
+        });
+    });
+};

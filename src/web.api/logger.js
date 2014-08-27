@@ -66,6 +66,6 @@ var log = bunyan.createLogger({
     }]
 });
 
-log.level('info');
+log.level('debug');
 
 module.exports = log;

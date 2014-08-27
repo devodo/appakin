@@ -1,94 +1,75 @@
 'use strict';
-var https = require('https');
-var http = require('http');
-var cheerio = require('cheerio');
+var Crawler = require("crawler").Crawler;
 var async = require('async');
 var log = require('../logger');
+var appakinRepo = require("../repos/appakinRepo.js");
 
-var callHistory = [];
-var callHistoryWindowMinutes = 1;
-var maxCallsPerSecond = 2;
+var crawl = function(seedUrls, next) {
+    var nameRegex = /.*-([^\/]+)\/(.*)-.*\//;
+    var crawlCount = 0;
 
-var getRequest = function(options, next, retries) {
-    var markDate = new Date();
-    markDate.setMinutes(markDate.getMinutes() - callHistoryWindowMinutes);
-    while (callHistory.length > 0 && callHistory[0] < markDate) {
-        callHistory.shift();
-    }
+    var urlHistory = {};
 
-    var dateNow = new Date();
-    if (callHistory.length > 0) {
-        var diff = dateNow.getTime() - callHistory[0].getTime();
-        var rate = (callHistory.length * 1000) / diff;
+    var c = new Crawler({
+        "maxConnections":2,
+        "skipDuplicates":true,
 
-        if (callHistory.length > 10 && rate >= maxCallsPerSecond) {
-            setTimeout(function() {
-                getRequest(options, next, retries);
-            }, 50);
+        //This will be called for each crawled page
+        "callback": function(error,result,$) {
+            $('section.interest-box').not('.wide').find('a.header').each(function(index,a) {
+                var url = a.href;
 
-            return;
+                log.debug("Found: " + url);
+
+                var div = $(a).children('div').first();
+                var linkText = $(div).children('h3').text();
+                var description = $(div).children('p').text();
+
+                var match = nameRegex.exec(url);
+                var appType = match[1];
+                var nameWords = match[2].split("-");
+                var name = nameWords.join(" ");
+                if (nameWords[nameWords.length - 1] !== appType) {
+                    name = name + " " + appType;
+                }
+
+                var category = {
+                    name: name,
+                    linkText: linkText,
+                    description: description,
+                    url: url
+                };
+
+                appakinRepo.insertXyoCategory(category, function(err, id) {
+                    if (err) {
+                        return next(err);
+                    }
+
+                    if (id !== -1) {
+                        log.debug("Inserted xyo category: " + id);
+                        crawlCount++;
+                        c.queue(url);
+                    }
+                });
+            });
+
+            $('div.search-results-list a').each(function(index,a) {
+                if (urlHistory[a.href]) {
+                    return;
+                }
+                log.debug("App page: " + a.href);
+
+                urlHistory[a.href] = true;
+                c.queue(a.href);
+            });
+        },
+        "onDrain": function() {
+            next(null, crawlCount);
         }
-    }
-
-    callHistory.push(new Date());
-
-    var isTimedOut = false;
-
-    var callback = function(response) {
-        var str = '';
-
-        response.on('data', function (chunk) {
-            str += chunk;
-        });
-
-        response.on('end', function () {
-            if (isTimedOut) {
-                return next("Request timed out");
-            }
-
-            next(null, str);
-        });
-    };
-
-    var req = http.request(options, callback);
-
-    req.setTimeout(20000, function() {
-        log.error("Request timed out: " + options.path);
-        isTimedOut = true;
-        req.abort();
     });
 
-    req.on('error', function(e) {
-        if (retries && retries > 0) {
-            log.error(e.message);
-            log.debug("Retrying request...");
-            return getRequest(options, next, retries - 1);
-        }
-
-        return next(e.message);
-    });
-
-    req.end();
+    c.queue(seedUrls);
 };
-
-var crawl = function(limit, next) {
-
-    var options = {
-        hostname: 'xyo.net',
-        port: 80,
-        path: '/iphone-apps',
-        method: 'GET'
-    };
-
-    var callback = function(err, pageSrc) {
-        var $ = cheerio.load(pageSrc);
-        var categoryLink = $(".interest-box");
-        next(null, limit);
-    };
-
-    getRequest(options, callback, 5);
-};
-
 
 exports.crawl = crawl;
 
