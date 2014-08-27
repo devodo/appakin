@@ -15,9 +15,11 @@
     "debug": "~0.7.4",
     "express": "~4.2.0",
     "express-bunyan-logger": "^1.0.0",
+    "line-reader": "^0.2.4",
     "morgan": "~1.0.0",
     "node-uuid": "^1.4.1",
     "pg": "^3.4.1",
+    "request": "^2.40.0",
     "string": "^1.9.1"
   },
   "devDependencies": {},

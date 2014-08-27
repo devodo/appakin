@@ -1,75 +1,10 @@
 'use strict';
-var https = require('https');
 var cheerio = require('cheerio');
 var async = require('async');
+var lineReader = require('line-reader');
+var httpDownloader = require('./httpDownloader').create(60, 2, 5);
 var log = require('../logger');
 var appakinRepo = require("../repos/appakinRepo.js");
-
-var callHistory = [];
-var callHistoryWindowMinutes = 1;
-var maxCallsPerSecond = 2;
-
-var getRequest = function(options, next, retries) {
-    var markDate = new Date();
-    markDate.setMinutes(markDate.getMinutes() - callHistoryWindowMinutes);
-    while (callHistory.length > 0 && callHistory[0] < markDate) {
-        callHistory.shift();
-    }
-
-    var dateNow = new Date();
-    if (callHistory.length > 0) {
-        var diff = dateNow.getTime() - callHistory[0].getTime();
-        var rate = (callHistory.length * 1000) / diff;
-
-        if (callHistory.length > 10 && rate >= maxCallsPerSecond) {
-            setTimeout(function() {
-                getRequest(options, next, retries);
-            }, 50);
-
-            return;
-        }
-    }
-
-    callHistory.push(new Date());
-
-    var isTimedOut = false;
-
-    var callback = function(response) {
-        var str = '';
-
-        response.on('data', function (chunk) {
-            str += chunk;
-        });
-
-        response.on('end', function () {
-            if (isTimedOut) {
-                return next("Request timed out");
-            }
-
-            next(null, str);
-        });
-    };
-
-    var req = https.request(options, callback);
-
-    req.setTimeout(20000, function() {
-        log.error("Request timed out: " + options.path);
-        isTimedOut = true;
-        req.abort();
-    });
-
-    req.on('error', function(e) {
-        if (retries && retries > 0) {
-            log.error(e.message);
-            log.debug("Retrying request...");
-            return getRequest(options, next, retries - 1);
-        }
-
-        return next(e.message);
-    });
-
-    req.end();
-};
 
 var getPageSrc = function(id, next) {
 
@@ -80,7 +15,7 @@ var getPageSrc = function(id, next) {
         method: 'GET'
     };
 
-    getRequest(options, next);
+    httpDownloader.downloadHttps(options, next);
 };
 
 var parseHtml = function(pageSrc, next) {
@@ -126,7 +61,7 @@ var getLookup = function(id, next) {
         }
     };
 
-    getRequest(options, callback, 5);
+    httpDownloader.downloadHttps(options, callback);
 };
 
 var getLookups = function(ids, next) {
@@ -147,17 +82,13 @@ var getLookups = function(ids, next) {
         try {
             var jsonData = JSON.parse(data);
 
-            if (!jsonData.resultCount || jsonData.resultCount === 0) {
-                return next("No result found");
-            }
-
             next(null, jsonData.results);
         } catch (ex) {
             return next(ex);
         }
     };
 
-    getRequest(options, callback, 5);
+    httpDownloader.downloadHttps(options, callback);
 };
 
 var parseLookup = function(data, next) {
@@ -290,7 +221,7 @@ var retrieveCategories = function(next) {
         });
     };
 
-    getRequest(options, callback);
+    httpDownloader.downloadHttps(options, callback);
 };
 
 var retrieveAppSources = function(category, startLetter, startPageNumber, next) {
@@ -386,7 +317,7 @@ var retrieveAppSources = function(category, startLetter, startPageNumber, next) 
             });
         };
 
-        getRequest(options, callback, 5);
+        httpDownloader.downloadHttps(options, callback);
     };
 
     var startLetterCode = startLetter.charCodeAt(0);
@@ -434,6 +365,48 @@ var lookupAppsBatched = function(startId, batchSize, next) {
     });
 };
 
+var lookupAppMonsta = function(startId, batchSize, next) {
+    appakinRepo.getAppMonstaBatch(startId, batchSize, function(err, ids) {
+        log.debug("Batch lookup start id: " + startId);
+
+        if (err) {
+            return next(err);
+        }
+
+        if (ids.length === 0) {
+            return next();
+        }
+
+        var lastId = ids[ids.length - 1];
+
+        retrieveApps(ids, function(err) {
+            if (err) {
+                return next(err);
+            }
+
+            return next(null, lastId);
+        });
+    });
+};
+
+var insertAppMonstaIds = function(filePath, next) {
+    lineReader.eachLine(filePath, function(line, last, cb) {
+        appakinRepo.insertAppMonstaItem(line, function(err) {
+            if (err) {
+                cb(false);
+                return next(err);
+            }
+
+            cb();
+        });
+
+        if (last) {
+            cb(false);
+            return next();
+        }
+    });
+};
+
 exports.getPageSrc = getPageSrc;
 exports.parseHtml = parseHtml;
 exports.getLookup = getLookup;
@@ -443,5 +416,7 @@ exports.retrieveCategories = retrieveCategories;
 exports.retrieveAppSources = retrieveAppSources;
 exports.retrieveAllAppSources = retrieveAllAppSources;
 exports.lookupAppsBatched = lookupAppsBatched;
+exports.lookupAppMonsta = lookupAppMonsta;
+exports.insertAppMonstaIds = insertAppMonstaIds;
 
 
