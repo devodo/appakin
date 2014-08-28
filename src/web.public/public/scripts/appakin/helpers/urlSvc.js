@@ -4,7 +4,6 @@
     angular.module('appAkin').factory('url', function() {
         return {
             createCategoryUrl: function(platform, urlName) {
-                console.log('category url');
                 return '/' + platform + '/category/' + urlName;
             },
             createAppUrl: function(platform, urlName) {

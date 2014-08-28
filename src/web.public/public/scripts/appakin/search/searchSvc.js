@@ -30,7 +30,7 @@
                 var currentSearchTerm = me.service.searchTerm;
                 var currentPlatform = me.service.platform;
 
-                if (currentSearchTerm == '') {
+                if (currentSearchTerm === '') {
                     me.service.autoComplete.terms = [];
                     autoCompleteApi.cancel();
                     return;
@@ -70,10 +70,9 @@
                 if (search.page) {
                     var pageInt = parseInt(search.page);
 
-                    me.service.results.currentPage =
-                        (!isNaN(pageInt) && pageInt > 0 && pageInt != me.service.results.currentPage)
-                            ? pageInt
-                            : me.service.results.currentPage;
+                    if (!isNaN(pageInt) && pageInt > 0 && pageInt != me.service.results.currentPage) {
+                        me.service.results.currentPage = pageInt;
+                    }
                 } else {
                     me.service.results.currentPage = defaultCurrentPage;
                 }
@@ -81,10 +80,9 @@
                 if (search.take) {
                     var takeInt = parseInt(search.take);
 
-                    me.service.results.itemsPerPage =
-                        (!isNaN(takeInt) && takeInt > 0 && takeInt < maxItemsPerPage && takeInt != me.service.results.itemsPerPage)
-                            ? takeInt
-                            : me.service.results.itemsPerPage;
+                    if (!isNaN(takeInt) && takeInt > 0 && takeInt < maxItemsPerPage && takeInt != me.service.results.itemsPerPage) {
+                        me.service.results.itemsPerPage = takeInt;
+                    }
                 } else {
                     me.service.results.itemsPerPage = defaultItemsPerPage;
                 }

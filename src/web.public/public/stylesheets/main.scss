@@ -1,0 +1,59 @@
+@import "includes/allmighty-autocomplete";
+
+@-ms-viewport { width: device-width; }
+@-o-viewport { width: device-width; }
+@viewport { width: device-width; }
+
+[ng\:cloak], [ng-cloak], [data-ng-cloak], [x-ng-cloak], .ng-cloak, .x-ng-cloak {
+  display: none !important;
+}
+
+body {
+  padding: 50px;
+  font: 14px "Lucida Grande", Helvetica, Arial, sans-serif;
+}
+
+a {
+  color: #00B7FF;
+}
+
+input.watermarked {
+  color: #bbb;
+}
+
+input[type="radio"]{
+  display:none;
+}
+
+input[type="radio"] + img {
+  border: 4px #fff;
+  padding: 10px;
+  display:inline-block;
+  -moz-border-radius: 15px;
+  border-radius: 15px;
+  color: #555;
+}
+
+input[type="radio"]:checked + img {
+  border: 4px solid;
+  padding: 10px;
+}
+
+#search-results ul.disabled {
+  color: #bbb;
+}
+
+#search-results ul.disabled a {
+  color: #bbb;
+}
+
+main .akin-logo {
+  width: 354px;
+  height: 100px;
+  background-image: url('/public/images/logo.png');
+  background-size: 354px 100px;
+}
+
+body {
+  font-family: 'Open Sans', 'Helvetica', 'Arial', sans-serif;
+}

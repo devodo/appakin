@@ -1,3 +1,5 @@
+// plumber info: http://cameronspear.com/blog/how-to-handle-gulp-watch-errors-with-plumber/
+
 'use strict';
 
 var gulp = require('gulp');
@@ -6,8 +8,6 @@ var plugins = require('gulp-load-plugins')({config: '../../package.json'});
 var path = require('path');
 var templateCache = require('gulp-angular-templatecache');
 var stylish = require('jshint-stylish');
-var streams = require('memory-streams');
-var source = require('vinyl-source-stream');
 var pkg = require('./package.json');
 var fs = require('fs');
 
@@ -94,15 +94,19 @@ gulp.task('build:scripts', ['build:clean', 'build:config'], function() {
         .on('error', handleError);
 });
 
-gulp.task('build:stylesheets', ['build:clean'], function() {
+gulp.task('build:stylesheets', ['build:clean', 'build:config'], function () {
     return gulp
-        .src(['./public/stylesheets/main.css', './public/stylesheets/**/*.css'])
-        .pipe(plugins.concat('app-styles.css'))
-		.pipe(plugins.minifyCss())
-		.pipe(plugins.size({ showFiles: true }))
+        .src(['./public/stylesheets/main.scss'])
+        .pipe(plugins.sass())
+        .pipe(plugins.rename(
+            function(path) {
+                path.basename = 'app-styles';
+            }))
+        .pipe(plugins.minifyCss())
+        .pipe(plugins.size({ showFiles: true }))
         .pipe(plugins.rev())
         .pipe(gulp.dest(buildRoot + '/public/stylesheets/'))
-		.on('error', handleError);
+        .on('error', handleError);
 });
 
 gulp.task('build:index-html', ['build:scripts', 'build:stylesheets', 'build:templates'], function() {
@@ -136,13 +140,13 @@ gulp.task('build:minify-images', ['build:clean'], function() {
 });
 
 gulp.task('build:copy', ['build:clean'], function() {
-	var filesToCopy = 
+	var filesToCopy =
 	    [
-	    './node_modules/**/*.*',
-		'./routes/**/*.*',
-		'./views/**/*.*',
-		'./*.*',
-		'!./bower.json', '!./gulpfile.js', '!./index.html'
+            './node_modules/**/*.*',
+            './routes/**/*.*',
+            './views/**/*.*',
+            './*.*',
+            '!./bower.json', '!./gulpfile.js', '!./index.html'
 		];
 		
 	return gulp
@@ -196,24 +200,29 @@ gulp.task('build:version', ['build:clean'], function() {
 gulp.task('dev:watch', ['dev:stylesheets', 'dev:templates', 'dev:scripts'], function() {
 	plugins.livereload.listen();
 
-	gulp.watch(['./public/stylesheets/**/*'], ['dev:stylesheets']);
+	gulp.watch(['./public/stylesheets/**/*.scss'], ['dev:stylesheets']);
 	gulp.watch(['./public/scripts/**/*.html'], ['dev:templates']);
 	gulp.watch(['./public/scripts/**/*.js'], ['dev:scripts']);
 	gulp.watch(['./index.html']).on('change', plugins.livereload.changed);
 });
 
-gulp.task('dev:stylesheets', function() {
+gulp.task('dev:stylesheets', function () {
     return gulp
-	    .src(['./public/stylesheets/main.css', './public/stylesheets/**/*.css'])
-        .pipe(plugins.concat('app-styles.css'))
+        .src(['./public/stylesheets/main.scss'])
+        .pipe(plugins.plumber({errorHandler: handleError}))
+        .pipe(plugins.sass()) //({errLogToConsole: true}))
+        .pipe(plugins.rename(
+            function(path) {
+                path.basename = 'app-styles';
+            }))
         .pipe(gulp.dest(publicGeneratedRoot + '/public/stylesheets/'))
-		.on('end', plugins.livereload.changed)
-		.on('error', handleError);
+        .on('end', plugins.livereload.changed);
 });
 
 gulp.task('dev:templates', function() {
 	return gulp
 	    .src(['./public/scripts/**/*.html'])
+        .pipe(plugins.plumber({errorHandler: handleError}))
 		.pipe(templateCache('app-templates.js', {module: 'appAkin'}))
         .pipe(gulp.dest(publicGeneratedRoot + '/public/templates/'))
 		.on('end', plugins.livereload.changed)
@@ -223,6 +232,7 @@ gulp.task('dev:templates', function() {
 gulp.task('dev:scripts', function() {
     return gulp
         .src(['./public/scripts/**/module.js', './public/scripts/**/*.js'])
+        .pipe(plugins.plumber({errorHandler: handleError}))
         .pipe(plugins.sourcemaps.init())
         .pipe(plugins.concat('app-scripts.js'))
         .pipe(plugins.ngAnnotate())
@@ -237,7 +247,11 @@ gulp.task('dev:scripts', function() {
 // ----------------
 
 function handleError(error) {
-    gutil.log(error.Message);
+    gutil.beep();
+    gutil.beep();
+    gutil.beep();
+    gutil.log(gutil.colors.red(error.message));
+    this.emit('end');
 }
 
 function inject(glob, path, tag) {
