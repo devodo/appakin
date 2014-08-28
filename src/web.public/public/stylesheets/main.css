@@ -34,7 +34,11 @@ input[type="radio"]:checked + img
 }
 
 ul.disabled {
-    display: none;
+    color: #bbb;
+}
+
+ul.disabled a {
+    color: #bbb;
 }
 
 main .akin-logo {
@@ -45,5 +49,5 @@ main .akin-logo {
 }
 
 body {
-    font-family: 'Open Sans', sans-serif;
+    font-family: 'Open Sans', 'Helvetica', 'Arial', sans-serif;
 }

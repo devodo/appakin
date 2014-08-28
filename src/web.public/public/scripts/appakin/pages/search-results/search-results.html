@@ -5,7 +5,7 @@
     <p ng-if="search.results.serverError">
         Oops! There was a problem getting results from the server. Please try again, or later if the problem continues.
     </p>
-    <ul ng-if="search.results.categories.length > 0">
+    <ul ng-if="search.results.categories.length > 0" ng-class="search.results.searchInProgress ? 'disabled' : ''">
         <li ng-repeat="category in search.results.categories">
             <h4><a href="/{{category.platform}}/category/{{category.urlName}}">{{category.name}}</a></h4>
             <p>

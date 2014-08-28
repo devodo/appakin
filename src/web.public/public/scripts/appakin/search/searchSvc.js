@@ -16,7 +16,8 @@
                 itemsPerPage: defaultItemsPerPage,
                 totalItems: 0,
                 initialState: true,
-                serverError: false
+                serverError: false,
+                searchInProgress: false
             },
             autoComplete: {
                 active: true,
@@ -50,6 +51,7 @@
                 me.service.results.totalItems = 0;
                 me.service.results.initialState = true;
                 me.service.results.serverError = false;
+                me.service.results.searchInProgress = false;
             },
             updateSearchFromUrl: function() {
                 var search = $location.search();
@@ -93,6 +95,8 @@
                     return;
                 }
 
+                me.service.results.searchInProgress = true;
+
                 searchApi.get(
                     me.service.searchTerm, me.service.platform,
                     me.service.results.currentPage, me.service.results.itemsPerPage,
@@ -102,9 +106,11 @@
                         me.service.results.currentPage = data.page;
                         me.service.results.initialState = false;
                         me.service.results.serverError = false;
+                        me.service.results.searchInProgress = false;
                     },
                     function(data) {
                         me.service.results.serverError = true;
+                        me.service.results.searchInProgress = false;
                     });
             },
             submitSearch: function(page) {
