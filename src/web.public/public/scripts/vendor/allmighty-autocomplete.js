@@ -11,7 +11,8 @@ app.directive('autocomplete', function() {
             searchParam: '=ngModel',
             suggestions: '=data',
             onType: '=onType',
-            onSelect: '=onSelect'
+            onSelect: '=onSelect',
+            isActive: '=isActive'
         },
         controller: ['$scope', function($scope){
             // the index of the suggestions that's currently selected
@@ -40,6 +41,10 @@ app.directive('autocomplete', function() {
             // starts autocompleting on typing in something
             $scope.$watch('searchParam', function(newValue, oldValue){
                 if (oldValue === newValue) {
+                    return;
+                }
+
+                if (!$scope.isActive) {
                     return;
                 }
 

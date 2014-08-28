@@ -5,7 +5,8 @@
         'ngCookies',
         'ngResource',
         'ui.bootstrap.pagination',
-        'autocomplete'
+        'autocomplete',
+        'appAkin.config'
     ]);
 
     appAkin.config(function ($routeProvider, $locationProvider) {
@@ -31,11 +32,11 @@
                 controller: 'SearchResultsCtrl',
                 reloadOnSearch: false
             })
-            .when('/category/:platform/:categoryName', {
+            .when('/:platform/category/:categoryName', {
                 templateUrl: 'appakin/pages/category/category.html',
                 controller: 'CategoryCtrl'
             })
-            .when('/app/:platform/:platformName', {
+            .when('/:platform/app/:platformName', {
                 templateUrl: 'appakin/pages/app/app.html',
                 controller: 'AppCtrl'
             })

@@ -1,3 +1,15 @@
 <div>
-    <h1>Search Results Page</h1>
+    <p ng-if="search.results.categories.length == 0 && !search.results.initialState">
+        Sorry - could not find anything relating to <span>{{search.searchTerm}}</span>.
+    </p>
+    <ul ng-if="search.results.categories.length > 0">
+        <li ng-repeat="category in search.results.categories">
+            <h4><a href="/{{category.platform}}/category/{{category.urlName}}">{{category.name}}</a></h4>
+            <p>
+                {{category.shortDesc}}
+            </p>
+        </li>
+    </ul>
+    <pagination ng-show="search.results.totalItems > 0" total-items="search.results.totalItems" max-size="numPages"
+                ng-model="search.results.currentPage" ng-change="pageChanged()"></pagination>
 </div>

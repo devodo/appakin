@@ -1,5 +1,5 @@
 <div>
-    <form ng-submit="search.redirectToSearch()">
+    <form ng-submit="search.submitSearch(1)">
         <div>
             <label>
                 <input type="radio" name="platform" value="android" ng-model="search.platform"/>
@@ -16,8 +16,9 @@
         </div>
         <div>
             <autocomplete ng-model="search.searchTerm" attr-placeholder="Search for categories or apps"
-                          click-activation="true" data="search.autoCompleteTerms"
-                          on-type="search.updateAutoCompleteTerms"></autocomplete>
+                          click-activation="false" data="search.autoComplete.terms"
+                          on-type="search.updateAutoCompleteTerms"
+                          is-active="search.autoComplete.active"></autocomplete>
             <button type="submit">Submit</button>
         </div>
     </form>

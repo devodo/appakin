@@ -6,30 +6,36 @@ var plugins = require('gulp-load-plugins')({config: '../../package.json'});
 var path = require('path');
 var templateCache = require('gulp-angular-templatecache');
 var stylish = require('jshint-stylish');
+var streams = require('memory-streams');
+var source = require('vinyl-source-stream');
+var pkg = require('./package.json');
+var fs = require('fs');
 
 var publicGeneratedRoot = path.resolve('./public-generated');
 var buildRoot = path.resolve('../../build-output/web.public');
+var buildTempRoot = path.resolve('./.tmp');
 var indexHtmlPath = path.resolve('./index.html');
 
 gulp.task('build', 
     [
-    'build:clean',
-	'build:copy',
-	'build:scripts',
-	'build:stylesheets',
-	'build:templates',
-	'build:minify-images',
-	'build:index-html',
-	'build:cdnify'
+        'build:clean',
+        'build:copy',
+        'build:scripts',
+        'build:stylesheets',
+        'build:templates',
+        'build:minify-images',
+        'build:index-html',
+        'build:cdnify',
+        'build:version'
 	]
 );
 
 gulp.task('dev', 
     [
-	'dev:stylesheets',
-	'dev:templates', 
-	'dev:scripts',
-	'dev:watch'
+        'dev:stylesheets',
+        'dev:templates',
+        'dev:scripts',
+        'dev:watch'
 	]
 );
 
@@ -55,9 +61,31 @@ gulp.task('build:clean', ['jshint'], function() {
 		.on('error', handleError);
 });
 
-gulp.task('build:scripts', ['build:clean'], function() {
+gulp.task('build:config', ['build:clean'], function() {
+    if (!fs.existsSync(buildTempRoot)) {
+        fs.mkdirSync(buildTempRoot);
+    }
+
+    fs.writeFileSync(buildTempRoot + '/configModule.js', '{}');
+
     return gulp
-        .src(['./public/scripts/**/module.js', './public/scripts/**/*.js'])
+        .src(buildTempRoot + '/configModule.js')
+        .pipe(plugins.ngConstant({
+            name: 'appAkin.config',
+            deps: [],
+            constants: { webApiUrl: 'http://aws/api/' },
+            wrap: ''
+        }))
+        .pipe(gulp.dest(buildTempRoot))
+        .on('error', handleError);
+});
+
+gulp.task('build:scripts', ['build:clean', 'build:config'], function() {
+    return gulp
+        .src(['./public/scripts/**/module.js',
+            './public/scripts/**/*.js',
+            './.tmp/configModule.js',
+            '!./public/scripts/appakin/configModule.js'])
         .pipe(plugins.concat('app-scripts.js'))
         .pipe(plugins.ngAnnotate())
         .pipe(plugins.uglify())
@@ -158,6 +186,11 @@ gulp.task('build:cdnify', ['build:index-html', 'build:stylesheets'], function() 
 			}))
         .pipe(gulp.dest(buildRoot))
 		.on('error', handleError);
+});
+
+gulp.task('build:version', ['build:clean'], function() {
+    fs.mkdirSync(buildRoot);
+    fs.writeFileSync(buildRoot + '/version.txt', 'Version: ' + pkg.version);
 });
 
 gulp.task('dev:watch', ['dev:stylesheets', 'dev:templates', 'dev:scripts'], function() {

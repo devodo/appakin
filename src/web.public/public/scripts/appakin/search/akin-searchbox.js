@@ -5,12 +5,8 @@
             restrict: 'A',
             replace: true,
             templateUrl: 'appakin/search/akin-searchbox.html',
-            controller: function ($scope, $timeout, search) {
+            controller: function ($scope, search) {
                 $scope.search = search;
-
-                $scope.updateAutoCompleteTerms = function(typed) {
-                    search.updateAutoCompleteTerms(typed);
-                }
             }
         };
     });

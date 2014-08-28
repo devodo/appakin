@@ -43,3 +43,7 @@ main .akin-logo {
     background-image: url('/public/images/logo-2.png');
     background-size: 354px 100px;
 }
+
+body {
+    font-family: 'Open Sans', sans-serif;
+}

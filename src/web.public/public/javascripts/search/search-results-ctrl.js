@@ -12,7 +12,7 @@
 
             $scope.categories = [];
             $scope.totalItems = 0;
-            $scope.currentPage = undefined;;
+            $scope.currentPage = undefined;
             $scope.numPages = 5;
 
             var search = function() {

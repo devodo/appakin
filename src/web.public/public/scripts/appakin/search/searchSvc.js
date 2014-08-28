@@ -1,73 +1,129 @@
 (function () {
     'use strict';
 
-    angular.module('appAkin').factory('search', function(autoComplete, $rootScope, $q, $timeout) {
-        var self = this;
-
+    angular.module('appAkin').factory('search', function(autoCompleteApi, searchApi, $timeout, $location, platform) {
+        var me = this;
         var defaultItemsPerPage = 10;
-        var debounceTimeoutMs = 100;
-        var initialPlatform = 'ios';
+        var maxItemsPerPage = 50;
+        var defaultCurrentPage = 1;
 
-        var debounceTimeout;
-        var autoCompleteSessionVersion = 0;
-
-        self.service = {
+        me.service = {
             searchTerm: '',
-            autoCompleteTerms: [],
-            platform: initialPlatform,
-            pageNumber: 1,
-            itemsPerPage: defaultItemsPerPage,
-            totalItems: 0,
-            redirectToSearch: function() {
-                self.service.autoCompleteTerms = [];
-                ++autoCompleteSessionVersion;
-
-                console.log('redirecting to search');
+            platform: platform.getInitialPlatform(),
+            results: {
+                categories: [],
+                currentPage: defaultCurrentPage,
+                itemsPerPage: defaultItemsPerPage,
+                totalItems: 0,
+                initialState: true
+            },
+            autoComplete: {
+                active: true,
+                terms: []
+            },
+            cancelAutoComplete: function() {
+                autoCompleteApi.cancel();
             },
             updateAutoCompleteTerms: function(typed) {
-                if (typed.length === 0) {
-                    self.service.autoCompleteTerms = [];
+                var currentSearchTerm = me.service.searchTerm;
+                var currentPlatform = me.service.platform;
+
+                if (currentSearchTerm == '') {
+                    me.service.autoComplete.terms = [];
+                    autoCompleteApi.cancel();
                     return;
                 }
 
-                var currentSearchTerm = self.service.searchTerm;
-                var currentAutoCompleteSessionVersion = autoCompleteSessionVersion;
+                autoCompleteApi.get(
+                    currentSearchTerm,
+                    currentPlatform,
+                    function(response) {
+                        me.service.autoComplete.terms = response.data;
+                    }
+                );
+            },
+            resetSearchResults: function() {
+                me.service.results.categories = [];
+                me.service.results.currentPage = defaultCurrentPage;
+                me.service.results.itemsPerPage = defaultItemsPerPage;
+                me.service.results.totalItems = 0;
+                me.service.results.initialState = true;
+            },
+            updateSearchFromUrl: function() {
+                var search = $location.search();
 
-                if (debounceTimeout) {
-                    $timeout.cancel(debounceTimeout);
+                if (search.q !== me.service.searchTerm) {
+                    me.service.searchTerm = search.q;
+
+                    me.service.autoComplete.active = false;
+                    $timeout(function() {me.service.autoComplete.active = true; console.log('set');}, 0);
                 }
 
-                debounceTimeout = $timeout(function() {
-                    if (currentSearchTerm !== self.service.searchTerm)
-                    {
-                        return;
-                    }
+                if (search.p !== me.service.platform) {
+                    me.service.platform = platform.normalisePlatform(search.p) || platform.defaultPlatform;
+                }
 
-                    console.log('making autocomplete request');
+                if (search.page) {
+                    var pageInt = parseInt(search.page);
 
-                    autoComplete.query(
-                        { q: self.service.searchTerm, p: self.service.platform },
-                        function(data) {
-                            if (currentSearchTerm !== self.service.searchTerm)
-                            {
-                                console.log('rejected autocomplete because search term has changed')
-                                return $q.reject();
-                            }
+                    me.service.results.currentPage =
+                        (!isNaN(pageInt) && pageInt > 0 && pageInt != me.service.results.currentPage)
+                            ? pageInt
+                            : me.service.results.currentPage;
+                } else {
+                    me.service.results.currentPage = defaultCurrentPage;
+                }
 
-                            if (currentAutoCompleteSessionVersion !== autoCompleteSessionVersion)
-                            {
-                                console.log('rejected autocomplete because search version has changed')
-                                return $q.reject();
-                            }
+                if (search.take) {
+                    var takeInt = parseInt(search.take);
 
-                            self.service.autoCompleteTerms = data;
-                        }
-                    );
-                }, debounceTimeoutMs);
+                    me.service.results.itemsPerPage =
+                        (!isNaN(takeInt) && takeInt > 0 && takeInt < maxItemsPerPage && takeInt != me.service.results.itemsPerPage)
+                            ? takeInt
+                            : me.service.results.itemsPerPage;
+                } else {
+                    me.service.results.itemsPerPage = defaultItemsPerPage;
+                }
+            },
+            search : function() {
+                if (me.service.searchTerm === '') {
+                    me.service.results.initialState = false;
+                    return;
+                }
+
+                searchApi.get(
+                    me.service.searchTerm, me.service.platform,
+                    me.service.results.currentPage, me.service.results.itemsPerPage,
+                    function(data) {
+                        me.service.results.categories = data.categories;
+                        me.service.results.totalItems = data.totalItems;
+                        me.service.results.currentPage = data.page;
+                        me.service.results.initialState = false;
+                    });
+            },
+            submitSearch: function(page) {
+                if (me.service.searchTerm === '') {
+                    return;
+                }
+
+                me.service.cancelAutoComplete();
+                me.service.autoComplete.terms = [];
+
+                var search = {
+                    q: me.service.searchTerm,
+                    p: me.service.platform
+                };
+
+                if (page > 1) {
+                    search.page = page;
+                }
+
+                console.log('redirecting to search: q=' + me.service.searchTerm + ' p=' + me.service.platform + ' page=' + page);
+                $location.path('/search').search(search);
             }
         };
 
-        return self.service;
+        return me.service;
     });
 
 }()); // use strict
