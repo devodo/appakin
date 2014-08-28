@@ -53,6 +53,18 @@
 
                 $cookies.platform = platform;
                 return platform;
+            },
+            getFriendlyName: function(platform) {
+                switch (platform) {
+                    case 'ios':
+                        return 'iOS';
+                    case 'android':
+                        return 'Android';
+                    case 'winphone':
+                        return 'Windows Phone';
+                    default:
+                        return platform;
+                }
             }
         };
     });

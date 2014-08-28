@@ -1,7 +1,7 @@
 (function () {
     'use strict';
 
-    angular.module('appAkin').factory('category', function($routeParams, categoryApi, search, platform) {
+    angular.module('appAkin').factory('category', function($routeParams, categoryApi, search, platform, pageTitle) {
         var me = this;
 
         me.service = {
@@ -14,13 +14,14 @@
                 }
             },
             get: function() {
-                var platform = $routeParams.platform;
+                var urlPlatform = $routeParams.platform;
                 var urlName = $routeParams.categoryUrlName;
 
                 categoryApi.get(
-                    platform, urlName,
+                    urlPlatform, urlName,
                     function(data) {
                         me.service.data = data;
+                        pageTitle.setPageTitle(data.name + ' for ' + platform.getFriendlyName(data.platform));
                     }
                 );
             }

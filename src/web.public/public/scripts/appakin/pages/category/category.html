@@ -1,9 +1,9 @@
 <div ng-show="category.data.name">
-    <h1>{{category.data.name}} <span>for {{category.data.platform | platformFriendlyName}}</span></h1>
+    <h1>{{category.data.name}} <span>for {{platform.getFriendlyName(category.data.platform)}}</span></h1>
     <p>{{category.data.desc}}</p>
     <ul ng-if="category.data.apps.length > 0">
        <li ng-repeat="app in category.data.apps">
-           <h4><a href="/{{app.platform}}/app/{{app.urlName}}">{{app.name}}</a></h4>
+           <h4><a href="{{ url.createAppUrl(app.platform, app.urlName) }}">{{app.name}}</a></h4>
            <p>
                {{app.shortDesc}}
            </p>

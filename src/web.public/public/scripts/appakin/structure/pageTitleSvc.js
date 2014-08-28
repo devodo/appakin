@@ -8,7 +8,9 @@
         self.service = {
             pageTitle: initialPageTitle,
             setPageTitle: function(value) {
-                self.service.pageTitle = initialPageTitle + ' | ' + value;
+                self.service.pageTitle = (value === '')
+                    ? initialPageTitle
+                    : initialPageTitle + ' | ' + value;
             }
         };
 
