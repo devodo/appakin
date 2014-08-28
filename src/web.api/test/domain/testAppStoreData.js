@@ -136,5 +136,13 @@ exports.group = {
             test.ok(err === null, err);
             test.done();
         });
+    },
+
+    testRetrievePopularApps: function(test) {
+        appStoreData.retrievePopularAppSourcesBatch(3, function(err) {
+            test.expect(1);
+            test.ok(!err, err);
+            test.done();
+        });
     }
 };

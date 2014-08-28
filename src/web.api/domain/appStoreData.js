@@ -2,20 +2,21 @@
 var cheerio = require('cheerio');
 var async = require('async');
 var lineReader = require('line-reader');
-var httpDownloader = require('./httpDownloader').create(60, 2, 5);
+var request = require('request');
 var log = require('../logger');
 var appakinRepo = require("../repos/appakinRepo.js");
 
 var getPageSrc = function(id, next) {
 
-    var options = {
-        hostname: 'itunes.apple.com',
-        port: 443,
-        path: '/us/app/id' + id,
-        method: 'GET'
-    };
+    var url = 'https://itunes.apple.com/us/app/id' + id;
 
-    httpDownloader.downloadHttps(options, next);
+    request(url, function (err, response, src) {
+        if (err) {
+            return next(err);
+        }
+
+        next(null, src);
+    });
 };
 
 var parseHtml = function(pageSrc, next) {
@@ -30,22 +31,15 @@ var parseHtml = function(pageSrc, next) {
 };
 
 var getLookup = function(id, next) {
+    var url = 'https://itunes.apple.com/lookup?id=' + id;
 
-    var options = {
-        hostname: 'itunes.apple.com',
-        port: 443,
-        path: '/lookup?id=' + id,
-        method: 'GET'
-    };
-
-    var callback = function(err, data) {
-
+    request(url, function (err, response, src) {
         if (err) {
             return next(err);
         }
 
         try {
-            var result = JSON.parse(data);
+            var result = JSON.parse(src);
 
             if (!result.resultCount || result.resultCount === 0) {
                 return next("No result found");
@@ -59,36 +53,25 @@ var getLookup = function(id, next) {
         } catch (ex) {
             return next(ex);
         }
-    };
-
-    httpDownloader.downloadHttps(options, callback);
+    });
 };
 
 var getLookups = function(ids, next) {
+    var url = 'https://itunes.apple.com/lookup?id=' + ids.join();
 
-    var options = {
-        hostname: 'itunes.apple.com',
-        port: 443,
-        path: '/lookup?id=' + ids.join(),
-        method: 'GET'
-    };
-
-    var callback = function(err, data) {
-
+    request(url, function (err, response, src) {
         if (err) {
             return next(err);
         }
 
         try {
-            var jsonData = JSON.parse(data);
+            var jsonData = JSON.parse(src);
 
             next(null, jsonData.results);
         } catch (ex) {
             return next(ex);
         }
-    };
-
-    httpDownloader.downloadHttps(options, callback);
+    });
 };
 
 var parseLookup = function(data, next) {
@@ -183,14 +166,9 @@ var retrieveApps = function(ids, next) {
 };
 
 var retrieveCategories = function(next) {
-    var options = {
-        hostname: 'itunes.apple.com',
-        port: 443,
-        path: '/us/genre/ios/id36?mt=8',
-        method: 'GET'
-    };
+    var url = 'https://itunes.apple.com/us/genre/ios/id36?mt=8';
 
-    var callback = function(err, pageSrc) {
+    request(url, function (err, response, src) {
         if (err) {
             return next(err);
         }
@@ -219,84 +197,76 @@ var retrieveCategories = function(next) {
         async.series(tasks, function(err, results) {
             next(err, results);
         });
-    };
+    });
+};
 
-    httpDownloader.downloadHttps(options, callback);
+var parseAppSources = function(pageSrc) {
+    var idRegex = /id([\d]+)/;
+
+    var $ = cheerio.load(pageSrc);
+
+    var appSources = $('#selectedcontent a').map(function(i, el) {
+        var url = $(this).attr('href');
+        var name = $(this).text();
+        var match = idRegex.exec(url);
+        var id = match[1];
+
+        var appSrc = {
+            storeAppId: id,
+            name: name
+        };
+
+        return appSrc;
+    });
+
+    return appSources;
 };
 
 var retrieveAppSources = function(category, startLetter, startPageNumber, next) {
     log.debug("Retrieve app sources for category: " + category.name);
-
-    var idRegex = /id([\d]+)/;
-    var prevItemSources = [];
+    var prevAppSources = [];
 
     var retrievePage = function(letterCode, pageNumber) {
         var letter = String.fromCharCode(letterCode);
         log.debug(letter + " " + pageNumber);
-        var url = category.storeUrl + '&letter=' + letter + '&page=' + pageNumber;
 
-        var options = {
-            hostname: 'itunes.apple.com',
-            port: 443,
-            path: url,
-            method: 'GET'
-        };
-
-        var callback = function(err, pageSrc) {
+        var callback = function(err, response, pageSrc) {
             if (err) {
                 return next(err);
             }
 
-            var $ = cheerio.load(pageSrc);
+            var appSources = parseAppSources(pageSrc);
 
-            var itemSources = $('#selectedcontent a').map(function(i, el) {
-                var url = $(this).attr('href');
-                var name = $(this).text();
-                var match = idRegex.exec(url);
-                var id = match[1];
-
-                var itemSrc = {
-                    categoryId: category.id,
-                    appStoreId: id,
-                    name: name,
-                    letter: letter,
-                    pageNumber: pageNumber
-                };
-
-                return itemSrc;
-            });
-
-            var tasksMap = itemSources.map(function(i, itemSrc) {
-                return function(callback) {
-                    appakinRepo.insertAppStoreItemSrc(itemSrc, function(err, id) {
-                        callback(err, id);
-                    });
-                };
-            });
-
-            var tasks = [];
-
-            for (var i = 0; i < tasksMap.length; i++) {
-                tasks.push(tasksMap[i]);
-            }
-
-            if (itemSources.length === prevItemSources.length) {
+            if (appSources.length === prevAppSources.length) {
                 var isSame = true;
-                for (var i = 0; i < itemSources.length; i++) {
-                    if (itemSources[i].storeCategoryId !== prevItemSources[i].storeCategoryId) {
+                for (var i = 0; i < appSources.length; i++) {
+                    if (appSources[i].storeAppId !== prevAppSources[i].storeAppId) {
                         isSame = false;
                         break;
                     }
                 }
 
                 if (isSame) {
-                    tasks = [];
+                    appSources = [];
                 }
             }
 
-            prevItemSources = itemSources;
+            prevAppSources = appSources;
 
-            async.series(tasks, function(err, results) {
+            var results = [];
+
+            var processAppSource = function(appSource, callback) {
+                appakinRepo.insertAppStoreAppSrc(appSource, category.id, letter, pageNumber, function(err, id) {
+                    if (err) {
+                        return callback(err);
+                    }
+
+                    results.push(id);
+                    callback();
+                });
+            };
+
+            async.eachSeries(appSources, processAppSource, function(err) {
                 if (err) {
                     return next(err);
                 }
@@ -317,12 +287,79 @@ var retrieveAppSources = function(category, startLetter, startPageNumber, next) 
             });
         };
 
-        httpDownloader.downloadHttps(options, callback);
+        var url = category.storeUrl + '&letter=' + letter + '&page=' + pageNumber;
+
+        request(url, callback);
     };
 
     var startLetterCode = startLetter.charCodeAt(0);
 
     retrievePage(startLetterCode, startPageNumber);
+};
+
+var retrievePopularAppSources = function(category, batchId, next) {
+    request(category.storeUrl, function (err, response, src) {
+        if (err) {
+            return next(err);
+        }
+
+        var appSources = parseAppSources(src);
+
+        var position = 0;
+        var results = [];
+        var previousCheck = {};
+
+        var processAppSource = function(appSource, callback) {
+            position = position + 1;
+
+            if (previousCheck[appSource.storeAppId]) {
+                log.warn("Duplicate popular app detected for app id: " + appSource.storeAppId);
+                return callback();
+            }
+
+            previousCheck[appSource.storeAppId] = true;
+
+            appakinRepo.insertAppStorePopular(appSource, category.id, position, batchId, function(err, id) {
+                if (err) {
+                    return callback(err);
+                }
+
+                results.push(id);
+                callback();
+            });
+        };
+
+        async.eachSeries(appSources, processAppSource, function(err) {
+            if (err) {
+                return next(err);
+            }
+
+            next(null, results);
+
+        });
+    });
+};
+
+var retrievePopularAppSourcesBatch = function(batchId, next) {
+    appakinRepo.getAppStoreCategories(function(err, categories) {
+        if (err) {
+            return next(err);
+        }
+
+        async.eachSeries(categories, function(category, callback) {
+            retrievePopularAppSources(category, batchId, function(err, results) {
+                if (err) {
+                    return callback(err);
+                }
+
+                if (results.length === 0) {
+                    return callback("No results returned for category: " + category.id);
+                }
+
+                callback();
+            });
+        }, next);
+    });
 };
 
 var retrieveAllAppSources = function(next) {
@@ -374,5 +411,6 @@ exports.retrieveCategories = retrieveCategories;
 exports.retrieveAppSources = retrieveAppSources;
 exports.retrieveAllAppSources = retrieveAllAppSources;
 exports.lookupAppsBatched = lookupAppsBatched;
+exports.retrievePopularAppSourcesBatch = retrievePopularAppSourcesBatch;
 
 

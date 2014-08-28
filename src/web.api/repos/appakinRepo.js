@@ -240,7 +240,7 @@ Repository.prototype.insertAppStoreCategory = function(category, next) {
     });
 };
 
-Repository.prototype.insertAppStoreItemSrc = function(item, next) {
+Repository.prototype.insertAppStoreAppSrc = function(app, categoryId, letter, pageNumber, next) {
     var me = this;
     var queryStr =
         "INSERT INTO appstore_app_src(" +
@@ -250,11 +250,11 @@ Repository.prototype.insertAppStoreItemSrc = function(item, next) {
         "RETURNING id;";
 
     var queryParams = [
-        item.categoryId,
-        item.storeCategoryId,
-        item.name,
-        item.letter,
-        item.pageNumber
+        categoryId,
+        app.storeAppId,
+        app.name,
+        letter,
+        pageNumber
     ];
 
     me.query(queryStr, queryParams, function (err, result) {
@@ -270,11 +270,37 @@ Repository.prototype.insertAppStoreItemSrc = function(item, next) {
     });
 };
 
+Repository.prototype.insertAppStorePopular = function(app, categoryId, position, batchId, next) {
+    var me = this;
+    var queryStr =
+        "INSERT INTO appstore_popular( " +
+        "batch, appstore_category_id, store_app_id, name, position, " +
+        "date_created) " +
+        "VALUES ($1, $2, $3, $4, $5, NOW()) " +
+        "RETURNING id;";
+
+    var queryParams = [
+        batchId,
+        categoryId,
+        app.storeAppId,
+        app.name,
+        position
+    ];
+
+    me.query(queryStr, queryParams, function (err, result) {
+        if (err) {
+            return next(err);
+        }
+
+        next(null, result.rows[0].id);
+    });
+};
+
 Repository.prototype.getAppStoreCategories = function(next) {
     var me = this;
     var queryStr =
         "SELECT id, store_category_id, name, store_url, parent_id, date_created, date_modified " +
-        "FROM appstore_category where id = 69" +
+        "FROM appstore_category " +
         "order by id";
 
     me.query(queryStr, [], function (err, result) {
@@ -478,13 +504,13 @@ exports.insertAppStoreCategory = function(category, next) {
     });
 };
 
-exports.insertAppStoreItemSrc = function(item, next) {
+exports.insertAppStoreAppSrc = function(app, categoryId, letter, pageNumber, next) {
     connectRepo(function(err, repo) {
         if (err) {
             return next(err);
         }
 
-        repo.insertAppStoreItemSrc(item, function(err, id) {
+        repo.insertAppStoreAppSrc(app, categoryId, letter, pageNumber, function(err, id) {
             repo.close(function() {
                 next(err, id);
             });
@@ -555,6 +581,20 @@ exports.insertXyoCategoryItem = function(categoryId, name, position, next) {
         }
 
         repo.insertXyoCategoryItem(categoryId, name, position, function(err, id) {
+            repo.close(function() {
+                next(err, id);
+            });
+        });
+    });
+};
+
+exports.insertAppStorePopular = function(app, categoryId, position, batchId, next) {
+    connectRepo(function(err, repo) {
+        if (err) {
+            return next(err);
+        }
+
+        repo.insertAppStorePopular(app, categoryId, position, batchId, function(err, id) {
             repo.close(function() {
                 next(err, id);
             });
