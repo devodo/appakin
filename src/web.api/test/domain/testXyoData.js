@@ -25,6 +25,10 @@ exports.group = {
             //'http://xyo.net/iphone-games/cats-mice-and-dogs-games-kOY/'
         ];
 
+        for (var i = 60; i < 84; i++) {
+            seedUrls.push('http://xyo.net/iphone/?page=' + i);
+        }
+
         xyoData.crawl(seedUrls, function(err, count) {
             test.expect(1);
             test.ok(err === null, err);
@@ -48,6 +52,7 @@ exports.group = {
     },
 
     testGetCategories: function(test) {
+        return test.done();
         xyoData.getCategories(function(err, categories) {
             test.expect(2);
             test.ok(err === null, err);
@@ -57,6 +62,7 @@ exports.group = {
     },
 
     testCrawlAllCategories: function(test) {
+        return test.done();
         xyoData.crawlAllCategories(10, function(err) {
             test.expect(1);
             test.ok(err === null, err);

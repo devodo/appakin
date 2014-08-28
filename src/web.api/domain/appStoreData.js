@@ -98,7 +98,7 @@ var parseLookup = function(data, next) {
 
     var result = {
         name: data.trackName,
-        storeItemId: data.trackId,
+        storeAppId: data.trackId,
         censoredName: data.trackCensoredName,
         description: data.description,
         appStoreUrl: data.trackViewUrl,
@@ -147,7 +147,7 @@ var retrieveApp = function(id, next) {
                 return next(err);
             }
 
-            appakinRepo.insertAppStoreItem(app, function(err, itemId) {
+            appakinRepo.insertAppStoreApp(app, function(err, itemId) {
                 if (err) {
                     return next(err);
                 }
@@ -170,7 +170,7 @@ var retrieveApps = function(ids, next) {
                     return next(err);
                 }
 
-                appakinRepo.insertAppStoreItem(app, function(err, itemId) {
+                appakinRepo.insertAppStoreApp(app, function(err, appId) {
                     if (err) {
                         return callback(err);
                     }
@@ -283,7 +283,7 @@ var retrieveAppSources = function(category, startLetter, startPageNumber, next) 
             if (itemSources.length === prevItemSources.length) {
                 var isSame = true;
                 for (var i = 0; i < itemSources.length; i++) {
-                    if (itemSources[i].appStoreId !== prevItemSources[i].appStoreId) {
+                    if (itemSources[i].storeCategoryId !== prevItemSources[i].storeCategoryId) {
                         isSame = false;
                         break;
                     }
@@ -352,7 +352,7 @@ var lookupAppsBatched = function(startId, batchSize, next) {
         var lastId = results[results.length - 1].id;
 
         var appIds = results.map(function(appSource) {
-            return appSource.appStoreId;
+            return appSource.storeCategoryId;
         });
 
         retrieveApps(appIds, function(err) {
@@ -365,48 +365,6 @@ var lookupAppsBatched = function(startId, batchSize, next) {
     });
 };
 
-var lookupAppMonsta = function(startId, batchSize, next) {
-    appakinRepo.getAppMonstaBatch(startId, batchSize, function(err, ids) {
-        log.debug("Batch lookup start id: " + startId);
-
-        if (err) {
-            return next(err);
-        }
-
-        if (ids.length === 0) {
-            return next();
-        }
-
-        var lastId = ids[ids.length - 1];
-
-        retrieveApps(ids, function(err) {
-            if (err) {
-                return next(err);
-            }
-
-            return next(null, lastId);
-        });
-    });
-};
-
-var insertAppMonstaIds = function(filePath, next) {
-    lineReader.eachLine(filePath, function(line, last, cb) {
-        appakinRepo.insertAppMonstaItem(line, function(err) {
-            if (err) {
-                cb(false);
-                return next(err);
-            }
-
-            cb();
-        });
-
-        if (last) {
-            cb(false);
-            return next();
-        }
-    });
-};
-
 exports.getPageSrc = getPageSrc;
 exports.parseHtml = parseHtml;
 exports.getLookup = getLookup;
@@ -416,7 +374,5 @@ exports.retrieveCategories = retrieveCategories;
 exports.retrieveAppSources = retrieveAppSources;
 exports.retrieveAllAppSources = retrieveAllAppSources;
 exports.lookupAppsBatched = lookupAppsBatched;
-exports.lookupAppMonsta = lookupAppMonsta;
-exports.insertAppMonstaIds = insertAppMonstaIds;
 
 

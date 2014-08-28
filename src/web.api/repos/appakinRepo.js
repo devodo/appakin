@@ -94,17 +94,16 @@ Repository.prototype.testArray = function(next) {
     });
 };
 
-Repository.prototype.insertItem = function(storeId, item, next) {
+Repository.prototype.insertApp = function(storeId, app, next) {
     var me = this;
     var queryStr =
-        "INSERT INTO item(ext_id, store_id, store_item_id, name, date_created, date_modified) " +
+        "INSERT INTO app(ext_id, store_id, name, date_created, date_modified) " +
         "VALUES ($1, $2, $3, $4, NOW(), NOW()) " +
         "RETURNING id;";
 
     var queryParams = [
         uuid.v4(),
         storeId,
-        item.storeItemId,
         item.name
     ];
 
@@ -117,11 +116,11 @@ Repository.prototype.insertItem = function(storeId, item, next) {
     });
 };
 
-Repository.prototype.insertAppStoreItemInternal = function (itemId, app, next) {
+Repository.prototype.insertAppStoreAppInternal = function (itemId, app, next) {
     var me = this;
     var queryStr =
-        "INSERT INTO appstore_item(" +
-        "item_id, name, censored_name, description, appstore_url, " +
+        "INSERT INTO appstore_app(" +
+        "app_id, store_app_id, name, censored_name, description, appstore_url, " +
         "dev_id, dev_name, dev_url, features, supported_devices, " +
         "is_game_center_enabled, screenshot_urls, ipad_screenshot_urls, " +
         "artwork_small_url, artwork_medium_url, artwork_large_url, price, " +
@@ -140,6 +139,7 @@ Repository.prototype.insertAppStoreItemInternal = function (itemId, app, next) {
 
     var queryParams = [
         itemId,
+        app.storeAppId,
         app.name,
         app.censoredName,
         app.description,
@@ -184,14 +184,14 @@ Repository.prototype.insertAppStoreItemInternal = function (itemId, app, next) {
     });
 };
 
-Repository.prototype.insertAppStoreItem = function(app, next) {
+Repository.prototype.insertAppStoreApp = function(app, next) {
     var me = this;
     me.beginTran(function(err) {
         if (err) {
             return next(err);
         }
 
-        me.insertItem(APP_STORE_ID, app, function(err, itemId) {
+        me.insertApp(APP_STORE_ID, app, function(err, appId) {
             if (err) {
                 if (err.code === UNIQUE_VIOLATION_CODE) {
                     return next(null, -1);
@@ -200,7 +200,7 @@ Repository.prototype.insertAppStoreItem = function(app, next) {
                 return next(err);
             }
 
-            me.insertAppStoreItemInternal(itemId, app, function(err) {
+            me.insertAppStoreAppInternal(appId, app, function(err) {
                 if (err) {
                     return next(err);
                 }
@@ -210,7 +210,7 @@ Repository.prototype.insertAppStoreItem = function(app, next) {
                         return next(err);
                     }
 
-                    next(null, itemId);
+                    next(null, appId);
                 });
             });
         });
@@ -221,7 +221,7 @@ Repository.prototype.insertAppStoreCategory = function(category, next) {
     var me = this;
     var queryStr =
         "INSERT INTO appstore_category(" +
-        "appstore_id, name, store_url, date_created, date_modified) " +
+        "store_category_id, name, store_url, date_created, date_modified) " +
         "VALUES ($1, $2, $3, NOW(), NOW()) " +
         "RETURNING id;";
 
@@ -243,15 +243,15 @@ Repository.prototype.insertAppStoreCategory = function(category, next) {
 Repository.prototype.insertAppStoreItemSrc = function(item, next) {
     var me = this;
     var queryStr =
-        "INSERT INTO appstore_item_src(" +
-        "appstore_category_id, appstore_id, name, letter, page_number, " +
+        "INSERT INTO appstore_app_src(" +
+        "appstore_category_id, store_app_id, name, letter, page_number, " +
         "date_created, date_modified) " +
         "VALUES ($1, $2, $3, $4, $5, NOW(), NOW()) " +
         "RETURNING id;";
 
     var queryParams = [
         item.categoryId,
-        item.appStoreId,
+        item.storeCategoryId,
         item.name,
         item.letter,
         item.pageNumber
@@ -273,7 +273,7 @@ Repository.prototype.insertAppStoreItemSrc = function(item, next) {
 Repository.prototype.getAppStoreCategories = function(next) {
     var me = this;
     var queryStr =
-        "SELECT id, appstore_id, name, store_url, parent_id, date_created, date_modified " +
+        "SELECT id, store_category_id, name, store_url, parent_id, date_created, date_modified " +
         "FROM appstore_category where id = 69" +
         "order by id";
 
@@ -285,7 +285,7 @@ Repository.prototype.getAppStoreCategories = function(next) {
         var categories = result.rows.map(function(item) {
             return {
                 id: item.id,
-                appStoreId: item.appstore_id,
+                storeCategoryId: item.store_category_id,
                 name: item.name,
                 storeUrl: item.store_url,
                 parentId: item.parent_id,
@@ -301,9 +301,9 @@ Repository.prototype.getAppStoreCategories = function(next) {
 Repository.prototype.getAppStoreSourceItemBatch = function(startId, batchSize, next) {
     var me = this;
     var queryStr =
-        "SELECT id, appstore_category_id, appstore_id, name, letter, page_number, " +
+        "SELECT id, appstore_category_id, store_app_id, name, letter, page_number, " +
         "date_created, date_modified " +
-        "FROM appstore_item_src " +
+        "FROM appstore_app_src " +
         "where id > $1 " +
         "order by id " +
         "limit $2;";
@@ -322,7 +322,7 @@ Repository.prototype.getAppStoreSourceItemBatch = function(startId, batchSize, n
             return {
                 id: item.id,
                 appStoreCategoryId: item.appstore_category_id,
-                appStoreId: item.appstore_id,
+                storeCategoryId: item.store_app_id,
                 name: item.name,
                 letter: item.letter,
                 pageNumber: item.page_number,
@@ -332,33 +332,6 @@ Repository.prototype.getAppStoreSourceItemBatch = function(startId, batchSize, n
         });
 
         next(null, items);
-    });
-};
-
-Repository.prototype.getAppMonstaBatch = function(startId, batchSize, next) {
-    var me = this;
-    var queryStr =
-        "SELECT appstore_id " +
-        "FROM appmonsta_item " +
-        "where appstore_id > $1 " +
-        "order by appstore_id " +
-        "limit $2;";
-
-    var queryParams = [
-        startId,
-        batchSize
-    ];
-
-    me.query(queryStr, queryParams, function (err, result) {
-        if (err) {
-            return next(err);
-        }
-
-        var ids = result.rows.map(function(item) {
-            return item.appstore_id;
-        });
-
-        next(null, ids);
     });
 };
 
@@ -390,23 +363,6 @@ Repository.prototype.insertXyoCategory = function(category, next) {
     });
 };
 
-Repository.prototype.insertAppMonstaItem = function(appId, next) {
-    var me = this;
-    var queryStr =
-        "INSERT INTO appmonsta_item(appstore_id) " +
-        "VALUES ($1);";
-
-    var queryParams = [appId];
-
-    me.query(queryStr, queryParams, function (err) {
-        if (err) {
-            return next(err);
-        }
-
-        next();
-    });
-};
-
 Repository.prototype.getXyoCategories = function(next) {
     var me = this;
     var queryStr =
@@ -435,17 +391,17 @@ Repository.prototype.getXyoCategories = function(next) {
     });
 };
 
-Repository.prototype.insertXyoCategoryItem = function(categoryId, name, position, next) {
+Repository.prototype.insertXyoCategoryItem = function(xyoCategoryId, name, position, next) {
     var me = this;
     var queryStr =
-        "INSERT INTO xyo_category_item(" +
-        "category_id, name, position, max_position, min_position, " +
+        "INSERT INTO xyo_category_app(" +
+        "xyo_category_id, name, position, max_position, min_position, " +
         "date_created, date_modified) " +
         "VALUES ($1, $2, $3, $4, $5, NOW(), NOW()) " +
         "RETURNING id;";
 
     var queryParams = [
-        categoryId,
+        xyoCategoryId,
         name,
         position,
         position,
@@ -457,7 +413,7 @@ Repository.prototype.insertXyoCategoryItem = function(categoryId, name, position
             if (err.code === UNIQUE_VIOLATION_CODE) {
                 return next(null, -1);
             }
-            
+
             return next(err);
         }
 
@@ -494,13 +450,13 @@ exports.testArray = function(next) {
     });
 };
 
-exports.insertAppStoreItem = function(app, next) {
+exports.insertAppStoreApp = function(app, next) {
     connectRepo(function(err, repo) {
         if (err) {
             return next(err);
         }
 
-        repo.insertAppStoreItem(app, function(err, itemId) {
+        repo.insertAppStoreApp(app, function(err, itemId) {
             repo.close(function() {
                 next(err, itemId);
             });
@@ -564,20 +520,6 @@ exports.getAppStoreSourceItemBatch = function(startId, batchSize, next) {
     });
 };
 
-exports.getAppMonstaBatch = function(startId, batchSize, next) {
-    connectRepo(function(err, repo) {
-        if (err) {
-            return next(err);
-        }
-
-        repo.getAppMonstaBatch(startId, batchSize, function(err, ids) {
-            repo.close(function() {
-                next(err, ids);
-            });
-        });
-    });
-};
-
 exports.insertXyoCategory = function(category, next) {
     connectRepo(function(err, repo) {
         if (err) {
@@ -587,20 +529,6 @@ exports.insertXyoCategory = function(category, next) {
         repo.insertXyoCategory(category, function(err, id) {
             repo.close(function() {
                 next(err, id);
-            });
-        });
-    });
-};
-
-exports.insertAppMonstaItem = function(appId, next) {
-    connectRepo(function(err, repo) {
-        if (err) {
-            return next(err);
-        }
-
-        repo.insertAppMonstaItem(appId, function(err) {
-            repo.close(function() {
-                next(err);
             });
         });
     });

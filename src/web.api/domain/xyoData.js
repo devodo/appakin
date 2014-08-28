@@ -102,12 +102,20 @@ var crawl = function(seedUrls, next) {
     var urlHistory = {};
 
     var c = new Crawler({
-        "maxConnections":2,
-        "skipDuplicates":true,
+        "maxConnections":5,
 
         //This will be called for each crawled page
         "callback": function(error,result,$) {
+            log.debug(result.uri);
+
             $('section.interest-box').not('.wide').find('a.header').each(function(index,a) {
+                if (urlHistory[a.href]) {
+                    return;
+                }
+                //log.debug("Category page: " + a.href);
+
+                urlHistory[a.href] = true;
+
                 var url = a.href;
 
                 log.debug("Found: " + url);
@@ -148,10 +156,13 @@ var crawl = function(seedUrls, next) {
                 if (urlHistory[a.href]) {
                     return;
                 }
-                log.debug("App page: " + a.href);
+                //log.debug("App page: " + a.href);
 
                 urlHistory[a.href] = true;
-                c.queue(a.href);
+
+                for (var i = 1; i <= 10; i++) {
+                    c.queue(a.href + '?page=' + i);
+                }
             });
         },
         "onDrain": function() {

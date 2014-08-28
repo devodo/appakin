@@ -136,29 +136,5 @@ exports.group = {
             test.ok(err === null, err);
             test.done();
         });
-    },
-
-    testRetrieveAppMonstaApps: function(test) {
-        return test.done(); //ignore test
-
-        var mainLoop = function(startId, batchSize, next) {
-            appStoreData.lookupAppMonsta(startId, batchSize, function(err, lastId) {
-                if (err) {
-                    return next(err);
-                }
-
-                if (lastId) {
-                    return mainLoop(lastId, batchSize, next);
-                }
-
-                next();
-            });
-        };
-
-        mainLoop(0, 200, function(err) {
-            test.expect(1);
-            test.ok(err === null, err);
-            test.done();
-        });
     }
 };
