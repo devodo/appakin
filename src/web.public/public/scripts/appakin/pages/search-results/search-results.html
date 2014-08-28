@@ -1,6 +1,9 @@
 <div>
     <p ng-if="search.results.categories.length == 0 && !search.results.initialState">
-        Sorry - could not find anything relating to <span>{{search.searchTerm}}</span>.
+        Sorry! We could not find anything relating to <span>{{search.searchTerm}}</span>.
+    </p>
+    <p ng-if="search.results.serverError">
+        Oops! There was a problem getting results from the server. Please try again, or later if the problem continues.
     </p>
     <ul ng-if="search.results.categories.length > 0">
         <li ng-repeat="category in search.results.categories">

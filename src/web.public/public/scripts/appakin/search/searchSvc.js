@@ -15,7 +15,8 @@
                 currentPage: defaultCurrentPage,
                 itemsPerPage: defaultItemsPerPage,
                 totalItems: 0,
-                initialState: true
+                initialState: true,
+                serverError: false
             },
             autoComplete: {
                 active: true,
@@ -48,6 +49,7 @@
                 me.service.results.itemsPerPage = defaultItemsPerPage;
                 me.service.results.totalItems = 0;
                 me.service.results.initialState = true;
+                me.service.results.serverError = false;
             },
             updateSearchFromUrl: function() {
                 var search = $location.search();
@@ -99,6 +101,10 @@
                         me.service.results.totalItems = data.totalItems;
                         me.service.results.currentPage = data.page;
                         me.service.results.initialState = false;
+                        me.service.results.serverError = false;
+                    },
+                    function(data) {
+                        me.service.results.serverError = true;
                     });
             },
             submitSearch: function(page) {

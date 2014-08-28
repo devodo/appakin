@@ -21,8 +21,10 @@
 
         return {
             cancel: cancelCurrentRequest,
-            get: function(q, p, page, take, callback) {
+            get: function(q, p, page, take, success, error) {
                 cancelCurrentRequest();
+
+                var requestTimedOut = false;
 
                 requestCancelPromise = $q.defer();
 
@@ -31,6 +33,9 @@
                         requestCancelPromise.resolve();
                         requestCancelPromise = null;
                     }
+
+                    console.log('Server request timed out.');
+                    requestTimedOut = true;
                 }, requestTimeoutMs);
 
                 console.log('Making search request: q=' + q + ' p=' + p);
@@ -44,16 +49,30 @@
                         webApiUrl + 'search?q='+encodeURIComponent(q)+'&p='+encodeURIComponent(p)+
                         '&page='+encodeURIComponent(page)+'&take='+encodeURIComponent(take),
                         { timeout: requestCancelPromise.promise })
-                    .then(function(response) {
-                        console.log('got result for q=' + q + ' p=' + p);
-                        $timeout.cancel(requestTimeoutPromise);
-                        requestTimeoutPromise = null;
+                    .success(function(data) {
+                        console.log('got result');
+                        success(data);
+                    })
+                    .error(function(data, status) {
+                        console.log('failed result: status=' + status + ' data=' + data);
 
-                        requestCancelPromise.resolve();
-                        requestCancelPromise = null;
-
-                        callback(response.data);
+                        if (error) {
+                            if (status > 0 || (status === 0 && requestTimedOut)) {
+                                error(data);
+                            }
+                        }
                     });
+//
+//                    .then(function(response) {
+//                        console.log('got result for q=' + q + ' p=' + p);
+//                        $timeout.cancel(requestTimeoutPromise);
+//                        requestTimeoutPromise = null;
+//
+//                        requestCancelPromise.resolve();
+//                        requestCancelPromise = null;
+//
+//                        callback(response.data);
+//                    });
             }
         };
     });

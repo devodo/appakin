@@ -51,6 +51,15 @@ exports.init = function init(app) {
             return;
         }
 
+        if (query === 'timeout') {
+            setTimeout(function() { res.json({}); }, 5000);
+            return;
+        }
+
+        if (query === 'error') {
+            setTimeout(function() { res.status(500).send('Deliberate error'); }, 200);
+        }
+
         setTimeout(
             function() {
                 res.json({
@@ -78,7 +87,7 @@ exports.init = function init(app) {
                     ]
                 });
             },
-            200);
+            300);
     });
 
 };
