@@ -1,4 +1,6 @@
-[ng\:cloak], [ng-cloak], .ng-cloak { display: none; }
+[ng\:cloak], [ng-cloak], [data-ng-cloak], [x-ng-cloak], .ng-cloak, .x-ng-cloak {
+    display: none !important;
+}
 
 body {
   padding: 50px;
@@ -33,11 +35,11 @@ input[type="radio"]:checked + img
     padding: 10px;
 }
 
-ul.disabled {
+#search-results ul.disabled {
     color: #bbb;
 }
 
-ul.disabled a {
+#search-results ul.disabled a {
     color: #bbb;
 }
 

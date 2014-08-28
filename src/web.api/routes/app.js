@@ -8,7 +8,7 @@ exports.init = function init(app) {
         setTimeout(
             function() {
                 res.json({
-                    name: 'Nike Running',
+                    name: 'Nike Shoe',
                     desc: 'This is a long description about this app',
                     urlName: req.params.appName,
                     platform: platform,

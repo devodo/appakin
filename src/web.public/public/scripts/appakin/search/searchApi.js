@@ -62,17 +62,6 @@
                             }
                         }
                     });
-//
-//                    .then(function(response) {
-//                        console.log('got result for q=' + q + ' p=' + p);
-//                        $timeout.cancel(requestTimeoutPromise);
-//                        requestTimeoutPromise = null;
-//
-//                        requestCancelPromise.resolve();
-//                        requestCancelPromise = null;
-//
-//                        callback(response.data);
-//                    });
             }
         };
     });

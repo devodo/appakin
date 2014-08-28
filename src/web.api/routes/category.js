@@ -27,7 +27,7 @@ exports.init = function init(app) {
                     ]
                 });
             },
-            200);
+            600);
     });
 
 };

@@ -32,11 +32,11 @@
                 controller: 'SearchResultsCtrl',
                 reloadOnSearch: false
             })
-            .when('/:platform/category/:categoryName', {
+            .when('/:platform/category/:categoryUrlName', {
                 templateUrl: 'appakin/pages/category/category.html',
                 controller: 'CategoryCtrl'
             })
-            .when('/:platform/app/:platformName', {
+            .when('/:platform/app/:appUrlName', {
                 templateUrl: 'appakin/pages/app/app.html',
                 controller: 'AppCtrl'
             })
