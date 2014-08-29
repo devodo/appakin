@@ -98,13 +98,13 @@ Repository.prototype.insertApp = function(storeId, app, next) {
     var me = this;
     var queryStr =
         "INSERT INTO app(ext_id, store_id, name, date_created, date_modified) " +
-        "VALUES ($1, $2, $3, $4, NOW(), NOW()) " +
+        "VALUES ($1, $2, $3, NOW(), NOW()) " +
         "RETURNING id;";
 
     var queryParams = [
         uuid.v4(),
         storeId,
-        item.name
+        app.name
     ];
 
     me.query(queryStr, queryParams, function (err, result) {
@@ -116,11 +116,11 @@ Repository.prototype.insertApp = function(storeId, app, next) {
     });
 };
 
-Repository.prototype.insertAppStoreAppInternal = function (itemId, app, next) {
+Repository.prototype.insertAppStoreAppInternal = function (appId, app, next) {
     var me = this;
     var queryStr =
         "INSERT INTO appstore_app(" +
-        "app_id, store_app_id, name, censored_name, description, appstore_url, " +
+        "app_id, store_app_id, name, censored_name, description, store_url, " +
         "dev_id, dev_name, dev_url, features, supported_devices, " +
         "is_game_center_enabled, screenshot_urls, ipad_screenshot_urls, " +
         "artwork_small_url, artwork_medium_url, artwork_large_url, price, " +
@@ -134,11 +134,11 @@ Repository.prototype.insertAppStoreAppInternal = function (itemId, app, next) {
         "$15, $16, $17, $18, " +
         "$19, $20, $21, $22, $23, $24, " +
         "$25, $26, $27, $28, $29, " +
-        "$30, $31, $32, $33, $34, " +
+        "$30, $31, $32, $33, $34, $35, " +
         "NOW(), NOW());";
 
     var queryParams = [
-        itemId,
+        appId,
         app.storeAppId,
         app.name,
         app.censoredName,
@@ -311,7 +311,7 @@ Repository.prototype.getAppStoreCategories = function(next) {
         var categories = result.rows.map(function(item) {
             return {
                 id: item.id,
-                storeCategoryId: item.store_category_id,
+                storeAppId: item.store_category_id,
                 name: item.name,
                 storeUrl: item.store_url,
                 parentId: item.parent_id,
@@ -348,7 +348,69 @@ Repository.prototype.getAppStoreSourceItemBatch = function(startId, batchSize, n
             return {
                 id: item.id,
                 appStoreCategoryId: item.appstore_category_id,
-                storeCategoryId: item.store_app_id,
+                storeAppId: item.store_app_id,
+                name: item.name,
+                letter: item.letter,
+                pageNumber: item.page_number,
+                dateCreated: item.date_created,
+                dateModified: item.date_modified
+            };
+        });
+
+        next(null, items);
+    });
+};
+
+Repository.prototype.getMissingAppStorePopularApps = function(next) {
+    var me = this;
+    var queryStr =
+        "SELECT ap.id, ap.batch, ap.appstore_category_id, ap.store_app_id, ap.name, ap.position, ap.date_created " +
+        "FROM appstore_popular ap " +
+        "LEFT JOIN appstore_app aa on ap.store_app_id = aa.store_app_id " +
+        "WHERE aa.app_id is null " +
+        "ORDER BY ap.id;";
+
+    me.query(queryStr, [], function (err, result) {
+        if (err) {
+            return next(err);
+        }
+
+        var items = result.rows.map(function(item) {
+            return {
+                id: item.id,
+                batchId: item.batch,
+                appStoreCategoryId: item.appstore_category_id,
+                storeAppId: item.store_app_id,
+                name: item.name,
+                position: item.position,
+                dateCreated: item.date_created
+            };
+        });
+
+        next(null, items);
+    });
+};
+
+Repository.prototype.getMissingAppStoreSourceApps = function(next) {
+    var me = this;
+    var queryStr =
+        "SELECT asa.id, asa.appstore_category_id, asa.store_app_id, asa.name, asa.letter, asa.page_number, " +
+        "asa.date_created, asa.date_modified " +
+        "FROM appstore_app_src asa " +
+        "LEFT JOIN appstore_app aa on asa.store_app_id = aa.store_app_id " +
+        "WHERE aa.app_id is null " +
+        "ORDER BY asa.id;";
+
+    me.query(queryStr, [], function (err, result) {
+        if (err) {
+            return next(err);
+        }
+
+        var items = result.rows.map(function(item) {
+            return {
+                id: item.id,
+                appStoreCategoryId: item.appstore_category_id,
+                storeAppId: item.store_app_id,
                 name: item.name,
                 letter: item.letter,
                 pageNumber: item.page_number,
@@ -482,9 +544,9 @@ exports.insertAppStoreApp = function(app, next) {
             return next(err);
         }
 
-        repo.insertAppStoreApp(app, function(err, itemId) {
+        repo.insertAppStoreApp(app, function(err, appId) {
             repo.close(function() {
-                next(err, itemId);
+                next(err, appId);
             });
         });
     });
@@ -496,9 +558,9 @@ exports.insertAppStoreCategory = function(category, next) {
             return next(err);
         }
 
-        repo.insertAppStoreCategory(category, function(err, itemId) {
+        repo.insertAppStoreCategory(category, function(err, appId) {
             repo.close(function() {
-                next(err, itemId);
+                next(err, appId);
             });
         });
     });
@@ -597,6 +659,34 @@ exports.insertAppStorePopular = function(app, categoryId, position, batchId, nex
         repo.insertAppStorePopular(app, categoryId, position, batchId, function(err, id) {
             repo.close(function() {
                 next(err, id);
+            });
+        });
+    });
+};
+
+exports.getMissingAppStorePopularApps = function(next) {
+    connectRepo(function(err, repo) {
+        if (err) {
+            return next(err);
+        }
+
+        repo.getMissingAppStorePopularApps(function(err, results) {
+            repo.close(function() {
+                next(err, results);
+            });
+        });
+    });
+};
+
+exports.getMissingAppStoreSourceApps = function(next) {
+    connectRepo(function(err, repo) {
+        if (err) {
+            return next(err);
+        }
+
+        repo.getMissingAppStoreSourceApps(function(err, results) {
+            repo.close(function() {
+                next(err, results);
             });
         });
     });

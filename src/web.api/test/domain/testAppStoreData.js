@@ -13,8 +13,7 @@ exports.group = {
     },
 
     testGetPageSrc: function(test) {
-        test.done();
-        return; //ignore test
+        return test.done(); //ignore test
 
         appStoreData.getPageSrc('284910350', function(err, pageSrc) {
             test.expect(2);
@@ -38,8 +37,7 @@ exports.group = {
     },
 
     testLookup: function(test) {
-        test.done();
-        return; //ignore test
+        return test.done(); //ignore test
 
         appStoreData.getLookup('284910350', function(err, result) {
             test.expect(2);
@@ -63,8 +61,7 @@ exports.group = {
     },
 
     testRetrieveApp: function(test) {
-        test.done();
-        return; //ignore test
+        return test.done(); //ignore test
 
         appStoreData.retrieveApp('575588416', function(err, itemId) {
             test.expect(2);
@@ -75,8 +72,7 @@ exports.group = {
     },
 
     testRetrieveCategories: function(test) {
-        test.done();
-        return; //ignore test
+        return test.done(); //ignore test
 
         appStoreData.retrieveCategories(function(err, results) {
             test.expect(2);
@@ -87,8 +83,7 @@ exports.group = {
     },
 
     testRetrieveAppSources: function(test) {
-        test.done();
-        return; //ignore test
+        return test.done(); //ignore test
 
         var category = {
             id: 1,
@@ -102,9 +97,8 @@ exports.group = {
         });
     },
 
-    testRetrieveAllAppSources: function(test) {
-        test.done();
-        return; //ignore test
+    retrieveAllAppSources: function(test) {
+        return test.done(); //ignore test
 
         appStoreData.retrieveAllAppSources(function(err) {
             test.expect(1);
@@ -114,8 +108,7 @@ exports.group = {
     },
 
     testRetrieveAllApps: function(test) {
-        test.done();
-        return; //ignore test
+        return test.done(); //ignore test
 
         var mainLoop = function(startId, batchSize, next) {
             appStoreData.lookupAppsBatched(startId, batchSize, function(err, lastId) {
@@ -139,7 +132,27 @@ exports.group = {
     },
 
     testRetrievePopularApps: function(test) {
+        return test.done(); //ignore test
+
         appStoreData.retrievePopularAppSourcesBatch(3, function(err) {
+            test.expect(1);
+            test.ok(!err, err);
+            test.done();
+        });
+    },
+
+    lookupMissingPopularApps: function(test) {
+        return test.done(); //ignore test
+
+        appStoreData.lookupMissingPopularApps(function(err) {
+            test.expect(1);
+            test.ok(!err, err);
+            test.done();
+        });
+    },
+
+    lookupMissingSourceApps: function(test) {
+        appStoreData.lookupMissingSourceApps(function(err) {
             test.expect(1);
             test.ok(!err, err);
             test.done();

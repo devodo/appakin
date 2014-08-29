@@ -63,7 +63,7 @@ exports.group = {
 
     testCrawlAllCategories: function(test) {
         return test.done();
-        xyoData.crawlAllCategories(10, function(err) {
+        xyoData.retrieveAllCategoryApps(10, function(err) {
             test.expect(1);
             test.ok(err === null, err);
             test.done();

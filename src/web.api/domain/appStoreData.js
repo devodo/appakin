@@ -1,7 +1,6 @@
 'use strict';
 var cheerio = require('cheerio');
 var async = require('async');
-var lineReader = require('line-reader');
 var request = require('request');
 var log = require('../logger');
 var appakinRepo = require("../repos/appakinRepo.js");
@@ -389,7 +388,7 @@ var lookupAppsBatched = function(startId, batchSize, next) {
         var lastId = results[results.length - 1].id;
 
         var appIds = results.map(function(appSource) {
-            return appSource.storeCategoryId;
+            return appSource.storeAppId;
         });
 
         retrieveApps(appIds, function(err) {
@@ -399,6 +398,59 @@ var lookupAppsBatched = function(startId, batchSize, next) {
 
             return next(null, lastId);
         });
+    });
+};
+
+var retrieveMissingApp = function(apps, next) {
+    var appIds = apps.map(function(appSource) {
+        return appSource.storeAppId;
+    });
+
+    var processBatch = function() {
+        var batch = [];
+        var maxItunesBatchSize = 200;
+
+        while (batch.length < maxItunesBatchSize && appIds.length > 0) {
+            batch.push(appIds.shift());
+        }
+
+        if (batch.length === 0) {
+            return next();
+        }
+
+        retrieveApps(batch, function(err) {
+            if (err) {
+                return next(err);
+            }
+
+            processBatch();
+        });
+    };
+
+    processBatch();
+};
+
+var lookupMissingPopularApps = function(next) {
+    appakinRepo.getMissingAppStorePopularApps(function(err, results) {
+        log.debug("Found " + results.length + " missing popular apps");
+
+        if (err) {
+            return next(err);
+        }
+
+        retrieveMissingApp(results, next);
+    });
+};
+
+var lookupMissingSourceApps = function(next) {
+    appakinRepo.getMissingAppStoreSourceApps(function(err, results) {
+        log.debug("Found " + results.length + " missing source apps");
+
+        if (err) {
+            return next(err);
+        }
+
+        retrieveMissingApp(results, next);
     });
 };
 
@@ -412,5 +464,7 @@ exports.retrieveAppSources = retrieveAppSources;
 exports.retrieveAllAppSources = retrieveAllAppSources;
 exports.lookupAppsBatched = lookupAppsBatched;
 exports.retrievePopularAppSourcesBatch = retrievePopularAppSourcesBatch;
+exports.lookupMissingPopularApps = lookupMissingPopularApps;
+exports.lookupMissingSourceApps = lookupMissingSourceApps;
 
 

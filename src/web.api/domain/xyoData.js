@@ -74,7 +74,7 @@ var crawlCategoryItems = function(category, numPages, next) {
     });
 };
 
-var crawlAllCategories = function(numPages, next) {
+var retrieveAllCategoryApps = function(numPages, next) {
     getCategories(function(err, categories) {
         if (err) {
             return next(err);
@@ -176,6 +176,6 @@ var crawl = function(seedUrls, next) {
 exports.crawl = crawl;
 exports.retrieveCategoryItems = retrieveCategoryItems;
 exports.getCategories = getCategories;
-exports.crawlAllCategories = crawlAllCategories;
+exports.retrieveAllCategoryApps = retrieveAllCategoryApps;
 
 
