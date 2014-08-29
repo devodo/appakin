@@ -286,7 +286,7 @@ Repository.prototype.getAppStoreCategories = function(next) {
     var me = this;
     var queryStr =
         "SELECT id, store_category_id, name, store_url, parent_id, date_created, date_modified " +
-        "FROM appstore_category where id > 30 " +
+        "FROM appstore_category " +
         "order by id";
 
     me.query(queryStr, [], function (err, result) {

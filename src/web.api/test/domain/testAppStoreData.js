@@ -126,7 +126,7 @@ exports.group = {
 
         mainLoop(539764, 200, function(err) {
             test.expect(1);
-            test.ok(err === null, err);
+            test.ok(!err, err);
             test.done();
         });
     },
