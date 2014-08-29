@@ -80,20 +80,6 @@ Repository.prototype.rollback = function (next, err) {
     });
 };
 
-Repository.prototype.testArray = function(next) {
-    var me = this;
-    var queryStr = "INSERT INTO test(name) VALUES($1) RETURNING id";
-    var queryParams = [['this', 'is','test']];
-
-    me.query(queryStr, queryParams, function (err, result) {
-        if (err) {
-            return next(err);
-        }
-
-        next(null, result.rows[0].id);
-    });
-};
-
 Repository.prototype.insertApp = function(storeId, app, next) {
     var me = this;
     var queryStr =
@@ -300,7 +286,7 @@ Repository.prototype.getAppStoreCategories = function(next) {
     var me = this;
     var queryStr =
         "SELECT id, store_category_id, name, store_url, parent_id, date_created, date_modified " +
-        "FROM appstore_category " +
+        "FROM appstore_category where id > 30 " +
         "order by id";
 
     me.query(queryStr, [], function (err, result) {
@@ -479,29 +465,23 @@ Repository.prototype.getXyoCategories = function(next) {
     });
 };
 
-Repository.prototype.insertXyoCategoryItem = function(xyoCategoryId, name, position, next) {
+Repository.prototype.insertXyoCategoryApp = function(xyoCategoryId, batchId, name, position, next) {
     var me = this;
     var queryStr =
         "INSERT INTO xyo_category_app(" +
-        "xyo_category_id, name, position, max_position, min_position, " +
-        "date_created, date_modified) " +
-        "VALUES ($1, $2, $3, $4, $5, NOW(), NOW()) " +
+        "xyo_category_id, batch_id, name, position, date_created) " +
+        "VALUES ($1, $2, $3, $4, NOW()) " +
         "RETURNING id;";
 
     var queryParams = [
         xyoCategoryId,
+        batchId,
         name,
-        position,
-        position,
         position
     ];
 
     me.query(queryStr, queryParams, function (err, id) {
         if (err) {
-            if (err.code === UNIQUE_VIOLATION_CODE) {
-                return next(null, -1);
-            }
-
             return next(err);
         }
 
@@ -521,20 +501,6 @@ var connectRepo = function(next) {
         }
 
         next(null, repo);
-    });
-};
-
-exports.testArray = function(next) {
-    connectRepo(function(err, repo) {
-        if (err) {
-            return next(err);
-        }
-
-        repo.testArray(function(err, result) {
-            repo.close(function() {
-                next(err, result);
-            });
-        });
     });
 };
 
@@ -636,13 +602,13 @@ exports.getXyoCategories = function(next) {
     });
 };
 
-exports.insertXyoCategoryItem = function(categoryId, name, position, next) {
+exports.insertXyoCategoryApp = function(categoryId, batchId, name, position, next) {
     connectRepo(function(err, repo) {
         if (err) {
             return next(err);
         }
 
-        repo.insertXyoCategoryItem(categoryId, name, position, function(err, id) {
+        repo.insertXyoCategoryApp(categoryId, batchId, name, position, function(err, id) {
             repo.close(function() {
                 next(err, id);
             });

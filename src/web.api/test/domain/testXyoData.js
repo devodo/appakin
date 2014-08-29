@@ -12,7 +12,7 @@ exports.group = {
         callback();
     },
 
-    testGetPageSrc: function(test) {
+    crawlCategories: function(test) {
         return test.done();
 
         var seedUrls = [
@@ -29,43 +29,33 @@ exports.group = {
             seedUrls.push('http://xyo.net/iphone/?page=' + i);
         }
 
-        xyoData.crawl(seedUrls, function(err, count) {
+        xyoData.crawlCategories(seedUrls, function(err, count) {
             test.expect(1);
-            test.ok(err === null, err);
+            test.ok(!err, err);
             test.done();
         });
     },
 
-    testGetCategoryItems: function(test) {
+    testCrawlCategoryApps: function(test) {
         return test.done();
 
         var category = {
             url: 'http://xyo.net/iphone-apps/social-networking-kew/'
         };
 
-        xyoData.retrieveCategoryItems(category, 2, function(err, items) {
+        xyoData.crawlCategoryApps(category, 2, function(err, items) {
             test.expect(2);
-            test.ok(err === null, err);
+            test.ok(!err, err);
             test.ok(items.length > 0, "No items retrieved");
             test.done();
         });
     },
 
-    testGetCategories: function(test) {
+    retrieveAllCategoryApps: function(test) {
         return test.done();
-        xyoData.getCategories(function(err, categories) {
-            test.expect(2);
-            test.ok(err === null, err);
-            test.ok(categories.length > 0, "No categories retrieved");
-            test.done();
-        });
-    },
-
-    testCrawlAllCategories: function(test) {
-        return test.done();
-        xyoData.retrieveAllCategoryApps(10, function(err) {
+        xyoData.retrieveAllCategoryApps(2, 100, function(err) {
             test.expect(1);
-            test.ok(err === null, err);
+            test.ok(!err, err);
             test.done();
         });
     }

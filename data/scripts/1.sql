@@ -208,6 +208,21 @@ CREATE TABLE xyo_category
   CONSTRAINT xyo_category_pkey PRIMARY KEY (id)
 );
 
+CREATE TABLE xyo_category_app
+(
+  id serial NOT NULL,
+  xyo_category_id integer NOT NULL,
+  batch_id integer NOT NULL,
+  name text NOT NULL,
+  "position" integer NOT NULL,
+  date_created timestamp without time zone NOT NULL,
+  CONSTRAINT xyo_category_app_pkey PRIMARY KEY (id),
+  CONSTRAINT xyo_category_app_xyo_category_id_fkey FOREIGN KEY (xyo_category_id)
+  REFERENCES xyo_category (id) MATCH SIMPLE
+  ON UPDATE NO ACTION ON DELETE NO ACTION,
+  CONSTRAINT xyo_category_app_unique UNIQUE (batch_id, xyo_category_id, name)
+);
+
 CREATE TABLE appstore_popular
 (
   id serial NOT NULL,

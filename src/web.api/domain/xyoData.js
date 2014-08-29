@@ -7,7 +7,7 @@ var log = require('../logger');
 var appakinRepo = require("../repos/appakinRepo.js");
 var request = require('request');
 
-var retrieveCategoryItems = function(category, numPages, next) {
+var crawlCategoryApps = function(category, numPages, next) {
     var items = [];
 
     var retrievePage = function(pageNumber) {
@@ -52,16 +52,27 @@ var getCategories = function(next) {
     });
 };
 
-var crawlCategoryItems = function(category, numPages, next) {
-    retrieveCategoryItems(category, numPages, function(err, items) {
+var retrieveCategoryApps = function(category, batchId, numPages, next) {
+    log.debug("Retrieve category apps for category: " + category.id);
+
+    crawlCategoryApps(category, numPages, function(err, apps) {
         if (err) {
             return next(err);
         }
 
-        var position = 1;
+        var duplicateCheck = {};
 
-        var insertItem = function(item, callback) {
-            appakinRepo.insertXyoCategoryItem(category.id, item.name, position++, function(err) {
+        var position = 0;
+
+        var insertApp = function(app, callback) {
+            position = position + 1;
+            if (duplicateCheck[app.name]) {
+                log.warn("Duplicate app detected: " + app.name);
+                return callback();
+            }
+            duplicateCheck[app.name] = true;
+
+            appakinRepo.insertXyoCategoryApp(category.id, batchId, app.name, position, function(err) {
                 if (err) {
                     return callback(err);
                 }
@@ -70,18 +81,18 @@ var crawlCategoryItems = function(category, numPages, next) {
             });
         };
 
-        async.eachSeries(items, insertItem, next);
+        async.eachSeries(apps, insertApp, next);
     });
 };
 
-var retrieveAllCategoryApps = function(numPages, next) {
+var retrieveAllCategoryApps = function(batchId, numPages, next) {
     getCategories(function(err, categories) {
         if (err) {
             return next(err);
         }
 
-        var crawlCategory = function(category, callback) {
-            crawlCategoryItems(category, numPages, function(err) {
+        var processCategory = function(category, callback) {
+            retrieveCategoryApps(category, batchId, numPages, function(err) {
                 if (err) {
                     return callback(err);
                 }
@@ -90,12 +101,12 @@ var retrieveAllCategoryApps = function(numPages, next) {
             });
         };
 
-        async.eachSeries(categories, crawlCategory, next);
+        async.eachSeries(categories, processCategory, next);
 
     });
 };
 
-var crawl = function(seedUrls, next) {
+var crawlCategories = function(seedUrls, next) {
     var nameRegex = /.*-([^\/]+)\/(.*)-.*\//;
     var crawlCount = 0;
 
@@ -173,9 +184,8 @@ var crawl = function(seedUrls, next) {
     c.queue(seedUrls);
 };
 
-exports.crawl = crawl;
-exports.retrieveCategoryItems = retrieveCategoryItems;
-exports.getCategories = getCategories;
+exports.crawlCategories = crawlCategories;
+exports.crawlCategoryApps = crawlCategoryApps;
 exports.retrieveAllCategoryApps = retrieveAllCategoryApps;
 
 

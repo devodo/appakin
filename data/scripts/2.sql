@@ -94,11 +94,5 @@ alter table app drop column store_app_id;
 
 alter table category drop column store_id;
 
-alter table xyo_category_item rename to xyo_category_app;
-alter sequence xyo_category_item_id_seq rename to xyo_category_app_id_seq;
-alter index xyo_category_item_pkey rename to xyo_category_app_pkey;
-alter index xyo_category_item_name_unique rename to xyo_category_app_name_unique;
-alter table xyo_category_app rename column category_id to xyo_category_id;
-alter table xyo_category_app drop constraint xyo_category_item_category_id_fkey;
-alter table xyo_category_app add foreign key (xyo_category_id) references xyo_category(id);
+ALTER TABLE appstore_app ADD CONSTRAINT appstore_app_store_app_id_unique UNIQUE (store_app_id);
 
