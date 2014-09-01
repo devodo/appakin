@@ -2,11 +2,10 @@
 var cheerio = require('cheerio');
 var async = require('async');
 var request = require('request');
-var log = require('../logger');
-var appakinRepo = require("../repos/appakinRepo.js");
+var log = require('../../logger');
+var appStoreRepo = require("../../repos/appakin/appStoreRepo");
 
 var getPageSrc = function(id, next) {
-
     var url = 'https://itunes.apple.com/us/app/id' + id;
 
     request(url, function (err, response, src) {
@@ -129,7 +128,7 @@ var retrieveApp = function(id, next) {
                 return next(err);
             }
 
-            appakinRepo.insertAppStoreApp(app, function(err, itemId) {
+            appStoreRepo.insertAppStoreApp(app, function(err, itemId) {
                 if (err) {
                     return next(err);
                 }
@@ -152,7 +151,7 @@ var retrieveApps = function(ids, next) {
                     return next(err);
                 }
 
-                appakinRepo.insertAppStoreApp(app, function(err, appId) {
+                appStoreRepo.insertAppStoreApp(app, function(err, appId) {
                     if (err) {
                         return callback(err);
                     }
@@ -187,7 +186,7 @@ var retrieveCategories = function(next) {
             };
 
             return function(callback) {
-                appakinRepo.insertAppStoreCategory(category, function(err, id) {
+                appStoreRepo.insertAppStoreCategory(category, function(err, id) {
                     callback(err, id);
                 });
             };
@@ -255,7 +254,7 @@ var retrieveAppSources = function(category, startLetter, startPageNumber, next) 
             var results = [];
 
             var processAppSource = function(appSource, callback) {
-                appakinRepo.insertAppStoreAppSrc(appSource, category.id, letter, pageNumber, function(err, id) {
+                appStoreRepo.insertAppStoreAppSrc(appSource, category.id, letter, pageNumber, function(err, id) {
                     if (err) {
                         return callback(err);
                     }
@@ -318,7 +317,7 @@ var retrievePopularAppSources = function(category, batchId, next) {
 
             previousCheck[appSource.storeAppId] = true;
 
-            appakinRepo.insertAppStorePopular(appSource, category.id, position, batchId, function(err, id) {
+            appStoreRepo.insertAppStorePopular(appSource, category.id, position, batchId, function(err, id) {
                 if (err) {
                     return callback(err);
                 }
@@ -340,7 +339,7 @@ var retrievePopularAppSources = function(category, batchId, next) {
 };
 
 var retrievePopularAppSourcesBatch = function(batchId, next) {
-    appakinRepo.getAppStoreCategories(function(err, categories) {
+    appStoreRepo.getAppStoreCategories(function(err, categories) {
         if (err) {
             return next(err);
         }
@@ -362,7 +361,7 @@ var retrievePopularAppSourcesBatch = function(batchId, next) {
 };
 
 var retrieveAllAppSources = function(next) {
-    appakinRepo.getAppStoreCategories(function(err, categories) {
+    appStoreRepo.getAppStoreCategories(function(err, categories) {
         if (err) {
             return next(err);
         }
@@ -374,7 +373,7 @@ var retrieveAllAppSources = function(next) {
 };
 
 var lookupAppsBatched = function(startId, batchSize, next) {
-    appakinRepo.getAppStoreSourceItemBatch(startId, batchSize, function(err, results) {
+    appStoreRepo.getAppStoreSourceItemBatch(startId, batchSize, function(err, results) {
         log.debug("Batch lookup start id: " + startId);
 
         if (err) {
@@ -431,7 +430,7 @@ var retrieveMissingApp = function(apps, next) {
 };
 
 var lookupMissingPopularApps = function(next) {
-    appakinRepo.getMissingAppStorePopularApps(function(err, results) {
+    appStoreRepo.getMissingAppStorePopularApps(function(err, results) {
         log.debug("Found " + results.length + " missing popular apps");
 
         if (err) {
@@ -443,7 +442,7 @@ var lookupMissingPopularApps = function(next) {
 };
 
 var lookupMissingSourceApps = function(next) {
-    appakinRepo.getMissingAppStoreSourceApps(function(err, results) {
+    appStoreRepo.getMissingAppStoreSourceApps(function(err, results) {
         log.debug("Found " + results.length + " missing source apps");
 
         if (err) {
@@ -451,6 +450,16 @@ var lookupMissingSourceApps = function(next) {
         }
 
         retrieveMissingApp(results, next);
+    });
+};
+
+var getCategories = function(next) {
+    appStoreRepo.getCategories(function(err, categories) {
+        if (err) {
+            return next(err);
+        }
+
+        next(null, categories);
     });
 };
 
@@ -466,5 +475,6 @@ exports.lookupAppsBatched = lookupAppsBatched;
 exports.retrievePopularAppSourcesBatch = retrievePopularAppSourcesBatch;
 exports.lookupMissingPopularApps = lookupMissingPopularApps;
 exports.lookupMissingSourceApps = lookupMissingSourceApps;
+exports.getCategories = getCategories;
 
 

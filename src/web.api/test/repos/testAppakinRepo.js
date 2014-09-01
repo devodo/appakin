@@ -1,6 +1,7 @@
 "use strict";
 
-var appakinRepo = require("../../repos/appakinRepo.js");
+var appakinRepo = require("../../repos/appakin/appakinRepo");
+var connection = require("../../repos/connection");
 
 exports.group = {
     setUp: function (callback) {
@@ -11,12 +12,12 @@ exports.group = {
         callback();
     },
 
-    testArray: function (test) {
-        appakinRepo.testArray(function(err, result) {
+    testGetCategories: function (test) {
+        appakinRepo.getCategories(function(err, results) {
             test.expect(2);
-            test.ok(err === null, err);
-            test.ok(result > 0);
-            appakinRepo.end();
+            test.ok(!err, err);
+            test.ok(results.length > 0);
+            connection.end();
             test.done();
         });
     }

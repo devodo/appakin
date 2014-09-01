@@ -1,6 +1,6 @@
 "use strict";
 
-var xyoData = require("../../domain/xyoData.js");
+var xyoDataProvider = require("../../../domain/dataProvider/xyoDataProvider");
 var fs = require('fs');
 
 exports.group = {
@@ -29,7 +29,7 @@ exports.group = {
             seedUrls.push('http://xyo.net/iphone/?page=' + i);
         }
 
-        xyoData.crawlCategories(seedUrls, function(err, count) {
+        xyoDataProvider.crawlCategories(seedUrls, function(err, count) {
             test.expect(1);
             test.ok(!err, err);
             test.done();
@@ -43,7 +43,7 @@ exports.group = {
             url: 'http://xyo.net/iphone-apps/social-networking-kew/'
         };
 
-        xyoData.crawlCategoryApps(category, 2, function(err, items) {
+        xyoDataProvider.crawlCategoryApps(category, 2, function(err, items) {
             test.expect(2);
             test.ok(!err, err);
             test.ok(items.length > 0, "No items retrieved");
@@ -53,7 +53,7 @@ exports.group = {
 
     retrieveAllCategoryApps: function(test) {
         return test.done();
-        xyoData.retrieveAllCategoryApps(2, 100, function(err) {
+        xyoDataProvider.retrieveAllCategoryApps(2, 100, function(err) {
             test.expect(1);
             test.ok(!err, err);
             test.done();

@@ -1,6 +1,6 @@
 "use strict";
 
-var appStoreData = require("../../domain/appStoreData.js");
+var appStoreData = require("../../../domain/dataProvider/appStoreDataProvider");
 var fs = require('fs');
 
 exports.group = {
@@ -24,7 +24,7 @@ exports.group = {
     },
 
     testParseSrc: function(test) {
-        fs.readFile('test/domain/files/AppStoreSrc.html', 'utf8', function(err, data) {
+        fs.readFile('test/domain/dataProvider/files/AppStoreSrc.html', 'utf8', function(err, data) {
             test.expect(3);
             test.ok(err === null, err);
 
@@ -48,7 +48,7 @@ exports.group = {
     },
 
     testParseLookup: function(test) {
-        fs.readFile('test/domain/files/AppStoreLookup.json', 'utf8', function(err, data) {
+        fs.readFile('test/domain/dataProvider/files/AppStoreLookup.json', 'utf8', function(err, data) {
             test.expect(3);
             test.ok(err === null, err);
 

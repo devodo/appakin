@@ -3,8 +3,8 @@ var Crawler = require("crawler").Crawler;
 var async = require('async');
 var url = require('url');
 var cheerio = require('cheerio');
-var log = require('../logger');
-var appakinRepo = require("../repos/appakinRepo.js");
+var log = require('../../logger');
+var xyoRepo = require("../../repos/appakin/xyoRepo.js");
 var request = require('request');
 
 var crawlCategoryApps = function(category, numPages, next) {
@@ -43,7 +43,7 @@ var crawlCategoryApps = function(category, numPages, next) {
 };
 
 var getCategories = function(next) {
-    appakinRepo.getXyoCategories(function(err, categories) {
+    xyoRepo.getXyoCategories(function(err, categories) {
         if (err) {
             return next(err);
         }
@@ -72,7 +72,7 @@ var retrieveCategoryApps = function(category, batchId, numPages, next) {
             }
             duplicateCheck[app.name] = true;
 
-            appakinRepo.insertXyoCategoryApp(category.id, batchId, app.name, position, function(err) {
+            xyoRepo.insertXyoCategoryApp(category.id, batchId, app.name, position, function(err) {
                 if (err) {
                     return callback(err);
                 }
@@ -150,7 +150,7 @@ var crawlCategories = function(seedUrls, next) {
                     url: url
                 };
 
-                appakinRepo.insertXyoCategory(category, function(err, id) {
+                xyoRepo.insertXyoCategory(category, function(err, id) {
                     if (err) {
                         return next(err);
                     }

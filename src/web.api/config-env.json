@@ -2,7 +2,7 @@
   "development": {
       "test": "test dev",
       "connectionString": {
-          "appakin": "postgres://localhost/appakin"
+          "appakin": "postgres://appakin:appakin@appakin-dev/appakin"
       }
   },
   "production": {
