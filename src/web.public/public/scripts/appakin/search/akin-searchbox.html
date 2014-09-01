@@ -1,25 +1,26 @@
 <div>
-    <form ng-submit="search.submitSearch(1)">
-        <div>
+    <form ng-submit="search.submitSearch(1)" class="searchbox">
+        <fieldset class="platform-input">
             <label>
                 <input type="radio" name="platform" value="android" ng-model="search.platform"/>
-                <img width="50" height="59" src="/public/images/android.png">
+                <img src="/public/images/android-240.png">
             </label>
             <label>
                 <input type="radio" name="platform" value="ios" ng-model="search.platform"/>
-                <img width="63" height="50" src="/public/images/ios.png">
+                <img src="/public/images/app-store-240.png">
             </label>
             <label>
                 <input type="radio" name="platform" value="winphone" ng-model="search.platform"/>
-                <img width="60" height="60" src="/public/images/winphone.png">
+                <img src="/public/images/winphone-240.png" class="last">
             </label>
-        </div>
-        <div>
-            <autocomplete ng-model="search.searchTerm" attr-placeholder="Search for categories or apps"
+        </fieldset>
+        <fieldset class="search-input">
+            <autocomplete ng-model="search.searchTerm"
+                          attr-placeholder="Search for categories or apps"
                           click-activation="false" data="search.autoComplete.terms"
                           on-type="search.updateAutoCompleteTerms"
                           is-active="search.autoComplete.active"></autocomplete>
-            <button type="submit">Submit</button>
-        </div>
+            <button type="submit"><img src="/public/images/magnifying-glass.png"></button>
+        </fieldset>
     </form>
 </div>

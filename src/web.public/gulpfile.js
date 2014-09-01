@@ -10,6 +10,7 @@ var templateCache = require('gulp-angular-templatecache');
 var stylish = require('jshint-stylish');
 var pkg = require('./package.json');
 var fs = require('fs');
+var sass = require('gulp-ruby-sass');
 
 var publicGeneratedRoot = path.resolve('./public-generated');
 var buildRoot = path.resolve('../../build-output/web.public');
@@ -97,7 +98,7 @@ gulp.task('build:scripts', ['build:clean', 'build:config'], function() {
 gulp.task('build:stylesheets', ['build:clean', 'build:config'], function () {
     return gulp
         .src(['./public/stylesheets/main.scss'])
-        .pipe(plugins.sass())
+        .pipe(sass())
         .pipe(plugins.rename(
             function(path) {
                 path.basename = 'app-styles';
@@ -210,12 +211,13 @@ gulp.task('dev:stylesheets', function () {
     return gulp
         .src(['./public/stylesheets/main.scss'])
         .pipe(plugins.plumber({errorHandler: handleError}))
-        .pipe(plugins.sass()) //({errLogToConsole: true}))
+        .pipe(sass()) //({errLogToConsole: true}))
         .pipe(plugins.rename(
             function(path) {
                 path.basename = 'app-styles';
             }))
         .pipe(gulp.dest(publicGeneratedRoot + '/public/stylesheets/'))
+        .on('end', beep)
         .on('end', plugins.livereload.changed);
 });
 
@@ -252,6 +254,10 @@ function handleError(error) {
     gutil.beep();
     gutil.log(gutil.colors.red(error.message));
     this.emit('end');
+}
+
+function beep() {
+    gutil.beep();
 }
 
 function inject(glob, path, tag) {

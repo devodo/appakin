@@ -10,6 +10,7 @@
     "tests"
   ],
   "dependencies": {
-    "angular": "~1.2.23"
+    "angular": "~1.2.23",
+    "normalize.scss": "~3.0.1+normalize.3.0.1"
   }
 }

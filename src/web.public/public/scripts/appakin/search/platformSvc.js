@@ -57,11 +57,23 @@
             getFriendlyName: function(platform) {
                 switch (platform) {
                     case 'ios':
-                        return 'iOS';
+                        return 'Apple';
                     case 'android':
                         return 'Android';
                     case 'winphone':
                         return 'Windows Phone';
+                    default:
+                        return platform;
+                }
+            },
+            getShortFriendlyName: function(platform) {
+                switch (platform) {
+                    case 'ios':
+                        return 'Apple';
+                    case 'android':
+                        return 'Android';
+                    case 'winphone':
+                        return 'Windows';
                     default:
                         return platform;
                 }

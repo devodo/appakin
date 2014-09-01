@@ -1,4 +1,303 @@
+
+$light-background-colour: #fff;
+$dark-background-colour: #444;
+$highlight-color: rgb(202, 219, 42);
+$active-input-colour: #888;
+$light-pressed-input-colour: #aaa;
+$searchbox-height: 26px;
+$watermark-colour: red;
+$input-border-width: 2px;
+$large-button-border-width: 3px;
+$large-border-radius: 10px;
+$small-border-radius: 6px;
+$large-border-radius-inner: $large-border-radius - $large-button-border-width;
+$body-text-font-family: 'Open Sans', 'Helvetica', 'Arial', sans-serif;
+
+
+// Uncomment these lines to display the grid.
+//$visual-grid: true;
+//$visual-grid-color: red;
+//$visual-grid-index: front;
+//$visual-grid-opacity: 0.1;
+
+@import "includes/meyer-reset";
+@import 'bourbon/bourbon';
+@import 'neat/neat';
 @import "includes/allmighty-autocomplete";
+
+$break-small: 320px;
+$break-large: 1024px;
+
+@mixin respond-to($media) {
+  @if $media == handhelds {
+    @media only screen and (max-width: $break-small) { @content; }
+  }
+  @else if $media == medium-screens {
+    @media only screen and (min-width: $break-small + 1) and (max-width: $break-large - 1) { @content; }
+  }
+  @else if $media == wide-screens {
+    @media only screen and (min-width: $break-large) { @content; }
+  }
+}
+
+body {
+  @include outer-container;
+  header { @include span-columns(12); }
+  main {
+    @include span-columns(12);
+    //margin-top: 25%;
+    margin-top: 50px;
+  }
+  footer { @include span-columns(12); }
+}
+
+body {
+  font-family: $body-text-font-family;
+}
+
+header {
+  background-color: $dark-background-colour;
+
+  ul.social-media-links {
+    float: right;
+    padding: 0 2px 2px 2px;
+
+    li {
+      //display: block;
+      float: left;
+
+      a {
+        display: block;
+        background-image: url('/public/images/social-media-sprite-32.png');
+        width: 32px;
+        height: 32px;
+      }
+
+      a.facebook-link {
+        background-position: 0 0;
+        margin-right: 2px;
+      }
+
+      a.twitter-link {
+        background-position: 32px 0;
+      }
+
+      // TODO: retina version of sprites.
+    }
+  }
+}
+
+
+//@media only screen and (min-device-pixel-ratio: 1.3),
+//only screen and (-webkit-min-device-pixel-ratio: 1.3),
+//only screen and (min--moz-device-pixel-ratio: 1.3),
+//only screen and (-o-min-device-pixel-ratio: 1.3 / 1),
+//only screen and (min-resolution: 125dpi),
+//only screen and (min-resolution: 1.3dppx) {
+//  header {
+//    margin-top: 100px;
+//  }
+//a {
+//  background-image: url('/public/images/social-media-sprite-64.png');
+//}
+//}
+
+
+#home-page div.akin-logo {
+  img {
+    display: block;
+    width: 172px;
+    height: 48px;
+    margin-left: auto;
+    margin-right: auto;
+    margin-bottom: 6px;
+    //height: auto !important;
+    -ms-interpolation-mode: bicubic;
+  }
+
+  // TODO: not sure how to handle logo here - I'm currently using a large one everywhere that gets shrunk down as needed.
+}
+
+
+//#home-page form {
+//  margin-top: 3%;
+//}
+
+form.searchbox {
+  input[type="radio"] {
+    display: none;
+  }
+}
+
+#home-page form.searchbox {
+  $big-button-padding: 3px;
+  $big-button-margin: 10px;
+  $big-button-img-dim: 60px;
+
+  .platform-input {
+    //display: table; margin: 0 auto;
+    display: block;
+    width: (($big-button-img-dim + ($large-button-border-width * 2) + ($big-button-padding * 2)) * 3) + ($big-button-margin * 2);
+    margin-left: auto;
+    margin-right: auto;
+    margin-bottom: 6px;
+
+    input {
+      margin: 0;
+      padding: 0;
+    }
+
+    img {
+      display: block;
+      float: left;
+      padding: $big-button-padding;
+      margin-right: $big-button-margin;
+      width: $big-button-img-dim + ($large-button-border-width * 2) + ($big-button-padding * 2);
+      height: $big-button-img-dim + ($large-button-border-width * 2) + ($big-button-padding * 2);
+      border: $large-button-border-width solid $light-background-colour;
+      @include border-top-radius($large-border-radius);
+      @include border-bottom-radius($large-border-radius);
+    }
+
+    img.last {
+      margin-right: 0px;
+    }
+
+    input[type="radio"]:checked + img {
+      border: $large-button-border-width solid $active-input-colour;
+    }
+  }
+
+  .search-input {
+    position: relative;
+    width: 95%;
+    max-width: 400px;
+    margin-left: auto;
+    margin-right: auto;
+    background-color: $active-input-colour;
+    padding: $input-border-width;
+    font-size: 0.8em;
+
+    div {
+      padding-right: $searchbox-height + $input-border-width;
+    }
+
+    input[type="text"] {
+      border: none;
+      margin: 0;
+      height: $searchbox-height;
+    }
+
+    button {
+      position: absolute;
+      top: $input-border-width;
+      right: $input-border-width;
+      padding: 0;
+      width: $searchbox-height;
+      height: $searchbox-height;
+      border: none;
+      background-color: $active-input-colour;
+
+      img {
+        width: $searchbox-height;
+        height: $searchbox-height;
+      }
+    }
+
+    button:active {
+      background-color: $light-pressed-input-colour;
+    }
+  }
+}
+
+footer {
+  background-color: $dark-background-colour;
+
+  p.call-to-action {
+    background-color: $light-pressed-input-colour;
+    padding: 6px;
+    width: 95%;
+    max-width: 25em;
+    margin: 6px auto;
+    font-size: 0.9em;
+    @include border-top-radius($small-border-radius);
+    @include border-bottom-radius($small-border-radius);
+    text-align: center;
+
+    a,
+    a:link,
+    a:visited,
+    a:hover,
+    a:active {
+      color: white;
+      text-decoration: none;
+      font-weight: normal;
+    }
+
+    a em {
+      font-weight: bold;
+    }
+  }
+
+  p.copyright {
+    padding-top: 3px;
+    font-size: 0.6em;
+    color: $light-pressed-input-colour;
+    margin-bottom: 2px;
+    text-align: center;
+    clear: both; // TODO find better solution.
+  }
+
+  .footer-nav {
+    float: right;
+    position: relative;
+    left: -50%;
+    text-align: left;
+
+    ul {
+      position: relative;
+      left: 50%;
+
+      li {
+        float: left;
+        position: relative; /* ie needs position:relative here*/
+        //display: inline;
+        list-style-type: none;
+        color: $highlight-color;
+
+        a {
+          text-decoration: none;
+          //margin:10px;
+          float: left;
+          //border:2px outset blue;
+          //color:#fff;
+          //padding:2px 5px;
+          text-align: center;
+          white-space: nowrap;
+        }
+
+        a,
+        a:link,
+        a:visited,
+        a:hover,
+        a:active {
+          color: $highlight-color;
+          font-weight: normal;
+          font-size: 0.9em;
+        }
+
+        a,
+        a:link,
+        a:visited,
+        a:active {
+          text-decoration: none;
+        }
+      }
+    }
+  }
+}
+
+
 
 @-ms-viewport { width: device-width; }
 @-o-viewport { width: device-width; }
@@ -8,52 +307,10 @@
   display: none !important;
 }
 
-body {
-  padding: 50px;
-  font: 14px "Lucida Grande", Helvetica, Arial, sans-serif;
-}
-
-a {
-  color: #00B7FF;
-}
-
-input.watermarked {
-  color: #bbb;
-}
-
-input[type="radio"]{
-  display:none;
-}
-
-input[type="radio"] + img {
-  border: 4px #fff;
-  padding: 10px;
-  display:inline-block;
-  -moz-border-radius: 15px;
-  border-radius: 15px;
-  color: #555;
-}
-
-input[type="radio"]:checked + img {
-  border: 4px solid;
-  padding: 10px;
-}
-
 #search-results ul.disabled {
   color: #bbb;
 }
 
 #search-results ul.disabled a {
   color: #bbb;
-}
-
-main .akin-logo {
-  width: 354px;
-  height: 100px;
-  background-image: url('/public/images/logo.png');
-  background-size: 354px 100px;
-}
-
-body {
-  font-family: 'Open Sans', 'Helvetica', 'Arial', sans-serif;
 }

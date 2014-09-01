@@ -37,6 +37,7 @@
     "gulp-rename": "^1.2.0",
     "gulp-rev": "^1.0.0",
     "gulp-rimraf": "^0.1.0",
+    "gulp-ruby-sass": "^0.7.1",
     "gulp-sass": "^0.7.3",
     "gulp-size": "^1.0.0",
     "gulp-sourcemaps": "^1.1.1",
