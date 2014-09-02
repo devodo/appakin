@@ -155,16 +155,18 @@ input, textarea {
 #home-page form.searchbox {
   $big-button-padding: 3px;
   $big-button-margin: 10px;
+  $big-button-dim-for-small-screens: 40px;
+  $big-button-dim-for-large-screens: 60px;
 
   .platform-input {
     display: block;
-    width: ((40 + ($input-border-width * 2) + ($big-button-padding * 2)) * 3) + ($big-button-margin * 2);
+    width: (($big-button-dim-for-small-screens + ($input-border-width * 2) + ($big-button-padding * 2)) * 3) + ($big-button-margin * 2);
     margin-left: auto;
     margin-right: auto;
     margin-bottom: 6px;
 
     @include respond-to(medium-screens) {
-      width: ((60 + ($input-border-width * 2) + ($big-button-padding * 2)) * 3) + ($big-button-margin * 2);
+      width: (($big-button-dim-for-large-screens + ($input-border-width * 2) + ($big-button-padding * 2)) * 3) + ($big-button-margin * 2);
     }
 
     input {
@@ -181,15 +183,15 @@ input, textarea {
       float: left;
       padding: $big-button-padding;
       margin-right: $big-button-margin;
-      width: 40 + ($input-border-width * 2) + ($big-button-padding * 2);
-      height: 40 + ($input-border-width * 2) + ($big-button-padding * 2);
+      width: $big-button-dim-for-small-screens + ($input-border-width * 2) + ($big-button-padding * 2);
+      height: $big-button-dim-for-small-screens + ($input-border-width * 2) + ($big-button-padding * 2);
       border: $input-border-width solid transparent;
       @include border-top-radius($large-border-radius);
       @include border-bottom-radius($large-border-radius);
 
       @include respond-to(medium-screens) {
-        width: 60 + ($input-border-width * 2) + ($big-button-padding * 2);
-        height: 60 + ($input-border-width * 2) + ($big-button-padding * 2);
+        width: $big-button-dim-for-large-screens + ($input-border-width * 2) + ($big-button-padding * 2);
+        height: $big-button-dim-for-large-screens + ($input-border-width * 2) + ($big-button-padding * 2);
       }
     }
 
