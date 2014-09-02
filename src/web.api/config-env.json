@@ -3,6 +3,17 @@
       "test": "test dev",
       "connectionString": {
           "appakin": "postgres://appakin:appakin@appakin-dev/appakin"
+      },
+      "search": {
+          "solr": {
+              "host": "appakin-dev",
+              "port": "8983",
+              "cores": {
+                  "auto": "appakin_auto",
+                  "category": "appakin_cat",
+                  "app": "appakin_app"
+              }
+          }
       }
   },
   "production": {

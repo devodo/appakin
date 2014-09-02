@@ -25,12 +25,12 @@ Connection.prototype.beginTran = function (next) {
 };
 
 Connection.prototype.commitTran = function (next) {
-    this.query('COMMIT', [], next);
+    this.client.query('COMMIT', [], next);
 };
 
 Connection.prototype.rollback = function (err, next) {
     var me = this;
-    me.query('ROLLBACK', [], function (rbErr) {
+    me.client.query('ROLLBACK', [], function (rbErr) {
         //if there was a problem rolling back the query
         //something is seriously messed up.  Return the error
         //to the done function to close & remove this client from

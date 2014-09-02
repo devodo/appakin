@@ -96,3 +96,20 @@ alter table category drop column store_id;
 
 ALTER TABLE appstore_app ADD CONSTRAINT appstore_app_store_app_id_unique UNIQUE (store_app_id);
 
+CREATE TABLE category_app
+(
+  id serial NOT NULL,
+  category_id integer NOT NULL,
+  app_id integer NOT NULL,
+  "position" integer NOT NULL,
+  date_created timestamp without time zone NOT NULL,
+  CONSTRAINT category_app_pkey PRIMARY KEY (id),
+  CONSTRAINT category_app_app_id_fkey FOREIGN KEY (app_id)
+  REFERENCES app (id) MATCH SIMPLE
+  ON UPDATE NO ACTION ON DELETE NO ACTION,
+  CONSTRAINT category_app_category_id_fkey FOREIGN KEY (category_id)
+  REFERENCES category (id) MATCH SIMPLE
+  ON UPDATE NO ACTION ON DELETE NO ACTION,
+  CONSTRAINT category_app_unique UNIQUE (category_id, app_id)
+);
+

@@ -3,7 +3,7 @@ var cheerio = require('cheerio');
 var async = require('async');
 var request = require('request');
 var log = require('../../logger');
-var appStoreRepo = require("../../repos/appakin/appStoreRepo");
+var appStoreRepo = require("../../repos/appStoreRepo");
 
 var getPageSrc = function(id, next) {
     var url = 'https://itunes.apple.com/us/app/id' + id;

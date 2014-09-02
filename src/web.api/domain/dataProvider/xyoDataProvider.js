@@ -4,7 +4,7 @@ var async = require('async');
 var url = require('url');
 var cheerio = require('cheerio');
 var log = require('../../logger');
-var xyoRepo = require("../../repos/appakin/xyoRepo.js");
+var xyoRepo = require("../../repos/xyoRepo.js");
 var request = require('request');
 
 var crawlCategoryApps = function(category, numPages, next) {
