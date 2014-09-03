@@ -1,12 +1,25 @@
 
-$light-background-colour: #fff;
-$dark-background-colour: #444;
-$main-spot-colour: rgb(202, 219, 42);
+@import "includes/meyer-reset";
+@import 'bourbon/bourbon';
+@import 'neat/neat';
+
+$main-spot-colour: rgb(46, 136, 129);
+$secondary-spot-colour: rgb(163, 89, 49);
 $background-spot-colour: #aaa;
-$input-border-colour: #888;
+$light-background-colour: #fff;
+$medium-background-colour: tint($main-spot-colour, 70%);
+$dark-background-colour: #444;
+$input-border-colour: #333;
+$light-black-colour: #666;
+$light-light-black-colour: #999;
+
+$big-button-padding: 6px;
+$big-button-margin: 10px;
+$big-button-dim-for-small-screens: 40px;
+$big-button-dim-for-large-screens: 50px;
 
 $input-border-width: 2px;
-$large-border-radius: 10px;
+$large-border-radius: 6px;
 
 $body-text-font-family: 'Open Sans', 'Helvetica', 'Arial', sans-serif;
 
@@ -16,9 +29,6 @@ $body-text-font-family: 'Open Sans', 'Helvetica', 'Arial', sans-serif;
 //$visual-grid-index: front;
 //$visual-grid-opacity: 0.1;
 
-@import "includes/meyer-reset";
-@import 'bourbon/bourbon';
-@import 'neat/neat';
 @import "includes/allmighty-autocomplete";
 
 $break-small: 320px;
@@ -49,7 +59,7 @@ body {
 
   main {
     @include span-columns(12);
-    margin-top: 50px; // stops footer encroaching on search box on home page.
+    margin-top: 30px; // stops footer encroaching on search box on home page.
   }
 
   footer {
@@ -58,11 +68,14 @@ body {
 }
 
 header {
-  background-color: $dark-background-colour;
+  //background-color: $dark-background-colour;
+  //border-bottom: 1px solid #ccc;
 
   ul.social-media-links {
     float: right;
     padding: 0 3px 2px 2px;
+    background-color: $medium-background-colour;
+    @include border-bottom-radius($large-border-radius);
 
     li {
       float: left;
@@ -94,8 +107,6 @@ header {
       a.twitter-link {
         background-position: 32px 0;
       }
-
-      // TODO: retina version of sprites.
     }
   }
 }
@@ -106,10 +117,10 @@ html, body {
 }
 .content-wrapper {
   min-height: 100%;
-  margin: 0 auto -4.75em;
+  margin: 0 auto -6em;
 }
 footer, .push {
-  height: 4.75em;
+  height: 6em;
 }
 
 // Stop mobile browsers zooming in on select
@@ -128,12 +139,11 @@ input, textarea {
 #home-page div.akin-logo {
   img {
     display: block;
-    width: 172px;
-    height: 48px;
+    width: 194px;
+    height: 54px;
     margin-left: auto;
     margin-right: auto;
-    margin-bottom: 6px;
-    //height: auto !important;
+    margin-bottom: 12px;
     -ms-interpolation-mode: bicubic;
   }
 
@@ -153,41 +163,23 @@ input, textarea {
 }
 
 #home-page form.searchbox {
-  $big-button-padding: 3px;
-  $big-button-margin: 10px;
-  $big-button-dim-for-small-screens: 40px;
-  $big-button-dim-for-large-screens: 50px;
 
   .platform-input {
-    display: block;
-    width: (($big-button-dim-for-small-screens + ($input-border-width * 2) + ($big-button-padding * 2)) * 3) + ($big-button-margin * 2);
+    display: table;
+    width: ($big-button-dim-for-small-screens + ($input-border-width * 2) + ($big-button-padding * 2)) * 3 + ($big-button-margin * 4);
     margin-left: auto;
     margin-right: auto;
-    margin-bottom: 6px;
+    margin-bottom: 16px;
 
     @include respond-to(medium-screens) {
-      width: (($big-button-dim-for-large-screens + ($input-border-width * 2) + ($big-button-padding * 2)) * 3) + ($big-button-margin * 2);
+      width: (($big-button-dim-for-large-screens + ($input-border-width * 2) + ($big-button-padding * 2)) * 3) + ($big-button-margin * 4);
     }
 
-    input {
-      margin: 0;
-      padding: 0;
-    }
-
-    input[type="radio"] {
-      display: none;
-    }
-
-    img {
-      display: block;
-      float: left;
-      padding: $big-button-padding;
-      margin-right: $big-button-margin;
+    label {
+      display: table-cell;
+      padding: 0px $big-button-margin;
       width: $big-button-dim-for-small-screens + ($input-border-width * 2) + ($big-button-padding * 2);
       height: $big-button-dim-for-small-screens + ($input-border-width * 2) + ($big-button-padding * 2);
-      border: $input-border-width solid transparent;
-      @include border-top-radius($large-border-radius);
-      @include border-bottom-radius($large-border-radius);
 
       @include respond-to(medium-screens) {
         width: $big-button-dim-for-large-screens + ($input-border-width * 2) + ($big-button-padding * 2);
@@ -195,21 +187,81 @@ input, textarea {
       }
     }
 
+    input[type="radio"] {
+      display: none;
+    }
+
+    input {
+      margin: 0;
+      padding: 0;
+    }
+
+    img {
+      width: $big-button-dim-for-small-screens;
+      height: $big-button-dim-for-small-screens;
+
+      @include respond-to(medium-screens) {
+        width: $big-button-dim-for-large-screens;
+        height: $big-button-dim-for-large-screens;
+      }
+    }
+
     img.last {
       margin-right: 0px;
     }
 
-    input[type="radio"]:checked + img {
-      border: $input-border-width solid $input-border-colour;
-      -moz-box-shadow:    inset 0 0 5px $main-spot-colour;
-      -webkit-box-shadow: inset 0 0 5px $main-spot-colour;
-      box-shadow:         inset 0 0 5px $main-spot-colour;
+    div {
+      display: block;
+      position: relative;
+      padding: $big-button-padding;
+      width: $big-button-dim-for-small-screens + ($big-button-padding * 2) + ($input-border-width * 2);
+      height: $big-button-dim-for-small-screens + ($big-button-padding * 2) + ($input-border-width * 2);
+
+      border: $input-border-width solid transparent;
+      @include border-top-radius($large-border-radius);
+      @include border-bottom-radius($large-border-radius);
+
+      @include respond-to(medium-screens) {
+        width: $big-button-dim-for-large-screens + ($big-button-padding * 2) + ($input-border-width * 2);
+        height: $big-button-dim-for-large-screens + ($big-button-padding * 2) + ($input-border-width * 2);
+      }
+    }
+
+    input[type="radio"]:checked + div {
+      //background-color: $main-spot-colour;
+      border: $input-border-width solid $main-spot-colour;
+    }
+
+    input[type="radio"]:checked + div:after,
+    input[type="radio"]:checked + div:before {
+      top: 100%;
+      left: 50%;
+      border: solid transparent;
+      content: " ";
+      height: 0;
+      width: 0;
+      position: absolute;
+      pointer-events: none;
+    }
+
+    input[type="radio"]:checked + div:after {
+      border-color: rgba(255, 255, 255, 0);
+      border-top-color: #ffffff;
+      border-width: 10px;
+      margin-left: -10px;
+    }
+
+    input[type="radio"]:checked + div:before {
+      border-color: rgba(90, 245, 12, 0);
+      border-top-color: $main-spot-colour;
+      border-width: 13px;
+      margin-left: -13px;
     }
   }
 
   // http://stackoverflow.com/questions/5825861/how-to-make-text-input-box-to-occupy-all-the-remaining-width-within-parent-block
   .search-input {
-    width: 90%;
+    width: 95%;
     max-width: 400px;
     margin-left: auto;
     margin-right: auto;
@@ -240,7 +292,7 @@ input, textarea {
       -webkit-appearance: none;
       -moz-appearance: none;
       //border: 2px solid transparent; /* Here */
-      border: 1px solid #999;
+      border: 1px solid $input-border-colour;
       border-right-width: 0px;
     }
 
@@ -271,22 +323,14 @@ input, textarea {
 }
 
 footer {
-  background-color: $dark-background-colour;
-
   p.call-to-action {
-    background-color: $background-spot-colour;
+    background-color: $main-spot-colour;
     padding: 8px;
-    width: 95%;
-    max-width: 25em;
+    width: 100%;
     margin: 6px auto;
-    font-size: 0.9em;
     text-align: center;
 
-    a,
-    a:link,
-    a:visited,
-    a:hover,
-    a:active {
+    a, a:link, a:visited, a:hover, a:active {
       color: white;
       text-decoration: none;
       font-weight: normal;
@@ -297,20 +341,12 @@ footer {
     }
   }
 
-  p.copyright {
-    padding-top: 3px;
-    font-size: 0.6em;
-    color: $background-spot-colour;
-    margin-bottom: 2px;
-    text-align: center;
-    clear: both; // TODO find better solution.
-  }
-
   .footer-nav {
     float: right;
     position: relative;
     left: -50%;
     text-align: left;
+    margin-bottom: 8px;
 
     ul {
       position: relative;
@@ -319,43 +355,62 @@ footer {
       li {
         float: left;
         position: relative; /* ie needs position:relative here*/
-        //display: inline;
         list-style-type: none;
-        color: $main-spot-colour;
+        color: $light-black-colour;
+        font-variant: uppercase;
 
         a {
           text-decoration: none;
-          //margin:10px;
           float: left;
-          //border:2px outset blue;
-          //color:#fff;
-          //padding:2px 5px;
           text-align: center;
           white-space: nowrap;
         }
 
-        a,
-        a:link,
-        a:visited,
-        a:hover,
-        a:active {
-          color: $main-spot-colour;
+        a, a:link, a:visited, a:hover, a:active {
+          color: $light-black-colour;
           font-weight: normal;
-          font-size: 0.9em;
+          font-size: 0.95em;
         }
 
-        a,
-        a:link,
-        a:visited,
-        a:active {
+        a, a:link, a:visited, a:active {
           text-decoration: none;
         }
       }
     }
   }
+
+  .footer-copyright {
+    display: table;
+    //margin: 0 5px;
+    clear: both;
+    width: 95%;
+    max-width: 320px;
+    margin-left: auto;
+    margin-right: auto;
+
+    span, p {
+      display: table-cell;
+      vertical-align: middle;
+    }
+
+    p {
+      width: 100%;
+      text-align: right;
+    }
+
+    img {
+      width: 80px;
+      height: 22px;
+    }
+  }
+
+  p.copyright {
+    padding-top: 3px;
+    font-size: 0.6em;
+    color: $light-light-black-colour;
+    margin-bottom: 2px;
+  }
 }
-
-
 
 @-ms-viewport { width: device-width; }
 @-o-viewport { width: device-width; }
