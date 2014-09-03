@@ -156,7 +156,7 @@ input, textarea {
   $big-button-padding: 3px;
   $big-button-margin: 10px;
   $big-button-dim-for-small-screens: 40px;
-  $big-button-dim-for-large-screens: 60px;
+  $big-button-dim-for-large-screens: 50px;
 
   .platform-input {
     display: block;
@@ -217,7 +217,7 @@ input, textarea {
     div {
       display: table;
       width: 100%;
-      background-color: $input-border-colour;
+      //background-color: $input-border-colour;
       padding: 0 2px;
     }
 
@@ -234,25 +234,37 @@ input, textarea {
       width: 100%;
       //font-size: 0.9em;
       font-size: 16px;
+      height: 28px;
       padding: 3px;
 
       -webkit-appearance: none;
       -moz-appearance: none;
-      border: 2px solid transparent; /* Here */
+      //border: 2px solid transparent; /* Here */
+      border: 1px solid #999;
+      border-right-width: 0px;
     }
 
     div button {
+      @include button($main-spot-colour);
+
       display: table-cell;
-      border: 0;
-      padding: 2px 0 0 0;
-      background: transparent;
+      //border: 1px solid red;
+      margin: 0;
+      background-color: black;
       vertical-align: middle;
-      width: 40px;
+      padding: 0px 7px;
+
+      @include border-top-radius(0);
+      @include border-bottom-radius(0);
 
       img {
         vertical-align: middle;
+        //margin-left: auto;
+        //margin-right: auto;
         width: 26px;
         height: 26px;
+        //max-width: 100%;
+        //height: auto;
       }
     }
   }

@@ -1,5 +1,5 @@
 'use strict';
-var appStoreData = require("../domain/dataProvider/appStoreData.js");
+var appStoreData = require("../domain/dataProvider/appStoreDataProvider");
 
 exports.init = function init(app) {
 
