@@ -24,16 +24,16 @@ var addApp = function(app, next) {
     }
 
     var appIndex = {
-        id : parseInt(app.id),
+        id : app.id,
         name: app.name,
         description: app.description,
         url: app.urlName,
         "img_url" : app.imageUrl,
-        "popularity": 1.0,
         price: app.price,
         "is_iphone": isIphone,
         "is_ipad": isIPad,
-        "is_free": !app.price || parseInt(app.price) === 0
+        "is_free": !app.price || parseInt(app.price) === 0,
+        popularity: app.popularity
     };
 
     solrCore.client.add(appIndex, function(err, obj){

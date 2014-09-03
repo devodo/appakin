@@ -36,7 +36,7 @@ exports.group = {
 
     addAllCategories: function (test) {
         return test.done(); // ignore test
-        categoryIndexer.addAllCategories(function(err) {
+        categoryIndexer.addAllCategories(20, function(err) {
             test.expect(1);
             test.ok(!err, err);
             test.done();

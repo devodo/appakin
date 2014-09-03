@@ -1,6 +1,6 @@
 "use strict";
 
-var appIndexer = require("../../domain/search/appIndexer");
+var autoIndexer = require("../../domain/search/autoIndexer");
 
 exports.group = {
     setUp: function (callback) {
@@ -14,7 +14,7 @@ exports.group = {
     addAllApps: function (test) {
         return test.done(); // disable
 
-        appIndexer.addAllApps(10000, function(err) {
+        autoIndexer.addAllAuto(function(err) {
             test.expect(1);
             test.ok(!err, err);
             test.done();

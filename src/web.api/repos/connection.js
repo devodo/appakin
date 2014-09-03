@@ -21,7 +21,7 @@ Connection.prototype.close = function (err, next) {
 };
 
 Connection.prototype.beginTran = function (next) {
-    this.query('BEGIN', [], next);
+    this.client.query('BEGIN', [], next);
 };
 
 Connection.prototype.commitTran = function (next) {

@@ -1,6 +1,6 @@
 "use strict";
 
-var appakinRepo = require("../../repos/appStoreRepo");
+var appStoreRepo = require("../../repos/appStoreRepo");
 var connection = require("../../repos/connection");
 
 exports.group = {
@@ -9,15 +9,35 @@ exports.group = {
     },
 
     tearDown: function (callback) {
+        connection.end();
         callback();
     },
 
     testGetCategories: function (test) {
-        appakinRepo.getCategories(function(err, results) {
+        appStoreRepo.getCategories(function(err, results) {
             test.expect(2);
             test.ok(!err, err);
             test.ok(results.length > 0);
-            connection.end();
+            test.done();
+        });
+    },
+
+    resetCategoryPopularities: function(test) {
+        return test.done(); //disable
+
+        appStoreRepo.resetCategoryPopularities(3, function(err) {
+            test.expect(1);
+            test.ok(!err, err);
+            test.done();
+        });
+    },
+
+    resetAppPopularities: function(test) {
+        return test.done(); //disable
+
+        appStoreRepo.resetAppPopularities(3, function(err) {
+            test.expect(1);
+            test.ok(!err, err);
             test.done();
         });
     }

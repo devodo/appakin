@@ -295,7 +295,7 @@ var retrieveAppSources = function(category, startLetter, startPageNumber, next) 
     retrievePage(startLetterCode, startPageNumber);
 };
 
-var retrievePopularAppSources = function(category, batchId, next) {
+var retrieveAppChartSources = function(category, batchId, next) {
     request(category.storeUrl, function (err, response, src) {
         if (err) {
             return next(err);
@@ -317,7 +317,7 @@ var retrievePopularAppSources = function(category, batchId, next) {
 
             previousCheck[appSource.storeAppId] = true;
 
-            appStoreRepo.insertAppStorePopular(appSource, category.id, position, batchId, function(err, id) {
+            appStoreRepo.insertAppChartEntry(appSource, category.id, position, batchId, function(err, id) {
                 if (err) {
                     return callback(err);
                 }
@@ -338,14 +338,14 @@ var retrievePopularAppSources = function(category, batchId, next) {
     });
 };
 
-var retrievePopularAppSourcesBatch = function(batchId, next) {
+var retrieveAppCharts = function(batchId, next) {
     appStoreRepo.getAppStoreCategories(function(err, categories) {
         if (err) {
             return next(err);
         }
 
         async.eachSeries(categories, function(category, callback) {
-            retrievePopularAppSources(category, batchId, function(err, results) {
+            retrieveAppChartSources(category, batchId, function(err, results) {
                 if (err) {
                     return callback(err);
                 }
@@ -472,7 +472,7 @@ exports.retrieveCategories = retrieveCategories;
 exports.retrieveAppSources = retrieveAppSources;
 exports.retrieveAllAppSources = retrieveAllAppSources;
 exports.lookupAppsBatched = lookupAppsBatched;
-exports.retrievePopularAppSourcesBatch = retrievePopularAppSourcesBatch;
+exports.retrieveAppCharts = retrieveAppCharts;
 exports.lookupMissingPopularApps = lookupMissingPopularApps;
 exports.lookupMissingSourceApps = lookupMissingSourceApps;
 exports.getCategories = getCategories;

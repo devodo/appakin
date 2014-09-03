@@ -4,8 +4,8 @@ var connection = require('./connection');
 var insertXyoCategory = function(client, category, next) {
     var queryStr =
         "INSERT INTO xyo_category(" +
-        "name, link_text, description, url, date_created, date_modified) " +
-        "VALUES ($1, $2, $3, $4, NOW(), NOW()) " +
+        "name, link_text, description, url, date_created, date_modified)\n" +
+        "VALUES ($1, $2, $3, $4, NOW(), NOW())\n" +
         "RETURNING id;";
 
     var queryParams = [
@@ -26,8 +26,8 @@ var insertXyoCategory = function(client, category, next) {
 
 var getXyoCategories = function(client, next) {
     var queryStr =
-        "SELECT id, name, link_text, description, url, date_created, date_modified " +
-        "FROM xyo_category " +
+        "SELECT id, name, link_text, description, url, date_created, date_modified\n" +
+        "FROM xyo_category\n" +
         "order by id;";
 
     client.query(queryStr, [], function (err, result) {
@@ -54,8 +54,8 @@ var getXyoCategories = function(client, next) {
 var insertXyoCategoryApp = function(client, xyoCategoryId, batchId, name, position, next) {
     var queryStr =
         "INSERT INTO xyo_category_app(" +
-        "xyo_category_id, batch_id, name, position, date_created) " +
-        "VALUES ($1, $2, $3, $4, NOW()) " +
+        "xyo_category_id, batch_id, name, position, date_created)\n" +
+        "VALUES ($1, $2, $3, $4, NOW())\n" +
         "RETURNING id;";
 
     var queryParams = [

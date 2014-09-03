@@ -1,6 +1,7 @@
 "use strict";
 
 var xyoDataProvider = require("../../../domain/dataProvider/xyoDataProvider");
+var connection = require("../../../repos/connection");
 var fs = require('fs');
 
 exports.group = {
@@ -9,6 +10,7 @@ exports.group = {
     },
 
     tearDown: function(callback) {
+        connection.end();
         callback();
     },
 

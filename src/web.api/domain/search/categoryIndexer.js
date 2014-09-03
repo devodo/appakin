@@ -14,7 +14,7 @@ var addCategory = function(category, appDescriptions, next) {
         description: category.description,
         url: category.urlName,
         "app_desc" : appDescriptions,
-        "popularity": 1.0
+        "popularity": category.popularity
     },function(err, obj){
         if(err){
             return next(err);
@@ -24,14 +24,14 @@ var addCategory = function(category, appDescriptions, next) {
     });
 };
 
-var addAllCategories = function(next) {
+var addAllCategories = function(appDescriptionLimit, next) {
     appStoreRepo.getCategories(function(err, categories) {
         if (err) {
             return next(err);
         }
 
         var processCategory = function(category, callback) {
-            appStoreRepo.getCategoryAppDescriptions(category.id, function(err, results) {
+            appStoreRepo.getCategoryAppDescriptions(category.id, appDescriptionLimit, function(err, results) {
                 if (err) {
                     return callback(err);
                 }

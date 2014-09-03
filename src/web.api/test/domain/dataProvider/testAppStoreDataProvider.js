@@ -1,6 +1,7 @@
 "use strict";
 
 var appStoreData = require("../../../domain/dataProvider/appStoreDataProvider");
+var connection = require("../../../repos/connection");
 var fs = require('fs');
 
 exports.group = {
@@ -9,6 +10,7 @@ exports.group = {
     },
 
     tearDown: function(callback) {
+        connection.end();
         callback();
     },
 
@@ -131,10 +133,10 @@ exports.group = {
         });
     },
 
-    testRetrievePopularApps: function(test) {
+    testRetrieveAppCharts: function(test) {
         return test.done(); //ignore test
 
-        appStoreData.retrievePopularAppSourcesBatch(3, function(err) {
+        appStoreData.retrieveAppCharts(3, function(err) {
             test.expect(1);
             test.ok(!err, err);
             test.done();
