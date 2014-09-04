@@ -28,6 +28,7 @@ public-generated/
 
 # Temp files
 .tmp/
+.sass-cache/
 
 # Ignore development dependencies
 /node_modules/
