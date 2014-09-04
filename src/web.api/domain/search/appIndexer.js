@@ -26,7 +26,7 @@ var addApp = function(app, next) {
     var appIndex = {
         id : app.id,
         name: app.name,
-        description: app.description,
+        desc: app.description,
         url: app.urlName,
         "img_url" : app.imageUrl,
         price: app.price,

@@ -1,5 +1,7 @@
 'use strict';
 
+var autoSearcher = require('../domain/search/autoSearcher');
+
 exports.init = function init(app) {
 
     app.get('/api/search/autocomplete', function (req, res) {
@@ -30,6 +32,27 @@ exports.init = function init(app) {
             100);
     });
 
+    app.get('/api/search/appstore/auto', function (req, res) {
+        var query = req.query.q || '';
+
+        if (query === '') {
+            res.status(400).send('Bad query string');
+            return;
+        }
+
+        autoSearcher.search(query, 1, function(err, result) {
+            if (err) {
+                return res.status(500).send(err);
+            }
+
+            var docs = result.docs.map(function(doc) {
+                return doc.name;
+            });
+
+            res.json(docs);
+        });
+    });
+
     app.get('/api/search', function (req, res) {
         var query = req.query.q || '';
         var platform = req.query.p || '';
@@ -38,7 +61,7 @@ exports.init = function init(app) {
 
         if (query === '' || platform === '' || isNaN(page) || isNaN(take)) {
             res.status(400).send('Bad query string');
-            return
+            return;
         }
 
         if (query === 'none') {

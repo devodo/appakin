@@ -11,7 +11,7 @@ var addCategory = function(category, appDescriptions, next) {
     solrCore.client.add({
         id : category.id,
         name: category.name,
-        description: category.description,
+        desc: category.description,
         url: category.urlName,
         "app_desc" : appDescriptions,
         "popularity": category.popularity
