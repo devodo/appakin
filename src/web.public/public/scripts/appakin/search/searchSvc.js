@@ -1,7 +1,7 @@
 (function () {
     'use strict';
 
-    angular.module('appAkin').factory('search', function(autoCompleteApi, searchApi, $timeout, $location, platform) {
+    angular.module('appAkin').factory('search', function(autoCompleteApi, searchApi, $timeout, $location, $rootScope, platform) {
         var me = this;
         var defaultItemsPerPage = 10;
         var maxItemsPerPage = 50;
@@ -137,6 +137,15 @@
                 $location.path('/search').search(search);
             }
         };
+
+        $rootScope.$watch(
+            function () {
+                return me.service.platform;
+            },
+            function () {
+                platform.persistPlatform(me.service.platform);
+            }
+        );
 
         return me.service;
     });

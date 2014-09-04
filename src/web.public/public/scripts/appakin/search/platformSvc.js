@@ -61,6 +61,12 @@
                 $cookies.platform = platform;
                 return platform;
             },
+            persistPlatform: function(platform) {
+                var normalisedPlatform = normalisePlatform(platform);
+                if (normalisedPlatform) {
+                    $cookies.platform = platform;
+                }
+            },
             getFriendlyName: function(platform) {
                 switch (platform) {
                     case 'ios':
