@@ -1,0 +1,18 @@
+#home-page div.akin-logo {
+  img {
+    display: block;
+    width: 194px;
+    height: 54px;
+    margin-left: auto;
+    margin-right: auto;
+    margin-bottom: 12px;
+    -ms-interpolation-mode: bicubic;
+
+    @include mq($from: tablet) {
+      width: 291px;
+      height: 81px;
+    }
+  }
+
+  // TODO: not sure how to handle logo here - I'm currently using a large one everywhere that gets shrunk down as needed.
+}

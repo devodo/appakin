@@ -1,0 +1,40 @@
+
+#search-results ul.disabled,
+#search-results ul.disabled a {
+  color: $disabled-text;
+}
+
+.footer-copyright {
+  display: table;
+  clear: both;
+  width: 90%;
+  max-width: 290px;
+  margin-left: auto;
+  margin-right: auto;
+
+  @include mq($from: tablet) {
+    float: right;
+    clear: none;
+    margin-left: 0px;
+    margin-right: 50px;
+  }
+
+  span, p {
+    display: table-cell;
+    vertical-align: middle;
+  }
+
+  p {
+    width: 100%;
+    text-align: right;
+    padding-top: 3px;
+    font-size: 10px;
+    color: $alt-black-colour;
+    margin-bottom: 2px;
+  }
+
+  img {
+    width: 80px;
+    height: 22px;
+  }
+}

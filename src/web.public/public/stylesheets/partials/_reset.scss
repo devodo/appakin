@@ -41,6 +41,14 @@
     border-collapse: collapse;
     border-spacing: 0;
   }
+
+  @-ms-viewport { width: device-width; }
+  @-o-viewport { width: device-width; }
+  @viewport { width: device-width; }
+
+  [ng\:cloak], [ng-cloak], [data-ng-cloak], [x-ng-cloak], .ng-cloak, .x-ng-cloak {
+    display: none !important;
+  }
 }
 
 @include meyer-reset;

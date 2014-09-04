@@ -1,0 +1,40 @@
+.social-media-links {
+  a {
+    display: block;
+    background-image: url('/public/images/social-media-sprite-32.png');
+    @include background-image-2x('/public/images/social-media-sprite-64.png', 64px, 32px);
+    width: 32px;
+    height: 32px;
+  }
+
+  a.facebook {
+    background-position: 0 0;
+    margin-right: 2px;
+  }
+
+  a.twitter {
+    background-position: 32px 0;
+  }
+}
+
+footer .call-to-action {
+  background-color: $main-spot-colour;
+  padding: 8px;
+  width: 100%;
+  margin: 6px auto;
+  text-align: center;
+
+  a, a:link, a:visited, a:hover, a:active {
+    color: white;
+    text-decoration: none;
+    font-weight: normal;
+  }
+
+  a:hover {
+    text-decoration: underline;
+  }
+
+  a em {
+    font-weight: bold;
+  }
+}

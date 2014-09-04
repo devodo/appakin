@@ -1,0 +1,36 @@
+// Stop mobile browsers zooming in on input widgets.
+@media screen and (-webkit-min-device-pixel-ratio: 0) {
+  select:focus, textarea:focus, input:focus {
+    font-size: 16px;
+  }
+}
+
+// Stop safari rounding the corners of input widgets.
+input,
+textarea {
+  -webkit-appearance: none;
+  -webkit-border-radius: 0;
+}
+
+$placeholder-text-colour: #aaa;
+$placeholder-text-colour-firefox-darken: 30%;
+
+// Placeholder text styling.
+::-webkit-input-placeholder {
+  color: $placeholder-text-colour;
+}
+:-moz-placeholder { /* Firefox 18- */
+  color: shade($placeholder-text-colour, $placeholder-text-colour-firefox-darken);
+}
+::-moz-placeholder {  /* Firefox 19+ */
+  color: shade($placeholder-text-colour, $placeholder-text-colour-firefox-darken);
+}
+:-ms-input-placeholder {
+  color: $placeholder-text-colour;
+}
+
+// Remove placeholder text on focus
+:focus::-webkit-input-placeholder { color: transparent; }
+:focus:-moz-placeholder { color: transparent; }
+:focus::-moz-placeholder { color: transparent; }
+:focus:-ms-input-placeholder { color: transparent; }

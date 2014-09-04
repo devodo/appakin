@@ -1,0 +1,160 @@
+
+// PLATFORM BIG BUTTONS
+
+$platform-big-button-padding: 6px;
+$platform-big-button-margin: 10px;
+$platform-big-button-small-screen-size: 40px;
+$platform-big-button-large-screen-size: 50px;
+$platform-big-button-border-width: 2px;
+$platform-big-button-border-radius: $normal-border-radius;
+$platform-big-button-border-colour: $main-spot-colour;
+
+#home-page .platform-input {
+  display: table;
+  width: ($platform-big-button-small-screen-size + ($platform-big-button-border-width * 2) + ($platform-big-button-padding * 2)) * 3 + ($platform-big-button-margin * 4);
+  margin-left: auto;
+  margin-right: auto;
+  margin-bottom: 16px;
+
+  @include mq($from: tablet) {
+    width: (($platform-big-button-large-screen-size + ($platform-big-button-border-width * 2) + ($platform-big-button-padding * 2)) * 3) + ($platform-big-button-margin * 4);
+  }
+
+  label {
+    display: table-cell;
+    padding: 0px $platform-big-button-margin;
+    width: $platform-big-button-small-screen-size + ($platform-big-button-border-width * 2) + ($platform-big-button-padding * 2);
+    height: $platform-big-button-small-screen-size + ($platform-big-button-border-width * 2) + ($platform-big-button-padding * 2);
+
+    @include mq($from: tablet) {
+      width: $platform-big-button-large-screen-size + ($platform-big-button-border-width * 2) + ($platform-big-button-padding * 2);
+      height: $platform-big-button-large-screen-size + ($platform-big-button-border-width * 2) + ($platform-big-button-padding * 2);
+    }
+  }
+
+  input[type="radio"] {
+    display: none;
+  }
+
+  input {
+    margin: 0;
+    padding: 0;
+  }
+
+  img {
+    width: $platform-big-button-small-screen-size;
+    height: $platform-big-button-small-screen-size;
+
+    @include mq($from: tablet) {
+      width: $platform-big-button-large-screen-size;
+      height: $platform-big-button-large-screen-size;
+    }
+  }
+
+  img.last {
+    margin-right: 0px;
+  }
+
+  div {
+    display: block;
+    position: relative;
+    padding: $platform-big-button-padding;
+    width: $platform-big-button-small-screen-size + ($platform-big-button-padding * 2) + ($platform-big-button-border-width * 2);
+    height: $platform-big-button-small-screen-size + ($platform-big-button-padding * 2) + ($platform-big-button-border-width * 2);
+
+    border: $platform-big-button-border-width solid transparent;
+    @include border-top-radius($platform-big-button-border-radius);
+    @include border-bottom-radius($platform-big-button-border-radius);
+
+    @include mq($from: tablet) {
+      width: $platform-big-button-large-screen-size + ($platform-big-button-padding * 2) + ($platform-big-button-border-width * 2);
+      height: $platform-big-button-large-screen-size + ($platform-big-button-padding * 2) + ($platform-big-button-border-width * 2);
+    }
+  }
+
+  input[type="radio"]:checked + div {
+    border: $platform-big-button-border-width solid $platform-big-button-border-colour;
+  }
+
+  // Create an arrow below the button. TODO: replace by an arrow image.
+  input[type="radio"]:checked + div:after,
+  input[type="radio"]:checked + div:before {
+    top: 100%;
+    left: 50%;
+    border: solid transparent;
+    content: " ";
+    height: 0;
+    width: 0;
+    position: absolute;
+    pointer-events: none;
+  }
+  input[type="radio"]:checked + div:after {
+    border-color: rgba(255, 255, 255, 0);
+    border-top-color: #ffffff;
+    border-width: 10px;
+    margin-left: -10px;
+  }
+  input[type="radio"]:checked + div:before {
+    border-color: rgba(90, 245, 12, 0);
+    border-top-color: $platform-big-button-border-colour;
+    border-width: 13px;
+    margin-left: -13px;
+  }
+}
+
+// SEARCHBOX
+
+$searchbox-button-colour: $main-spot-colour;
+$searchbox-border-colour: $control-border-colour;
+
+#home-page form.searchbox .search-input {
+  width: 95%;
+  max-width: 400px;
+  margin-left: auto;
+  margin-right: auto;
+
+  div {
+    display: table;
+    width: 100%;
+    padding: 0 2px;
+  }
+
+  div span.wrapper {
+    display: table-cell;
+    width: 100%;
+    vertical-align: middle;
+  }
+
+  div input[type="text"] {
+    display: table-cell;
+    vertical-align: middle;
+    width: 100%;
+    font-size: 16px;
+    height: 28px;
+    padding: 3px;
+
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    border: 1px solid $searchbox-border-colour;
+    border-right-width: 0px;
+  }
+
+  div button {
+    @include button($searchbox-button-colour);
+
+    display: table-cell;
+    margin: 0;
+    background-color: black;
+    vertical-align: middle;
+    padding: 0px 7px;
+
+    @include border-top-radius(0);
+    @include border-bottom-radius(0);
+
+    img {
+      vertical-align: middle;
+      width: 26px;
+      height: 26px;
+    }
+  }
+}

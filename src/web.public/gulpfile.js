@@ -201,10 +201,19 @@ gulp.task('build:version', ['build:clean'], function() {
 gulp.task('dev:watch', ['dev:stylesheets', 'dev:templates', 'dev:scripts'], function() {
 	plugins.livereload.listen();
 
-	gulp.watch(['./public/stylesheets/**/*.scss'], ['dev:stylesheets']);
-	gulp.watch(['./public/scripts/**/*.html'], ['dev:templates']);
-	gulp.watch(['./public/scripts/**/*.js'], ['dev:scripts']);
-	gulp.watch(['./index.html']).on('change', plugins.livereload.changed);
+	gulp.watch(['./public/stylesheets/**/*.scss'], ['dev:stylesheets'])
+        .on('error', handleError);
+
+	gulp.watch(['./public/scripts/**/*.html'], ['dev:templates'])
+        .on('error', handleError);
+
+	gulp.watch(['./public/scripts/**/*.js'], ['dev:scripts'])
+        .on('error', handleError);
+
+	gulp.watch(['./index.html'])
+        .on('change', plugins.livereload.changed)
+        .on('change', beep)
+        .on('error', handleError);
 });
 
 gulp.task('dev:stylesheets', function () {
