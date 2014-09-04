@@ -12,7 +12,8 @@ app.directive('autocomplete', function() {
             suggestions: '=data',
             onType: '=onType',
             onSelect: '=onSelect',
-            isActive: '=isActive'
+            isActive: '=isActive',
+            placeholder: '=placeholder'
         },
         controller: ['$scope', function($scope){
             // the index of the suggestions that's currently selected
@@ -103,7 +104,6 @@ app.directive('autocomplete', function() {
 
             // Default atts
             scope.attrs = {
-                "placeholder": "start typing...",
                 "class": "",
                 "id": "",
                 "inputclass": "",

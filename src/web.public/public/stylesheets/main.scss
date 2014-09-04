@@ -1,17 +1,27 @@
 
+// Uncomment these lines to display the grid.
+//$visual-grid: true;
+//$visual-grid-color: red;
+//$visual-grid-index: front;
+//$visual-grid-opacity: 0.1;
+
 @import "includes/meyer-reset";
 @import 'bourbon/bourbon';
 @import 'neat/neat';
 
-$main-spot-colour: rgb(46, 136, 129);
+$main-spot-colour: #2b8780;
+$dark-main-spot-color: #58847e;
 $secondary-spot-colour: rgb(163, 89, 49);
 $background-spot-colour: #aaa;
-$light-background-colour: #fff;
-$medium-background-colour: tint($main-spot-colour, 70%);
+$main-background-colour: #fff;
+$light-background-colour: #e6e6df;
 $dark-background-colour: #444;
 $input-border-colour: #333;
 $light-black-colour: #666;
+$alt-black-colour: #78725b;
 $light-light-black-colour: #999;
+$placeholder-text-colour: #aaa;
+$placeholder-text-colour-firefox-darken: 30%;
 
 $big-button-padding: 6px;
 $big-button-margin: 10px;
@@ -22,12 +32,6 @@ $input-border-width: 2px;
 $large-border-radius: 6px;
 
 $body-text-font-family: 'Open Sans', 'Helvetica', 'Arial', sans-serif;
-
-// Uncomment these lines to display the grid.
-//$visual-grid: true;
-//$visual-grid-color: red;
-//$visual-grid-index: front;
-//$visual-grid-opacity: 0.1;
 
 @import "includes/allmighty-autocomplete";
 
@@ -68,13 +72,10 @@ body {
 }
 
 header {
-  //background-color: $dark-background-colour;
-  //border-bottom: 1px solid #ccc;
-
   ul.social-media-links {
     float: right;
     padding: 0 3px 2px 2px;
-    background-color: $medium-background-colour;
+    background-color: $light-background-colour;
     @include border-bottom-radius($large-border-radius);
 
     li {
@@ -117,10 +118,23 @@ html, body {
 }
 .content-wrapper {
   min-height: 100%;
-  margin: 0 auto -6em;
+  margin: 0 auto -96px;
 }
+
+@include respond-to(medium-screens) {
+  .content-wrapper {
+    margin: 0 auto -80px;
+  }
+}
+
 footer, .push {
-  height: 6em;
+  height: 96px;
+}
+
+@include respond-to(medium-screens) {
+  footer, .push {
+    height: 80px;
+  }
 }
 
 // Stop mobile browsers zooming in on select
@@ -136,6 +150,26 @@ input, textarea {
   -webkit-border-radius: 0;
 }
 
+// Placeholder text styling.
+::-webkit-input-placeholder {
+  color: $placeholder-text-colour;
+}
+:-moz-placeholder { /* Firefox 18- */
+  color: shade($placeholder-text-colour, $placeholder-text-colour-firefox-darken);
+}
+::-moz-placeholder {  /* Firefox 19+ */
+  color: shade($placeholder-text-colour, $placeholder-text-colour-firefox-darken);
+}
+:-ms-input-placeholder {
+  color: $placeholder-text-colour;
+}
+
+// Remove placeholder text on focus
+:focus::-webkit-input-placeholder { color: transparent; }
+:focus:-moz-placeholder { color: transparent; }
+:focus::-moz-placeholder { color: transparent; }
+:focus:-ms-input-placeholder { color: transparent; }
+
 #home-page div.akin-logo {
   img {
     display: block;
@@ -149,8 +183,8 @@ input, textarea {
 
   @include respond-to(medium-screens) {
     img {
-      width: 258px;
-      height: 72px;
+      width: 291px;
+      height: 81px;
     }
   }
 
@@ -284,7 +318,6 @@ input, textarea {
       table-cell;
       vertical-align: middle;
       width: 100%;
-      //font-size: 0.9em;
       font-size: 16px;
       height: 28px;
       padding: 3px;
@@ -324,7 +357,7 @@ input, textarea {
 
 footer {
   p.call-to-action {
-    background-color: $main-spot-colour;
+    background-color: $dark-main-spot-color;
     padding: 8px;
     width: 100%;
     margin: 6px auto;
@@ -334,6 +367,10 @@ footer {
       color: white;
       text-decoration: none;
       font-weight: normal;
+    }
+
+    a:hover {
+      text-decoration: underline;
     }
 
     a em {
@@ -348,15 +385,26 @@ footer {
     text-align: left;
     margin-bottom: 8px;
 
+    @include respond-to(medium-screens) {
+      float: left;
+      left: 0px;
+      margin-left: 50px;
+      line-height: 24px;
+    }
+
     ul {
       position: relative;
       left: 50%;
 
+      @include respond-to(medium-screens) {
+        left: 0px;
+      }
+
       li {
         float: left;
-        position: relative; /* ie needs position:relative here*/
+        position: relative; /* IE needs position:relative here*/
         list-style-type: none;
-        color: $light-black-colour;
+        color: $alt-black-colour;
         font-variant: uppercase;
 
         a {
@@ -367,13 +415,18 @@ footer {
         }
 
         a, a:link, a:visited, a:hover, a:active {
-          color: $light-black-colour;
+          color: $alt-black-colour;
           font-weight: normal;
-          font-size: 0.95em;
+          font-size: 15px;
         }
 
-        a, a:link, a:visited, a:active {
+        a, //a:link,
+        a:visited, a:active {
           text-decoration: none;
+        }
+
+        a:hover {
+          text-decoration: underline;
         }
       }
     }
@@ -383,10 +436,18 @@ footer {
     display: table;
     //margin: 0 5px;
     clear: both;
-    width: 95%;
+    width: 90%;
     max-width: 320px;
     margin-left: auto;
     margin-right: auto;
+    //background-color: $light-background-colour;
+
+    @include respond-to(medium-screens) {
+      float: right;
+      clear: none;
+      margin-left: 0px;
+      margin-right: 50px;
+    }
 
     span, p {
       display: table-cell;
@@ -406,7 +467,7 @@ footer {
 
   p.copyright {
     padding-top: 3px;
-    font-size: 0.6em;
+    font-size: 10px;
     color: $light-light-black-colour;
     margin-bottom: 2px;
   }

@@ -23,6 +23,11 @@
                 active: true,
                 terms: []
             },
+            getPlaceholderText: function() {
+                return 'Search for ' +
+                    platform.getFriendlyName(me.service.platform) +
+                    ' apps';
+            },
             cancelAutoComplete: function() {
                 autoCompleteApi.cancel();
             },

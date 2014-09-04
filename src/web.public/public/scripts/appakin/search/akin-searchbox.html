@@ -16,8 +16,9 @@
         </fieldset>
         <fieldset class="search-input">
             <autocomplete ng-model="search.searchTerm"
-                          attr-placeholder="Search for categories or apps"
-                          click-activation="false" data="search.autoComplete.terms"
+                          placeholder="search.getPlaceholderText()"
+                          click-activation="false"
+                          data="search.autoComplete.terms"
                           on-type="search.updateAutoCompleteTerms"
                           is-active="search.autoComplete.active"></autocomplete>
             <!--<button type="submit"><img src="/public/images/magnifying-glass.png"></button>-->
