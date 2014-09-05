@@ -173,10 +173,15 @@ gulp.task('build:cdnify', ['build:index-html', 'build:stylesheets'], function() 
                         cdn: '//ajax.googleapis.com/ajax/libs/angularjs/${ version }/angular-route.min.js'
                     },
                     {
-                        file: '/bower_components/angular-resource/angular-resource.js',
-                        package: 'angular-resource',
-                        cdn: '//ajax.googleapis.com/ajax/libs/angularjs/${ version }/angular-resource.min.js'
+                        file: '/bower_components/angular-touch/angular-touch.js',
+                        package: 'angular-touch',
+                        cdn: '//ajax.googleapis.com/ajax/libs/angularjs/${ version }/angular-touch.min.js'
                     },
+//                    {
+//                        file: '/bower_components/angular-resource/angular-resource.js',
+//                        package: 'angular-resource',
+//                        cdn: '//ajax.googleapis.com/ajax/libs/angularjs/${ version }/angular-resource.min.js'
+//                    },
                     {
                         file: '/bower_components/angular-cookies/angular-cookies.js',
                         package: 'angular-cookies',

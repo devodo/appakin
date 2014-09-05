@@ -2,7 +2,7 @@
 
 var express = require('express');
 var path = require('path');
-var favicon = require('static-favicon');
+var favicon = require('serve-favicon');
 var logger = require('express-bunyan-logger');
 var cookieParser = require('cookie-parser');
 var bodyParser = require('body-parser');
@@ -44,8 +44,8 @@ function initStaticRoutes(app) {
     if (config.environment !== 'development') { 
 	    return;
     }
-	
-	app.use(favicon());
+
+    app.use(favicon(path.join(__dirname, 'favicon.ico')));
 	app.use('/public/images', express.static(path.join(__dirname, 'public/images')));
 	app.use('/public', express.static(path.join(__dirname, 'public-generated/public')));
 	app.use('/public', express.static(path.join(__dirname, 'public')));

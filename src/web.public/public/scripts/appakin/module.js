@@ -3,6 +3,8 @@
     var appAkin = angular.module('appAkin', [
         'ngRoute',
         'ngCookies',
+        'ngTouch',
+        'ngDropdowns',
         'ui.bootstrap.pagination',
         'allmighty.autocomplete',
         'appAkin.config'

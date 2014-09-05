@@ -4,41 +4,42 @@ $social-media-links-border-radius: $normal-border-radius;
 
 header ul.social-media-links {
   float: right;
-  padding: 0 3px 2px 2px;
-  background-color: $social-media-links-background-colour;
-  @include border-bottom-radius($social-media-links-border-radius);
+  padding: 2px 4px 0px 0px;
+  //background-color: $social-media-links-background-colour;
+  //@include border-bottom-radius($social-media-links-border-radius);
 
   li {
     float: left;
   }
 }
 
-header .searchbox .platform-input {
-  ul {
-    float: right;
-    margin-top: 1px;
-  }
-
-  li {
-    display: block;
-    float: left;
-    @include border-top-radius(6px);
-    padding: 5px 6px;
-    margin-right: 3px;
-    border: 1px solid $light-background-colour;
-    font-size: 13px;
-    text-transform: uppercase;
-    background-color: $light-background-colour;
-    color: #888;
-    cursor: pointer;
-  }
-
-  li.active {
-    border-color: $main-spot-colour;
-    background-color: $main-spot-colour;
-    color: white;
-  }
-}
+//
+//header .searchbox .platform-input {
+//  ul {
+//    float: right;
+//    margin-top: 1px;
+//  }
+//
+//  li {
+//    display: block;
+//    float: left;
+//    @include border-top-radius(6px);
+//    padding: 5px 6px;
+//    margin-right: 3px;
+//    border: 1px solid $light-background-colour;
+//    font-size: 13px;
+//    text-transform: uppercase;
+//    background-color: $light-background-colour;
+//    color: #888;
+//    cursor: pointer;
+//  }
+//
+//  li.active {
+//    border-color: $main-spot-colour;
+//    background-color: $main-spot-colour;
+//    color: white;
+//  }
+//}
 
 // Centred horizontal list of page links.
 .footer-nav {
@@ -46,7 +47,7 @@ header .searchbox .platform-input {
   position: relative;
   left: -50%;
   text-align: left;
-  margin-bottom: 8px;
+  margin-bottom: 4px;
 
   @include mq($from: tablet) {
     float: left;
@@ -67,24 +68,27 @@ header .searchbox .platform-input {
       float: left;
       position: relative; /* IE needs position:relative here*/
       list-style-type: none;
-      color: $alt-black-colour;
-      font-variant: uppercase;
 
       a {
-        text-decoration: none;
         float: left;
         text-align: center;
         white-space: nowrap;
       }
 
-      a, a:link, a:visited, a:hover, a:active {
+      a,
+      a:link,
+      a:visited,
+      a:hover,
+      a:active {
         color: $alt-black-colour;
         font-weight: normal;
-        font-size: 15px;
+        font-size: 16px;
       }
 
-      a, //a:link,
-      a:visited, a:active {
+      a,
+      a:link,
+      a:visited,
+      a:active {
         text-decoration: none;
       }
 

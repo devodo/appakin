@@ -8,19 +8,31 @@
             controller: function ($scope, search) {
                 $scope.search = search;
                 $scope.platform = platform;
+                $scope.status = { isOpen: false };
 
-                $scope.platformTabs = [
-                    {name: 'android', friendlyName: 'Android'},
-                    {name: 'ios', friendlyName: 'Apple'},
-                    {name: 'winphone', friendlyName: 'Windows'}
+                $scope.ddSelectOptions = [
+                    {
+                        text: $scope.platform.getStoreName('ios'),
+                        platform: 'ios'
+                    },
+                    {
+                        text: $scope.platform.getStoreName('android'),
+                        platform: 'android'
+                    },
+                    {
+                        text: $scope.platform.getStoreName('winphone'),
+                        platform: 'winphone'
+                    }
                 ];
 
-                $scope.isActiveTab = function (tabName) {
-                    return tabName === $scope.search.platform;
-                };
+                $scope.ddSelectSelected = {
+                    text: $scope.platform.getStoreName($scope.search.platform),
+                    platform: $scope.search.platform
+                }
 
-                $scope.onTabClick = function (tabName) {
-                    $scope.search.platform = tabName;
+                $scope.dropdownOnchange = function (selected) {
+                    console.log('changed ' + selected.platform);
+                    $scope.search.platform = selected.platform;
                 };
             }
         };

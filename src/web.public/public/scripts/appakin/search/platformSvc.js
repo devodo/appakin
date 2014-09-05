@@ -67,6 +67,18 @@
                     $cookies.platform = platform;
                 }
             },
+            getStoreName: function(platform) {
+                switch (platform) {
+                    case 'ios':
+                        return 'Apple App Store';
+                    case 'android':
+                        return 'Android';
+                    case 'winphone':
+                        return 'Windows Phone';
+                    default:
+                        return platform;
+                }
+            },
             getFriendlyName: function(platform) {
                 switch (platform) {
                     case 'ios':

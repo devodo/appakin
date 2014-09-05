@@ -16,3 +16,15 @@
 
   // TODO: not sure how to handle logo here - I'm currently using a large one everywhere that gets shrunk down as needed.
 }
+
+header .akin-logo {
+  display: block;
+  width: 100px;
+  height: 38px;
+  margin-left: 6px;
+  //vertical-align: middle;
+  background-image: url('/public/images/appakin-logo-jade.png');
+  background-repeat: no-repeat;
+  background-size: 98px;
+  background-position: left 7px;
+}
