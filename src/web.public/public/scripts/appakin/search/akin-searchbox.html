@@ -1,18 +1,11 @@
 <div>
     <form ng-submit="search.submitSearch(1)" class="searchbox">
         <fieldset class="platform-input">
-            <label>
-                <input type="radio" name="platform" value="android" ng-model="search.platform"/>
-                <div><img src="/public/images/android-240.png"></div>
-            </label>
-            <label>
-                <input type="radio" name="platform" value="ios" ng-model="search.platform"/>
-                <div><img src="/public/images/app-store-240.png"></div>
-            </label>
-            <label>
-                <input type="radio" name="platform" value="winphone" ng-model="search.platform"/>
-                <div><img src="/public/images/winphone-240.png" class="last"></div>
-            </label>
+            <ul>
+                <li ng-repeat="tab in platformTabs"
+                        ng-class="{active: isActiveTab(tab.name)}"
+                        ng-click="onTabClick(tab.name)">{{tab.friendlyName}}</li>
+            </ul>
         </fieldset>
         <fieldset class="search-input">
             <autocomplete ng-model="search.searchTerm"
@@ -21,7 +14,6 @@
                           data="search.autoComplete.terms"
                           on-type="search.updateAutoCompleteTerms"
                           is-active="search.autoComplete.active"></autocomplete>
-            <!--<button type="submit"><img src="/public/images/magnifying-glass.png"></button>-->
         </fieldset>
     </form>
 </div>

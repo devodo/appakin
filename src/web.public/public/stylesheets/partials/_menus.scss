@@ -13,6 +13,33 @@ header ul.social-media-links {
   }
 }
 
+header .searchbox .platform-input {
+  ul {
+    float: right;
+    margin-top: 1px;
+  }
+
+  li {
+    display: block;
+    float: left;
+    @include border-top-radius(6px);
+    padding: 5px 6px;
+    margin-right: 3px;
+    border: 1px solid $light-background-colour;
+    font-size: 13px;
+    text-transform: uppercase;
+    background-color: $light-background-colour;
+    color: #888;
+    cursor: pointer;
+  }
+
+  li.active {
+    border-color: $main-spot-colour;
+    background-color: $main-spot-colour;
+    color: white;
+  }
+}
+
 // Centred horizontal list of page links.
 .footer-nav {
   float: right;
