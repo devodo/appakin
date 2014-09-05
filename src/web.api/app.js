@@ -36,6 +36,11 @@ function configureApp(app) {
         // TODO: add shutdown code.
         process.exit(0);
     });
+
+    app.use(function(req, res, next) {
+        res.contentType("application/json; charset=UTF-8");
+        next();
+    });
 }
 
 function initApiRoutes(app) {
@@ -45,7 +50,7 @@ function initApiRoutes(app) {
     var isRouteFile = function(filePath) {
         var isValid = S(filePath.toLowerCase()).endsWith('.js');
         return isValid;
-    }
+    };
 
     files.forEach(function (file) {
         var filePath = path.resolve(apiDir, file);

@@ -2,35 +2,43 @@
 var solr = require('solr-client');
 var async = require('async');
 var unidecode = require('unidecode');
-var slug = require('slug');
 var appStoreRepo = require('../../repos/appStoreRepo');
 var log = require('../../logger');
 var solrCore = require('./solrCore').getAutoSolrCore();
 
 var CATEGORY_TYPE = 1;
 var APP_TYPE = 2;
+var APP_ID_OFFSET = 10000000;
 
+var preProcess = function(input) {
+    return input.toLowerCase().trim();
+};
 
-var slugify = function(input) {
-    var slugStr = slug(input, ' ');
-    slugStr = slugStr.toLowerCase().trim();
-
-    return slugStr;
+var asciiFold = function(input) {
+    return unidecode(input);
 };
 
 var addCategory = function(category, next) {
     log.debug("Adding category: " + category.name);
 
-    var name = slugify(category.name);
+    var name = preProcess(category.name);
 
-    solrCore.client.add({
+    var solrCategory = {
         id: category.id,
         type: CATEGORY_TYPE,
         name: name,
-        "name_wildcard": name,
         "name_prefix": name,
+        "name_wildcard": name,
         "popularity": category.popularity
-    },function(err, obj){
+    };
+
+    if (name !== asciiFold(name)) {
+        solrCategory.name_ascii = name;
+        solrCategory.name_prefix_ascii = name;
+        solrCategory.name_wildcard_ascii = name;
+    }
+
+    solrCore.client.add(solrCategory, function(err, obj) {
         if(err){
             return next(err);
         }
@@ -40,21 +48,22 @@ var addCategory = function(category, next) {
 };
 
 var addApp = function(app, next) {
-    var name = slugify(app.name);
+    var name = preProcess(app.name);
 
-    if (!name || name === '') {
-        return next();
-    }
-
-    var appIndex = {
-        id: app.id,
+    var solrApp = {
+        id: parseInt(app.id, 10) + APP_ID_OFFSET,
         type: APP_TYPE,
         name: name,
         "name_prefix": name,
         popularity: app.popularity
     };
 
-    solrCore.client.add(appIndex, function(err, obj){
+    if (name !== asciiFold(name)) {
+        solrApp.name_ascii = name;
+        solrApp.name_prefix_ascii = name;
+    }
+
+    solrCore.client.add(solrApp, function(err, obj){
         if(err){
             return next(err);
         }

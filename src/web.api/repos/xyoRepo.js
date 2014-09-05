@@ -30,7 +30,7 @@ var getXyoCategories = function(client, next) {
         "FROM xyo_category\n" +
         "order by id;";
 
-    client.query(queryStr, [], function (err, result) {
+    client.query(queryStr, function (err, result) {
         if (err) {
             return next(err);
         }
@@ -99,8 +99,8 @@ exports.getXyoCategories = function(next) {
         }
 
         getXyoCategories(conn.client, function(err, categories) {
-            conn.close(function(closeErr) {
-                next(closeErr, categories);
+            conn.close(err, function(err) {
+                next(err, categories);
             });
         });
     });
@@ -113,8 +113,8 @@ exports.insertXyoCategoryApp = function(categoryId, batchId, name, position, nex
         }
 
         insertXyoCategoryApp(conn.client, categoryId, batchId, name, position, function(err, id) {
-            conn.close(function(closeErr) {
-                next(closeErr, id);
+            conn.close(err, function(err) {
+                next(err, id);
             });
         });
     });

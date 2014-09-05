@@ -181,7 +181,15 @@ var crawlCategories = function(seedUrls, next) {
         }
     });
 
-    c.queue(seedUrls);
+    xyoRepo.getXyoCategories(function(err, categories) {
+        if (err) { return next(err); }
+
+        categories.forEach(function(category) {
+            urlHistory[category.url] = true;
+        });
+
+        c.queue(seedUrls);
+    });
 };
 
 exports.crawlCategories = crawlCategories;

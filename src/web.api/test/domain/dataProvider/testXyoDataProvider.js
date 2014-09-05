@@ -15,9 +15,10 @@ exports.group = {
     },
 
     crawlCategories: function(test) {
-        return test.done();
+        //return test.done();
 
         var seedUrls = [
+            'http://xyo.net/iphone-app/--7OQZ36Q/'
             //'http://xyo.net/iphone/',
             //'http://xyo.net/iphone-apps/developer-resources-kmI/',
             //'http://xyo.net/iphone-games/movie-trivia-kIM/',
@@ -27,9 +28,9 @@ exports.group = {
             //'http://xyo.net/iphone-games/cats-mice-and-dogs-games-kOY/'
         ];
 
-        for (var i = 60; i < 84; i++) {
-            seedUrls.push('http://xyo.net/iphone/?page=' + i);
-        }
+        //for (var i = 60; i < 84; i++) {
+         //   seedUrls.push('http://xyo.net/iphone/?page=' + i);
+        //}
 
         xyoDataProvider.crawlCategories(seedUrls, function(err, count) {
             test.expect(1);

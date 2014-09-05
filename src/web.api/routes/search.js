@@ -4,6 +4,10 @@ var autoSearcher = require('../domain/search/autoSearcher');
 
 exports.init = function init(app) {
 
+    app.get('/api/search/here', function(req, res) {
+        res.json('populär');
+    });
+
     app.get('/api/search/autocomplete', function (req, res) {
         var query = req.query.q || '';
         var platform = req.query.p || '';
