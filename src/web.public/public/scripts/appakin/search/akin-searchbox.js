@@ -31,7 +31,6 @@
                 }
 
                 $scope.dropdownOnchange = function (selected) {
-                    console.log('changed ' + selected.platform);
                     $scope.search.platform = selected.platform;
                 };
             }
