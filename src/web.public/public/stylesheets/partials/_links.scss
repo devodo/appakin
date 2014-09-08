@@ -1,3 +1,5 @@
+// SOCIAL MEDIA
+
 .social-media-links {
   a {
     display: block;
@@ -17,13 +19,9 @@
   }
 }
 
-footer .call-to-action {
-  background-color: $main-spot-colour;
-  padding: 8px;
-  width: 100%;
-  margin: 6px auto;
-  text-align: center;
+// AD
 
+footer .call-to-action {
   a, a:link, a:visited, a:hover, a:active {
     color: white;
     text-decoration: none;
@@ -36,5 +34,36 @@ footer .call-to-action {
 
   a em {
     font-weight: bold;
+  }
+}
+
+// FOOTER NAVIGATION
+
+.footer-nav ul li {
+  a {
+    float: left;
+    text-align: center;
+    white-space: nowrap;
+  }
+
+  a,
+  a:link,
+  a:visited,
+  a:hover,
+  a:active {
+    color: $alt-black-colour;
+    font-weight: normal;
+    font-size: 16px;
+  }
+
+  a,
+  a:link,
+  a:visited,
+  a:active {
+    text-decoration: none;
+  }
+
+  a:hover {
+    text-decoration: underline;
   }
 }

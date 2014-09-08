@@ -49,6 +49,11 @@
   [ng\:cloak], [ng-cloak], [data-ng-cloak], [x-ng-cloak], .ng-cloak, .x-ng-cloak {
     display: none !important;
   }
+
+  // Stop iphone zooming text in landscape mode:
+  html {
+    -webkit-text-size-adjust: 100%;
+  }
 }
 
 @include meyer-reset;

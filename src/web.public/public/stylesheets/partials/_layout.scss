@@ -1,0 +1,168 @@
+// STICKY FOOTER
+
+// http://pixelsvsbytes.com/blog/2011/09/sticky-css-footers-the-flexible-way/
+html, body { height: 100%; }
+body { display: table; max-width: 1200px; width: 100%; margin-left: auto; margin-right: auto; }
+main { height: auto; }
+header, footer, main { display: table-row; }
+header, footer { height: 1px; }
+
+// Sticky footer adjustment
+#home-page {
+  margin-top: 30px;
+  margin-bottom: 150px;
+}
+
+// CONTENT LAYOUT
+
+#search-results {
+  max-width: 960px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+// HEADER LAYOUT
+
+header .header-wrapper {
+
+  @include mq($from: mobile-landscape) {
+    display: table;
+    width: 100%;
+  }
+
+  .akin-logo {
+
+    @include mq($from: mobile-landscape) {
+      display: table-cell;
+      vertical-align: middle;
+    }
+  }
+
+  .searchbox-wrapper {
+
+    @include mq($from: mobile-landscape) {
+      display: table-cell;
+      width: 100%;
+      vertical-align: middle;
+    }
+  }
+
+  .searchbox {
+    width: 100%;
+    position: relative;
+
+    @include mq($from: mobile-landscape) {
+      display: table;
+    }
+  }
+
+  .search-input {
+
+    @include mq($from: mobile-landscape) {
+      display: table-cell;
+      width: 100%;
+      vertical-align: middle;
+      padding-right: 3px;
+    }
+  }
+
+  .platform-menu {
+    position: absolute;
+    top: -35px;
+    right: 0;
+
+    @include mq($from: mobile-landscape) {
+      display: table-cell;
+      min-width: 140px;
+      position: relative;
+      top: 0px;
+      vertical-align: middle;
+    }
+  }
+}
+
+// HOME PAGE HEADER
+
+header ul.social-media-links {
+  float: right;
+  padding: 2px 4px 0px 0px;
+
+  li {
+    float: left;
+  }
+}
+
+// FOOTER
+
+// AD
+
+footer .call-to-action {
+  background-color: $main-spot-colour;
+  padding: 8px;
+  width: 100%;
+  margin: 6px auto;
+  text-align: center;
+}
+
+// FOOTER COPYRIGHT
+
+.footer-copyright {
+  clear: both;
+  margin-left: auto;
+  margin-right: auto;
+
+  @include mq($from: mobile-landscape) {
+    float: right;
+    clear: none;
+    margin-left: 0px;
+    margin-right: 45px;
+    line-height: 26px;
+  }
+
+  p {
+    font-size: 9px;
+    color: $alt-black-colour;
+    margin-bottom: 2px;
+    text-align: center;
+
+    img {
+      display: none;
+
+      @include mq($from: tablet) {
+        display: inline-block;
+      }
+    }
+  }
+}
+
+// FOOTER NAVIGATION
+
+.footer-nav {
+  float: right;
+  position: relative;
+  left: -50%;
+  text-align: left;
+  margin-bottom: 4px;
+
+  @include mq($from: mobile-landscape) {
+    float: left;
+    left: 0px;
+    margin-left: 45px;
+    line-height: 24px;
+  }
+
+  ul {
+    position: relative;
+    left: 50%;
+
+    @include mq($from: mobile-landscape) {
+      left: 0px;
+    }
+
+    li {
+      float: left;
+      position: relative; // for IE
+      list-style-type: none;
+    }
+  }
+}

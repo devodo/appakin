@@ -1,14 +1,14 @@
 <div>
     <form ng-submit="search.submitSearch(1)" class="searchbox">
-        <fieldset class="search-input">
+        <div class="search-input">
             <autocomplete ng-model="search.searchTerm"
                           placeholder="search.getPlaceholderText()"
                           click-activation="true"
                           data="search.autoComplete.terms"
                           on-type="search.updateAutoCompleteTerms"
                           is-active="search.autoComplete.active"></autocomplete>
-        </fieldset>
-        <fieldset class="platform-menu btn-group" dropdown is-open="status.isOpen">
+        </div>
+        <div class="platform-menu btn-group" dropdown is-open="status.isOpen">
             <button type="button" class="btn-menu"
                     dropdown-menu="ddSelectOptions"
                     dropdown-model="ddSelectSelected"
@@ -24,6 +24,6 @@
                 <!--<li>Android</li>-->
                 <!--<li>Windows Phone</li>-->
             <!--</ul>-->
-        </fieldset>
+        </div>
     </form>
 </div>

@@ -1,27 +1,8 @@
-// Stop mobile browsers zooming in on input widgets.
-@media screen and (-webkit-min-device-pixel-ratio: 0) {
-  select:focus, textarea:focus, input:focus {
-    font-size: 16px;
-  }
-}
-
-// Stop safari rounding the corners of input widgets.
-input,
-textarea {
-  -webkit-appearance: none;
-  -webkit-border-radius: 0;
-}
-
-// Remove Gray Highlight When Tapping Links in Mobile Safari
-// http://css-tricks.com/snippets/css/remove-gray-highlight-when-tapping-links-in-mobile-safari/
-* {
-  -webkit-tap-highlight-color:transparent;
-}
+// PLACEHOLDER TEXT STYLING
 
 $placeholder-text-colour: #aaa;
 $placeholder-text-colour-firefox-darken: 30%;
 
-// Placeholder text styling.
 ::-webkit-input-placeholder {
   color: $placeholder-text-colour;
 }

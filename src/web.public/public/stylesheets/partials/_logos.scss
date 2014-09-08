@@ -1,4 +1,4 @@
-#home-page div.akin-logo {
+#home-page .akin-logo {
   img {
     display: block;
     width: 194px;
@@ -13,18 +13,28 @@
       height: 81px;
     }
   }
-
-  // TODO: not sure how to handle logo here - I'm currently using a large one everywhere that gets shrunk down as needed.
 }
 
 header .akin-logo {
-  display: block;
   width: 100px;
-  height: 38px;
-  margin-left: 6px;
-  //vertical-align: middle;
-  background-image: url('/public/images/appakin-logo-jade.png');
-  background-repeat: no-repeat;
-  background-size: 98px;
-  background-position: left 7px;
+  min-width: 100px;
+  height: 28px;
+  margin-left: 3px;
+  margin-right: 6px;
+  margin-top: 6px;
+
+  @include mq($from: mobile-landscape) {
+    margin-left: 6px;
+    margin-right: 12px;
+  }
+}
+
+footer .akin-logo {
+  @include mq($from: tablet) {
+    width: 80px;
+    height: 22px;
+    margin-left: 6px;
+    vertical-align: bottom;
+    margin-bottom: 4px;
+  }
 }
