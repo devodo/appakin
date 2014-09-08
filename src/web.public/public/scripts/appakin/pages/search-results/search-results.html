@@ -1,5 +1,9 @@
 <div id="search-results">
-    <div class="results-wrapper">
+<div class="results-wrapper">
+        <ul class="search-types">
+            <li><a href ng-click="setSearchType('category')'">Categories</a></li>
+            <li><a href ng-click="setSearchType('app')'">Apps</a></li>
+        </ul>
         <p ng-if="!search.results.serverError && search.results.categories.length == 0 && !search.results.initialState">
             Sorry! We could not find anything relating to <span>{{search.searchTerm}}</span>.
         </p>

@@ -167,20 +167,14 @@ footer .call-to-action {
   }
 }
 
-//ul.pagination {
-//  margin: 10px auto;
-//  //text-align: center;
-//}
-
-
-
+// SEARCH RESULTS PAGE
 
 #search-results {
   display: table;
   height: 100%;
   padding-top: 12px;
   padding-bottom: 6px;
-  padding-left: 6px;
+  //padding-left: 6px;
   //max-width: 800px;
   width: 100%;
 
@@ -192,7 +186,26 @@ footer .call-to-action {
   .results-wrapper, .pagination-wrapper { display: table-row; }
   .pagination-wrapper { height: 1px; }
 
-  div.centering-wrapper {
+  .results-wrapper p,
+  .results-wrapper ul {
+    padding-left: 6px;
+
+    @include mq($from: tablet) {
+      padding-left: 0px;
+    }
+  }
+
+  .results-wrapper ul.search-types {
+    @include clearfix;
+
+    li {
+      float: left;
+      position: relative; // for IE
+      list-style-type: none;
+    }
+  }
+
+  .pagination-wrapper .centering-wrapper {
     float: right;
     position: relative;
     left: -50%;

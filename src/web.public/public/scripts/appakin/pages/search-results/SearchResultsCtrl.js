@@ -13,6 +13,10 @@
 
             //console.log('search in service is: q=' + search.searchTerm + ' p=' + search.platform);
 
+            $scope.setSearchType = function(searchType) {
+
+            };
+
             $scope.$on('$routeUpdate',function(event) {
                 //console.log('location changed: ' + $location.search().q);
                 search.updateSearchFromUrl();
