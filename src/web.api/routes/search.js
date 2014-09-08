@@ -28,7 +28,7 @@ exports.init = function init(app) {
                     'Apple',
                     'Banana',
                     'Happle',
-                    'mmm apples',
+                    'mmm apples this is a long string of text that just keeps going on',
                     'Coconut',
                     'Facet'
                 ]);

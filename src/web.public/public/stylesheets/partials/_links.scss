@@ -67,3 +67,70 @@ footer .call-to-action {
     text-decoration: underline;
   }
 }
+
+ul.pagination {
+
+  li {
+    float: left;
+    list-style-type: none;
+
+    a {
+      display: inline-block;
+      min-width: 32px;
+      min-height: 30px;
+      border: 1px solid $control-border-colour;
+      margin-right: 4px;
+      text-align: center;
+      font-size: 14px;
+      line-height: 30px;
+      height: 32px;
+      @include border-top-radius(4px);
+      @include border-bottom-radius(4px);
+    }
+
+    a,
+    a:link,
+    a:visited,
+    a:hover,
+    a:active {
+      color: $alt-black-colour;
+      font-weight: normal;
+    }
+
+    a,
+    a:link,
+    a:visited,
+    a:active {
+      text-decoration: none;
+    }
+  }
+
+  li a.next:before
+  {
+    font-family: "icomoon";
+    content: ">";
+  }
+
+  li a.previous:before
+  {
+    font-family: "icomoon";
+    content: "<";
+  }
+
+  li.active a {
+    border: 1px solid transparent;
+    //color: black;
+  }
+
+  li a.next,
+  li a.previous {
+    border: 1px solid transparent;
+  }
+
+  li.disabled a {
+    //border: 1px solid transparent;
+    color: $disabled-text;
+    //display: none;
+    //visibility: hidden;
+  }
+}

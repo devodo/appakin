@@ -69,8 +69,8 @@ angular.module('ui.bootstrap.pagination', [])
         boundaryLinks: false,
         directionLinks: true,
         firstText: 'First',
-        previousText: 'Previous',
-        nextText: 'Next',
+        previousText: '',
+        nextText: '',
         lastText: 'Last',
         rotate: true
     })

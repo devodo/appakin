@@ -17,8 +17,8 @@ header, footer { height: 1px; }
 
 #search-results {
   max-width: 960px;
-  margin-left: auto;
-  margin-right: auto;
+  //margin-left: auto;
+  //margin-right: auto;
 }
 
 // HEADER LAYOUT
@@ -163,6 +163,53 @@ footer .call-to-action {
       float: left;
       position: relative; // for IE
       list-style-type: none;
+    }
+  }
+}
+
+//ul.pagination {
+//  margin: 10px auto;
+//  //text-align: center;
+//}
+
+
+
+
+#search-results {
+  display: table;
+  height: 100%;
+  padding-top: 12px;
+  padding-bottom: 6px;
+  padding-left: 6px;
+  //max-width: 800px;
+  width: 100%;
+
+  @include mq($from: tablet) {
+    padding-left: 120px;
+  }
+
+  .results-wrapper { height: auto; }
+  .results-wrapper, .pagination-wrapper { display: table-row; }
+  .pagination-wrapper { height: 1px; }
+
+  div.centering-wrapper {
+    float: right;
+    position: relative;
+    left: -50%;
+    text-align: left;
+
+    @include mq($from: tablet) {
+      float: none;
+      left: 0px;
+    }
+
+    ul {
+      position: relative;
+      left: 50%;
+
+      @include mq($from: tablet) {
+        left: 0px;
+      }
     }
   }
 }

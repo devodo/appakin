@@ -1,18 +1,26 @@
 <div id="search-results">
-    <p ng-if="!search.results.serverError && search.results.categories.length == 0 && !search.results.initialState">
-        Sorry! We could not find anything relating to <span>{{search.searchTerm}}</span>.
-    </p>
-    <p ng-if="search.results.serverError">
-        Oops! There was a problem getting results from the server. Please try again, or later if the problem continues.
-    </p>
-    <ul ng-if="search.results.categories.length > 0" ng-class="search.results.searchInProgress ? 'disabled' : ''">
-        <li ng-repeat="category in search.results.categories">
-            <h4><a href="{{ url.createCategoryUrl(category.platform, category.urlName) }}">{{category.name}}</a></h4>
-            <p>
-                {{category.shortDesc}}
-            </p>
-        </li>
-    </ul>
-    <pagination ng-show="search.results.totalItems > 0" total-items="search.results.totalItems" max-size="numPages"
-                ng-model="search.results.currentPage" ng-change="pageChanged()"></pagination>
+    <div class="results-wrapper">
+        <p ng-if="!search.results.serverError && search.results.categories.length == 0 && !search.results.initialState">
+            Sorry! We could not find anything relating to <span>{{search.searchTerm}}</span>.
+        </p>
+        <p ng-if="search.results.serverError">
+            Oops! There was a problem getting results from the server. Please try again, or later if the problem continues.
+        </p>
+        <ul ng-if="search.results.categories.length > 0" ng-class="search.results.searchInProgress ? 'disabled' : ''">
+            <li ng-repeat="category in search.results.categories">
+                <h4><a href="{{ url.createCategoryUrl(category.platform, category.urlName) }}">{{category.name}}</a></h4>
+                <p>
+                    {{category.shortDesc}}
+                </p>
+            </li>
+        </ul>
+    </div>
+    <div class="pagination-wrapper">
+        <div class="centering-wrapper">
+            <div pagination
+                 ng-show="search.results.totalItems > 0" total-items="search.results.totalItems" max-size="numPages"
+                 ng-model="search.results.currentPage" ng-change="pageChanged()"
+                 previous-text="" next-text=""></div>
+        </div>
+    </div>
 </div>
