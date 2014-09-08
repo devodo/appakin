@@ -14,7 +14,7 @@ exports.group = {
     addAllApps: function (test) {
         return test.done(); // disable
 
-        autoIndexer.addAllAuto(10000, function(err) {
+        autoIndexer.addAllAuto(1000, function(err) {
             test.expect(1);
             test.ok(!err, err);
             test.done();

@@ -15,7 +15,7 @@ exports.group = {
     },
 
     crawlCategories: function(test) {
-        //return test.done();
+        return test.done();
 
         var seedUrls = [
             'http://xyo.net/iphone-app/--7OQZ36Q/'

@@ -1,5 +1,4 @@
 'use strict';
-var solr = require('solr-client');
 var async = require('async');
 var log = require('../../logger');
 var solrCore = require('./solrCore').getAutoSolrCore();
@@ -14,25 +13,16 @@ function escapeSpecialChars(s){
 }
 
 var search = function(queryStr, pageNum, next) {
+    queryStr = solrCore.preProcessText(queryStr);
     var queryLength = queryStr.length;
     var useLong = queryLength >= EDGE_THRESHOLD;
 
     var q = escapeSpecialChars(queryStr);
-    if (useLong) {
-        q = q + '*';
-    }
-
-    var query = solrCore.client.createQuery();
-    query.q(q);
-    query.rows(PAGE_SIZE);
-
-    if (pageNum && pageNum > 1) {
-        query.start((pageNum - 1) * PAGE_SIZE);
-    }
+    var solrQuery = 'qq=' + encodeURIComponent(q);
 
     var requestHandler = useLong ? 'custom_long' : 'custom';
 
-    solrCore.client.get(requestHandler, query, function (err, obj) {
+    solrCore.client.get(requestHandler, solrQuery, function (err, obj) {
         if (err) {
             return next(err);
         }

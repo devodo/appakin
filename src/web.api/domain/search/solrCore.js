@@ -1,5 +1,6 @@
 'use strict';
 var solr = require('solr-client');
+var unidecode = require('unidecode');
 var config = require('../../config');
 
 var SolrCore = function(client) {
@@ -16,6 +17,20 @@ SolrCore.prototype.commit = function (next) {
 
         return next(null, res);
     });
+};
+
+SolrCore.prototype.preProcessText = function(input) {
+    var output = input.replace(/^&amp;\s|\s&amp;\s|\s&amp;$/g, " and ");
+    output = output.replace(/['"]/g, "");
+    output = output.replace(/[\s\-_]+/g, " ");
+    output = output.toLowerCase();
+    output = output.trim();
+
+    return output;
+};
+
+SolrCore.prototype.asciiFold = function(input) {
+    return unidecode(input);
 };
 
 var createSolrCore = function(coreName) {
@@ -44,7 +59,6 @@ exports.getAutoSolrCore = function() {
     var solrCore = createSolrCore(coreName);
     return solrCore;
 };
-
 
 
 

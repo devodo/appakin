@@ -1,7 +1,5 @@
 'use strict';
-var solr = require('solr-client');
 var async = require('async');
-var unidecode = require('unidecode');
 var appStoreRepo = require('../../repos/appStoreRepo');
 var log = require('../../logger');
 var solrCore = require('./solrCore').getAutoSolrCore();
@@ -10,32 +8,23 @@ var CATEGORY_TYPE = 1;
 var APP_TYPE = 2;
 var APP_ID_OFFSET = 10000000;
 
-var preProcess = function(input) {
-    return input.toLowerCase().trim();
-};
-
-var asciiFold = function(input) {
-    return unidecode(input);
-};
-
 var addCategory = function(category, next) {
     log.debug("Adding category: " + category.name);
 
-    var name = preProcess(category.name);
+    var name = solrCore.preProcessText(category.name);
 
     var solrCategory = {
         id: category.id,
         type: CATEGORY_TYPE,
         name: name,
-        "name_prefix": name,
-        "name_wildcard": name,
+        "name_word_prefix": name,
         "popularity": category.popularity
     };
 
-    if (name !== asciiFold(name)) {
-        solrCategory.name_ascii = name;
-        solrCategory.name_prefix_ascii = name;
-        solrCategory.name_wildcard_ascii = name;
+    var nameAscii = solrCore.asciiFold(name);
+
+    if (name !== nameAscii) {
+        solrCategory.name_alt = nameAscii;
     }
 
     solrCore.client.add(solrCategory, function(err, obj) {
@@ -48,19 +37,19 @@ var addCategory = function(category, next) {
 };
 
 var addApp = function(app, next) {
-    var name = preProcess(app.name);
+    var name = solrCore.preProcessText(app.name);
 
     var solrApp = {
         id: parseInt(app.id, 10) + APP_ID_OFFSET,
         type: APP_TYPE,
         name: name,
-        "name_prefix": name,
         popularity: app.popularity
     };
 
-    if (name !== asciiFold(name)) {
-        solrApp.name_ascii = name;
-        solrApp.name_prefix_ascii = name;
+    var nameAscii = solrCore.asciiFold(name);
+
+    if (name !== nameAscii) {
+        solrApp.name_alt = nameAscii;
     }
 
     solrCore.client.add(solrApp, function(err, obj){
