@@ -3,19 +3,33 @@
 .social-media-links {
   a {
     display: block;
-    background-image: url('/public/images/social-media-sprite-32.png');
-    @include background-image-2x('/public/images/social-media-sprite-64.png', 64px, 32px);
+    //background-image: url('/public/images/social-media-sprite-32.png');
+    //@include background-image-2x('/public/images/social-media-sprite-64.png', 64px, 32px);
     width: 32px;
     height: 32px;
+
+    font-family: "icomoon";
+    font-size: 28px;
+    text-align: center;
+  }
+
+  a,
+  a:link,
+  a:visited,
+  a:hover,
+  a:active {
+    text-decoration: none;
   }
 
   a.facebook {
-    background-position: 0 0;
+    //background-position: 0 0;
     margin-right: 2px;
+    color: #3a579b;
   }
 
   a.twitter {
-    background-position: 32px 0;
+    //background-position: 32px 0;
+    color: #598dca;
   }
 }
 

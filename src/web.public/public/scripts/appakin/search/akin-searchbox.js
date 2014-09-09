@@ -28,7 +28,7 @@
                 $scope.ddSelectSelected = {
                     text: $scope.platform.getStoreName($scope.search.platform),
                     platform: $scope.search.platform
-                }
+                };
 
                 $scope.dropdownOnchange = function (selected) {
                     $scope.search.platform = selected.platform;

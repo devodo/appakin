@@ -1,5 +1,7 @@
 // plumber info: http://cameronspear.com/blog/how-to-handle-gulp-watch-errors-with-plumber/
 
+// TODO: Look into using gulp-if-else plugin to reduce repetition in the tasks.
+
 'use strict';
 
 var gulp = require('gulp');
@@ -16,6 +18,15 @@ var publicGeneratedRoot = path.resolve('./public-generated');
 var buildRoot = path.resolve('../../build-output/web.public');
 var buildTempRoot = path.resolve('./.tmp');
 var indexHtmlPath = path.resolve('./index.html');
+
+var minifyHtmlOptions = {
+        empty: true, // do not remove empty attributes
+        cdata: true, // do not strip CDATA from scripts
+        comments: false, // remove comments
+        conditionals: false, // remove conditional internet explorer comments
+        spare: true, // do not remove redundant attributes
+        quotes: true // do not remove arbitrary quotes
+    };
 
 gulp.task('build', 
     [
@@ -57,7 +68,7 @@ gulp.task('jshint', function() {
 
 gulp.task('build:clean', ['jshint'], function() {
     return gulp
-	    .src(buildRoot, { read: false })
+	    .src([buildRoot, buildTempRoot], { read: false })
         .pipe(plugins.rimraf({ force: true }))
 		.on('error', handleError);
 });
@@ -74,19 +85,31 @@ gulp.task('build:config', ['build:clean'], function() {
         .pipe(plugins.ngConstant({
             name: 'appAkin.config',
             deps: [],
-            constants: { webApiUrl: 'http://aws/api/' },
+            constants: { webApiUrl: 'http://10.0.1.4:3002/api/' },
             wrap: ''
         }))
         .pipe(gulp.dest(buildTempRoot))
         .on('error', handleError);
 });
 
-gulp.task('build:scripts', ['build:clean', 'build:config'], function() {
+gulp.task('build:templates', ['build:clean', 'build:config'], function() {
+    return gulp
+        .src(['./public/scripts/**/*.html'])
+        .pipe(plugins.minifyHtml(minifyHtmlOptions))
+        .pipe(templateCache('appTemplates.js', {module: 'appAkin'}))
+        .pipe(plugins.size({ showFiles: true }))
+        .pipe(gulp.dest(buildTempRoot))
+        .on('error', handleError);
+});
+
+gulp.task('build:scripts', ['build:clean', 'build:config', 'build:templates'], function() {
     return gulp
         .src(['./public/scripts/**/module.js',
             './public/scripts/**/*.js',
-            './.tmp/configModule.js',
-            '!./public/scripts/appakin/configModule.js'])
+            buildTempRoot + '/configModule.js',
+            buildTempRoot + '/appTemplates.js',
+            '!./public/scripts/appakin/configModule.js'
+        ])
         .pipe(plugins.concat('app-scripts.js'))
         .pipe(plugins.ngAnnotate())
         .pipe(plugins.uglify())
@@ -120,17 +143,6 @@ gulp.task('build:index-html', ['build:scripts', 'build:stylesheets', 'build:temp
 		.on('error', handleError);
 });
 
-gulp.task('build:templates', ['build:clean'], function() {
-	return gulp
-	    .src(['./public/scripts/**/*.html'])
-        .pipe(plugins.minifyHtml({quotes: true}))
-		.pipe(templateCache('app-templates.js', {module: 'appAkin'}))
-        .pipe(plugins.size({ showFiles: true }))
-        .pipe(plugins.rev())
-        .pipe(gulp.dest(buildRoot + '/public/templates/'))
-		.on('error', handleError);		
-});
-
 gulp.task('build:minify-images', ['build:clean'], function() {
     return gulp
 	    .src('./public/images/**/*.*')
@@ -146,6 +158,7 @@ gulp.task('build:copy', ['build:clean'], function() {
             './node_modules/**/*.*',
             './routes/**/*.*',
             './views/**/*.*',
+            './public/fonts/*.*',
             './*.*',
             '!./bower.json', '!./gulpfile.js', '!./index.html'
 		];
@@ -177,11 +190,6 @@ gulp.task('build:cdnify', ['build:index-html', 'build:stylesheets'], function() 
                         package: 'angular-touch',
                         cdn: '//ajax.googleapis.com/ajax/libs/angularjs/${ version }/angular-touch.min.js'
                     },
-//                    {
-//                        file: '/bower_components/angular-resource/angular-resource.js',
-//                        package: 'angular-resource',
-//                        cdn: '//ajax.googleapis.com/ajax/libs/angularjs/${ version }/angular-resource.min.js'
-//                    },
                     {
                         file: '/bower_components/angular-cookies/angular-cookies.js',
                         package: 'angular-cookies',
@@ -209,10 +217,7 @@ gulp.task('dev:watch', ['dev:stylesheets', 'dev:templates', 'dev:scripts'], func
 	gulp.watch(['./public/stylesheets/**/*.scss'], ['dev:stylesheets'])
         .on('error', handleError);
 
-	gulp.watch(['./public/scripts/**/*.html'], ['dev:templates'])
-        .on('error', handleError);
-
-	gulp.watch(['./public/scripts/**/*.js'], ['dev:scripts'])
+	gulp.watch(['./public/scripts/**/*.js', './public/scripts/**/*.html'], ['dev:scripts'])
         .on('error', handleError);
 
 	gulp.watch(['./index.html'])
@@ -225,7 +230,7 @@ gulp.task('dev:stylesheets', function () {
     return gulp
         .src(['./public/stylesheets/main.scss'])
         .pipe(plugins.plumber({errorHandler: handleError}))
-        .pipe(sass()) //({errLogToConsole: true}))
+        .pipe(sass())
         .pipe(plugins.rename(
             function(path) {
                 path.basename = 'app-styles';
@@ -239,21 +244,27 @@ gulp.task('dev:templates', function() {
 	return gulp
 	    .src(['./public/scripts/**/*.html'])
         .pipe(plugins.plumber({errorHandler: handleError}))
-		.pipe(templateCache('app-templates.js', {module: 'appAkin'}))
+        .pipe(plugins.minifyHtml(minifyHtmlOptions))
+		.pipe(templateCache('appTemplates.js', {module: 'appAkin'}))
         .pipe(gulp.dest(publicGeneratedRoot + '/public/templates/'))
-		.on('end', plugins.livereload.changed)
 		.on('error', handleError);		
 });
 
-gulp.task('dev:scripts', function() {
+gulp.task('dev:scripts', ['dev:templates'], function() {
     return gulp
-        .src(['./public/scripts/**/module.js', './public/scripts/**/*.js'])
+        .src(
+            [
+                './public/scripts/**/module.js',
+                './public/scripts/**/*.js',
+                publicGeneratedRoot + '/public/templates/appTemplates.js'
+            ])
         .pipe(plugins.plumber({errorHandler: handleError}))
         .pipe(plugins.sourcemaps.init())
         .pipe(plugins.concat('app-scripts.js'))
         .pipe(plugins.ngAnnotate())
         .pipe(plugins.sourcemaps.write())
         .pipe(gulp.dest(publicGeneratedRoot + '/public/scripts/'))
+        .on('end', beep)
         .on('end', plugins.livereload.changed)
         .on('error', handleError);
 });
