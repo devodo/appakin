@@ -121,16 +121,24 @@ header .searchbox-wrapper {
       cursor: pointer;
       text-align: left;
 
-      .caret {
-        width: 0;
-        height: 0;
+      .caret:after
+      {
         position: absolute;
-        right: 10px;
-        top: 40%;
-        border-left: $menu-arrow-size solid transparent;
-        border-right: $menu-arrow-size solid transparent;
-        border-top: $menu-arrow-size solid $alt-black-colour;
+        right: 6px;
+        font-family: "icomoon";
+        content: "d";
       }
+
+//      .caret {
+//        width: 0;
+//        height: 0;
+//        position: absolute;
+//        right: 10px;
+//        top: 40%;
+//        border-left: $menu-arrow-size solid transparent;
+//        border-right: $menu-arrow-size solid transparent;
+//        border-top: $menu-arrow-size solid $alt-black-colour;
+//      }
     }
 
     button:hover,

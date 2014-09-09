@@ -3,20 +3,25 @@
 
     angular.module('appAkin').factory('searchApi', function(webApiUrl, $timeout, $http, $q) {
         var requestTimeoutMs = 4000;
-
-        var requestCancelPromise = null;
-        var requestTimeoutPromise = null;
+        var currentRequest = createCurrentRequest();
 
         function cancelCurrentRequest() {
-            if (requestCancelPromise) {
-                requestCancelPromise.resolve();
-                requestCancelPromise = null;
+            currentRequest.cancelled = true;
+
+            if (currentRequest.requestCancelPromise) {
+                currentRequest.requestCancelPromise.resolve();
             }
 
-            if (requestTimeoutPromise) {
-                $timeout.cancel(requestTimeoutPromise);
-                requestTimeoutPromise = null;
+            if (currentRequest.requestTimeoutPromise) {
+                $timeout.cancel(currentRequest.requestTimeoutPromise);
             }
+        }
+
+        function createCurrentRequest() {
+            return {
+                timedOut: false,
+                cancelled: false
+            };
         }
 
         return {
@@ -24,40 +29,44 @@
             get: function(q, p, page, take, success, error) {
                 cancelCurrentRequest();
 
-                var requestTimedOut = false;
+                currentRequest = createCurrentRequest();
+                var localCurrentRequest = currentRequest;
 
-                requestCancelPromise = $q.defer();
+                localCurrentRequest.requestCancelPromise = $q.defer();
 
-                requestTimeoutPromise = $timeout(function() {
-                    if (requestCancelPromise) {
-                        requestCancelPromise.resolve();
-                        requestCancelPromise = null;
+                localCurrentRequest.requestTimeoutPromise = $timeout(function() {
+                    if (localCurrentRequest.requestCancelPromise) {
+                        //localCurrentRequest.cancelled = true;
+                        localCurrentRequest.requestCancelPromise.resolve();
                     }
 
+                    localCurrentRequest.timedOut = true;
+
                     console.log('Server request timed out.');
-                    requestTimedOut = true;
                 }, requestTimeoutMs);
 
                 console.log('Making search request: q=' + q + ' p=' + p);
-
-                // TODO: At the moment, if the http request errors, the requestTimeoutPromise continues running.
-                // Find a way to cancel it on http request error (not using error() handler by itself as the
-                // autocomplete dropdown doesn't show in that case).
 
                 $http
                     .get(
                         webApiUrl + 'search?q='+encodeURIComponent(q)+'&p='+encodeURIComponent(p)+
                         '&page='+encodeURIComponent(page)+'&take='+encodeURIComponent(take),
-                        { timeout: requestCancelPromise.promise })
+                        { timeout: localCurrentRequest.requestCancelPromise.promise })
                     .success(function(data) {
                         console.log('got result');
                         success(data);
                     })
                     .error(function(data, status) {
-                        console.log('failed result: status=' + status + ' data=' + data);
+                        console.log('Failed search: status=' + status + ' data=' + data);
+
+                        var requestTimedOut = localCurrentRequest.timedOut;
+                        var requestCancelled = localCurrentRequest.cancelled;
 
                         if (error) {
-                            if (status > 0 || (status === 0 && requestTimedOut)) {
+                            if (status > 0 ||
+                                (status === 0 && !requestCancelled))// && requestTimedOut))
+                            {
+                                console.log('Invoking error callback.');
                                 error(data);
                             }
                         }

@@ -16,6 +16,7 @@ exports.init = function init(app) {
 
         if (/^no/.test(query)) {
             res.json([]);
+            return;
         }
 
         autoSearcher.search(query, 1, function(err, result) {

@@ -12,12 +12,12 @@
 
                 $scope.ddSelectOptions = [
                     {
-                        text: $scope.platform.getStoreName('ios'),
-                        platform: 'ios'
-                    },
-                    {
                         text: $scope.platform.getStoreName('android'),
                         platform: 'android'
+                    },
+                    {
+                        text: $scope.platform.getStoreName('ios'),
+                        platform: 'ios'
                     },
                     {
                         text: $scope.platform.getStoreName('winphone'),
@@ -32,6 +32,7 @@
 
                 $scope.dropdownOnchange = function (selected) {
                     $scope.search.platform = selected.platform;
+                    console.log('platform is ' + $scope.search.platform);
                 };
             }
         };

@@ -1,7 +1,7 @@
 (function () {
     'use strict';
 
-    angular.module('appAkin').factory('platform', function($routeParams, $cookies) {
+    angular.module('appAkin').factory('platform', function($routeParams, $location, $cookies) {
         var defaultPlatform = 'ios';
         var platformRegex = /(ios|android|winphone)/;
 
@@ -34,7 +34,8 @@
                 //return defaultPlatform;
 
                 // First try setting platform from URL.
-                var platform = normalisePlatform($routeParams.platform);
+                var platform = normalisePlatform($location.search().p);
+                    //$routeParams.p);
                 console.log('platform from url: ' + platform);
 
                 if (platform === undefined) {
@@ -70,7 +71,7 @@
             getStoreName: function(platform) {
                 switch (platform) {
                     case 'ios':
-                        return 'Apple App Store';
+                        return 'iPhone & iPad';
                     case 'android':
                         return 'Android';
                     case 'winphone':
@@ -82,7 +83,7 @@
             getFriendlyName: function(platform) {
                 switch (platform) {
                     case 'ios':
-                        return 'Apple';
+                        return 'iPhone & iPad';
                     case 'android':
                         return 'Android';
                     case 'winphone':

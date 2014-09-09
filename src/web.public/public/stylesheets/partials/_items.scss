@@ -1,0 +1,31 @@
+p.error {
+  padding: 12px;
+  background: tint($error-colour, 80);
+  color: $error-colour;
+}
+
+p.warning {
+  padding: 12px;
+  background: tint($warning-colour, 80);
+  color: $warning-colour;
+}
+
+p.search-type {
+  padding-bottom: 12px;
+
+  @include mq($from: tablet) {
+    padding-bottom: 18px;
+  }
+}
+
+li.category-search-result {
+  h4 {
+    margin-bottom: 3px;
+    font-size: 18px;
+  }
+  p {
+    margin-bottom: 21px;
+    font-size: 14px;
+    color: $alt-black-colour;
+  }
+}

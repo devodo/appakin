@@ -1,30 +1,38 @@
 <div id="search-results">
-<div class="results-wrapper">
-        <ul class="search-types">
-            <li><a href ng-click="setSearchType('category')'">Categories</a></li>
-            <li><a href ng-click="setSearchType('app')'">Apps</a></li>
-        </ul>
-        <p ng-if="!search.results.serverError && search.results.categories.length == 0 && !search.results.initialState">
-            Sorry! We could not find anything relating to <span>{{search.searchTerm}}</span>.
+    <p class="error"
+       ng-show="search.results.serverError && !search.results.searchInProgress">
+        There was a problem getting your search result. Please try again, or if the problem persists please try later.
+    </p>
+    <div class="no-error-wrapper"
+         ng-hide="search.results.serverError">
+        <p class="warning"
+           ng-show="search.results.categories.length == 0 && !search.results.initialState"
+           ng-class="search.results.searchInProgress ? 'disabled' : ''">
+            Sorry! We couldn't find anything to show you. Please try again with a different search term.
         </p>
-        <p ng-if="search.results.serverError">
-            Oops! There was a problem getting results from the server. Please try again, or later if the problem continues.
-        </p>
-        <ul ng-if="search.results.categories.length > 0" ng-class="search.results.searchInProgress ? 'disabled' : ''">
-            <li ng-repeat="category in search.results.categories">
-                <h4><a href="{{ url.createCategoryUrl(category.platform, category.urlName) }}">{{category.name}}</a></h4>
-                <p>
-                    {{category.shortDesc}}
-                </p>
-            </li>
-        </ul>
-    </div>
-    <div class="pagination-wrapper">
-        <div class="centering-wrapper">
-            <div pagination
-                 ng-show="search.results.totalItems > 0" total-items="search.results.totalItems" max-size="numPages"
-                 ng-model="search.results.currentPage" ng-change="pageChanged()"
-                 previous-text="" next-text=""></div>
+        <div class="valid-results-wrapper"
+             ng-show="search.results.categories.length > 0"
+             ng-class="search.results.searchInProgress ? 'disabled' : ''">
+            <div class="list-wrapper">
+                <p class="search-type">Showing categories. <a href>Click here for apps</a>.</p>
+                <ul ng-if="search.results.categories.length > 0">
+                    <li ng-repeat="category in search.results.categories"
+                        class="category-search-result">
+                        <h4><a href="{{ url.createCategoryUrl(category.platform, category.urlName) }}">{{category.name}}</a></h4>
+                        <p>
+                            {{category.shortDesc}}
+                        </p>
+                    </li>
+                </ul>
+            </div>
+            <div class="pagination-wrapper">
+                <div class="centering-wrapper">
+                    <div pagination
+                         ng-show="search.results.totalItems > 0" total-items="search.results.totalItems" max-size="numPages"
+                         ng-model="search.results.currentPage" ng-change="pageChanged()"
+                         previous-text="" next-text=""></div>
+                </div>
+            </div>
         </div>
     </div>
 </div>

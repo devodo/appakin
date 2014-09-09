@@ -128,47 +128,40 @@ ul.pagination {
   }
 
   li.disabled a {
-    //border: 1px solid transparent;
-    color: $disabled-text;
-    //display: none;
-    //visibility: hidden;
+    visibility: hidden;
   }
 }
 
-#search-results .results-wrapper ul.search-types {
-  //padding-bottom: 6px;
-  border-bottom: 1px solid $main-spot-colour;
+// no longer used
+#search-results .search-type {
+  color: $alt-black-colour;
+  font-size: 16px;
   margin-bottom: 12px;
 
-  li {
-    margin-left: 6px;
+  a,
+  a:link,
+  a:visited,
+  a:hover,
+  a:active {
+    color: $alt-black-colour;
+    text-decoration: underline;
+  }
+}
 
-    a {
-      display: block;
-      min-width: 100px;
-      padding: 3px 6px 6px 6px;
-      border: 1px solid $main-spot-colour;
-      border-bottom: 1px solid white;
-      @include border-top-radius(4px);
-      background-color: white;
-      text-align: center;
-    }
-
-    a,
-    a:link,
-    a:visited,
-    a:hover,
-    a:active {
-      color: $alt-black-colour;
-      font-weight: normal;
-    }
-
-    a,
-    a:link,
-    a:visited,
-    a:active {
-      text-decoration: none;
-    }
+li.category-search-result h4 {
+  a,
+  a:link,
+  a:visited,
+  a:hover,
+  a:active {
+    color: darken($main-spot-colour, 10);
+    font-weight: normal;
   }
 
+  a,
+  a:link,
+  a:visited,
+  a:active {
+    text-decoration: none;
+  }
 }

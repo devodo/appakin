@@ -2,7 +2,7 @@
 
 // http://pixelsvsbytes.com/blog/2011/09/sticky-css-footers-the-flexible-way/
 html, body { height: 100%; }
-body { display: table; max-width: 1200px; width: 100%; margin-left: auto; margin-right: auto; }
+body { display: table; min-width: 320px; max-width: 1200px; width: 100%; margin-left: auto; margin-right: auto; }
 main { height: auto; }
 header, footer, main { display: table-row; }
 header, footer { height: 1px; }
@@ -125,6 +125,10 @@ footer .call-to-action {
     margin-bottom: 2px;
     text-align: center;
 
+    @include mq($from: mobile-landscape) {
+      line-height: 26px;
+    }
+
     img {
       display: none;
 
@@ -170,58 +174,50 @@ footer .call-to-action {
 // SEARCH RESULTS PAGE
 
 #search-results {
+  padding: 6px 6px 6px 6px;
   display: table;
   height: 100%;
-  padding-top: 12px;
-  padding-bottom: 6px;
-  //padding-left: 6px;
-  //max-width: 800px;
   width: 100%;
 
   @include mq($from: tablet) {
     padding-left: 120px;
   }
 
-  .results-wrapper { height: auto; }
-  .results-wrapper, .pagination-wrapper { display: table-row; }
-  .pagination-wrapper { height: 1px; }
-
-  .results-wrapper p,
-  .results-wrapper ul {
-    padding-left: 6px;
-
-    @include mq($from: tablet) {
-      padding-left: 0px;
-    }
+  .no-error-wrapper {
+    display: table;
+    height: 100%;
+    width: 100%;
   }
 
-  .results-wrapper ul.search-types {
-    @include clearfix;
+  .valid-results-wrapper {
+    display: table;
+    height: 100%;
+    width: 100%;
 
-    li {
-      float: left;
-      position: relative; // for IE
-      list-style-type: none;
-    }
+    .list-wrapper { height: auto; }
+    .list-wrapper, .pagination-wrapper { display: table-row; }
+    .pagination-wrapper { height: 1px; }
   }
 
-  .pagination-wrapper .centering-wrapper {
-    float: right;
-    position: relative;
-    left: -50%;
-    text-align: left;
-
-    @include mq($from: tablet) {
-      float: none;
-      left: 0px;
-    }
-
-    ul {
+  .pagination-wrapper {
+    .centering-wrapper {
+      float: right;
       position: relative;
-      left: 50%;
+      left: -50%;
+      text-align: left;
 
       @include mq($from: tablet) {
+        float: none;
         left: 0px;
+      }
+
+      ul {
+        position: relative;
+        left: 50%;
+
+        @include mq($from: tablet) {
+          left: 0px;
+        }
       }
     }
   }

@@ -1,9 +1,12 @@
 
 $main-spot-colour: #2d8881;
+$alt-spot-colour: #8d5e37;
 $light-background-colour: #c3d5d4;
 $control-border-colour: #bbb;
 $alt-black-colour: #78725b;
-$disabled-text: #999;
+$error-colour: #a03d34;
+$warning-colour: $alt-black-colour;
+$disabled-text-colour: #bbb;
 $normal-border-radius: 6px;
 $body-font-family: "HelveticaNeue-Light", "Helvetica Neue Light", "Helvetica Neue", Helvetica, Arial, "Lucida Grande", sans-serif;
 $menu-arrow-size: 7px;

@@ -45,7 +45,7 @@ function initStaticRoutes(app) {
 	    return;
     }
 
-    app.use(favicon(path.join(__dirname, 'favicon.ico')));
+    app.use(favicon(path.join(__dirname, 'public/images/favicon.ico')));
 	app.use('/public/images', express.static(path.join(__dirname, 'public/images')));
 	app.use('/public', express.static(path.join(__dirname, 'public-generated/public')));
 	app.use('/public', express.static(path.join(__dirname, 'public')));
