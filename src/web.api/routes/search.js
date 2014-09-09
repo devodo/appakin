@@ -4,10 +4,6 @@ var autoSearcher = require('../domain/search/autoSearcher');
 
 exports.init = function init(app) {
 
-    app.get('/api/search/here', function(req, res) {
-        res.json('populär');
-    });
-
     app.get('/api/search/autocomplete', function (req, res) {
         var query = req.query.q || '';
         var platform = req.query.p || '';
@@ -22,18 +18,17 @@ exports.init = function init(app) {
             res.json([]);
         }
 
-        setTimeout(
-            function() {
-                res.json([
-                    'Apple',
-                    'Banana',
-                    'Happle',
-                    'mmm apples this is a long string of text that just keeps going on',
-                    'Coconut',
-                    'Facet'
-                ]);
-            },
-            100);
+        autoSearcher.search(query, 1, function(err, result) {
+            if (err) {
+                return res.status(500).send(err);
+            }
+
+            var docs = result.docs.map(function(doc) {
+                return doc.name;
+            });
+
+            res.json(docs);
+        });
     });
 
     app.get('/api/search/appstore/auto', function (req, res) {

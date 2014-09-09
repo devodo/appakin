@@ -172,7 +172,7 @@ var retrieveCategories = function(next) {
         }
 
         var idRegex = /id([\d]+)/;
-        var $ = cheerio.load(pageSrc);
+        var $ = cheerio.load(src);
         var tasks = $('#genre-nav a').map(function(i, el) {
             var url = $(this).attr('href');
             var name = $(this).text();

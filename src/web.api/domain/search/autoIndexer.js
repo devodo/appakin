@@ -9,8 +9,6 @@ var APP_TYPE = 2;
 var APP_ID_OFFSET = 10000000;
 
 var addCategory = function(category, next) {
-    log.debug("Adding category: " + category.name);
-
     var name = solrCore.preProcessText(category.name);
 
     var solrCategory = {
@@ -61,13 +59,15 @@ var addApp = function(app, next) {
     });
 };
 
-var addAllCategories = function(next) {
+var addAllCategories = function(outputHandler, next) {
     appStoreRepo.getCategories(function(err, categories) {
         if (err) {
             return next(err);
         }
 
         var processCategory = function(category, callback) {
+            outputHandler("Adding category: " + category.name);
+
             addCategory(category, function(err) {
                 callback(err);
             });
@@ -86,9 +86,9 @@ var addAllCategories = function(next) {
     });
 };
 
-var addAllApps = function(batchSize, next) {
+var addAllApps = function(batchSize, outputHandler, next) {
     var processBatch = function(lastId) {
-        log.debug("Adding batch from id: " + lastId);
+        outputHandler("Adding batch from id: " + lastId);
 
         appStoreRepo.getAppIndexBatch(lastId, batchSize, function(err, apps) {
             if (err) {
@@ -101,7 +101,7 @@ var addAllApps = function(batchSize, next) {
 
             lastId = apps[apps.length - 1].id;
 
-            log.debug("Last app name: " + apps[apps.length - 1].name);
+            outputHandler("Last app name: " + apps[apps.length - 1].name);
 
             var processApp = function(app, callback) {
                 addApp(app, function(err) {
@@ -128,11 +128,11 @@ var addAllApps = function(batchSize, next) {
     processBatch(0);
 };
 
-var addAllAuto = function(batchSize, next) {
-    addAllCategories(function(err) {
+var rebuild = function(batchSize, outputHandler, next) {
+    addAllCategories(outputHandler, function(err) {
         if (err) { return next(err); }
 
-        addAllApps(batchSize, function(err) {
+        addAllApps(batchSize, outputHandler, function(err) {
             if (err) { return next(err); }
 
             next();
@@ -140,7 +140,7 @@ var addAllAuto = function(batchSize, next) {
     });
 };
 
-exports.addAllAuto = addAllAuto;
+exports.rebuild = rebuild;
 
 
 

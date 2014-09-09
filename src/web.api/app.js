@@ -43,14 +43,35 @@ function configureApp(app) {
     });
 }
 
+
 function initApiRoutes(app) {
-    var apiDir = path.resolve(__dirname, 'routes');
-    var files = fs.readdirSync(apiDir);
+    var getFilesSync = function(dir, recurse) {
+        var results = [];
+        var list = fs.readdirSync(dir);
+
+        list.forEach(function(file) {
+            file = dir + '/' + file;
+            var stat = fs.statSync(file);
+            if (stat && stat.isDirectory()) {
+                if (recurse) {
+                    var res = getFilesSync(file, recurse);
+                    results = results.concat(res);
+                }
+            } else {
+                results.push(file);
+            }
+        });
+
+        return results;
+    };
 
     var isRouteFile = function(filePath) {
         var isValid = S(filePath.toLowerCase()).endsWith('.js');
         return isValid;
     };
+
+    var apiDir = path.resolve(__dirname, 'routes');
+    var files = getFilesSync(apiDir, true);
 
     files.forEach(function (file) {
         var filePath = path.resolve(apiDir, file);
