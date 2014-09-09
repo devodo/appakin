@@ -13,7 +13,7 @@ function escapeSpecialChars(s){
 }
 
 var search = function(queryStr, pageNum, next) {
-    queryStr = solrCore.preProcessText(queryStr);
+    queryStr = solrCore.preProcessIndexText(queryStr);
     var queryLength = queryStr.length;
     var useLong = queryLength >= EDGE_THRESHOLD;
 

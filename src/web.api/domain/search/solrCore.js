@@ -19,10 +19,18 @@ SolrCore.prototype.commit = function (next) {
     });
 };
 
-SolrCore.prototype.preProcessText = function(input) {
-    var output = input.replace(/^&amp;\s|\s&amp;\s|\s&amp;$/g, " and ");
+SolrCore.prototype.preProcessDisplayText = function(input) {
+    var output = input.replace(/\s+/g, " ");
+    output = output.toLowerCase();
+    output = output.trim();
+
+    return output;
+};
+
+SolrCore.prototype.preProcessIndexText = function(input) {
+    var output = input.replace(/^&[\s_\-]|[\s_\-]&[\s_\-]|[\s_\-]&$/g, " and ");
     output = output.replace(/['"]/g, "");
-    output = output.replace(/[\s\-_]+/g, " ");
+    output = output.replace(/[\s_\-]+/g, " ");
     output = output.toLowerCase();
     output = output.trim();
 

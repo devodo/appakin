@@ -19,17 +19,18 @@ exports.init = function init(app) {
             return;
         }
 
-        autoSearcher.search(query, 1, function(err, result) {
-            if (err) {
-                return res.status(500).send(err);
-            }
-
-            var docs = result.docs.map(function(doc) {
-                return doc.name;
-            });
-
-            res.json(docs);
-        });
+        setTimeout(
+            function() {
+                res.json([
+                    'Apple',
+                    'Banana',
+                    'Happle',
+                    'mmm apples this is a long string of text that just keeps going on',
+                    'Coconut',
+                    'Facet'
+                ]);
+            },
+            100);
     });
 
     app.get('/api/search/appstore/auto', function (req, res) {
@@ -46,7 +47,7 @@ exports.init = function init(app) {
             }
 
             var docs = result.docs.map(function(doc) {
-                return doc.name;
+                return doc.name_display;
             });
 
             res.json(docs);

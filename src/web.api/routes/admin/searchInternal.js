@@ -15,7 +15,7 @@ exports.init = function init(app) {
 
         autoIndexer.rebuild(appBatchSize, outputHandler, function(err) {
             if (err) {
-                res.write(err);
+                res.write(JSON.stringify(err));
             }
             else {
                 res.write("Rebuild completed successfully\n");

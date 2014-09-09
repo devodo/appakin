@@ -9,19 +9,21 @@ var APP_TYPE = 2;
 var APP_ID_OFFSET = 10000000;
 
 var addCategory = function(category, next) {
-    var name = solrCore.preProcessText(category.name);
+    var nameDisplay = solrCore.preProcessDisplayText(category.name);
+    var nameIndex = solrCore.preProcessIndexText(category.name);
 
     var solrCategory = {
         id: category.id,
         type: CATEGORY_TYPE,
-        name: name,
-        "name_word_prefix": name,
+        "name_display": nameDisplay,
+        name: nameIndex,
+        "name_word_prefix": nameIndex,
         "popularity": category.popularity
     };
 
-    var nameAscii = solrCore.asciiFold(name);
+    var nameAscii = solrCore.asciiFold(nameIndex);
 
-    if (name !== nameAscii) {
+    if (nameIndex !== nameAscii) {
         solrCategory.name_alt = nameAscii;
     }
 
@@ -35,18 +37,20 @@ var addCategory = function(category, next) {
 };
 
 var addApp = function(app, next) {
-    var name = solrCore.preProcessText(app.name);
+    var nameDisplay = solrCore.preProcessDisplayText(app.name);
+    var nameIndex = solrCore.preProcessIndexText(app.name);
 
     var solrApp = {
         id: parseInt(app.id, 10) + APP_ID_OFFSET,
         type: APP_TYPE,
-        name: name,
+        "name_display": nameDisplay,
+        name: nameIndex,
         popularity: app.popularity
     };
 
-    var nameAscii = solrCore.asciiFold(name);
+    var nameAscii = solrCore.asciiFold(nameIndex);
 
-    if (name !== nameAscii) {
+    if (nameIndex !== nameAscii) {
         solrApp.name_alt = nameAscii;
     }
 

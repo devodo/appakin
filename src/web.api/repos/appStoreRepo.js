@@ -295,6 +295,7 @@ var getAppIndexBatch = function(client, lastId, limit, next) {
         "FROM appstore_app a\n" +
         "LEFT JOIN app_popularity ap on a.app_id = ap.app_id\n" +
         "WHERE a.app_id > $1\n" +
+        "AND a.name is not null\n" +
         "ORDER BY a.app_id\n" +
         "limit $2;";
 
@@ -436,6 +437,39 @@ var getCategoryAppDescriptions = function(client, categoryId, limit, next) {
                 position: item.position,
                 appId: item.app_id,
                 description: item.description
+            };
+        });
+
+        next(null, items);
+    });
+};
+
+var getCategoryAppsForIndex = function(client, categoryId, next) {
+    var queryStr =
+        "SELECT a.app_id, a.name, a.description, a.store_url, a.supported_devices,\n" +
+        "a.artwork_small_url, a.price, ap.popularity, ca.position\n" +
+        "FROM appstore_app a\n" +
+        "JOIN category_app ca on a.app_id = ca.app_id\n" +
+        "LEFT JOIN app_popularity ap on a.app_id = ap.app_id\n" +
+        "WHERE ca.category_id = $1\n" +
+        "ORDER BY ca.position;";
+
+    client.query(queryStr, [categoryId], function (err, result) {
+        if (err) {
+            return next(err);
+        }
+
+        var items = result.rows.map(function(item) {
+            return {
+                id: item.app_id,
+                name: item.name,
+                description: item.description,
+                urlName: item.store_url,
+                supportedDevices: item.supported_devices,
+                imageUrl: item.artwork_small_url,
+                price: item.price,
+                popularity: item.popularity,
+                position: item.position
             };
         });
 
@@ -778,6 +812,20 @@ exports.getCategoryAppDescriptions = function(categoryId, limit, next) {
         }
 
         getCategoryAppDescriptions(conn.client, categoryId, limit, function(err, results) {
+            conn.close(err, function(err) {
+                next(err, results);
+            });
+        });
+    });
+};
+
+exports.getCategoryAppsForIndex = function(categoryId, next) {
+    connection.open(function(err, conn) {
+        if (err) {
+            return next(err);
+        }
+
+        getCategoryAppsForIndex(conn.client, categoryId, function(err, results) {
             conn.close(err, function(err) {
                 next(err, results);
             });

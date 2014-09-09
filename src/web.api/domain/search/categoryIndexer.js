@@ -5,17 +5,37 @@ var appStoreRepo = require('../../repos/appStoreRepo');
 var log = require('../../logger');
 var solrCore = require('./solrCore').getCategoryCore();
 
-var addCategory = function(category, appDescriptions, next) {
+var CATEGORY_TYPE = 1;
+var APP_TYPE = 2;
+
+
+var addCategory = function(category, apps, next) {
     log.debug("Adding category: " + category.name);
 
-    solrCore.client.add({
+    var solrApps = apps.map(function(app) {
+        var position = parseInt(app.position, 10);
+        var popularity = 1.0 / position;
+
+        return {
+            id : category.id + '-' + app.id,
+            type: APP_TYPE,
+            name: app.name,
+            desc: app.description,
+            popularity: popularity
+        };
+    });
+
+    var solrCategory = {
         id : category.id,
+        type: CATEGORY_TYPE,
         name: category.name,
         desc: category.description,
         url: category.urlName,
-        "app_desc" : appDescriptions,
-        "popularity": category.popularity
-    },function(err, obj){
+        "_childDocuments_" : solrApps,
+        popularity: category.popularity
+    };
+
+    solrCore.client.add(solrCategory, function(err, obj){
         if(err){
             return next(err);
         }
@@ -31,16 +51,12 @@ var addAllCategories = function(appDescriptionLimit, next) {
         }
 
         var processCategory = function(category, callback) {
-            appStoreRepo.getCategoryAppDescriptions(category.id, appDescriptionLimit, function(err, results) {
+            appStoreRepo.getCategoryAppsForIndex(category.id, function(err, apps) {
                 if (err) {
                     return callback(err);
                 }
 
-                var appDescriptions = results.map(function(item) {
-                    return item.description;
-                });
-
-                addCategory(category, appDescriptions, function(err) {
+                addCategory(category, apps, function(err) {
                     callback(err);
                 });
             });
