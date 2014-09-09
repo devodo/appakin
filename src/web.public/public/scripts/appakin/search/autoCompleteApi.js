@@ -40,6 +40,8 @@
                             requestCancelPromise.resolve();
                             requestCancelPromise = null;
                         }
+
+                        console.log('auto request timed out.')
                     }, requestTimeoutMs);
 
                     console.log('Making auto complete request: q=' + q + ' p=' + p);
@@ -52,16 +54,36 @@
                         .get(
                             webApiUrl + 'search/autocomplete?q='+encodeURIComponent(q)+'&p='+encodeURIComponent(p),
                             { timeout: requestCancelPromise.promise })
-                        .then(function(response) {
+
+
+                        .success(function(data) {
                             console.log('got result for q=' + q + ' p=' + p);
+                            console.log(data);
+
                             $timeout.cancel(requestTimeoutPromise);
                             requestTimeoutPromise = null;
 
                             requestCancelPromise.resolve();
                             requestCancelPromise = null;
 
-                            callback(response);
+                            callback(data);
+                        })
+                        .error(function(data, status) {
+                            console.log('Failed search: status=' + status + ' data=' + data);
                         });
+
+
+
+//                        .then(function(response) {
+//                            console.log('got result for q=' + q + ' p=' + p);
+//                            $timeout.cancel(requestTimeoutPromise);
+//                            requestTimeoutPromise = null;
+//
+//                            requestCancelPromise.resolve();
+//                            requestCancelPromise = null;
+//
+//                            callback(response);
+//                        });
                 }, debounceTimeoutMs);
             }
         };

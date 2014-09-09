@@ -44,8 +44,9 @@
                 autoCompleteApi.get(
                     currentSearchTerm,
                     currentPlatform,
-                    function(response) {
-                        me.service.autoComplete.terms = response.data;
+                    function(data) {
+                        me.service.autoComplete.terms = data;
+                        console.log(data);
                     }
                 );
             },

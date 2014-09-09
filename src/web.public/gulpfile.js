@@ -85,7 +85,7 @@ gulp.task('build:config', ['build:clean'], function() {
         .pipe(plugins.ngConstant({
             name: 'appAkin.config',
             deps: [],
-            constants: { webApiUrl: 'http://10.0.1.4:3002/api/' },
+            constants: { webApiUrl: 'http://127.0.0.1:3002/api/' },
             wrap: ''
         }))
         .pipe(gulp.dest(buildTempRoot))
@@ -95,7 +95,7 @@ gulp.task('build:config', ['build:clean'], function() {
 gulp.task('build:templates', ['build:clean', 'build:config'], function() {
     return gulp
         .src(['./public/scripts/**/*.html'])
-        .pipe(plugins.minifyHtml(minifyHtmlOptions))
+        //.pipe(plugins.minifyHtml(minifyHtmlOptions))
         .pipe(templateCache('appTemplates.js', {module: 'appAkin'}))
         .pipe(plugins.size({ showFiles: true }))
         .pipe(gulp.dest(buildTempRoot))
@@ -244,7 +244,7 @@ gulp.task('dev:templates', function() {
 	return gulp
 	    .src(['./public/scripts/**/*.html'])
         .pipe(plugins.plumber({errorHandler: handleError}))
-        .pipe(plugins.minifyHtml(minifyHtmlOptions))
+        //.pipe(plugins.minifyHtml(minifyHtmlOptions))
 		.pipe(templateCache('appTemplates.js', {module: 'appAkin'}))
         .pipe(gulp.dest(publicGeneratedRoot + '/public/templates/'))
 		.on('error', handleError);		
