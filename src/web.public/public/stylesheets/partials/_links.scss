@@ -33,6 +33,24 @@
   }
 }
 
+// AUTOCOMPLETE CLEAR BUTTON
+
+.autocomplete {
+  a.clear-search,
+  a.clear-search:link,
+  a.clear-search:visited,
+  a.clear-search:hover,
+  a.clear-search:active {
+    text-decoration: none;
+    color: lighten($alt-black-colour, 10);
+  }
+
+  a.clear-search:active {
+    color: black;
+    background-color: lighten($alt-black-colour, 20);
+  }
+}
+
 // AD
 
 footer .call-to-action {

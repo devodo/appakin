@@ -126,19 +126,8 @@ header .searchbox-wrapper {
         position: absolute;
         right: 6px;
         font-family: "icomoon";
-        content: "d";
+        content: "/";
       }
-
-//      .caret {
-//        width: 0;
-//        height: 0;
-//        position: absolute;
-//        right: 10px;
-//        top: 40%;
-//        border-left: $menu-arrow-size solid transparent;
-//        border-right: $menu-arrow-size solid transparent;
-//        border-top: $menu-arrow-size solid $alt-black-colour;
-//      }
     }
 
     button:hover,
@@ -204,6 +193,7 @@ $searchbox-border-colour: $control-border-colour;
     font-size: 16px;
     height: 28px;
     padding: 3px;
+    padding-right: 35px;
     line-height: 28px;
 
     -webkit-appearance: none;
@@ -216,6 +206,8 @@ $searchbox-border-colour: $control-border-colour;
     @include button($searchbox-button-colour);
 
     display: table-cell;
+    width: 46px;
+    height: 28px;
     margin: 0;
     background-color: black;
     vertical-align: middle;
@@ -223,6 +215,12 @@ $searchbox-border-colour: $control-border-colour;
 
     @include border-top-radius(0);
     @include border-bottom-radius(0);
+
+    .icon:after
+    {
+      font-family: "icomoon";
+      content: "!";
+    }
 
     img {
       vertical-align: middle;

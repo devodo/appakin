@@ -36,3 +36,22 @@
 .autocomplete em {
   font-weight: bold;
 }
+
+.autocomplete {
+  a.clear-search {
+    position: absolute;
+    right: 48px;
+    top: 0px;
+
+    display: block;
+    width: 34px;
+    height: 28px;
+    text-align: center;
+    line-height: 28px;
+
+    .icon:after {
+      font-family: "icomoon";
+      content: "+";
+    }
+  }
+}

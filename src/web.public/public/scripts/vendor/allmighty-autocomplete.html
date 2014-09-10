@@ -1,5 +1,6 @@
 <div class="autocomplete {{ attrs.class }}" id="{{ attrs.id }}">
-    <span class="wrapper"><input
+    <span class="wrapper">
+        <input
             type="text"
             ng-model="searchParam"
             placeholder="{{ placeholder }}"
@@ -7,8 +8,10 @@
             id="{{ attrs.inputid }}"
             spellcheck=false
             autocomplete="off"
-            autocorrect="off"/></span>
-    <button type="submit"><img src="/public/images/magnifying-glass.png"></button>
+            autocorrect="off"/>
+        <a class="clear-search" href ng-click="clear()"><span class="icon"></span></a>
+    </span>
+    <button type="submit"><span class="icon"></span></button>
     <ul ng-show="completing && suggestions.length > 0">
         <li
                 suggestion

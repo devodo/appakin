@@ -96,6 +96,9 @@ app.directive('autocomplete', function() {
                 $scope.setIndex(-1);
             };
 
+            $scope.clear = function() {
+                $scope.searchParam = '';
+            }
 
         }],
         link: function(scope, element, attrs){
@@ -237,19 +240,25 @@ app.filter('highlight', ['$sce', function ($sce) {
     };
 
     return function (input, searchParam) {
-        if (typeof input === 'function') return '';
+        if (typeof input === 'function') {
+            return '';
+        }
+
         if (searchParam) {
             searchParam = escapeRegex(searchParam);
 
-            var words = '(' +
-                    searchParam.split(/\ /).join(' |') + '|' +
-                    searchParam.split(/\ /).join('|') +
-                    ')',
-                exp = new RegExp(words, 'gi');
+            var words = searchParam.split(/\ /);
+            words.forEach(function(part, index, theArray) {
+                theArray[index] = '\\b' + part;
+            });
+
+            var exp = new RegExp('(' + words.join('|') + ')', 'gi');
+
             if (words.length) {
                 input = input.replace(exp, "<em>$1</em>");
             }
         }
+
         return $sce.trustAsHtml(input);
     };
 }]);

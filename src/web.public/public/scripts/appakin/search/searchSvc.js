@@ -27,7 +27,7 @@
                 me.service.searchTerm = '';
             },
             getPlaceholderText: function() {
-                return 'Search for ' +
+                return 'Search ' +
                     platform.getFriendlyName(me.service.platform) +
                     ' apps';
             },
