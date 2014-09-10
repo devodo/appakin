@@ -1,7 +1,7 @@
 (function () {
     'use strict';
 
-    angular.module('appAkin').factory('autoCompleteApi', function(webApiUrl, $timeout, $http, $q) {
+    angular.module('appAkin').factory('autoCompleteApi', function(webApiUrl, platform, $timeout, $http, $q) {
         var debounceTimeoutMs = 200;
         var requestTimeoutMs = 3000;
 
@@ -44,21 +44,15 @@
                         console.log('auto request timed out.');
                     }, requestTimeoutMs);
 
-                    console.log('Making auto complete request: q=' + q + ' p=' + p);
-
-                    // TODO: At the moment, if the http request errors, the requestTimeoutPromise continues running.
-                    // Find a way to cancel it on http request error (not using error() handler by itself as the
-                    // autocomplete dropdown doesn't show in that case).
+                    var store = platform.getApiName(p);
+                    console.log('Making auto complete request: q=' + q + ' store=' + store);
 
                     $http
                         .get(
-                            webApiUrl + 'search/autocomplete?q='+encodeURIComponent(q)+'&p='+encodeURIComponent(p),
+                            webApiUrl + 'search/'+store+'/auto?q='+encodeURIComponent(q),
                             { timeout: requestCancelPromise.promise })
-
-
                         .success(function(data) {
                             console.log('got result for q=' + q + ' p=' + p);
-                            console.log(data);
 
                             $timeout.cancel(requestTimeoutPromise);
                             requestTimeoutPromise = null;
@@ -70,20 +64,13 @@
                         })
                         .error(function(data, status) {
                             console.log('Failed search: status=' + status + ' data=' + data);
+
+                            $timeout.cancel(requestTimeoutPromise);
+                            requestTimeoutPromise = null;
+
+                            requestCancelPromise.resolve();
+                            requestCancelPromise = null;
                         });
-
-
-
-//                        .then(function(response) {
-//                            console.log('got result for q=' + q + ' p=' + p);
-//                            $timeout.cancel(requestTimeoutPromise);
-//                            requestTimeoutPromise = null;
-//
-//                            requestCancelPromise.resolve();
-//                            requestCancelPromise = null;
-//
-//                            callback(response);
-//                        });
                 }, debounceTimeoutMs);
             }
         };

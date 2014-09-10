@@ -103,6 +103,10 @@
                     default:
                         return platform;
                 }
+            },
+            getApiName: function(platform) {
+                // TODO: Change this when we support other stores.
+                return 'appstore';
             }
         };
     });

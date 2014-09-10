@@ -49,7 +49,6 @@
                     currentPlatform,
                     function(data) {
                         me.service.autoComplete.terms = data;
-                        console.log(data);
                     }
                 );
             },
