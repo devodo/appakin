@@ -90,7 +90,7 @@ var addAllCategories = function(outputHandler, next) {
     });
 };
 
-var addAllApps = function(batchSize, outputHandler, next) {
+var addAllApps = function(lastId, batchSize, outputHandler, next) {
     var processBatch = function(lastId) {
         outputHandler("Adding batch from id: " + lastId);
 
@@ -129,14 +129,14 @@ var addAllApps = function(batchSize, outputHandler, next) {
         });
     };
 
-    processBatch(0);
+    processBatch(lastId);
 };
 
-var rebuild = function(batchSize, outputHandler, next) {
+var rebuild = function(lastId, batchSize, outputHandler, next) {
     addAllCategories(outputHandler, function(err) {
         if (err) { return next(err); }
 
-        addAllApps(batchSize, outputHandler, function(err) {
+        addAllApps(lastId, batchSize, outputHandler, function(err) {
             if (err) { return next(err); }
 
             next();

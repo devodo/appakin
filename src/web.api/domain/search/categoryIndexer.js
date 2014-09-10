@@ -19,6 +19,7 @@ var addCategory = function(category, apps, next) {
         return {
             id : category.id + '-' + app.id,
             type: APP_TYPE,
+            parent_id: category.id,
             name: app.name,
             desc: app.description,
             popularity: popularity
@@ -27,6 +28,7 @@ var addCategory = function(category, apps, next) {
 
     var solrCategory = {
         id : category.id,
+        parent_id: category.id,
         type: CATEGORY_TYPE,
         name: category.name,
         desc: category.description,
