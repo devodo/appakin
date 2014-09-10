@@ -13,36 +13,36 @@
     appAkin.config(function ($routeProvider, $locationProvider) {
         $routeProvider
             .when('/', {
-                templateUrl: 'appakin/pages/home/home.html',
+                templateUrl: '/public/templates/appakin/pages/home/home.html',
                 controller: 'HomeCtrl'
             })
             .when('/raters', {
-                templateUrl: 'appakin/pages/raters/raters.html',
+                templateUrl: '/public/templates/appakin/pages/raters/raters.html',
                 controller: 'RatersCtrl'
             })
             .when('/about', {
-                templateUrl: 'appakin/pages/about/about.html',
+                templateUrl: '/public/templates/appakin/pages/about/about.html',
                 controller: 'AboutCtrl'
             })
             .when('/terms', {
-                templateUrl: 'appakin/pages/terms/terms.html',
+                templateUrl: '/public/templates/appakin/pages/terms/terms.html',
                 controller: 'TermsCtrl'
             })
             .when('/search', {
-                templateUrl: 'appakin/pages/search-results/search-results.html',
+                templateUrl: '/public/templates/appakin/pages/search-results/search-results.html',
                 controller: 'SearchResultsCtrl',
                 reloadOnSearch: false
             })
             .when('/:platform/category/:categoryUrlName', {
-                templateUrl: 'appakin/pages/category/category.html',
+                templateUrl: '/public/templates/appakin/pages/category/category.html',
                 controller: 'CategoryCtrl'
             })
             .when('/:platform/app/:appUrlName', {
-                templateUrl: 'appakin/pages/app/app.html',
+                templateUrl: '/public/templates/appakin/pages/app/app.html',
                 controller: 'AppCtrl'
             })
             .when('/privacy', {
-                templateUrl: 'appakin/pages/privacy/privacy.html',
+                templateUrl: '/public/templates/appakin/pages/privacy/privacy.html',
                 controller: 'PrivacyCtrl'
             })
             .otherwise({

@@ -49,6 +49,7 @@ function initStaticRoutes(app) {
 	app.use('/public/images', express.static(path.join(__dirname, 'public/images')));
 	app.use('/public', express.static(path.join(__dirname, 'public-generated/public')));
 	app.use('/public', express.static(path.join(__dirname, 'public')));
+    app.use('/public/templates', express.static(path.join(__dirname, 'public/scripts')));
     app.use('/bower_components', express.static(path.join(__dirname, 'bower_components')));
 	app.use('*', routes);
 }

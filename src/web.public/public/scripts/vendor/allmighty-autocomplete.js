@@ -227,7 +227,7 @@ app.directive('autocomplete', function() {
                     e.preventDefault();
             });
         },
-        templateUrl: 'vendor/allmighty-autocomplete.html'
+        templateUrl: '/public/templates/vendor/allmighty-autocomplete.html'
     };
 });
 

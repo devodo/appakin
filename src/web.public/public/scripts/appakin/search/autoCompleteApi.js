@@ -41,7 +41,7 @@
                             requestCancelPromise = null;
                         }
 
-                        console.log('auto request timed out.')
+                        console.log('auto request timed out.');
                     }, requestTimeoutMs);
 
                     console.log('Making auto complete request: q=' + q + ' p=' + p);

@@ -4,7 +4,7 @@
         return {
             restrict: 'A',
             replace: false,
-            templateUrl: 'appakin/structure/akin-header.html',
+            templateUrl: '/public/templates/appakin/structure/akin-header.html',
             controller: function ($scope, $location) {
                 $scope.location = $location;
             }

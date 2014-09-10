@@ -13,20 +13,12 @@ var stylish = require('jshint-stylish');
 var pkg = require('./package.json');
 var fs = require('fs');
 var sass = require('gulp-ruby-sass');
+var fsSync = require('fs-sync');
 
 var publicGeneratedRoot = path.resolve('./public-generated');
 var buildRoot = path.resolve('../../build-output/web.public');
 var buildTempRoot = path.resolve('./.tmp');
 var indexHtmlPath = path.resolve('./index.html');
-
-var minifyHtmlOptions = {
-        empty: true, // do not remove empty attributes
-        cdata: true, // do not strip CDATA from scripts
-        comments: false, // remove comments
-        conditionals: false, // remove conditional internet explorer comments
-        spare: true, // do not remove redundant attributes
-        quotes: true // do not remove arbitrary quotes
-    };
 
 gulp.task('build', 
     [
@@ -93,10 +85,15 @@ gulp.task('build:config', ['build:clean'], function() {
 });
 
 gulp.task('build:templates', ['build:clean', 'build:config'], function() {
+    // Note: html minification removed as it caused errors.
+
     return gulp
-        .src(['./public/scripts/**/*.html'])
-        //.pipe(plugins.minifyHtml(minifyHtmlOptions))
-        .pipe(templateCache('appTemplates.js', {module: 'appAkin'}))
+        .src([
+            './public/scripts/**/*.html',
+            '!./public/scripts/appakin/pages/terms/terms.html',
+            '!./public/scripts/appakin/pages/privacy/privacy.html'
+        ])
+        .pipe(templateCache('appTemplates.js', {module: 'appAkin', root: '/public/templates'}))
         .pipe(plugins.size({ showFiles: true }))
         .pipe(gulp.dest(buildTempRoot))
         .on('error', handleError);
@@ -138,7 +135,7 @@ gulp.task('build:index-html', ['build:scripts', 'build:stylesheets', 'build:temp
 	    .src(indexHtmlPath)
         .pipe(inject('./public/stylesheets/app-styles*.css', buildRoot, 'appakin-styles'))
         .pipe(inject('./public/scripts/app-scripts*.js', buildRoot, 'appakin-scripts'))
-        .pipe(inject('./public/templates/app-templates*.js', buildRoot, 'appakin-templates'))
+        //.pipe(inject('./public/templates/app-templates*.js', buildRoot, 'appakin-templates'))
         .pipe(gulp.dest(buildRoot))
 		.on('error', handleError);
 });
@@ -162,6 +159,15 @@ gulp.task('build:copy', ['build:clean'], function() {
             './*.*',
             '!./bower.json', '!./gulpfile.js', '!./index.html'
 		];
+
+    fsSync.copy('./public/scripts/appakin/pages/terms/terms.html',
+        buildRoot + '/public/templates/appakin/pages/terms/terms.html');
+
+    fsSync.copy('./public/scripts/appakin/pages/privacy/privacy.html',
+            buildRoot + '/public/templates/appakin/pages/privacy/privacy.html');
+
+    //'!./public/scripts/appakin/pages/terms/terms.html',
+    //    '!./public/scripts/appakin/pages/privacy/privacy.html'
 		
 	return gulp
 	    .src(filesToCopy, {base: './'})
@@ -206,8 +212,7 @@ gulp.task('build:cdnify', ['build:index-html', 'build:stylesheets'], function() 
 		.on('error', handleError);
 });
 
-gulp.task('build:version', ['build:clean'], function() {
-    fs.mkdirSync(buildRoot);
+gulp.task('build:version', ['build:copy'], function() {
     fs.writeFileSync(buildRoot + '/version.txt', 'Version: ' + pkg.version);
 });
 
@@ -241,19 +246,23 @@ gulp.task('dev:stylesheets', function () {
 });
 
 gulp.task('dev:templates', function() {
+    // Note: html minification removed as it caused errors.
+
 	return gulp
-	    .src(['./public/scripts/**/*.html'])
+	    .src([
+                './public/scripts/**/*.html',
+                '!./public/scripts/appakin/pages/terms/terms.html',
+                '!./public/scripts/appakin/pages/privacy/privacy.html'
+            ])
         .pipe(plugins.plumber({errorHandler: handleError}))
-        //.pipe(plugins.minifyHtml(minifyHtmlOptions))
-		.pipe(templateCache('appTemplates.js', {module: 'appAkin'}))
+		.pipe(templateCache('appTemplates.js', {module: 'appAkin', root: '/public/templates'}))
         .pipe(gulp.dest(publicGeneratedRoot + '/public/templates/'))
 		.on('error', handleError);		
 });
 
 gulp.task('dev:scripts', ['dev:templates'], function() {
     return gulp
-        .src(
-            [
+        .src([
                 './public/scripts/**/module.js',
                 './public/scripts/**/*.js',
                 publicGeneratedRoot + '/public/templates/appTemplates.js'

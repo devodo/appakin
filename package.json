@@ -8,6 +8,7 @@
     "browserify": "^5.10.0",
     "cdnjs-cdn-data": "^0.1.1",
     "del": "^0.1.2",
+    "fs-sync": "^0.2.5",
     "google-cdn": "^0.6.0",
     "google-cdn-data": "^0.1.6",
     "grunt-contrib-clean": "^0.6.0",
