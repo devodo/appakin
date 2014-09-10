@@ -28,7 +28,6 @@
                         webApiUrl + platform + '/app/' + urlName, // TODO: url encoding?
                         { timeout: requestCancelPromise.promise })
                     .success(function(data) {
-                        console.log('got result');
                         success(data);
                     })
                     .error(function(data, status) {

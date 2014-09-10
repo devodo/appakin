@@ -1,22 +1,28 @@
 (function () {
     'use strict';
 
-    angular.module('appAkin').factory('search', function(autoCompleteApi, debounce, searchApi, $timeout, $location, $rootScope, platform) {
+    angular.module('appAkin').factory('search', function(httpGet, debounce, $timeout, $location, $rootScope, platform) {
         var me = this;
         var defaultItemsPerPage = 10;
         var maxItemsPerPage = 50;
         var defaultCurrentPage = 1;
         var debounceTimeoutMs = 200;
 
+        var searchApi = httpGet();
+        var autoCompleteApi = httpGet();
+
         var debouncedAutoCompleteApi = debounce(
             function(currentSearchTerm, currentPlatform) {
-                autoCompleteApi.get(
-                    currentSearchTerm,
-                    currentPlatform,
+                var store = platform.getApiName(currentPlatform);
+
+                autoCompleteApi(
+                    'search/'+store+'/auto?q='+encodeURIComponent(currentSearchTerm),
                     function(data) {
                         me.service.autoComplete.terms = data;
-                    });
-            }, debounceTimeoutMs);
+                    }
+                );
+            },
+            debounceTimeoutMs);
 
         me.service = {
             searchTerm: '',
@@ -44,7 +50,7 @@
             },
             cancelAutoComplete: function() {
                 debouncedAutoCompleteApi.cancel();
-                //autoCompleteApi.cancel();
+                autoCompleteApi.cancel();
             },
             updateAutoCompleteTerms: function(typed) {
                 var currentSearchTerm = me.service.searchTerm;
@@ -53,19 +59,10 @@
                 if (currentSearchTerm === '') {
                     me.service.autoComplete.terms = [];
                     me.service.cancelAutoComplete();
-                    //debouncedAutoCompleteApi.cancel();
                     return;
                 }
 
                 debouncedAutoCompleteApi(currentSearchTerm, currentPlatform);
-
-//                autoCompleteApi.get(
-//                    currentSearchTerm,
-//                    currentPlatform,
-//                    function(data) {
-//                        me.service.autoComplete.terms = data;
-//                    }
-//                );
             },
             resetSearchResults: function() {
                 me.service.results.categories = [];
@@ -111,6 +108,9 @@
                 }
             },
             search : function() {
+                var a = httpGet('a');
+                var b = httpGet('b');
+
                 if (me.service.searchTerm === '') {
                     me.service.results.initialState = false;
                     return;
@@ -118,9 +118,13 @@
 
                 me.service.results.searchInProgress = true;
 
-                searchApi.get(
-                    me.service.searchTerm, me.service.platform,
-                    me.service.results.currentPage, me.service.results.itemsPerPage,
+                searchApi.cancel();
+
+                searchApi(
+                    'search?q='+encodeURIComponent(me.service.searchTerm)+
+                        '&p='+encodeURIComponent(me.service.platform)+
+                        '&page='+encodeURIComponent(me.service.results.currentPage)+
+                        '&take='+encodeURIComponent(me.service.results.itemsPerPage),
                     function(data) {
                         me.service.results.categories = data.categories;
                         me.service.results.totalItems = data.totalItems;
@@ -132,7 +136,8 @@
                     function(data) {
                         me.service.results.serverError = true;
                         me.service.results.searchInProgress = false;
-                    });
+                    }
+                );
             },
             submitSearch: function(page) {
                 if (me.service.searchTerm === '') {

@@ -8,6 +8,7 @@
         'ui.bootstrap.pagination',
         'allmighty.autocomplete',
         'appAkin.config',
+        'appAkin.http',
         'debounce'
     ]);
 

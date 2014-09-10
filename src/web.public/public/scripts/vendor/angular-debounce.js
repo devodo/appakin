@@ -1,6 +1,7 @@
 (function () {
     'use strict';
 
+    // https://github.com/shahata/angular-debounce
     angular.module('debounce', [])
         .service('debounce', ['$timeout', function ($timeout) {
             return function (func, wait, immediate) {
