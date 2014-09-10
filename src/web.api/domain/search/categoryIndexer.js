@@ -8,30 +8,37 @@ var solrCore = require('./solrCore').getCategoryCore();
 var CATEGORY_TYPE = 1;
 var APP_TYPE = 2;
 
-
 var addCategory = function(category, apps, next) {
     log.debug("Adding category: " + category.name);
 
     var solrApps = apps.map(function(app) {
-        var position = parseInt(app.position, 10);
-        var popularity = 1.0 / position;
-
         return {
             id : category.id + '-' + app.id,
             type: APP_TYPE,
-            parent_id: category.id,
+            "parent_id": category.id,
             name: app.name,
-            desc: app.description,
-            popularity: popularity
+            "parent_name": category.name,
+            "app_desc": app.description,
+            url: app.urlName,
+            "image_url": app.imageUrl,
+            position: app.position,
+            popularity: app.popularity
         };
     });
 
+    var appDescriptions = [];
+
+    for (var i = 0; i < 20 && i < apps.length; i++) {
+        appDescriptions.push(apps[i].description);
+    }
+
     var solrCategory = {
         id : category.id,
-        parent_id: category.id,
+        "parent_id": category.id,
         type: CATEGORY_TYPE,
         name: category.name,
-        desc: category.description,
+        //desc: category.description,
+        desc: appDescriptions.join("\n\n"),
         url: category.urlName,
         "_childDocuments_" : solrApps,
         popularity: category.popularity

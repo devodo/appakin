@@ -1,6 +1,7 @@
 'use strict';
 
 var autoSearcher = require('../domain/search/autoSearcher');
+var catSearcher = require('../domain/search/categorySearcher');
 
 exports.init = function init(app) {
 
@@ -22,6 +23,27 @@ exports.init = function init(app) {
             });
 
             res.json(docs);
+        });
+    });
+
+    app.get('/api/search/appstore/cat', function (req, res) {
+        var query = req.query.q || '';
+        var pageNum = 1;
+
+        if (req.query.p) {
+            pageNum = parseInt(req.query.p, 10);
+        }
+
+        if (query === '' || isNaN(pageNum)) {
+            return res.status(400).send('Bad query string');
+        }
+
+        catSearcher.search(query, 1, function(err, result) {
+            if (err) {
+                return res.status(500).send(err);
+            }
+
+            res.json(result);
         });
     });
 
