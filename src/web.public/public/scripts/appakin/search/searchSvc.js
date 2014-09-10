@@ -23,6 +23,9 @@
                 active: true,
                 terms: []
             },
+            resetSearchTerm: function() {
+                me.service.searchTerm = '';
+            },
             getPlaceholderText: function() {
                 return 'Search for ' +
                     platform.getFriendlyName(me.service.platform) +

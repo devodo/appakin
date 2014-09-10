@@ -1,7 +1,8 @@
 (function () {'use strict';
 
-    angular.module('appAkin').controller('AppCtrl', function($scope, pageTitle, app, url, platform) {
+    angular.module('appAkin').controller('AppCtrl', function($scope, search, pageTitle, app, url, platform) {
         pageTitle.setPageTitle('');
+        search.resetSearchTerm();
 
         $scope.app = app;
         $scope.url = url;
