@@ -18,7 +18,7 @@ var search = function(queryStr, pageNum, next) {
     var useLong = queryLength >= EDGE_THRESHOLD;
 
     var q = escapeSpecialChars(queryStr);
-    var solrQuery = 'qq=' + encodeURIComponent(q);
+    var solrQuery = 'rows=' + PAGE_SIZE + '&qq=' + encodeURIComponent(q);
 
     var requestHandler = useLong ? 'custom_long' : 'custom';
 
