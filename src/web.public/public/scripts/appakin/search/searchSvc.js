@@ -1,11 +1,22 @@
 (function () {
     'use strict';
 
-    angular.module('appAkin').factory('search', function(autoCompleteApi, searchApi, $timeout, $location, $rootScope, platform) {
+    angular.module('appAkin').factory('search', function(autoCompleteApi, debounce, searchApi, $timeout, $location, $rootScope, platform) {
         var me = this;
         var defaultItemsPerPage = 10;
         var maxItemsPerPage = 50;
         var defaultCurrentPage = 1;
+        var debounceTimeoutMs = 200;
+
+        var debouncedAutoCompleteApi = debounce(
+            function(currentSearchTerm, currentPlatform) {
+                autoCompleteApi.get(
+                    currentSearchTerm,
+                    currentPlatform,
+                    function(data) {
+                        me.service.autoComplete.terms = data;
+                    });
+            }, debounceTimeoutMs);
 
         me.service = {
             searchTerm: '',
@@ -32,7 +43,8 @@
                     ' apps';
             },
             cancelAutoComplete: function() {
-                autoCompleteApi.cancel();
+                debouncedAutoCompleteApi.cancel();
+                //autoCompleteApi.cancel();
             },
             updateAutoCompleteTerms: function(typed) {
                 var currentSearchTerm = me.service.searchTerm;
@@ -40,17 +52,20 @@
 
                 if (currentSearchTerm === '') {
                     me.service.autoComplete.terms = [];
-                    autoCompleteApi.cancel();
+                    me.service.cancelAutoComplete();
+                    //debouncedAutoCompleteApi.cancel();
                     return;
                 }
 
-                autoCompleteApi.get(
-                    currentSearchTerm,
-                    currentPlatform,
-                    function(data) {
-                        me.service.autoComplete.terms = data;
-                    }
-                );
+                debouncedAutoCompleteApi(currentSearchTerm, currentPlatform);
+
+//                autoCompleteApi.get(
+//                    currentSearchTerm,
+//                    currentPlatform,
+//                    function(data) {
+//                        me.service.autoComplete.terms = data;
+//                    }
+//                );
             },
             resetSearchResults: function() {
                 me.service.results.categories = [];

@@ -7,7 +7,8 @@
         'ngDropdowns',
         'ui.bootstrap.pagination',
         'allmighty.autocomplete',
-        'appAkin.config'
+        'appAkin.config',
+        'debounce'
     ]);
 
     appAkin.config(function ($routeProvider, $locationProvider) {

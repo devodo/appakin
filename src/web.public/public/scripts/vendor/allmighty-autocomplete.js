@@ -98,6 +98,8 @@ app.directive('autocomplete', function() {
 
             $scope.clear = function() {
                 $scope.searchParam = '';
+
+                // TODO: focus on input box.
             }
 
         }],
