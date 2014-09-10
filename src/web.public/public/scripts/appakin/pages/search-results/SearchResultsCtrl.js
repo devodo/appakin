@@ -18,12 +18,11 @@
             };
 
             $scope.$on('$routeUpdate',function(event) {
-                //console.log('location changed: ' + $location.search().q);
                 search.updateSearchFromUrl();
                 search.search();
             });
 
-            // Add this listener after the controller has initialised in order to prevent a second search request
+            // Have to add this listener after the controller has initialised in order to prevent a second search request
             // being generated when the currentPage value possibly gets adjusted as part of controller initialisation.
             $timeout(function() {
                 $scope.pageChanged = function() {

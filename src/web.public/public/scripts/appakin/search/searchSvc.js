@@ -7,6 +7,7 @@
         var maxItemsPerPage = 50;
         var defaultCurrentPage = 1;
         var debounceTimeoutMs = 200;
+        var searchPath = '/search';
 
         var searchApi = httpGet();
         var autoCompleteApi = httpGet();
@@ -72,6 +73,33 @@
                 me.service.results.initialState = true;
                 me.service.results.serverError = false;
                 me.service.results.searchInProgress = false;
+            },
+            urlMatchesSearch: function() {
+                var search = $location.search();
+                var pageInt = null;
+                var takeInt = null;
+
+                if (search.page) {
+                    pageInt = parseInt(search.page);
+                    if (isNaN(pageInt)) {pageInt = null;}
+                }
+
+                if (search.take) {
+                    takeInt = parseInt(search.take);
+                    if (isNaN(takeInt)) {takeInt = null;}
+                }
+
+                var searchTermMatches = search.q === me.service.searchTerm;
+                var platformMatches = search.p === me.service.platform;
+                var pageMatches = pageInt === me.service.results.currentPage;
+                var takeMatches = takeInt === me.service.results.itemsPerPage;
+                // current page is a string
+                var pageIsDefault = pageInt === null && me.service.results.currentPage == defaultCurrentPage;
+                var takeIsDefault = takeInt === null && me.service.results.itemsPerPage === defaultItemsPerPage;
+
+                return searchTermMatches && platformMatches &&
+                    (pageMatches || pageIsDefault) &&
+                    (takeMatches || takeIsDefault);
             },
             updateSearchFromUrl: function() {
                 var search = $location.search();
@@ -156,8 +184,15 @@
                     search.page = page;
                 }
 
-                console.log('redirecting to search: q=' + me.service.searchTerm + ' p=' + me.service.platform + ' page=' + page);
-                $location.path('/search').search(search);
+                // If the exact same search is being submitted on the search results page,
+                // we need to manually call search();
+                if ($location.path() === searchPath && me.service.urlMatchesSearch()) {
+                    me.service.search();
+                }
+                else {
+                    console.log('redirecting to search: q=' + me.service.searchTerm + ' p=' + me.service.platform + ' page=' + page);
+                    $location.path(searchPath).search(search);
+                }
             }
         };
 
