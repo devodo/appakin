@@ -21,6 +21,7 @@
     "pg": "^3.4.1",
     "request": "^2.40.0",
     "slug": "^0.5.0",
+    "slugid": "^1.0.2",
     "solr-client": "^0.3.0",
     "string": "^1.9.1",
     "unidecode": "^0.1.3"

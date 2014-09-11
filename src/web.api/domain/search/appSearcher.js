@@ -1,5 +1,6 @@
 'use strict';
 var solrCore = require('./solrCore').getAppSolrCore();
+var urlUtil = require('../urlUtil');
 
 var PAGE_SIZE = 10;
 
@@ -41,7 +42,7 @@ var search = function(queryStr, pageNum, next) {
 
             var app = {
                 name: doc.name,
-                url: doc.url,
+                url: urlUtil.makeUrl(doc.url, doc.name),
                 imageUrl: doc.img_url,
                 popularity: doc.popularity
             };

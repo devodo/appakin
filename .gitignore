@@ -38,3 +38,4 @@ public-generated/
 
 #Stupid OSX files
 .DS_Store
+.swp

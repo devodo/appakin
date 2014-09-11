@@ -5,14 +5,14 @@ var connection = require('./connection');
 
 var APP_STORE_ID = 1;
 
-var insertApp = function(client, storeId, app, next) {
+var insertApp = function(client, storeId, extId, app, next) {
     var queryStr =
         "INSERT INTO app(ext_id, store_id, name, date_created, date_modified)\n" +
         "VALUES ($1, $2, $3, NOW(), NOW())\n" +
         "RETURNING id;";
 
     var queryParams = [
-        uuid.v4(),
+        extId,
         storeId,
         app.name
     ];
@@ -26,10 +26,10 @@ var insertApp = function(client, storeId, app, next) {
     });
 };
 
-var insertAppStoreAppInternal = function (client, appId, app, next) {
+var insertAppStoreAppInternal = function (client, appId, extId, app, next) {
     var queryStr =
         "INSERT INTO appstore_app(" +
-        "app_id, store_app_id, name, censored_name, description, store_url,\n" +
+        "app_id, ext_id, store_app_id, name, censored_name, description, store_url,\n" +
         "dev_id, dev_name, dev_url, features, supported_devices,\n" +
         "is_game_center_enabled, screenshot_urls, ipad_screenshot_urls,\n" +
         "artwork_small_url, artwork_medium_url, artwork_large_url, price,\n" +
@@ -48,6 +48,7 @@ var insertAppStoreAppInternal = function (client, appId, app, next) {
 
     var queryParams = [
         appId,
+        extId,
         app.storeAppId,
         app.name,
         app.censoredName,
@@ -99,12 +100,14 @@ var insertAppStoreApp = function(conn, app, next) {
             return next(err);
         }
 
-        insertApp(conn.client, APP_STORE_ID, app, function(err, appId) {
+        var extId = uuid.v4();
+
+        insertApp(conn.client, APP_STORE_ID, extId, app, function(err, appId) {
             if (err) {
                 return next(err);
             }
 
-            insertAppStoreAppInternal(conn.client, appId, app, function(err) {
+            insertAppStoreAppInternal(conn.client, appId, extId, app, function(err) {
                 if (err) {
                     return next(err);
                 }
@@ -222,7 +225,7 @@ var getAppStoreCategories = function(client, next) {
 
 var getCategories = function(client, next) {
     var queryStr =
-        "SELECT c.id, c.ext_id, c.name, c.url_name, c.description,\n" +
+        "SELECT c.id, c.ext_id, c.name, c.description,\n" +
         "c.date_created, c.date_modified, c.date_deleted, cp.popularity\n" +
         "FROM category c\n" +
         "LEFT JOIN category_popularity cp\n" +
@@ -237,9 +240,8 @@ var getCategories = function(client, next) {
         var categories = result.rows.map(function(item) {
             return {
                 id: item.id,
-                externalId: item.ext_ud,
+                extId: item.ext_id,
                 name: item.name,
-                urlName: item.url_name,
                 description: item.description,
                 dateCreated: item.date_created,
                 dateModified: item.date_modified,
@@ -290,7 +292,7 @@ var getAppStoreSourceItemBatch = function(client, startId, batchSize, next) {
 
 var getAppIndexBatch = function(client, lastId, limit, next) {
     var queryStr =
-        "SELECT a.app_id, a.name, a.description, a.store_url, a.supported_devices,\n" +
+        "SELECT a.app_id, a.ext_id, a.name, a.description, a.store_url, a.supported_devices,\n" +
         "a.artwork_small_url, a.price, ap.popularity\n" +
         "FROM appstore_app a\n" +
         "LEFT JOIN app_popularity ap on a.app_id = ap.app_id\n" +
@@ -312,9 +314,9 @@ var getAppIndexBatch = function(client, lastId, limit, next) {
         var items = result.rows.map(function(item) {
             return {
                 id: item.app_id,
+                extId: item.ext_id,
                 name: item.name,
                 description: item.description,
-                urlName: item.store_url,
                 supportedDevices: item.supported_devices,
                 imageUrl: item.artwork_small_url,
                 price: item.price,
@@ -328,7 +330,7 @@ var getAppIndexBatch = function(client, lastId, limit, next) {
 
 var getChartAppIndex = function(client, next) {
     var queryStr =
-        "SELECT a.app_id, a.name, a.description, a.store_url, a.supported_devices,\n" +
+        "SELECT a.app_id, a.ext_id, a.name, a.description, a.store_url, a.supported_devices,\n" +
         "a.artwork_small_url, a.price, ap.popularity\n" +
         "FROM appstore_app a\n" +
         "JOIN app_popularity ap on a.app_id = ap.app_id\n" +
@@ -342,6 +344,7 @@ var getChartAppIndex = function(client, next) {
         var items = result.rows.map(function(item) {
             return {
                 id: item.app_id,
+                extId: item.ext_id,
                 name: item.name,
                 description: item.description,
                 urlName: item.store_url,
@@ -446,7 +449,7 @@ var getCategoryAppDescriptions = function(client, categoryId, limit, next) {
 
 var getCategoryAppsForIndex = function(client, categoryId, next) {
     var queryStr =
-        "SELECT a.app_id, a.name, a.description, a.store_url, a.supported_devices,\n" +
+        "SELECT a.app_id, a.ext_id, a.name, a.description, a.store_url, a.supported_devices,\n" +
         "a.artwork_small_url, a.price, ap.popularity, ca.position\n" +
         "FROM appstore_app a\n" +
         "JOIN category_app ca on a.app_id = ca.app_id\n" +
@@ -462,6 +465,7 @@ var getCategoryAppsForIndex = function(client, categoryId, next) {
         var items = result.rows.map(function(item) {
             return {
                 id: item.app_id,
+                extId: item.ext_id,
                 name: item.name,
                 description: item.description,
                 urlName: item.store_url,

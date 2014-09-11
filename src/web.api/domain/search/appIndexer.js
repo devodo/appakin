@@ -27,7 +27,7 @@ var addApp = function(app, next) {
         id : app.id,
         name: app.name,
         desc: app.description,
-        url: app.urlName,
+        url: app.extId,
         "img_url" : app.imageUrl,
         price: app.price,
         "is_iphone": isIphone,

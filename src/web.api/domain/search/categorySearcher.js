@@ -1,5 +1,7 @@
 'use strict';
+var slug = require('slug');
 var solrCore = require('./solrCore').getCategoryCore();
+var urlUtil = require('../urlUtil');
 
 var PAGE_SIZE = 10;
 
@@ -25,7 +27,7 @@ var getApps = function(expanded, doc) {
     return appDocs.map(function(appDoc) {
         return {
             name: appDoc.name,
-            url: appDoc.url,
+            url: urlUtil.makeUrl(appDoc.url, appDoc.name),
             imageUrl: appDoc.image_url
         };
     });
@@ -59,7 +61,7 @@ var search = function(queryStr, pageNum, next) {
 
             var category = {
                 name: doc.name,
-                url: doc.url,
+                url: urlUtil.makeUrl(doc.url, doc.name),
                 apps: apps
             };
 

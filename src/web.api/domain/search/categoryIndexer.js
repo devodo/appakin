@@ -8,7 +8,7 @@ var solrCore = require('./solrCore').getCategoryCore();
 var CATEGORY_TYPE = 1;
 var APP_TYPE = 2;
 
-var addCategory = function(category, apps, next) {
+var addCategory = function(category, apps, numAppDescriptions, next) {
     log.debug("Adding category: " + category.name);
 
     var solrApps = apps.map(function(app) {
@@ -19,7 +19,7 @@ var addCategory = function(category, apps, next) {
             name: app.name,
             "parent_name": category.name,
             "app_desc": app.description,
-            url: app.urlName,
+            url: app.extId.replace(/\-/g, ''),
             "image_url": app.imageUrl,
             position: app.position,
             popularity: app.popularity
@@ -28,7 +28,7 @@ var addCategory = function(category, apps, next) {
 
     var appDescriptions = [];
 
-    for (var i = 0; i < 20 && i < apps.length; i++) {
+    for (var i = 0; i < numAppDescriptions && i < apps.length; i++) {
         appDescriptions.push(apps[i].description);
     }
 
@@ -39,8 +39,8 @@ var addCategory = function(category, apps, next) {
         name: category.name,
         //desc: category.description,
         desc: appDescriptions.join("\n\n"),
-        url: category.urlName,
-        "_childDocuments_" : solrApps,
+        url: category.extId.replace(/\-/g, ''),
+        "_childDocuments_": solrApps,
         popularity: category.popularity
     };
 
@@ -53,19 +53,20 @@ var addCategory = function(category, apps, next) {
     });
 };
 
-var addAllCategories = function(appDescriptionLimit, next) {
+var rebuild = function(numAppDescriptions, outputHandler, next) {
     appStoreRepo.getCategories(function(err, categories) {
         if (err) {
             return next(err);
         }
 
         var processCategory = function(category, callback) {
+            outputHandler("Adding category: " + category.name);
             appStoreRepo.getCategoryAppsForIndex(category.id, function(err, apps) {
                 if (err) {
                     return callback(err);
                 }
 
-                addCategory(category, apps, function(err) {
+                addCategory(category, apps, numAppDescriptions, function(err) {
                     callback(err);
                 });
             });
@@ -84,18 +85,7 @@ var addAllCategories = function(appDescriptionLimit, next) {
     });
 };
 
-exports.addCategory = function(category, next) {
-    addCategory(category, function(err, resp) {
-        if (err) {
-            return next(err);
-        }
 
-        solrCore.commit(function(err) {
-            next(err, resp);
-        });
-    });
-};
-
-exports.addAllCategories = addAllCategories;
+exports.rebuild = rebuild;
 
 
