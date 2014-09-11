@@ -6,22 +6,31 @@
     <div class="no-error-wrapper"
          ng-hide="search.results.serverError">
         <p class="warning"
-           ng-show="search.results.categories.length == 0 && !search.results.initialState"
+           ng-show="search.results.items.length == 0 && !search.results.initialState"
            ng-class="search.results.searchInProgress ? 'disabled' : ''">
             Sorry! We couldn't find anything to show you. Please try again with a different search term.
         </p>
         <div class="valid-results-wrapper"
-             ng-if="search.results.categories.length > 0"
+             ng-if="search.results.items.length > 0"
              ng-class="search.results.searchInProgress ? 'disabled' : ''">
             <div class="list-wrapper">
-                <p class="search-type" ng-if="search.searchType == 'category'">Showing categories. <a href ng-click="setSearchType('app')">Click here for apps</a>.</p>
-                <p class="search-type" ng-if="search.searchType == 'app'">Showing apps. <a href ng-click="setSearchType('category')">Click here for categories</a>.</p>
-                <ul ng-if="search.results.categories.length > 0">
-                    <li ng-repeat="category in search.results.categories"
+                <p class="search-type" ng-if="search.searchType == 'category'">Showing <em>categories. </em><a href ng-click="setSearchType('app')">Click here for apps</a>.</p>
+                <p class="search-type" ng-if="search.searchType == 'app'"><em>Showing apps. </em><a href ng-click="setSearchType('category')">Click here for categories</a>.</p>
+                <ul ng-if="search.results.searchType === 'category'">
+                    <li ng-repeat="category in search.results.items"
                         class="category-search-result">
-                        <h4><a href="{{ url.createCategoryUrl(category.platform, category.urlName) }}">{{category.name + ' ' + category.platform}}</a></h4>
+                        <h4><a href="{{ url.createCategoryUrl(category.platform, category.url) }}">{{category.name}}</a></h4>
                         <p>
                             {{category.shortDesc}}
+                        </p>
+                    </li>
+                </ul>
+                <ul ng-if="search.results.searchType === 'app'">
+                    <li ng-repeat="app in search.results.items"
+                        class="app-search-result">
+                        <h4><a href="{{ url.createAppUrl(app.platform, app.url) }}">{{app.name}}</a></h4>
+                        <p>
+                            {{app.shortDesc}}
                         </p>
                     </li>
                 </ul>

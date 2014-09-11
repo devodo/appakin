@@ -166,6 +166,19 @@ ul.pagination {
   }
 }
 
+// SEARCH TYPE
+
+.search-type {
+  a,
+  a:link,
+  a:visited,
+  a:hover,
+  a:active {
+    color: darken($main-spot-colour, 10);
+    font-weight: normal;
+  }
+}
+
 // CATEGORY SEARCH RESULT
 
 li.category-search-result h4 {
@@ -186,7 +199,9 @@ li.category-search-result h4 {
   }
 }
 
-.search-type {
+// APP SEARCH RESULT
+
+li.app-search-result h4 {
   a,
   a:link,
   a:visited,
@@ -194,5 +209,12 @@ li.category-search-result h4 {
   a:active {
     color: darken($main-spot-colour, 10);
     font-weight: normal;
+  }
+
+  a,
+  a:link,
+  a:visited,
+  a:active {
+    text-decoration: none;
   }
 }

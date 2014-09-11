@@ -36,13 +36,14 @@
             platform: platform.getInitialPlatform(),
             searchType: defaultSearchType,
             results: {
-                categories: [],
+                items: [],
                 currentPage: defaultCurrentPage,
                 itemsPerPage: defaultItemsPerPage,
                 totalItems: 0,
                 initialState: true,
                 serverError: false,
-                searchInProgress: false
+                searchInProgress: false,
+                searchType: defaultSearchType
             },
             autoComplete: {
                 active: true,
@@ -79,15 +80,16 @@
                 debouncedAutoCompleteApi(currentSearchTerm, currentPlatform);
             },
             resetSearchResults: function() {
-                me.service.results.categories = [];
+                me.service.results.items = [];
                 me.service.results.currentPage = defaultCurrentPage;
                 me.service.results.itemsPerPage = defaultItemsPerPage;
                 me.service.results.totalItems = 0;
                 me.service.results.initialState = true;
                 me.service.results.serverError = false;
                 me.service.results.searchInProgress = false;
+                me.service.results.searchType = defaultSearchType;
             },
-            urlMatchesSearch: function() {
+            urlMatchesSearch: function(targetPage) {
                 var search = $location.search();
                 var pageInt = null;
                 var takeInt = null;
@@ -95,7 +97,11 @@
 
                 if (search.page) {
                     pageInt = parseInt(search.page);
-                    if (isNaN(pageInt)) {pageInt = null;}
+                    if (isNaN(pageInt)) {
+                        pageInt = defaultCurrentPage;
+                    }
+                } else {
+                    pageInt = defaultCurrentPage;
                 }
 
                 if (search.take) {
@@ -110,15 +116,12 @@
                 var searchTermMatches = search.q === me.service.searchTerm;
                 var platformMatches = search.p === me.service.platform;
                 var searchTypeMatches = searchType === me.service.searchType;
-                var pageMatches = pageInt === me.service.results.currentPage;
+                var pageMatches = pageInt === targetPage;
                 var takeMatches = takeInt === me.service.results.itemsPerPage;
-                // Note: currentPage is a string!
-                var pageIsDefault = pageInt === null && me.service.results.currentPage == defaultCurrentPage;
                 var takeIsDefault = takeInt === null && me.service.results.itemsPerPage === defaultItemsPerPage;
 
                 return searchTermMatches && platformMatches && searchTypeMatches &&
-                    (pageMatches || pageIsDefault) &&
-                    (takeMatches || takeIsDefault);
+                    pageMatches && (takeMatches || takeIsDefault);
             },
             updateSearchFromUrl: function() {
                 var search = $location.search();
@@ -175,6 +178,8 @@
 
                 if (page > 1) {
                     search.page = page;
+                } else {
+                    search.page = null;
                 }
 
                 if ($location.path() !== searchResultsPagePath) {
@@ -185,8 +190,9 @@
 
                 // If the exact same search is being submitted on the search results page,
                 // we need to manually call search();
-                if ($location.path() === searchResultsPagePath && me.service.urlMatchesSearch()) {
-                    me.service.search();
+                if ($location.path() === searchResultsPagePath && me.service.urlMatchesSearch(page)) {
+                    console.log('direct search');
+                    me.service.search(page);
                 }
                 else {
                     console.log('redirecting to search: q=' + me.service.searchTerm + ' p=' + me.service.platform + ' page=' + page);
@@ -194,36 +200,46 @@
                 }
             },
             // Call submitSearch() rather than search() directly.
-            search : function() {
+            search : function(page) {
                 if (me.service.searchTerm === '') {
                     me.service.results.initialState = false;
                     return;
                 }
 
-                console.log(me.service.results.currentPage);
+                console.log(page);
 
                 me.service.results.searchInProgress = true;
                 var localPlatform = me.service.platform;
+                var localSearchType = me.service.searchType;
+
+                var platformApiName = platform.getApiName(localPlatform);
+                var typeApiName = me.service.searchType === 'category' ? 'cat' : 'app';
+
+                function addPlatform(arr) {
+                    if (!arr) { return; }
+
+                    var i;
+                    for (i = 0; i < arr.length; ++i) {
+                        arr[i].platform = localPlatform;
+                    }
+                }
 
                 searchApi(
-                    'search?q='+encodeURIComponent(me.service.searchTerm) +
-                        '&p='+encodeURIComponent(me.service.platform) +
-                        '&type='+encodeURIComponent(me.service.searchType) +
-                        '&page='+encodeURIComponent(me.service.results.currentPage) +
-                        '&take='+encodeURIComponent(me.service.results.itemsPerPage),
+                    platformApiName + '/search/' + typeApiName +
+                        '?q='+encodeURIComponent(me.service.searchTerm) +
+                        '&p='+encodeURIComponent(page),
                     function(data) {
-                        // Add in category
-                        var i;
-                        for (i = 0; i < data.categories.length; ++i) {
-                            data.categories[i].platform = localPlatform;
-                        }
+                        addPlatform(data.categories);
+                        addPlatform(data.apps);
 
-                        me.service.results.categories = data.categories;
-                        me.service.results.totalItems = data.totalItems;
+                        me.service.results.items = data.categories || data.apps;
+                        me.service.results.apps = data.apps;
+                        me.service.results.totalItems = data.total;
                         me.service.results.currentPage = data.page;
                         me.service.results.initialState = false;
                         me.service.results.serverError = false;
                         me.service.results.searchInProgress = false;
+                        me.service.results.searchType = localSearchType;
                     },
                     function(data) {
                         me.service.results.serverError = true;

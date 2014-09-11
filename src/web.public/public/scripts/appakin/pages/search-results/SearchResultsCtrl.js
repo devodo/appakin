@@ -12,14 +12,13 @@
             search.updateSearchFromUrl();
 
             $scope.setSearchType = function(searchType) {
-                console.log('setting search type to: ' + searchType);
                 search.searchType = searchType;
                 search.submitSearch(1);
             };
 
             $scope.$on('$routeUpdate', function(event) {
                 search.updateSearchFromUrl();
-                search.search();
+                search.search(search.results.currentPage);
             });
 
             $scope.$on('userChangedPlatform', function(event) {
@@ -30,7 +29,7 @@
                 // Have the search run after page load.
                 // One reason for doing this is to prevent the search being cancelled
                 // by the setting of the search.platform variable in the controller.
-                search.search();
+                search.search(search.results.currentPage);
 
                 // Have to add this listener after the controller has initialised in order to prevent a second search request
                 // being generated when the currentPage value possibly gets adjusted as part of controller initialisation.

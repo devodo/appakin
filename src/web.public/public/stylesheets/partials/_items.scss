@@ -30,3 +30,15 @@ li.category-search-result {
     color: $alt-black-colour;
   }
 }
+
+li.app-search-result {
+  h4 {
+    margin-bottom: 3px;
+    font-size: 18px;
+  }
+  p {
+    margin-bottom: 21px;
+    font-size: 14px;
+    color: $alt-black-colour;
+  }
+}
