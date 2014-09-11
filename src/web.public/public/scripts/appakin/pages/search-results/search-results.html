@@ -11,7 +11,7 @@
             Sorry! We couldn't find anything to show you. Please try again with a different search term.
         </p>
         <div class="valid-results-wrapper"
-             ng-show="search.results.categories.length > 0"
+             ng-if="search.results.categories.length > 0"
              ng-class="search.results.searchInProgress ? 'disabled' : ''">
             <div class="list-wrapper">
                 <p class="search-type" ng-if="search.searchType == 'category'">Showing categories. <a href ng-click="setSearchType('app')">Click here for apps</a>.</p>

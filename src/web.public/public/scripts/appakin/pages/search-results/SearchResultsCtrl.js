@@ -26,20 +26,18 @@
                 search.submitSearch(1);
             });
 
-            // Have to add this listener after the controller has initialised in order to prevent a second search request
-            // being generated when the currentPage value possibly gets adjusted as part of controller initialisation.
             $timeout(function() {
+                // Have the search run after page load.
+                // One reason for doing this is to prevent the search being cancelled
+                // by the setting of the search.platform variable in the controller.
+                search.search();
+
+                // Have to add this listener after the controller has initialised in order to prevent a second search request
+                // being generated when the currentPage value possibly gets adjusted as part of controller initialisation.
                 $scope.pageChanged = function() {
-                    //console.log('page changed: ' + search.results.currentPage);
+                    console.log('page changed: ' + search.results.currentPage);
                     search.submitSearch(search.results.currentPage);
                 };
-            }, 0);
-
-            // Have the search run after page load.
-            // One reason for doing this is to prevent the search being cancelled
-            // by the setting of the search.platform variable in the controller.
-            $timeout(function() {
-                search.search();
             }, 0);
         });
 

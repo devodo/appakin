@@ -126,8 +126,9 @@
                 if (search.q !== me.service.searchTerm) {
                     me.service.searchTerm = search.q;
 
+                    // Stop autocomplete dropdown appearing at first.
                     me.service.autoComplete.active = false;
-                    $timeout(function() {me.service.autoComplete.active = true; console.log('set');}, 0);
+                    $timeout(function() {me.service.autoComplete.active = true;}, 0);
                 }
 
                 if (search.p !== me.service.platform) {
@@ -198,6 +199,8 @@
                     me.service.results.initialState = false;
                     return;
                 }
+
+                console.log(me.service.results.currentPage);
 
                 me.service.results.searchInProgress = true;
                 var localPlatform = me.service.platform;
