@@ -21,7 +21,7 @@
             });
 
             $scope.$on('userChangedPlatform', function(event) {
-                search.submitSearch(search.results.currentPage);
+                search.submitSearch(1);
             });
 
             // Have to add this listener after the controller has initialised in order to prevent a second search request

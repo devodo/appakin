@@ -62,6 +62,7 @@
             cancelAutoComplete: function() {
                 debouncedAutoCompleteApi.cancel();
                 autoCompleteApi.cancel();
+                me.service.autoComplete.terms = [];
             },
             cancelSearch: function() {
                 searchApi.cancel();
@@ -71,7 +72,6 @@
                 var currentPlatform = me.service.platform;
 
                 if (currentSearchTerm === '') {
-                    me.service.autoComplete.terms = [];
                     me.service.cancelAutoComplete();
                     return;
                 }
@@ -201,7 +201,6 @@
                 }
 
                 me.service.cancelAutoComplete();
-                me.service.autoComplete.terms = [];
 
                 var search = {
                     q: me.service.searchTerm,
