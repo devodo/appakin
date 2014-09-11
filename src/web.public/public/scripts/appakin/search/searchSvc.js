@@ -146,8 +146,6 @@
 
                 me.service.results.searchInProgress = true;
 
-                searchApi.cancel();
-
                 searchApi(
                     'search?q='+encodeURIComponent(me.service.searchTerm)+
                         '&p='+encodeURIComponent(me.service.platform)+
