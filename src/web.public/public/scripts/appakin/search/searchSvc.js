@@ -19,7 +19,7 @@
                 var platformApiName = platform.getApiName(currentPlatform);
 
                 autoCompleteApi(
-                    'search/'+platformApiName+'/auto?q='+encodeURIComponent(currentSearchTerm),
+                    platformApiName+'/search/auto?q='+encodeURIComponent(currentSearchTerm),
                     function(data) {
                         me.service.autoComplete.terms = data;
                     }

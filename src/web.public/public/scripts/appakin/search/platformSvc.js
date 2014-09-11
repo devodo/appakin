@@ -106,7 +106,7 @@
             },
             getApiName: function(platform) {
                 // TODO: Change this when we support other stores.
-                return 'appstore';
+                return 'ios';
             }
         };
     });
