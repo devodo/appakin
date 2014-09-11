@@ -27,12 +27,12 @@ var addApp = function(app, next) {
         id : app.id,
         name: app.name,
         desc: app.description,
-        url: app.extId,
+        url: app.extId.replace(/\-/g, ''),
         "img_url" : app.imageUrl,
         price: app.price,
         "is_iphone": isIphone,
         "is_ipad": isIPad,
-        "is_free": !app.price || parseInt(app.price) === 0,
+        "is_free": !app.price || parseInt(app.price, 10) === 0,
         popularity: app.popularity
     };
 
@@ -45,9 +45,9 @@ var addApp = function(app, next) {
     });
 };
 
-var addAllApps = function(batchSize, next) {
+var rebuild = function(batchSize, outputHandler, next) {
     var processBatch = function(lastId) {
-        log.debug("Adding batch from id: " + lastId);
+        outputHandler("Adding batch from id: " + lastId);
 
         appStoreRepo.getAppIndexBatch(lastId, batchSize, function(err, apps) {
             if (err) {
@@ -85,7 +85,6 @@ var addAllApps = function(batchSize, next) {
     processBatch(0);
 };
 
-exports.addApp = addApp;
-exports.addAllApps = addAllApps;
+exports.rebuild = rebuild;
 
 
