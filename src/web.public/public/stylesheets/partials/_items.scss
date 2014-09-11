@@ -12,6 +12,7 @@ p.warning {
 
 p.search-type {
   padding-bottom: 12px;
+  font-size: 14px;
 
   @include mq($from: tablet) {
     padding-bottom: 18px;

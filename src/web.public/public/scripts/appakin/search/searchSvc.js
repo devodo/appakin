@@ -160,6 +160,39 @@
                     me.service.results.itemsPerPage = defaultItemsPerPage;
                 }
             },
+            submitSearch: function(page) {
+                if (me.service.searchTerm === '') {
+                    return;
+                }
+
+                me.service.cancelAutoComplete();
+
+                var search = {
+                    q: me.service.searchTerm,
+                    p: me.service.platform
+                };
+
+                if (page > 1) {
+                    search.page = page;
+                }
+
+                if ($location.path() !== searchResultsPagePath) {
+                    me.service.resetSearchType();
+                } else if (me.service.searchType !== defaultSearchType) {
+                    search.type = me.service.searchType;
+                }
+
+                // If the exact same search is being submitted on the search results page,
+                // we need to manually call search();
+                if ($location.path() === searchResultsPagePath && me.service.urlMatchesSearch()) {
+                    me.service.search();
+                }
+                else {
+                    console.log('redirecting to search: q=' + me.service.searchTerm + ' p=' + me.service.platform + ' page=' + page);
+                    $location.path(searchResultsPagePath).search(search);
+                }
+            },
+            // Call submitSearch() rather than search() directly.
             search : function() {
                 if (me.service.searchTerm === '') {
                     me.service.results.initialState = false;
@@ -194,36 +227,6 @@
                         me.service.results.searchInProgress = false;
                     }
                 );
-            },
-            submitSearch: function(page) {
-                if (me.service.searchTerm === '') {
-                    return;
-                }
-
-                me.service.cancelAutoComplete();
-
-                var search = {
-                    q: me.service.searchTerm,
-                    p: me.service.platform
-                };
-
-                if (page > 1) {
-                    search.page = page;
-                }
-
-                if ($location.path() !== searchResultsPagePath) {
-                    me.service.resetSearchType();
-                }
-
-                // If the exact same search is being submitted on the search results page,
-                // we need to manually call search();
-                if ($location.path() === searchResultsPagePath && me.service.urlMatchesSearch()) {
-                    me.service.search();
-                }
-                else {
-                    console.log('redirecting to search: q=' + me.service.searchTerm + ' p=' + me.service.platform + ' page=' + page);
-                    $location.path(searchResultsPagePath).search(search);
-                }
             }
         };
 

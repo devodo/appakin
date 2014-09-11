@@ -100,6 +100,8 @@ footer .call-to-action {
   }
 }
 
+// PAGINATION
+
 ul.pagination {
 
   li {
@@ -164,21 +166,7 @@ ul.pagination {
   }
 }
 
-// no longer used
-#search-results .search-type {
-  color: $alt-black-colour;
-  font-size: 16px;
-  margin-bottom: 12px;
-
-  a,
-  a:link,
-  a:visited,
-  a:hover,
-  a:active {
-    color: $alt-black-colour;
-    text-decoration: underline;
-  }
-}
+// CATEGORY SEARCH RESULT
 
 li.category-search-result h4 {
   a,
@@ -195,5 +183,16 @@ li.category-search-result h4 {
   a:visited,
   a:active {
     text-decoration: none;
+  }
+}
+
+.search-type {
+  a,
+  a:link,
+  a:visited,
+  a:hover,
+  a:active {
+    color: darken($main-spot-colour, 10);
+    font-weight: normal;
   }
 }

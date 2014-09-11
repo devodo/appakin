@@ -12,7 +12,9 @@
             search.updateSearchFromUrl();
 
             $scope.setSearchType = function(searchType) {
-
+                console.log('setting search type to: ' + searchType);
+                search.searchType = searchType;
+                search.submitSearch(1);
             };
 
             $scope.$on('$routeUpdate', function(event) {

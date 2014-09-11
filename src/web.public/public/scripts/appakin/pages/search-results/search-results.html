@@ -14,7 +14,8 @@
              ng-show="search.results.categories.length > 0"
              ng-class="search.results.searchInProgress ? 'disabled' : ''">
             <div class="list-wrapper">
-                <p class="search-type">Showing categories. <a href>Click here for apps</a>.</p>
+                <p class="search-type" ng-if="search.searchType == 'category'">Showing categories. <a href ng-click="setSearchType('app')">Click here for apps</a>.</p>
+                <p class="search-type" ng-if="search.searchType == 'app'">Showing apps. <a href ng-click="setSearchType('category')">Click here for categories</a>.</p>
                 <ul ng-if="search.results.categories.length > 0">
                     <li ng-repeat="category in search.results.categories"
                         class="category-search-result">
