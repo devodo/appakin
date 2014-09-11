@@ -2,15 +2,15 @@
 
 var autoSearcher = require('../domain/search/autoSearcher');
 var catSearcher = require('../domain/search/categorySearcher');
+var appSearcher = require('../domain/search/appSearcher');
 
 exports.init = function init(app) {
 
     app.get('/ios/search/auto', function (req, res) {
-        var query = req.query.q || '';
+        var query = req.query.q;
 
-        if (query === '') {
-            res.status(400).send('Bad query string');
-            return;
+        if (!query || query.trim() === '') {
+            return res.status(400).send('Bad query string');
         }
 
         autoSearcher.search(query, 1, function(err, result) {
@@ -18,27 +18,36 @@ exports.init = function init(app) {
                 return res.status(500).send(err);
             }
 
-            var docs = result.docs.map(function(doc) {
-                return doc.name_display;
-            });
-
-            res.json(docs);
+            res.json(result.suggestions);
         });
     });
 
     app.get('/ios/search/cat', function (req, res) {
-        var query = req.query.q || '';
-        var pageNum = 1;
+        var query = req.query.q;
+        var pageNum = req.query.p ? parseInt(req.query.p, 10) : 1;
 
-        if (req.query.p) {
-            pageNum = parseInt(req.query.p, 10);
-        }
-
-        if (query === '' || isNaN(pageNum)) {
+        if (!query || query.trim() === '' || isNaN(pageNum)) {
             return res.status(400).send('Bad query string');
         }
 
         catSearcher.search(query, pageNum, function(err, result) {
+            if (err) {
+                return res.status(500).send(err);
+            }
+
+            res.json(result);
+        });
+    });
+
+    app.get('/ios/search/app', function (req, res) {
+        var query = req.query.q;
+        var pageNum = req.query.p ? parseInt(req.query.p, 10) : 1;
+
+        if (!query || query.trim() === '' || isNaN(pageNum)) {
+            return res.status(400).send('Bad query string');
+        }
+
+        appSearcher.search(query, pageNum, function(err, result) {
             if (err) {
                 return res.status(500).send(err);
             }

@@ -1,5 +1,5 @@
 'use strict';
-var solrCore = require('./solrCore').getCategoryCore();
+var solrCore = require('./solrCore').getAppSolrCore();
 
 var PAGE_SIZE = 10;
 
@@ -13,22 +13,6 @@ var getHighlight = function(highlights, doc) {
     if (!hDesc || hDesc.length < 1) { return null; }
 
     return hDesc[0];
-};
-
-var getApps = function(expanded, doc) {
-    var appSection = expanded[doc.id];
-    if (!appSection) { return []; }
-
-    var appDocs = appSection.docs;
-    if (!appDocs) { return []; }
-
-    return appDocs.map(function(appDoc) {
-        return {
-            name: appDoc.name,
-            url: appDoc.url,
-            imageUrl: appDoc.image_url
-        };
-    });
 };
 
 var getSuggestions = function(spellCheckSection) {
@@ -53,7 +37,7 @@ var getSuggestions = function(spellCheckSection) {
 
 var search = function(queryStr, pageNum, next) {
     var q = encodeURIComponent(solrCore.escapeSpecialChars(queryStr));
-    var solrQuery = 'rows=' + PAGE_SIZE + '&qq=' + q + '&spellcheck.q=' + q;
+    var solrQuery = 'rows=' + PAGE_SIZE + '&q=' + q;
 
     if (pageNum && pageNum > 1) {
         var start = (pageNum - 1) * PAGE_SIZE;
@@ -70,24 +54,23 @@ var search = function(queryStr, pageNum, next) {
         }
 
         var highlights = obj.highlighting;
-        var expanded = obj.expanded;
 
-        var categories = obj.response.docs.map(function(doc) {
+        var apps = obj.response.docs.map(function(doc) {
 
             var highlight = getHighlight(highlights, doc);
-            var apps = getApps(expanded, doc);
 
-            var category = {
+            var app = {
                 name: doc.name,
                 url: doc.url,
-                apps: apps
+                imageUrl: doc.img_url,
+                popularity: doc.popularity
             };
 
             if (highlight) {
-                category.highlight = highlight;
+                app.highlight = highlight;
             }
 
-            return category;
+            return app;
         });
 
         var suggestions = getSuggestions(obj.spellcheck);
@@ -95,7 +78,7 @@ var search = function(queryStr, pageNum, next) {
         var searhcResult = {
             total: obj.response.numFound,
             page: pageNum,
-            categories: categories,
+            apps: apps,
             suggestions: suggestions
         };
 
