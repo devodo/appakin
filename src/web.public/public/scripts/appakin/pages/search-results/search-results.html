@@ -18,7 +18,7 @@
                 <ul ng-if="search.results.categories.length > 0">
                     <li ng-repeat="category in search.results.categories"
                         class="category-search-result">
-                        <h4><a href="{{ url.createCategoryUrl(category.platform, category.urlName) }}">{{category.name}}</a></h4>
+                        <h4><a href="{{ url.createCategoryUrl(category.platform, category.urlName) }}">{{category.name + ' ' + category.platform}}</a></h4>
                         <p>
                             {{category.shortDesc}}
                         </p>

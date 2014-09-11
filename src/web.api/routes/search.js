@@ -52,8 +52,9 @@ exports.init = function init(app) {
         var platform = req.query.p || '';
         var page = req.query.page;
         var take = req.query.take;
+        var type = req.query.type;
 
-        if (query === '' || platform === '' || isNaN(page) || isNaN(take)) {
+        if (query === '' || platform === '' || type === '' || isNaN(page) || isNaN(take)) {
             res.status(400).send('Bad query string');
             return;
         }
@@ -84,22 +85,19 @@ exports.init = function init(app) {
                     totalItems: 100,
                     categories: [
                         {
-                            name: page + ' ' + query + ' ' + platform + ' Running apps',
+                            name: page + ' ' + query + ' ' + type + ' Running apps',
                             shortDesc: 'Apps for tracking your runs.',
-                            urlName: 'running',
-                            platform: platform
+                            urlName: 'running'
                         },
                         {
-                            name: page + ' ' + query + ' ' + platform + ' Games for children aged 3 to 5',
+                            name: page + ' ' + query + ' ' + type + ' Games for children aged 3 to 5',
                             shortDesc: 'Fun games that help your child learn about the world.',
-                            urlName: 'games-for-children-aged-3-to-5',
-                            platform: platform
+                            urlName: 'games-for-children-aged-3-to-5'
                         },
                         {
-                            name: page + ' ' + query + ' ' + platform + ' Drawing apps',
+                            name: page + ' ' + query + ' ' + type + ' Drawing apps',
                             shortDesc: 'Apps for sketching on your phone',
-                            urlName: 'drawing-apps',
-                            platform: platform
+                            urlName: 'drawing-apps'
                         }
                     ]
                 });

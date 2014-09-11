@@ -7,17 +7,19 @@
         var maxItemsPerPage = 50;
         var defaultCurrentPage = 1;
         var debounceTimeoutMs = 200;
-        var searchPath = '/search';
+        var searchResultsPagePath = '/search';
+        var defaultSearchType = 'category';
+        var searchTypeRegex = /(category|app)/;
 
         var searchApi = httpGet();
         var autoCompleteApi = httpGet();
 
         var debouncedAutoCompleteApi = debounce(
             function(currentSearchTerm, currentPlatform) {
-                var store = platform.getApiName(currentPlatform);
+                var platformApiName = platform.getApiName(currentPlatform);
 
                 autoCompleteApi(
-                    'search/'+store+'/auto?q='+encodeURIComponent(currentSearchTerm),
+                    'search/'+platformApiName+'/auto?q='+encodeURIComponent(currentSearchTerm),
                     function(data) {
                         me.service.autoComplete.terms = data;
                     }
@@ -25,9 +27,14 @@
             },
             debounceTimeoutMs);
 
+        function normaliseSearchType(value) {
+            return !searchTypeRegex.test(value) ? undefined : value;
+        };
+
         me.service = {
             searchTerm: '',
             platform: platform.getInitialPlatform(),
+            searchType: defaultSearchType,
             results: {
                 categories: [],
                 currentPage: defaultCurrentPage,
@@ -44,6 +51,9 @@
             resetSearchTerm: function() {
                 me.service.searchTerm = '';
             },
+            resetSearchType: function() {
+                me.service.searchType = defaultSearchType;
+            },
             getPlaceholderText: function() {
                 return 'Search ' +
                     platform.getFriendlyName(me.service.platform) +
@@ -52,6 +62,9 @@
             cancelAutoComplete: function() {
                 debouncedAutoCompleteApi.cancel();
                 autoCompleteApi.cancel();
+            },
+            cancelSearch: function() {
+                searchApi.cancel();
             },
             updateAutoCompleteTerms: function(typed) {
                 var currentSearchTerm = me.service.searchTerm;
@@ -78,6 +91,7 @@
                 var search = $location.search();
                 var pageInt = null;
                 var takeInt = null;
+                var searchType = defaultSearchType;
 
                 if (search.page) {
                     pageInt = parseInt(search.page);
@@ -89,15 +103,20 @@
                     if (isNaN(takeInt)) {takeInt = null;}
                 }
 
+                if (search.type) {
+                    searchType = search.type;
+                }
+
                 var searchTermMatches = search.q === me.service.searchTerm;
                 var platformMatches = search.p === me.service.platform;
+                var searchTypeMatches = searchType === me.service.searchType;
                 var pageMatches = pageInt === me.service.results.currentPage;
                 var takeMatches = takeInt === me.service.results.itemsPerPage;
-                // current page is a string
+                // Note: currentPage is a string!
                 var pageIsDefault = pageInt === null && me.service.results.currentPage == defaultCurrentPage;
                 var takeIsDefault = takeInt === null && me.service.results.itemsPerPage === defaultItemsPerPage;
 
-                return searchTermMatches && platformMatches &&
+                return searchTermMatches && platformMatches && searchTypeMatches &&
                     (pageMatches || pageIsDefault) &&
                     (takeMatches || takeIsDefault);
             },
@@ -113,6 +132,12 @@
 
                 if (search.p !== me.service.platform) {
                     me.service.platform = platform.normalisePlatform(search.p) || platform.defaultPlatform;
+                }
+
+                if (search.type) {
+                    me.service.searchType = normaliseSearchType(search.type) || defaultSearchType;
+                } else {
+                    me.service.searchType = defaultSearchType;
                 }
 
                 if (search.page) {
@@ -136,22 +161,27 @@
                 }
             },
             search : function() {
-                var a = httpGet('a');
-                var b = httpGet('b');
-
                 if (me.service.searchTerm === '') {
                     me.service.results.initialState = false;
                     return;
                 }
 
                 me.service.results.searchInProgress = true;
+                var localPlatform = me.service.platform;
 
                 searchApi(
-                    'search?q='+encodeURIComponent(me.service.searchTerm)+
-                        '&p='+encodeURIComponent(me.service.platform)+
-                        '&page='+encodeURIComponent(me.service.results.currentPage)+
+                    'search?q='+encodeURIComponent(me.service.searchTerm) +
+                        '&p='+encodeURIComponent(me.service.platform) +
+                        '&type='+encodeURIComponent(me.service.searchType) +
+                        '&page='+encodeURIComponent(me.service.results.currentPage) +
                         '&take='+encodeURIComponent(me.service.results.itemsPerPage),
                     function(data) {
+                        // Add in category
+                        var i;
+                        for (i = 0; i < data.categories.length; ++i) {
+                            data.categories[i].platform = localPlatform;
+                        }
+
                         me.service.results.categories = data.categories;
                         me.service.results.totalItems = data.totalItems;
                         me.service.results.currentPage = data.page;
@@ -182,14 +212,18 @@
                     search.page = page;
                 }
 
+                if ($location.path() !== searchResultsPagePath) {
+                    me.service.resetSearchType();
+                }
+
                 // If the exact same search is being submitted on the search results page,
                 // we need to manually call search();
-                if ($location.path() === searchPath && me.service.urlMatchesSearch()) {
+                if ($location.path() === searchResultsPagePath && me.service.urlMatchesSearch()) {
                     me.service.search();
                 }
                 else {
                     console.log('redirecting to search: q=' + me.service.searchTerm + ' p=' + me.service.platform + ' page=' + page);
-                    $location.path(searchPath).search(search);
+                    $location.path(searchResultsPagePath).search(search);
                 }
             }
         };

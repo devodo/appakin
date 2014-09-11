@@ -11,15 +11,17 @@
             search.resetSearchResults();
             search.updateSearchFromUrl();
 
-            //console.log('search in service is: q=' + search.searchTerm + ' p=' + search.platform);
-
             $scope.setSearchType = function(searchType) {
 
             };
 
-            $scope.$on('$routeUpdate',function(event) {
+            $scope.$on('$routeUpdate', function(event) {
                 search.updateSearchFromUrl();
                 search.search();
+            });
+
+            $scope.$on('userChangedPlatform', function(event) {
+                search.submitSearch(search.results.currentPage);
             });
 
             // Have to add this listener after the controller has initialised in order to prevent a second search request
@@ -31,7 +33,12 @@
                 };
             }, 0);
 
-            search.search();
+            // Have the search run after page load.
+            // One reason for doing this is to prevent the search being cancelled
+            // by the setting of the search.platform variable in the controller.
+            $timeout(function() {
+                search.search();
+            }, 0);
         });
 
 }()); // use strict

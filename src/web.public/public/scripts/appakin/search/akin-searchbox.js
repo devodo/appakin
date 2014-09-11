@@ -1,6 +1,6 @@
 (function () {'use strict';
 
-    angular.module('appAkin').directive('akinSearchbox', function (platform) {
+    angular.module('appAkin').directive('akinSearchbox', function ($rootScope, platform) {
         return {
             restrict: 'A',
             replace: true,
@@ -31,8 +31,12 @@
                 };
 
                 $scope.dropdownOnchange = function (selected) {
+                    if ($scope.search.platform === selected.platform) {
+                        return;
+                    }
+
                     $scope.search.platform = selected.platform;
-                    console.log('platform is ' + $scope.search.platform);
+                    $rootScope.$broadcast('userChangedPlatform');
                 };
             }
         };
