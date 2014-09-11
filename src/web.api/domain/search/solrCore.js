@@ -47,6 +47,24 @@ SolrCore.prototype.asciiFold = function(input) {
     return unidecode(input);
 };
 
+SolrCore.prototype.getSuggestions = function(spellCheckSection) {
+    if (!spellCheckSection) { return []; }
+    var suggestions = spellCheckSection.suggestions;
+    if (!suggestions) { return []; }
+
+    var results = [];
+    for (var i = 0; i < suggestions.length; i++) {
+        if (suggestions[i] !== 'collation') { continue; }
+
+        i = i + 1;
+        if (i >= suggestions.length) { break; }
+
+        results.push(suggestions[i]);
+    }
+
+    return results;
+};
+
 var createSolrCore = function(coreName) {
     var host = config.search.solr.host;
     var port = config.search.solr.port;

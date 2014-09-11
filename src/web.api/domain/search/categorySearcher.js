@@ -31,26 +31,6 @@ var getApps = function(expanded, doc) {
     });
 };
 
-var getSuggestions = function(spellCheckSection) {
-    if (!spellCheckSection) { return []; }
-    var suggestions = spellCheckSection.suggestions;
-    if (!suggestions) { return []; }
-
-    var results = [];
-    for (var i = 0; i < suggestions.length; i++) {
-        if (suggestions[i] !== 'collation') { continue; }
-
-        i = i + 1;
-        if (i >= suggestions.length) { break; }
-
-        var collationGroup = suggestions[i];
-        if (!collationGroup || collationGroup.length < 2) { continue; }
-        results.push(collationGroup[1]);
-    }
-
-    return results;
-};
-
 var search = function(queryStr, pageNum, next) {
     var q = encodeURIComponent(solrCore.escapeSpecialChars(queryStr));
     var solrQuery = 'rows=' + PAGE_SIZE + '&qq=' + q + '&spellcheck.q=' + q;
@@ -90,7 +70,7 @@ var search = function(queryStr, pageNum, next) {
             return category;
         });
 
-        var suggestions = getSuggestions(obj.spellcheck);
+        var suggestions = solrCore.getSuggestions(obj.spellcheck);
 
         var searhcResult = {
             total: obj.response.numFound,
