@@ -1,9 +1,9 @@
 'use strict';
-var appStoreData = require("../domain/dataProvider/appStoreDataProvider");
+var appStoreData = require("../../domain/dataProvider/appStoreDataProvider");
 
 exports.init = function init(app) {
 
-    app.post('/api/appstore/retrieve', function (req, res) {
+    app.post('/admin/appstore/retrieve', function (req, res) {
 
         var id = req.body.id;
 

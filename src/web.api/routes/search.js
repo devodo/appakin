@@ -5,7 +5,7 @@ var catSearcher = require('../domain/search/categorySearcher');
 
 exports.init = function init(app) {
 
-    app.get('/api/search/appstore/auto', function (req, res) {
+    app.get('/ios/search/auto', function (req, res) {
         var query = req.query.q || '';
 
         if (query === '') {
@@ -26,7 +26,7 @@ exports.init = function init(app) {
         });
     });
 
-    app.get('/api/search/appstore/cat', function (req, res) {
+    app.get('/ios/search/cat', function (req, res) {
         var query = req.query.q || '';
         var pageNum = 1;
 
@@ -38,7 +38,7 @@ exports.init = function init(app) {
             return res.status(400).send('Bad query string');
         }
 
-        catSearcher.search(query, 1, function(err, result) {
+        catSearcher.search(query, pageNum, function(err, result) {
             if (err) {
                 return res.status(500).send(err);
             }
@@ -47,7 +47,7 @@ exports.init = function init(app) {
         });
     });
 
-    app.get('/api/search', function (req, res) {
+    app.get('/ios/search/cattest', function (req, res) {
         var query = req.query.q || '';
         var platform = req.query.p || '';
         var page = req.query.page;

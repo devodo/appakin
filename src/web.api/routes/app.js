@@ -2,7 +2,7 @@
 
 exports.init = function init(app) {
 
-    app.get('/api/:platform/app/:appName', function (req, res) {
+    app.get('/app/:platform/app/:appName', function (req, res) {
         var platform = req.params.platform;
 
         setTimeout(

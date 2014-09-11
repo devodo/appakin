@@ -2,7 +2,7 @@
 
 exports.init = function init(app) {
 
-    app.get('/api/:platform/category/:categoryName', function (req, res) {
+    app.get('/:platform/category/:categoryName', function (req, res) {
 
         setTimeout(
             function() {

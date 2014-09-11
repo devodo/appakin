@@ -3,7 +3,7 @@
 var autoIndexer = require('../../domain/search/autoIndexer');
 
 exports.init = function init(app) {
-    app.get('/api/admin/search/rebuild_auto', function (req, res) {
+    app.get('/admin/search/rebuild_auto', function (req, res) {
         var appBatchSize = 10000;
         var lastId = 0;
 

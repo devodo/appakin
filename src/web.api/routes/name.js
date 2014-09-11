@@ -2,7 +2,7 @@
 
 exports.init = function init(app) {
 
-    app.get('/api/name', function (req, res) {
+    app.get('/name', function (req, res) {
         res.json({name: 'Steve!'});
     });
 	

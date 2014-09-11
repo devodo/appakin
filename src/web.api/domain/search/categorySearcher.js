@@ -11,6 +11,54 @@ function escapeSpecialChars(s){
     });
 }
 
+var getHighlight = function(highlights, doc) {
+    if (!highlights) { return null; }
+
+    var hDoc = highlights[doc.id];
+    if (!hDoc) { return null; }
+
+    var hDesc = hDoc.desc_split;
+    if (!hDesc || hDesc.length < 1) { return null; }
+
+    return hDesc[0];
+};
+
+var getApps = function(expanded, doc) {
+    var appSection = expanded[doc.id];
+    if (!appSection) { return []; }
+
+    var appDocs = appSection.docs;
+    if (!appDocs) { return []; }
+
+    return appDocs.map(function(appDoc) {
+        return {
+            name: appDoc.name,
+            url: appDoc.url,
+            imageUrl: appDoc.image_url
+        };
+    });
+};
+
+var getSuggestions = function(spellCheckSection) {
+    if (!spellCheckSection) { return []; }
+    var suggestions = spellCheckSection.suggestions;
+    if (!suggestions) { return []; }
+
+    var results = [];
+    for (var i = 0; i < suggestions.length; i++) {
+        if (suggestions[i] !== 'collation') { continue; }
+
+        i = i + 1;
+        if (i >= suggestions.length) { break; }
+
+        var collationGroup = suggestions[i];
+        if (!collationGroup || collationGroup.length < 2) { continue; }
+        results.push(collationGroup[1]);
+    }
+
+    return results;
+};
+
 var search = function(queryStr, pageNum, next) {
     queryStr = solrCore.preProcessIndexText(queryStr);
 
@@ -36,33 +84,8 @@ var search = function(queryStr, pageNum, next) {
 
         var categories = obj.response.docs.map(function(doc) {
 
-            var highlight = (function() {
-                if (!highlights) { return null; }
-
-                var hDoc = highlights[doc.id];
-                if (!hDoc) { return null; }
-
-                var hDesc = hDoc.desc_split;
-                if (!hDesc || hDesc.length < 1) { return null; }
-
-                return hDesc[0];
-            })();
-
-            var apps = (function() {
-                var appSection = expanded[doc.id];
-                if (!appSection) { return []; }
-
-                var appDocs = appSection.docs;
-                if (!appDocs) { return []; }
-
-                return appDocs.map(function(appDoc) {
-                    return {
-                        name: appDoc.name,
-                        url: appDoc.url,
-                        imageUrl: appDoc.image_url
-                    };
-                });
-            })();
+            var highlight = getHighlight(highlights, doc);
+            var apps = getApps(expanded, doc);
 
             var category = {
                 name: doc.name,
@@ -77,9 +100,13 @@ var search = function(queryStr, pageNum, next) {
             return category;
         });
 
+        var suggestions = getSuggestions(obj.spellcheck);
+
         var searhcResult = {
             total: obj.response.numFound,
-            categories: categories
+            page: pageNum,
+            categories: categories,
+            suggestions: suggestions
         };
 
         next(null, searhcResult);
