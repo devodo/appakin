@@ -29,12 +29,31 @@ exports.init = function init(app) {
             }
 
             var urlName = urlUtil.slugifyName(app.name);
+            var appUrl = urlUtil.makeUrl(app.extId, app.name);
             if (req.params.slug !== urlName) {
-                var redirectUrl = urlUtil.makeUrl(app.extId, app.name);
-                return res.redirect(301, '/ios/app/' + redirectUrl);
+                return res.redirect(301, '/ios/app/' + appUrl);
             }
 
-            res.json(app);
+            appStoreRepo.getAppCategories(app.id, 100, 0, function(err, cats) {
+                if (err) {
+                    log.error(err);
+                    return res.status(500).send('Error retrieving app category data');
+                }
+
+                cats.forEach(function(cat) {
+                    cat.url = urlUtil.makeUrl(cat.extId, cat.name);
+                    delete cat.extId;
+                });
+
+                app.categories = cats;
+
+                delete app.id;
+                delete app.extId;
+                delete app.dateCreated;
+                app.url = appUrl;
+
+                res.json(app);
+            });
         });
     });
 

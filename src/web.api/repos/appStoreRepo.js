@@ -323,6 +323,38 @@ var getCategories = function(client, next) {
     });
 };
 
+var getAppCategories = function(client, appId, take, skip, next) {
+    var queryStr =
+        "SELECT c.id, c.ext_id, c.name,\n" +
+        "c.date_created, c.date_modified, c.date_deleted, cp.popularity, ca.position\n" +
+        "FROM category c\n" +
+        "JOIN category_app ca ON c.id = ca.category_id\n" +
+        "LEFT JOIN category_popularity cp ON c.id = cp.category_id\n" +
+        "WHERE ca.app_id = $1\n" +
+        "AND c.date_deleted is null\n" +
+        "ORDER BY ca.position, ca.id\n" +
+        "LIMIT $2 OFFSET $3";
+
+    var queryParams = [appId, take, skip];
+
+    client.query(queryStr, queryParams, function (err, result) {
+        if (err) {
+            return next(err);
+        }
+
+        var categories = result.rows.map(function(item) {
+            return {
+                extId: item.ext_id,
+                name: item.name,
+                popularity: item.popularity,
+                position: item.position
+            };
+        });
+
+        next(null, categories);
+    });
+};
+
 var getAppStoreSourceItemBatch = function(client, startId, batchSize, next) {
     var queryStr =
         "SELECT id, appstore_category_id, store_app_id, name, letter, page_number,\n" +
@@ -801,6 +833,20 @@ exports.getCategories = function(next) {
         }
 
         getCategories(conn.client, function(err, results) {
+            conn.close(err, function(err) {
+                next(err, results);
+            });
+        });
+    });
+};
+
+exports.getAppCategories = function(appId, take, skip, next) {
+    connection.open(function(err, conn) {
+        if (err) {
+            return next(err);
+        }
+
+        getAppCategories(conn.client, appId, take, skip, function(err, results) {
             conn.close(err, function(err) {
                 next(err, results);
             });
