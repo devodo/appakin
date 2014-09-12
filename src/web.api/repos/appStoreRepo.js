@@ -94,6 +94,75 @@ var insertAppStoreAppInternal = function (client, appId, extId, app, next) {
     });
 };
 
+var getAppStoreAppByExtId = function (client, extId, next) {
+    var queryStr =
+        "SELECT app_id, ext_id, store_app_id, name, censored_name, description, store_url,\n" +
+        "dev_id, dev_name, dev_url, features, supported_devices,\n" +
+        "is_game_center_enabled, screenshot_urls, ipad_screenshot_urls,\n" +
+        "artwork_small_url, artwork_medium_url, artwork_large_url, price,\n" +
+        "currency, version, primary_genre, genres, release_date, bundle_id,\n" +
+        "seller_name, release_notes, min_os_version, language_codes, file_size_bytes,\n" +
+        "advisory_rating, content_rating, user_rating_current, rating_count_current, user_rating,\n" +
+        "rating_count, date_created, date_modified\n" +
+        "FROM appstore_app\n" +
+        "WHERE ext_id = $1;";
+
+    client.query(queryStr, [extId], function (err, result) {
+        if (err) {
+            return next(err);
+        }
+
+        if (result.rows.length !== 1) {
+            return next(null, null);
+        }
+
+        var item = result.rows[0];
+
+        var app = {
+            id: item.app_id,
+            extId: item.ext_id,
+            storeAppId: item.store_app_id,
+            name: item.name,
+            censoredName: item.censored_name,
+            description: item.description,
+            storeUrl: item.store_url,
+            devId: item.dev_id,
+            devName: item.dev_name,
+            devUrl: item.dev_url,
+            features: item.features,
+            supportedDevices: item.supported_devices,
+            isGameCenterEnabled: item.is_game_center_enabled,
+            screenShotUrls: item.screenshot_urls,
+            ipadScreenShotUrls: item.ipad_screenshot_urls,
+            artworkSmallUrl: item.artwork_small_url,
+            artworkMediumUrl: item.artwork_medium_url,
+            artworkLargeUrl: item.artwork_large_url,
+            price: item.price,
+            currency: item.currency,
+            version: item.version,
+            primaryGenre: item.primary_genre,
+            genres: item.genres,
+            releaseDate: item.release_date,
+            bundleId: item.bundle_id,
+            sellerName: item.seller_name,
+            releaseNotes: item.release_notes,
+            minOsVersion: item.min_os_version,
+            languageCodes: item.language_codes,
+            fileSizeBytes: item.file_size_bytes,
+            advisoryRating: item.advisory_rating,
+            contentRating: item.content_rating,
+            userRatingCurrent: item.user_rating_current,
+            ratingCountCurrent: item.rating_count_current,
+            userRating: item.user_rating,
+            ratingCount: item.rating_count,
+            dateCreated: item.date_created,
+            dateModified: item.date_modified
+        };
+
+        next(null, app);
+    });
+};
+
 var insertAppStoreApp = function(conn, app, next) {
     conn.beginTran(function(err) {
         if (err) {
@@ -692,6 +761,20 @@ exports.insertAppStoreAppSrc = function(app, categoryId, letter, pageNumber, nex
                 }
 
                 next(err, id);
+            });
+        });
+    });
+};
+
+exports.getAppStoreAppByExtId = function(extId, next) {
+    connection.open(function(err, conn) {
+        if (err) {
+            return next(err);
+        }
+
+        getAppStoreAppByExtId(conn.client, extId, function(err, app) {
+            conn.close(err, function(err) {
+                next(err, app);
             });
         });
     });

@@ -5,25 +5,36 @@ var autoIndexer = require('../../domain/search/autoIndexer');
 var catIndexer = require('../../domain/search/categoryIndexer');
 var appIndexer = require('../../domain/search/appIndexer');
 
+var issueResponseHeaders = function(response) {
+    response.setHeader('Connection', 'Transfer-Encoding');
+    response.setHeader('Content-Type', 'text/html; charset=utf-8');
+    response.setHeader('Transfer-Encoding', 'chunked');
+};
+
+var writeResponse = function(response, message) {
+    log.debug(message);
+    response.write(message + '<br/>');
+};
+
 exports.init = function init(app) {
     app.get('/admin/search/auto/rebuild', function (req, res) {
         var appBatchSize = 10000;
         var lastId = 0;
 
-        res.contentType("text/plain; charset=UTF-8");
-        res.write("Starting rebuild of auto complete index\n");
-
         var outputHandler = function(msg) {
-            log.debug(msg);
-            res.write(msg + '\n');
+            writeResponse(res, msg);
         };
+
+        issueResponseHeaders(res);
+        outputHandler("Starting rebuild of auto complete index");
 
         autoIndexer.rebuild(lastId, appBatchSize, outputHandler, function(err) {
             if (err) {
-                res.write(JSON.stringify(err));
+                log.err(err);
+                outputHandler(JSON.stringify(err));
             }
             else {
-                res.write("Rebuild completed successfully\n");
+                outputHandler("Rebuild completed successfully");
             }
 
             res.end();
@@ -33,20 +44,20 @@ exports.init = function init(app) {
     app.get('/admin/search/cat/rebuild', function (req, res) {
         var numAppDescriptions = 20;
 
-        res.contentType("text/plain; charset=UTF-8");
-        res.write("Starting rebuild of category index\n");
-
         var outputHandler = function(msg) {
-            log.debug(msg);
-            res.write(msg + '\n');
+            writeResponse(res, msg);
         };
+
+        issueResponseHeaders(res);
+        outputHandler("Starting rebuild of category index");
 
         catIndexer.rebuild(numAppDescriptions, outputHandler, function(err) {
             if (err) {
-                res.write(JSON.stringify(err));
+                log.err(err);
+                outputHandler(JSON.stringify(err));
             }
             else {
-                res.write("Rebuild completed successfully\n");
+                outputHandler("Rebuild completed successfully");
             }
 
             res.end();
@@ -56,20 +67,20 @@ exports.init = function init(app) {
     app.get('/admin/search/app/rebuild', function (req, res) {
         var batchSize = 10000;
 
-        res.contentType("text/plain; charset=UTF-8");
-        res.write("Starting rebuild of app index\n");
-
         var outputHandler = function(msg) {
-            log.debug(msg);
-            res.write(msg + '\n');
+            writeResponse(res, msg);
         };
+
+        issueResponseHeaders(res);
+        outputHandler("Starting rebuild of app index");
 
         appIndexer.rebuild(batchSize, outputHandler, function(err) {
             if (err) {
-                res.write(JSON.stringify(err));
+                log.err(err);
+                outputHandler(JSON.stringify(err));
             }
             else {
-                res.write("Rebuild completed successfully\n");
+                outputHandler("Rebuild completed successfully");
             }
 
             res.end();

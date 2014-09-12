@@ -19,6 +19,18 @@ SolrCore.prototype.commit = function (next) {
     });
 };
 
+SolrCore.prototype.optimise = function (next) {
+    var me = this;
+
+    me.client.optimize(function(err, res){
+        if(err) {
+            return next(err);
+        }
+
+        return next(null, res);
+    });
+};
+
 SolrCore.prototype.escapeSpecialChars = function(s){
     return s.replace(/([\+\-&\|!\(\)\{\}\[\]\^"~\*\?:\\])/g, function(match) {
         return '\\' + match;

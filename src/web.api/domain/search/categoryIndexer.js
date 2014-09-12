@@ -1,16 +1,12 @@
 'use strict';
-var solr = require('solr-client');
 var async = require('async');
 var appStoreRepo = require('../../repos/appStoreRepo');
-var log = require('../../logger');
 var solrCore = require('./solrCore').getCategoryCore();
 
 var CATEGORY_TYPE = 1;
 var APP_TYPE = 2;
 
 var addCategory = function(category, apps, numAppDescriptions, next) {
-    log.debug("Adding category: " + category.name);
-
     var solrApps = apps.map(function(app) {
         return {
             id : category.id + '-' + app.id,
@@ -77,14 +73,19 @@ var rebuild = function(numAppDescriptions, outputHandler, next) {
                 return next(err);
             }
 
+            outputHandler("Solr committing changes");
             solrCore.commit(function(err) {
-                next(err);
+                if (err) { return next(err); }
+
+                outputHandler("Solr optimising");
+                solrCore.optimise(function(err) {
+                    next(err);
+                });
             });
         });
 
     });
 };
-
 
 exports.rebuild = rebuild;
 

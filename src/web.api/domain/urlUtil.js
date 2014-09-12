@@ -4,8 +4,7 @@ var slug = require('slug');
 
 var MAX_NAME_LENGTH = 25;
 
-exports.makeUrl = function(extId, name) {
-    var sId = slugid.encode(extId);
+var slugifyName = function(name) {
     var slugName = slug(name);
     var nameLength = Math.min(slugName.length, MAX_NAME_LENGTH);
     var shortName = slugName.substring(0, nameLength).toLowerCase();
@@ -13,8 +12,28 @@ exports.makeUrl = function(extId, name) {
         shortName = shortName.substring(0, shortName.length - 1);
     }
 
-    return sId + '/' + shortName;
+    return shortName;
 };
+
+exports.slugifyName = slugifyName;
+
+exports.makeUrl = function(extId, name) {
+    var sId = slugid.encode(extId);
+    var slugName = slugifyName(name);
+
+    return sId + '/' + slugName;
+};
+
+exports.decodeId = function(encodedId) {
+    var uuid = slugid.decode(encodedId);
+
+    if (uuid.length !== 36) {
+        uuid = null;
+    }
+
+    return uuid;
+};
+
 
 
 

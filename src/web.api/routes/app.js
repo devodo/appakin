@@ -1,6 +1,42 @@
 'use strict';
+var log = require('../logger');
+var urlUtil = require('../domain/urlUtil');
+var appStoreRepo = require('../repos/appStoreRepo');
 
 exports.init = function init(app) {
+
+    app.get('/ios/app/:encodedId/:slug', function (req, res) {
+        var encodedId = req.params.encodedId;
+        if (!encodedId)
+        {
+            return res.status(400).send('Bad query string');
+        }
+
+        var extId = urlUtil.decodeId(encodedId);
+
+        if (!extId) {
+            return res.status(400).send('Invalid app id');
+        }
+
+        appStoreRepo.getAppStoreAppByExtId(extId, function(err, app) {
+            if (err) {
+                log.error(err);
+                return res.status(500).send('Error retrieving app data');
+            }
+
+            if (!app) {
+                return res.status(400).send('No app found');
+            }
+
+            var urlName = urlUtil.slugifyName(app.name);
+            if (req.params.slug !== urlName) {
+                var redirectUrl = urlUtil.makeUrl(app.extId, app.name);
+                return res.redirect(301, '/ios/app/' + redirectUrl);
+            }
+
+            res.json(app);
+        });
+    });
 
     app.get('/app/:platform/app/:appName', function (req, res) {
         var platform = req.params.platform;

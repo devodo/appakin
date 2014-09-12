@@ -1,9 +1,7 @@
 'use strict';
-var solr = require('solr-client');
 var async = require('async');
 var appStoreRepo = require('../../repos/appStoreRepo');
 var solrCore = require('./solrCore').getAppSolrCore();
-var log = require('../../logger');
 
 var addApp = function(app, next) {
     var isIphone = false;
@@ -59,6 +57,7 @@ var rebuild = function(batchSize, outputHandler, next) {
             }
 
             lastId = apps[apps.length - 1].id;
+            outputHandler("Last app: " + apps[apps.length - 1].name);
 
             var processApp = function(app, callback) {
                 addApp(app, function(err) {

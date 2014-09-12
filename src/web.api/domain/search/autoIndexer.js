@@ -1,7 +1,6 @@
 'use strict';
 var async = require('async');
 var appStoreRepo = require('../../repos/appStoreRepo');
-var log = require('../../logger');
 var solrCore = require('./solrCore').getAutoSolrCore();
 
 var CATEGORY_TYPE = 1;
