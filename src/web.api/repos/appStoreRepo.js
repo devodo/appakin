@@ -94,7 +94,7 @@ var insertAppStoreAppInternal = function (client, appId, extId, app, next) {
     });
 };
 
-var getAppStoreAppByExtId = function (client, extId, next) {
+var getAppByExtId = function (client, extId, next) {
     var queryStr =
         "SELECT app_id, ext_id, store_app_id, name, censored_name, description, store_url,\n" +
         "dev_id, dev_name, dev_url, features, supported_devices,\n" +
@@ -160,6 +160,67 @@ var getAppStoreAppByExtId = function (client, extId, next) {
         };
 
         next(null, app);
+    });
+};
+
+var getCategoryByExtId = function (client, extId, next) {
+    var queryStr =
+        "SELECT id, ext_id, name, description, date_created, date_modified,\n" +
+        "date_deleted\n" +
+        "FROM category\n" +
+        "WHERE ext_id = $1\n" +
+        "AND date_deleted is null;";
+
+    client.query(queryStr, [extId], function (err, result) {
+        if (err) {
+            return next(err);
+        }
+
+        if (result.rows.length !== 1) {
+            return next(null, null);
+        }
+
+        var item = result.rows[0];
+
+        var category = {
+            id: item.id,
+            extId: item.ext_id,
+            name: item.name,
+            description: item.description,
+            dateCreated: item.date_created,
+            dateModified: item.date_modified
+        };
+
+        next(null, category);
+    });
+};
+
+var getCategoryApps = function(client, categoryId, skip, take, next) {
+    var queryStr =
+        "SELECT a.ext_id, a.name, a.artwork_small_url, ca.position\n" +
+        "FROM appstore_app a\n" +
+        "JOIN category_app ca ON a.app_id = ca.app_id\n" +
+        "WHERE ca.category_id = $1\n" +
+        "ORDER BY ca.position\n" +
+        "LIMIT $2 OFFSET $3;";
+
+    var queryParams = [categoryId, take, skip];
+
+    client.query(queryStr, queryParams, function (err, result) {
+        if (err) {
+            return next(err);
+        }
+
+        var apps = result.rows.map(function(item) {
+            return {
+                extId: item.ext_id,
+                name: item.name,
+                artworkSmallUrl: item.artwork_small_url,
+                position: item.position
+            };
+        });
+
+        next(null, apps);
     });
 };
 
@@ -323,7 +384,7 @@ var getCategories = function(client, next) {
     });
 };
 
-var getAppCategories = function(client, appId, take, skip, next) {
+var getAppCategories = function(client, appId, skip, take, next) {
     var queryStr =
         "SELECT c.id, c.ext_id, c.name,\n" +
         "c.date_created, c.date_modified, c.date_deleted, cp.popularity, ca.position\n" +
@@ -798,15 +859,43 @@ exports.insertAppStoreAppSrc = function(app, categoryId, letter, pageNumber, nex
     });
 };
 
-exports.getAppStoreAppByExtId = function(extId, next) {
+exports.getAppByExtId = function(extId, next) {
     connection.open(function(err, conn) {
         if (err) {
             return next(err);
         }
 
-        getAppStoreAppByExtId(conn.client, extId, function(err, app) {
+        getAppByExtId(conn.client, extId, function(err, app) {
             conn.close(err, function(err) {
                 next(err, app);
+            });
+        });
+    });
+};
+
+exports.getCategoryByExtId = function(extId, next) {
+    connection.open(function(err, conn) {
+        if (err) {
+            return next(err);
+        }
+
+        getCategoryByExtId(conn.client, extId, function(err, category) {
+            conn.close(err, function(err) {
+                next(err, category);
+            });
+        });
+    });
+};
+
+exports.getCategoryApps = function(categoryId, skip, take, next) {
+    connection.open(function(err, conn) {
+        if (err) {
+            return next(err);
+        }
+
+        getCategoryApps(conn.client, categoryId, skip, take, function(err, apps) {
+            conn.close(err, function(err) {
+                next(err, apps);
             });
         });
     });
@@ -840,13 +929,13 @@ exports.getCategories = function(next) {
     });
 };
 
-exports.getAppCategories = function(appId, take, skip, next) {
+exports.getAppCategories = function(appId, skip, take, next) {
     connection.open(function(err, conn) {
         if (err) {
             return next(err);
         }
 
-        getAppCategories(conn.client, appId, take, skip, function(err, results) {
+        getAppCategories(conn.client, appId, skip, take, function(err, results) {
             conn.close(err, function(err) {
                 next(err, results);
             });

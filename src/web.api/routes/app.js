@@ -3,6 +3,8 @@ var log = require('../logger');
 var urlUtil = require('../domain/urlUtil');
 var appStoreRepo = require('../repos/appStoreRepo');
 
+var PAGE_SIZE = 10;
+
 exports.init = function init(app) {
 
     app.get('/ios/app/:encodedId/:slug', function (req, res) {
@@ -15,17 +17,17 @@ exports.init = function init(app) {
         var extId = urlUtil.decodeId(encodedId);
 
         if (!extId) {
-            return res.status(400).send('Invalid app id');
+            return res.status(400).send('Bad app id');
         }
 
-        appStoreRepo.getAppStoreAppByExtId(extId, function(err, app) {
+        appStoreRepo.getAppByExtId(extId, function(err, app) {
             if (err) {
                 log.error(err);
                 return res.status(500).send('Error retrieving app data');
             }
 
             if (!app) {
-                return res.status(400).send('No app found');
+                return res.status(404).send('App not found');
             }
 
             var urlName = urlUtil.slugifyName(app.name);
@@ -34,7 +36,7 @@ exports.init = function init(app) {
                 return res.redirect(301, '/ios/app/' + appUrl);
             }
 
-            appStoreRepo.getAppCategories(app.id, 100, 0, function(err, cats) {
+            appStoreRepo.getAppCategories(app.id, 0, PAGE_SIZE, function(err, cats) {
                 if (err) {
                     log.error(err);
                     return res.status(500).send('Error retrieving app category data');
@@ -45,12 +47,12 @@ exports.init = function init(app) {
                     delete cat.extId;
                 });
 
+                app.url = appUrl;
                 app.categories = cats;
 
                 delete app.id;
                 delete app.extId;
                 delete app.dateCreated;
-                app.url = appUrl;
 
                 res.json(app);
             });
