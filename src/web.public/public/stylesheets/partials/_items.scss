@@ -1,5 +1,5 @@
 p.error {
-  padding: 12px;
+  padding: 10px 12px 12px 12px;
   background: tint($error-colour, 80);
   color: $error-colour;
 }
@@ -11,11 +11,16 @@ p.warning {
 }
 
 p.search-type {
-  padding-bottom: 12px;
-  font-size: 14px;
+  font-size: 22px;
+  border-bottom: 3px solid $main-spot-colour;
+  margin-top: 12px;
+  margin-bottom: 30px;
+  font-weight: bold;
+  color: $text-light-colour;
+  display: inline-block;
 
   @include mq($from: tablet) {
-    padding-bottom: 18px;
+    margin-bottom: 30px;
   }
 }
 
@@ -24,6 +29,7 @@ li.category-search-result {
     margin-bottom: 3px;
     font-size: 18px;
   }
+
   p {
     margin-bottom: 21px;
     font-size: 14px;

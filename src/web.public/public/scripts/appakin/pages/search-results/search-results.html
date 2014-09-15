@@ -1,21 +1,19 @@
-<div id="search-results" ng-cloak>
+<div id="search-results" class="main-wrapper" ng-cloak>
     <p class="error"
        ng-show="search.results.serverError && !search.results.searchInProgress">
         There was a problem getting your search result. Please try again, or if the problem persists please try later.
     </p>
-    <div class="no-error-wrapper"
-         ng-hide="search.results.serverError">
+    <div class="no-error-wrapper" ng-hide="search.results.serverError">
+        <p class="search-type" ng-if="search.searchType == 'category' && !search.results.initialState">Categories&nbsp;&nbsp;<a href ng-click="setSearchType('app')">Click here for App results</a></p>
+        <p class="search-type" ng-if="search.searchType == 'app' && !search.results.initialState">Apps&nbsp;&nbsp;<a href ng-click="setSearchType('category')">Click here for Category results</a></p>
         <p class="warning"
-           ng-show="search.results.items.length == 0 && !search.results.initialState"
-           ng-class="search.results.searchInProgress ? 'disabled' : ''">
-            Sorry! We couldn't find anything to show you. Please try again with a different search term.
+           ng-show="search.results.items.length == 0 && !search.results.initialState && !search.results.searchInProgress">
+            No results found.<span ng-show="search.results.suggestion"> Did you mean <a href="{{url.createSearchUrl(search.results.suggestion)}}">{{search.results.suggestion}}</a>?</span>
         </p>
         <div class="valid-results-wrapper"
              ng-if="search.results.items.length > 0"
              ng-class="search.results.searchInProgress ? 'disabled' : ''">
             <div class="list-wrapper">
-                <p class="search-type" ng-if="search.searchType == 'category'">Showing <em>categories. </em><a href ng-click="setSearchType('app')">Click here for apps</a>.</p>
-                <p class="search-type" ng-if="search.searchType == 'app'"><em>Showing apps. </em><a href ng-click="setSearchType('category')">Click here for categories</a>.</p>
                 <ul ng-if="search.results.searchType === 'category'">
                     <li ng-repeat="category in search.results.items"
                         class="category-search-result">

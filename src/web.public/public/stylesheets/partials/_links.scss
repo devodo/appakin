@@ -143,12 +143,14 @@ ul.pagination {
   {
     font-family: "icomoon";
     content: ">";
+    color: $icon-colour;
   }
 
   li a.previous:before
   {
     font-family: "icomoon";
     content: "<";
+    color: $icon-colour;
   }
 
   li.active a {
@@ -174,8 +176,16 @@ ul.pagination {
   a:visited,
   a:hover,
   a:active {
-    color: darken($main-spot-colour, 10);
+    color: $text-light-colour;
     font-weight: normal;
+    font-size: 14px;
+  }
+
+  a,
+  a:link,
+  a:visited,
+  a:active {
+    text-decoration: none;
   }
 }
 

@@ -1,8 +1,13 @@
 /* AUTOCOMPLETE */
 
 .autocomplete{
-    width: 100%;
-    position: relative;
+  width: 100%;
+  position: relative;
+  padding: 0 3px;
+
+  @include mq($from: mobile-landscape) {
+    padding: 0;
+  }
 }
 
 .autocomplete ul {
@@ -40,18 +45,22 @@
 .autocomplete {
   a.clear-search {
     position: absolute;
-    right: 48px;
+    right: 49px;
     top: 0px;
-
     display: block;
-    width: 34px;
+    width: 30px;
     height: 28px;
     text-align: center;
     line-height: 28px;
 
+    @include mq($from: mobile-landscape) {
+      right: 46px;
+    }
+
     .icon:after {
       font-family: "icomoon";
       content: "+";
+      color: $icon-colour;
     }
   }
 }

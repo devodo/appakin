@@ -2,7 +2,7 @@
 
 // http://pixelsvsbytes.com/blog/2011/09/sticky-css-footers-the-flexible-way/
 html, body { height: 100%; }
-body { display: table; min-width: 320px; max-width: 1200px; width: 100%; margin-left: auto; margin-right: auto; }
+body { display: table; min-width: 320px; width: 100%; }
 main { height: auto; }
 header, footer, main { display: table-row; }
 header, footer { height: 1px; }
@@ -13,82 +13,113 @@ header, footer { height: 1px; }
   margin-bottom: 150px;
 }
 
-// CONTENT LAYOUT
-
-#search-results {
-  max-width: 960px;
-  //margin-left: auto;
-  //margin-right: auto;
-}
-
 // HEADER LAYOUT
 
-header .header-wrapper {
+header {
+  .home-header-wrapper {
+    max-width: $website-max-width;
+    margin-left: auto;
+    margin-right: auto;
 
-  @include mq($from: mobile-landscape) {
-    display: table;
-    width: 100%;
-  }
+    ul.social-media-links {
+      float: right;
+      padding: 2px 4px 0px 0px;
 
-  .akin-logo {
-
-    @include mq($from: mobile-landscape) {
-      display: table-cell;
-      vertical-align: middle;
+      li {
+        float: left;
+      }
     }
   }
 
-  .searchbox-wrapper {
+  .search-header-outer-wrapper {
+    background-color: $dark-background-colour;
+    //background: -webkit-radial-gradient(top left, darken($dark-background-colour, 20), $dark-background-colour);
+    border-bottom: 1px solid lighten($dark-background-colour, 20);
+    //background-color: #636366;
 
-    @include mq($from: mobile-landscape) {
-      display: table-cell;
-      width: 100%;
-      vertical-align: middle;
-    }
-  }
+    .search-header-inner-wrapper {
+      max-width: $website-max-width;
+      background-color: $dark-background-colour;
+      margin-left: auto;
+      margin-right: auto;
+      background: -10px -55px no-repeat url('/public/images/header-background.png');
+      background-color: $dark-background-colour;
 
-  .searchbox {
-    width: 100%;
-    position: relative;
+      @include mq($from: mobile-landscape) {
+        display: table;
+        width: 100%;
+        padding-top: 35px;
+        background: -30px -22px no-repeat url('/public/images/header-background.png');
+        background-color: $dark-background-colour;
+      }
 
-    @include mq($from: mobile-landscape) {
-      display: table;
-    }
-  }
+      .akin-logo {
 
-  .search-input {
+        @include mq($from: mobile-landscape) {
+          display: table-cell;
+          vertical-align: middle;
+        }
+      }
 
-    @include mq($from: mobile-landscape) {
-      display: table-cell;
-      width: 100%;
-      vertical-align: middle;
-      padding-right: 3px;
-    }
-  }
+      .searchbox-wrapper {
 
-  .platform-menu {
-    position: absolute;
-    top: -35px;
-    right: 0;
+        @include mq($from: mobile-landscape) {
+          display: table-cell;
+          width: 100%;
+          vertical-align: middle;
+        }
+      }
 
-    @include mq($from: mobile-landscape) {
-      display: table-cell;
-      min-width: 140px;
-      position: relative;
-      top: 0px;
-      vertical-align: middle;
+      .searchbox {
+        width: 100%;
+        position: relative;
+
+        @include mq($from: mobile-landscape) {
+          display: table;
+        }
+      }
+
+      .search-input {
+
+        @include mq($from: mobile-landscape) {
+          display: table-cell;
+          width: 100%;
+          vertical-align: middle;
+          padding-right: 3px;
+        }
+      }
+
+      .platform-menu {
+        position: absolute;
+        top: -31px;
+        right: 0;
+
+        @include mq($from: mobile-landscape) {
+          display: table-cell;
+          min-width: 140px;
+          position: relative;
+          top: 0px;
+          vertical-align: middle;
+        }
+      }
     }
   }
 }
 
-// HOME PAGE HEADER
+// MAIN
 
-header ul.social-media-links {
-  float: right;
-  padding: 2px 4px 0px 0px;
+main .main-wrapper {
+  max-width: $website-max-width;
+  margin-left: auto;
+  margin-right: auto;
+  padding: 6px 6px 6px 6px;
 
-  li {
-    float: left;
+  @include mq($from: mobile-landscape) {
+    padding-left: 50px;
+  }
+
+  @include mq($from: tablet) {
+    padding-left: 185px;
   }
 }
 
@@ -174,13 +205,17 @@ footer .call-to-action {
 // SEARCH RESULTS PAGE
 
 #search-results {
-  padding: 6px 6px 6px 6px;
+  //padding: 6px 6px 6px 6px;
   display: table;
   height: 100%;
   width: 100%;
 
+  @include mq($from: mobile-landscape) {
+  //  padding-left: 70px;
+  }
+
   @include mq($from: tablet) {
-    padding-left: 120px;
+  //  padding-left: 70px;
   }
 
   .no-error-wrapper {

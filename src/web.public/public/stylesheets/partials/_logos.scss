@@ -16,16 +16,16 @@
 }
 
 header .akin-logo img {
-  width: 100px;
-  min-width: 100px;
-  height: 28px;
-  margin-left: 3px;
-  margin-right: 6px;
-  margin-top: 6px;
+  width: 83px;
+  min-width: 83px;
+  height: 24px;
+  margin: 6px 6px 2px 6px;
 
   @include mq($from: mobile-landscape) {
-    margin-left: 6px;
-    margin-right: 6px;
+    width: 165px;
+    min-width: 165px;
+    height: 47px;
+    margin: 0px 12px 0px 6px;
   }
 }
 

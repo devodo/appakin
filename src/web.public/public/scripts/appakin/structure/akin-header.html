@@ -1,12 +1,12 @@
-<div ng-switch="location.path() === '/'">
-    <div ng-switch-when="true">
-        <ul class="social-media-links">
-            <li><a href="http://www.facebook.com" class="facebook" target="_blank">[</a></li>
-            <li><a href="http://www.twitter.com" class="twitter" target="_blank">]</a></li>
-        </ul>
-    </div>
-    <div ng-switch-default class="header-wrapper">
-        <a href="/" class="akin-logo"><img src="/public/images/appakin-logo-jade.png"></a>
+<div ng-show="location.path() === '/'" class="home-header-wrapper">
+    <ul class="social-media-links">
+        <li><a href="http://www.facebook.com" class="facebook" target="_blank">[</a></li>
+        <li><a href="http://www.twitter.com" class="twitter" target="_blank">]</a></li>
+    </ul>
+</div>
+<div ng-hide="location.path() === '/'" class="search-header-outer-wrapper">
+    <div class="search-header-inner-wrapper">
+        <a href="/" class="akin-logo"><img src="/public/images/appakin-logo-grey.png"></a>
         <div akin-searchbox class="searchbox-wrapper"></div>
     </div>
 </div>

@@ -1,14 +1,18 @@
 
-$main-spot-colour: #2d8881;
+$main-spot-colour: #9cc243;
 $alt-spot-colour: #8d5e37;
+$dark-background-colour: #808183;
 $light-background-colour: #c3d5d4;
-$control-border-colour: #bbb;
+$icon-colour: darken($dark-background-colour, 5);
+$control-border-colour: darken($dark-background-colour, 10);
 $alt-black-colour: #78725b;
+$text-light-colour: darken($dark-background-colour, 10);
 $error-colour: #a03d34;
 $warning-colour: $alt-black-colour;
 $disabled-text-colour: #bbb;
 $normal-border-radius: 6px;
 $body-font-family: "HelveticaNeue-Light", "Helvetica Neue Light", "Helvetica Neue", Helvetica, Arial, "Lucida Grande", sans-serif;
 $menu-arrow-size: 7px;
+$website-max-width: 1200px;
 
 @import "modules/retina";

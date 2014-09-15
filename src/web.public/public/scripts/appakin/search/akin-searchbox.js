@@ -10,6 +10,8 @@
                 $scope.platform = platform;
                 $scope.status = { isOpen: false };
 
+                console.log('wat: ' + $scope.search.platform);
+
                 $scope.ddSelectOptions = [
                     {
                         text: $scope.platform.getStoreName('android'),
@@ -29,6 +31,14 @@
                     text: $scope.platform.getStoreName($scope.search.platform),
                     platform: $scope.search.platform
                 };
+
+                // TODO: There may be a better way to manage platform updating.
+                $scope.$watch('search.platform', function(newValue, oldValue) {
+                    $scope.ddSelectSelected = {
+                        text: $scope.platform.getStoreName($scope.search.platform),
+                        platform: $scope.search.platform
+                    };
+                });
 
                 $scope.dropdownOnchange = function (selected) {
                     if ($scope.search.platform === selected.platform) {

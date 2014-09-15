@@ -107,9 +107,10 @@ header .searchbox-wrapper {
 
   .platform-menu {
     button {
-      margin-right: 3px;
+      margin: 0px 3px 0px 0px;
       font-size: 14px;
-      padding: 5px 8px;
+      line-height: 26px;
+      padding: 0px 8px;
       font-weight: normal;
       min-width: 140px;
       position: relative;
@@ -117,7 +118,7 @@ header .searchbox-wrapper {
       border: 1px solid $control-border-colour;
       @include border-top-radius(6px);
       @include border-bottom-radius(6px);
-      color: $alt-black-colour;
+      color: $text-light-colour;
       cursor: pointer;
       text-align: left;
 
@@ -127,6 +128,7 @@ header .searchbox-wrapper {
         right: 6px;
         font-family: "icomoon";
         content: "/";
+        color: $icon-colour;
       }
     }
 
@@ -192,23 +194,28 @@ $searchbox-border-colour: $control-border-colour;
     width: 100%;
     font-size: 16px;
     height: 28px;
-    padding: 3px;
-    padding-right: 35px;
+    padding: 3px 30px 3px 3px;
     line-height: 28px;
+    //margin-left: 3px;
+    margin-bottom: 3px;
 
     -webkit-appearance: none;
     -moz-appearance: none;
     border: 1px solid $searchbox-border-colour;
     border-right-width: 0px;
+
+    @include mq($from: mobile-landscape) {
+      margin-bottom: 0px;
+    }
   }
 
   div button {
-    @include button($searchbox-button-colour);
+    @include button(lighten($main-spot-colour, 25));
 
     display: table-cell;
     width: 46px;
-    height: 28px;
-    margin: 0;
+    height: 26px;
+    margin: 1px 0 0 0 !important;
     background-color: black;
     vertical-align: middle;
     padding: 0px 7px;
@@ -220,12 +227,7 @@ $searchbox-border-colour: $control-border-colour;
     {
       font-family: "icomoon";
       content: "!";
-    }
-
-    img {
-      vertical-align: middle;
-      width: 26px;
-      height: 26px;
+      color: $icon-colour;
     }
   }
 }
@@ -236,7 +238,8 @@ $searchbox-border-colour: $control-border-colour;
   margin-left: auto;
   margin-right: auto;
 
-  div {
-    padding: 0 2px;
+  div button {
+    height: 28px;
+    margin: 0 !important;
   }
 }

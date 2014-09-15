@@ -43,7 +43,8 @@
                 initialState: true,
                 serverError: false,
                 searchInProgress: false,
-                searchType: defaultSearchType
+                searchType: defaultSearchType,
+                suggestion: null
             },
             autoComplete: {
                 active: true,
@@ -88,6 +89,7 @@
                 me.service.results.serverError = false;
                 me.service.results.searchInProgress = false;
                 me.service.results.searchType = defaultSearchType;
+                me.service.results.suggestion = null;
             },
             urlMatchesSearch: function(targetPage) {
                 var search = $location.search();
@@ -240,6 +242,10 @@
                         me.service.results.serverError = false;
                         me.service.results.searchInProgress = false;
                         me.service.results.searchType = localSearchType;
+
+                        if (data.suggestions && data.suggestions[0]) {
+                            me.service.results.suggestion = data.suggestions[0];
+                        }
                     },
                     function(data) {
                         me.service.results.serverError = true;
