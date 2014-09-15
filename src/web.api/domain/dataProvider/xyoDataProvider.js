@@ -52,6 +52,68 @@ var getCategories = function(next) {
     });
 };
 
+var lookupCategoryLinks = function(url, next) {
+    var categories = {};
+
+    var pageRequest = function(pageNum) {
+        var pageUrl = url + '?country=US&page=1&wix=' + pageNum + '&autoscroll=0';
+
+        request(pageUrl, function (err, response, src) {
+            if (err) {
+                return next(err);
+            }
+
+            var $ = cheerio.load(src);
+
+            $('section.interest-box').find('a.header').each(function (index, a) {
+                var categoryUrl = $(a).attr('href').replace(/(.*)\?.*/, '$1');
+                categories[categoryUrl] = true;
+            });
+
+            if (pageNum < 2) {
+                return pageRequest(pageNum + 1);
+            }
+
+            next(null, Object.keys(categories));
+        });
+    };
+
+    pageRequest(0);
+};
+
+var retrieveAllCategoryLinks = function(batchId, next) {
+    getCategories(function(err, categories) {
+
+        var processCategory = function(category, callback) {
+            lookupCategoryLinks(category.url, function(err, links) {
+                if (err) { return callback(err); }
+
+                var position = 0;
+                var processLink = function(link, callback) {
+                    position = position + 1;
+                    xyoRepo.insertXyoCategoryLink(batchId, category.id, link, position, function(err) {
+                        if (err) { return callback(err); }
+
+                        callback();
+                    });
+                };
+
+                async.eachSeries(links, processLink, function(err) {
+                    if (err) { return callback(err); }
+
+                    callback();
+                });
+            });
+        };
+
+        async.eachSeries(categories, processCategory, function(err) {
+            if (err) { return next(err); }
+
+            next();
+        });
+    });
+};
+
 var retrieveCategoryApps = function(category, batchId, numPages, next) {
     log.debug("Retrieve category apps for category: " + category.id);
 
@@ -86,7 +148,7 @@ var retrieveCategoryApps = function(category, batchId, numPages, next) {
 };
 
 var retrieveAllCategoryApps = function(batchId, numPages, next) {
-    getCategories(function(err, categories) {
+    xyoRepo.getXyoCategoriesMissingApps(batchId, function(err, categories) {
         if (err) {
             return next(err);
         }
@@ -195,5 +257,7 @@ var crawlCategories = function(seedUrls, next) {
 exports.crawlCategories = crawlCategories;
 exports.crawlCategoryApps = crawlCategoryApps;
 exports.retrieveAllCategoryApps = retrieveAllCategoryApps;
+exports.lookupCategoryLinks = lookupCategoryLinks;
+exports.retrieveAllCategoryLinks = retrieveAllCategoryLinks;
 
 

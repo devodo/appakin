@@ -18,14 +18,9 @@ exports.group = {
         return test.done();
 
         var seedUrls = [
-            'http://xyo.net/iphone-app/--7OQZ36Q/'
-            //'http://xyo.net/iphone/',
-            //'http://xyo.net/iphone-apps/developer-resources-kmI/',
-            //'http://xyo.net/iphone-games/movie-trivia-kIM/',
-            //'http://xyo.net/iphone-apps/history-apps-kVM/',
-            //'http://xyo.net/iphone-apps/flight-apps-lGI/',
-            //'http://xyo.net/iphone-apps/chinese-language-and-culture-kgg/',
-            //'http://xyo.net/iphone-games/cats-mice-and-dogs-games-kOY/'
+            'http://xyo.net/iphone-apps/musicians-and-bands-kcw/',
+            'http://xyo.net/iphone-apps/debt-managers-kEA/',
+            'http://xyo.net/iphone-apps/hip-hop-lI4/'
         ];
 
         //for (var i = 60; i < 84; i++) {
@@ -55,7 +50,7 @@ exports.group = {
     },
 
     retrieveAllCategoryApps: function(test) {
-        return test.done();
+        //return test.done();
         xyoDataProvider.retrieveAllCategoryApps(2, 100, function(err) {
             test.expect(1);
             test.ok(!err, err);

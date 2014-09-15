@@ -15,6 +15,16 @@ exports.init = function init(app) {
             res.json({status: 'success'});
         });
     });
+
+    app.get('/admin/appstore/insert_missing_xyo_categories', function (req, res) {
+        appStoreData.insertMissingXyoCategories(function(err, results) {
+            if (err) {
+                return res.status(500).json(err);
+            }
+
+            res.json(results);
+        });
+    });
 };
 
 

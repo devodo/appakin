@@ -3,7 +3,9 @@ var cheerio = require('cheerio');
 var async = require('async');
 var request = require('request');
 var log = require('../../logger');
-var appStoreRepo = require("../../repos/appStoreRepo");
+var appStoreAdminRepo = require("../../repos/appStoreAdminRepo");
+var connection = require("../../repos/connection");
+var S = require('string');
 
 var getPageSrc = function(id, next) {
     var url = 'https://itunes.apple.com/us/app/id' + id;
@@ -128,7 +130,7 @@ var retrieveApp = function(id, next) {
                 return next(err);
             }
 
-            appStoreRepo.insertAppStoreApp(app, function(err, itemId) {
+            appStoreAdminRepo.insertAppStoreApp(app, function(err, itemId) {
                 if (err) {
                     return next(err);
                 }
@@ -151,7 +153,7 @@ var retrieveApps = function(ids, next) {
                     return next(err);
                 }
 
-                appStoreRepo.insertAppStoreApp(app, function(err, appId) {
+                appStoreAdminRepo.insertAppStoreApp(app, function(err, appId) {
                     if (err) {
                         return callback(err);
                     }
@@ -186,7 +188,7 @@ var retrieveCategories = function(next) {
             };
 
             return function(callback) {
-                appStoreRepo.insertAppStoreCategory(category, function(err, id) {
+                appStoreAdminRepo.insertAppStoreCategory(category, function(err, id) {
                     callback(err, id);
                 });
             };
@@ -254,7 +256,7 @@ var retrieveAppSources = function(category, startLetter, startPageNumber, next) 
             var results = [];
 
             var processAppSource = function(appSource, callback) {
-                appStoreRepo.insertAppStoreAppSrc(appSource, category.id, letter, pageNumber, function(err, id) {
+                appStoreAdminRepo.insertAppStoreAppSrc(appSource, category.id, letter, pageNumber, function(err, id) {
                     if (err) {
                         return callback(err);
                     }
@@ -317,7 +319,7 @@ var retrieveAppChartSources = function(category, batchId, next) {
 
             previousCheck[appSource.storeAppId] = true;
 
-            appStoreRepo.insertAppChartEntry(appSource, category.id, position, batchId, function(err, id) {
+            appStoreAdminRepo.insertAppChartEntry(appSource, category.id, position, batchId, function(err, id) {
                 if (err) {
                     return callback(err);
                 }
@@ -339,7 +341,7 @@ var retrieveAppChartSources = function(category, batchId, next) {
 };
 
 var retrieveAppCharts = function(batchId, next) {
-    appStoreRepo.getAppStoreCategories(function(err, categories) {
+    appStoreAdminRepo.getAppStoreCategories(function(err, categories) {
         if (err) {
             return next(err);
         }
@@ -361,7 +363,7 @@ var retrieveAppCharts = function(batchId, next) {
 };
 
 var retrieveAllAppSources = function(next) {
-    appStoreRepo.getAppStoreCategories(function(err, categories) {
+    appStoreAdminRepo.getAppStoreCategories(function(err, categories) {
         if (err) {
             return next(err);
         }
@@ -373,7 +375,7 @@ var retrieveAllAppSources = function(next) {
 };
 
 var lookupAppsBatched = function(startId, batchSize, next) {
-    appStoreRepo.getAppStoreSourceItemBatch(startId, batchSize, function(err, results) {
+    appStoreAdminRepo.getAppStoreSourceItemBatch(startId, batchSize, function(err, results) {
         log.debug("Batch lookup start id: " + startId);
 
         if (err) {
@@ -430,7 +432,7 @@ var retrieveMissingApp = function(apps, next) {
 };
 
 var lookupMissingPopularApps = function(next) {
-    appStoreRepo.getMissingAppStorePopularApps(function(err, results) {
+    appStoreAdminRepo.getMissingAppStorePopularApps(function(err, results) {
         log.debug("Found " + results.length + " missing popular apps");
 
         if (err) {
@@ -442,7 +444,7 @@ var lookupMissingPopularApps = function(next) {
 };
 
 var lookupMissingSourceApps = function(next) {
-    appStoreRepo.getMissingAppStoreSourceApps(function(err, results) {
+    appStoreAdminRepo.getMissingAppStoreSourceApps(function(err, results) {
         log.debug("Found " + results.length + " missing source apps");
 
         if (err) {
@@ -454,12 +456,76 @@ var lookupMissingSourceApps = function(next) {
 };
 
 var getCategories = function(next) {
-    appStoreRepo.getCategories(function(err, categories) {
+    appStoreAdminRepo.getCategories(function(err, categories) {
         if (err) {
             return next(err);
         }
 
         next(null, categories);
+    });
+};
+
+var insertMissingXyoCategories = function(next) {
+    var results = [];
+
+    connection.open(function(err, conn) {
+        if (err) { return next(err); }
+
+        var closeFinally = function(err) {
+            conn.close(err, function(err) {
+                next(err, results);
+            });
+        };
+
+        conn.beginTran(function(err) {
+            if (err) { return closeFinally(err); }
+
+            appStoreAdminRepo.getMissingXyoCategories(conn.client, function(err, xyoCategories) {
+                if (err) { return closeFinally(err); }
+
+                var processCategory = function(xyoCategory, callback) {
+                    var nameWords = xyoCategory.name.toLowerCase().split(/\s/);
+
+                    if (nameWords.length > 1 && nameWords[0] === nameWords[nameWords.length - 1]) {
+                        nameWords.pop();
+                    }
+
+                    if (nameWords.length > 1 && nameWords[nameWords.length - 1] === 'apps') {
+                        nameWords.pop();
+                    }
+
+                    var pos = 0;
+                    var name = nameWords.map(function(word) {
+                        if (pos > 0 && /^(and|but|nor|or|of|the|a|an|at|by|with|for|in|on|to)$/i.test(word)) {
+                            return word.toLowerCase();
+                        }
+
+                        pos = pos + 1;
+
+                        return S(word).capitalize();
+                    }).join(' ');
+
+                    appStoreAdminRepo.insertCategory(conn.client, name, xyoCategory.description, function(err, catId) {
+                        if (err) { return callback(err); }
+
+                        appStoreAdminRepo.insertXyoCategoryMap(conn.client, catId, xyoCategory.id, function(err) {
+                            if (err) { return callback(err); }
+
+                            results.push(name);
+                            callback();
+                        });
+                    });
+                };
+
+                async.eachSeries(xyoCategories, processCategory, function(err) {
+                    if (err) { return closeFinally(err); }
+
+                    conn.commitTran(function(err) {
+                        closeFinally(err);
+                    });
+                });
+            });
+        });
     });
 };
 
@@ -476,5 +542,6 @@ exports.retrieveAppCharts = retrieveAppCharts;
 exports.lookupMissingPopularApps = lookupMissingPopularApps;
 exports.lookupMissingSourceApps = lookupMissingSourceApps;
 exports.getCategories = getCategories;
+exports.insertMissingXyoCategories = insertMissingXyoCategories;
 
 
