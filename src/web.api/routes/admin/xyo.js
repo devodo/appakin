@@ -18,7 +18,7 @@ exports.init = function init(app) {
     app.get('/admin/xyo/retrieveAllCategoryLinks', function (req, res) {
         xyoData.retrieveAllCategoryLinks(1, function(err) {
             if (err) {
-                return res.status(500).send(err);
+                return res.status(500).json(err);
             }
 
             res.json({"success": true});

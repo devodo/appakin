@@ -73,6 +73,36 @@ var getXyoCategories = function(client, next) {
     });
 };
 
+var getXyoCategoriesMissingLinks = function(client, batchId, next) {
+    var queryStr =
+        "SELECT xc.id, xc.name, xc.link_text, xc.description, xc.url, xc.date_created, xc.date_modified\n" +
+        "FROM xyo_category xc\n" +
+        "WHERE xc.id NOT IN (\n" +
+        "SELECT distinct xyo_category_id from xyo_category_link\n" +
+        "WHERE batch_id = $1)\n" +
+        "order by xc.id;";
+
+    client.query(queryStr, [batchId], function (err, result) {
+        if (err) {
+            return next(err);
+        }
+
+        var categories = result.rows.map(function(item) {
+            return {
+                id: item.id,
+                name: item.name,
+                linkText: item.link_text,
+                description: item.description,
+                url: item.url,
+                dateCreated: item.date_created,
+                dateModified: item.date_modified
+            };
+        });
+
+        next(null, categories);
+    });
+};
+
 var getXyoCategoriesMissingApps = function(client, batchId, next) {
     var queryStr =
         "SELECT xc.id, xc.name, xc.link_text, xc.description, xc.url, xc.date_created, xc.date_modified\n" +
@@ -168,6 +198,20 @@ exports.getXyoCategories = function(next) {
         }
 
         getXyoCategories(conn.client, function(err, categories) {
+            conn.close(err, function(err) {
+                next(err, categories);
+            });
+        });
+    });
+};
+
+exports.getXyoCategoriesMissingLinks = function(batchId, next) {
+    connection.open(function(err, conn) {
+        if (err) {
+            return next(err);
+        }
+
+        getXyoCategoriesMissingLinks(conn.client, batchId, function(err, categories) {
             conn.close(err, function(err) {
                 next(err, categories);
             });

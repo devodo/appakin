@@ -82,7 +82,8 @@ var lookupCategoryLinks = function(url, next) {
 };
 
 var retrieveAllCategoryLinks = function(batchId, next) {
-    getCategories(function(err, categories) {
+    xyoRepo.getXyoCategoriesMissingLinks(batchId, function(err, categories) {
+        if (err) { return next(err); }
 
         var processCategory = function(category, callback) {
             lookupCategoryLinks(category.url, function(err, links) {
