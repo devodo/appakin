@@ -10,17 +10,24 @@ p.warning {
   color: $warning-colour;
 }
 
-p.search-type {
+h1 {
   font-size: 22px;
-  border-bottom: 3px solid $main-spot-colour;
-  margin-top: 12px;
-  margin-bottom: 30px;
   font-weight: bold;
-  color: $text-light-colour;
-  display: inline-block;
+  display: block;
+  color: white;
+  background-color: lighten($main-spot-colour, 5);
+  margin: 0px 0px 10px 0px;
+  padding: 18px 12px 6px 6px;
 
-  @include mq($from: tablet) {
+  @include mq($from: mobile-landscape) {
     margin-bottom: 30px;
+
+    background: none;
+    border-bottom: 3px solid $main-spot-colour;
+    margin-top: 12px;
+    margin-bottom: 30px;
+    color: $text-light-colour;
+    display: inline-block;
   }
 }
 
@@ -47,4 +54,21 @@ li.app-search-result {
     font-size: 14px;
     color: $alt-black-colour;
   }
+}
+
+footer .call-to-action {
+  background-color: lighten($alt-spot-colour, 20);
+  height: 28px;
+  line-height: 28px;
+  margin: 0px 18px;
+  text-align: center;
+  border: 1px solid $control-border-colour;
+  border-bottom: none;
+  @include border-top-radius(6px);
+}
+
+.rule {
+  height: 2px;
+  border-top: 1px solid black; //darken($dark-background-colour, 10);
+  border-bottom: 1px solid lighten($dark-background-colour, 30);
 }

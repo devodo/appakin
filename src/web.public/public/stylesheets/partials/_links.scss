@@ -55,7 +55,8 @@
 
 footer .call-to-action {
   a, a:link, a:visited, a:hover, a:active {
-    color: white;
+    //color: white;
+    color: lighten(black, 20);
     text-decoration: none;
     font-weight: normal;
   }
@@ -72,10 +73,18 @@ footer .call-to-action {
 // FOOTER NAVIGATION
 
 .footer-nav ul li {
+  color: white;
+
   a {
     float: left;
     text-align: center;
     white-space: nowrap;
+    //padding: 3px 0px;
+    padding-bottom: 6px;
+
+    @include mq($from: tablet) {
+      font-size: 20px !important;
+    }
   }
 
   a,
@@ -83,9 +92,11 @@ footer .call-to-action {
   a:visited,
   a:hover,
   a:active {
-    color: $alt-black-colour;
+    color: white;
     font-weight: normal;
     font-size: 16px;
+
+    color: lighten($main-spot-colour, 20);
   }
 
   a,
@@ -171,14 +182,31 @@ ul.pagination {
 // SEARCH TYPE
 
 .search-type {
+
   a,
   a:link,
   a:visited,
   a:hover,
   a:active {
-    color: $text-light-colour;
+    color: white;
     font-weight: normal;
     font-size: 14px;
+  }
+
+  @include mq($from: mobile-landscape) {
+    a,
+    a:link,
+    a:visited,
+    a:hover,
+    a:active {
+      color: $text-light-colour;
+      //font-weight: normal;
+      //font-size: 14px;
+    }
+  }
+
+  a:hover {
+    text-decoration: underline !important;
   }
 
   a,
@@ -197,7 +225,7 @@ li.category-search-result h4 {
   a:visited,
   a:hover,
   a:active {
-    color: darken($main-spot-colour, 10);
+    color: darken($alt-spot-colour, 10);
     font-weight: normal;
   }
 
@@ -217,7 +245,7 @@ li.app-search-result h4 {
   a:visited,
   a:hover,
   a:active {
-    color: darken($main-spot-colour, 10);
+    color: darken($alt-spot-colour, 10);
     font-weight: normal;
   }
 

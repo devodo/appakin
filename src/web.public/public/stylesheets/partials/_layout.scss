@@ -33,23 +33,20 @@ header {
 
   .search-header-outer-wrapper {
     background-color: $dark-background-colour;
-    //background: -webkit-radial-gradient(top left, darken($dark-background-colour, 20), $dark-background-colour);
-    border-bottom: 1px solid lighten($dark-background-colour, 20);
-    //background-color: #636366;
+    padding-bottom: 2px;
+    background-color: #636366;
 
     .search-header-inner-wrapper {
       max-width: $website-max-width;
       background-color: $dark-background-colour;
       margin-left: auto;
       margin-right: auto;
-      background: -10px -55px no-repeat url('/public/images/header-background.png');
       background-color: $dark-background-colour;
 
       @include mq($from: mobile-landscape) {
         display: table;
         width: 100%;
-        padding-top: 35px;
-        background: -30px -22px no-repeat url('/public/images/header-background.png');
+        padding-top: 20px;
         background-color: $dark-background-colour;
       }
 
@@ -116,57 +113,43 @@ main .main-wrapper {
 
   @include mq($from: mobile-landscape) {
     padding-left: 50px;
+    padding-right: 50px;
   }
 
   @include mq($from: tablet) {
-    padding-left: 185px;
+    padding-left: 140px;
   }
 }
 
 // FOOTER
 
-// AD
-
-footer .call-to-action {
-  background-color: $main-spot-colour;
-  padding: 8px;
-  width: 100%;
-  margin: 6px auto;
-  text-align: center;
-}
-
-// FOOTER COPYRIGHT
-
-.footer-copyright {
-  clear: both;
+footer .footer-call-to-action-wrapper {
+  max-width: 500px;
   margin-left: auto;
   margin-right: auto;
+}
+
+footer .footer-background-wrapper {
+  background-color: $dark-background-colour;
+  padding-top: 2px;
+}
+
+footer .footer-centering-wrapper {
+  @include clearfix;
+
+  padding-bottom: 2px;
+  position: relative;
+  max-width: $website-max-width;
+  margin-left:auto;
+  margin-right: auto;
+  padding-top: 6px;
 
   @include mq($from: mobile-landscape) {
-    float: right;
-    clear: none;
-    margin-left: 0px;
-    margin-right: 45px;
-    line-height: 26px;
+    height: 60px;
   }
 
-  p {
-    font-size: 9px;
-    color: $alt-black-colour;
-    margin-bottom: 2px;
-    text-align: center;
-
-    @include mq($from: mobile-landscape) {
-      line-height: 26px;
-    }
-
-    img {
-      display: none;
-
-      @include mq($from: tablet) {
-        display: inline-block;
-      }
-    }
+  @include mq($from: tablet) {
+    height: 118px;
   }
 }
 
@@ -177,13 +160,13 @@ footer .call-to-action {
   position: relative;
   left: -50%;
   text-align: left;
-  margin-bottom: 4px;
 
   @include mq($from: mobile-landscape) {
-    float: left;
+    float: none;
+    position: absolute;
     left: 0px;
-    margin-left: 45px;
-    line-height: 24px;
+    bottom: 6px;
+    margin-left: 30px;
   }
 
   ul {
@@ -202,6 +185,40 @@ footer .call-to-action {
   }
 }
 
+// FOOTER COPYRIGHT
+
+.footer-copyright {
+  clear: both;
+  margin-left: auto;
+  margin-right: auto;
+
+  @include mq($from: mobile-landscape) {
+    position: absolute;
+    right: 0px;
+    bottom: 13px;
+    margin-right: 30px;
+  }
+
+  p {
+    font-size: 9px;
+    color: darken($main-spot-colour, 10);
+    text-align: center;
+
+    img {
+      display: none;
+
+      @include mq($from: tablet) {
+        display: block;
+        position: absolute;
+        bottom: 16px;
+        right: 0px;
+        width: 200px;
+        height: 58px;
+      }
+    }
+  }
+}
+
 // SEARCH RESULTS PAGE
 
 #search-results {
@@ -209,14 +226,6 @@ footer .call-to-action {
   display: table;
   height: 100%;
   width: 100%;
-
-  @include mq($from: mobile-landscape) {
-  //  padding-left: 70px;
-  }
-
-  @include mq($from: tablet) {
-  //  padding-left: 70px;
-  }
 
   .no-error-wrapper {
     display: table;
@@ -232,6 +241,10 @@ footer .call-to-action {
     .list-wrapper { height: auto; }
     .list-wrapper, .pagination-wrapper { display: table-row; }
     .pagination-wrapper { height: 1px; }
+
+    ul {
+      margin-left: 6px;
+    }
   }
 
   .pagination-wrapper {

@@ -1,11 +1,12 @@
 <div id="search-results" class="main-wrapper" ng-cloak>
+    <h1 class="search-type" ng-if="search.searchType == 'category'">Categories&nbsp;&nbsp;<a href ng-click="setSearchType('app')">Click here for App results</a></h1>
+    <h1 class="search-type" ng-if="search.searchType == 'app'">Apps&nbsp;&nbsp;<a href ng-click="setSearchType('category')">Click here for Category results</a></h1>
     <p class="error"
        ng-show="search.results.serverError && !search.results.searchInProgress">
         There was a problem getting your search result. Please try again, or if the problem persists please try later.
     </p>
-    <div class="no-error-wrapper" ng-hide="search.results.serverError">
-        <p class="search-type" ng-if="search.searchType == 'category' && !search.results.initialState">Categories&nbsp;&nbsp;<a href ng-click="setSearchType('app')">Click here for App results</a></p>
-        <p class="search-type" ng-if="search.searchType == 'app' && !search.results.initialState">Apps&nbsp;&nbsp;<a href ng-click="setSearchType('category')">Click here for Category results</a></p>
+    <div class="no-error-wrapper"
+         ng-hide="search.results.serverError">
         <p class="warning"
            ng-show="search.results.items.length == 0 && !search.results.initialState && !search.results.searchInProgress">
             No results found.<span ng-show="search.results.suggestion"> Did you mean <a href="{{url.createSearchUrl(search.results.suggestion)}}">{{search.results.suggestion}}</a>?</span>

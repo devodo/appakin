@@ -1,7 +1,7 @@
 #home-page .akin-logo {
   img {
     display: block;
-    width: 194px;
+    width: 190px;
     height: 54px;
     margin-left: auto;
     margin-right: auto;
@@ -9,8 +9,8 @@
     -ms-interpolation-mode: bicubic;
 
     @include mq($from: tablet) {
-      width: 291px;
-      height: 81px;
+      width: 296px;
+      height: 84px;
     }
   }
 }
@@ -22,10 +22,10 @@ header .akin-logo img {
   margin: 6px 6px 2px 6px;
 
   @include mq($from: mobile-landscape) {
-    width: 165px;
-    min-width: 165px;
-    height: 47px;
-    margin: 0px 12px 0px 6px;
+    width: 121px;
+    min-width: 121px;
+    height: 35px;
+    margin: 0px 9px 0px 6px;
   }
 }
 
