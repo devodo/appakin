@@ -1,8 +1,7 @@
 "use strict";
-var isWin = /^win/.test(process.platform);
 
 var config = require('../config');
-var pg = isWin ? require("pg") : require("pg").native;
+var pg = require("pg").native;
 
 var Connection = function(client, done) {
     this.client = client;

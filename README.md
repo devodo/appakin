@@ -2,9 +2,10 @@
 
 ## Developer setup
 
-0. Install Ruby and SASS: http://sass-lang.com/install
-1. Use npm to install the global packages: 'npm install -g  express nodemon bower browserify watchify gulp nodeunit'.
-2. Cd to the appakin repo root directory and run 'npm install' to install the dev dependencies.  (All dev dependencies should be installed at the root level so that they are shared amongst all the projects in the repo.)
+1. Install Ruby and SASS: http://sass-lang.com/install
+2. If you're on Windows, install VC++ 2010 using the instructions at https://github.com/TooTallNate/node-gyp/wiki/Visual-Studio-2010-Setup.
+3. Use npm to install the global packages: 'npm install -g  express nodemon bower browserify watchify gulp nodeunit'.
+4. Cd to the appakin repo root directory and run 'npm install' to install the dev dependencies.  (All dev dependencies should be installed at the root level so that they are shared amongst all the projects in the repo.)
 
 ## Application: web.public
 
