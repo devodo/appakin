@@ -34,20 +34,20 @@ header {
   .search-header-outer-wrapper {
     background-color: $dark-background-colour;
     padding-bottom: 2px;
-    background-color: #636366;
+    @include linear-gradient(to top, darken($dark-background-colour, 10), $dark-background-colour, $fallback: $dark-background-colour);
+
+
+
 
     .search-header-inner-wrapper {
       max-width: $website-max-width;
-      background-color: $dark-background-colour;
       margin-left: auto;
       margin-right: auto;
-      background-color: $dark-background-colour;
 
       @include mq($from: mobile-landscape) {
         display: table;
         width: 100%;
         padding-top: 20px;
-        background-color: $dark-background-colour;
       }
 
       .akin-logo {
@@ -132,6 +132,7 @@ footer .footer-call-to-action-wrapper {
 footer .footer-background-wrapper {
   background-color: $dark-background-colour;
   padding-top: 2px;
+  @include linear-gradient(to top, darken($dark-background-colour, 10), $dark-background-colour, $fallback: $dark-background-colour);
 }
 
 footer .footer-centering-wrapper {
@@ -222,16 +223,10 @@ footer .footer-centering-wrapper {
 // SEARCH RESULTS PAGE
 
 #search-results {
-  //padding: 6px 6px 6px 6px;
-  display: table;
-  height: 100%;
-  width: 100%;
-
-  .no-error-wrapper {
-    display: table;
-    height: 100%;
-    width: 100%;
-  }
+  ////padding: 6px 6px 6px 6px;
+  //display: table;
+  //height: 100%;
+  //width: 100%;
 
   .valid-results-wrapper {
     display: table;
