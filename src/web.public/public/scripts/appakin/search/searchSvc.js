@@ -29,23 +29,26 @@
 
         function normaliseSearchType(value) {
             return !searchTypeRegex.test(value) ? undefined : value;
-        };
+        }
+
+        function createResultsObject(isInitialState) {
+            return {
+                items: [],
+                totalItems: 0,
+                initialState: isInitialState,
+                serverError: false,
+                searchType: defaultSearchType,
+                suggestion: null
+            };
+        }
 
         me.service = {
             searchTerm: '',
             platform: platform.getInitialPlatform(),
+            currentPage: defaultCurrentPage,
             searchType: defaultSearchType,
-            results: {
-                items: [],
-                currentPage: defaultCurrentPage,
-                itemsPerPage: defaultItemsPerPage,
-                totalItems: 0,
-                initialState: true,
-                serverError: false,
-                searchInProgress: false,
-                searchType: defaultSearchType,
-                suggestion: null
-            },
+            searchInProgress: false,
+            results: createResultsObject(true),
             autoComplete: {
                 active: true,
                 terms: []
@@ -81,15 +84,7 @@
                 debouncedAutoCompleteApi(currentSearchTerm, currentPlatform);
             },
             resetSearchResults: function() {
-                me.service.results.items = [];
-                me.service.results.currentPage = defaultCurrentPage;
-                me.service.results.itemsPerPage = defaultItemsPerPage;
-                me.service.results.totalItems = 0;
-                me.service.results.initialState = true;
-                me.service.results.serverError = false;
-                me.service.results.searchInProgress = false;
-                me.service.results.searchType = defaultSearchType;
-                me.service.results.suggestion = null;
+                me.service.results = createResultsObject(true);
             },
             urlMatchesSearch: function(targetPage) {
                 var search = $location.search();
@@ -119,11 +114,7 @@
                 var platformMatches = search.p === me.service.platform;
                 var searchTypeMatches = searchType === me.service.searchType;
                 var pageMatches = pageInt === targetPage;
-                var takeMatches = takeInt === me.service.results.itemsPerPage;
-                var takeIsDefault = takeInt === null && me.service.results.itemsPerPage === defaultItemsPerPage;
-
-                return searchTermMatches && platformMatches && searchTypeMatches &&
-                    pageMatches && (takeMatches || takeIsDefault);
+                return searchTermMatches && platformMatches && searchTypeMatches && pageMatches;
             },
             updateSearchFromUrl: function() {
                 var search = $location.search();
@@ -149,21 +140,11 @@
                 if (search.page) {
                     var pageInt = parseInt(search.page);
 
-                    if (!isNaN(pageInt) && pageInt > 0 && pageInt != me.service.results.currentPage) {
-                        me.service.results.currentPage = pageInt;
+                    if (!isNaN(pageInt) && pageInt > 0 && pageInt != me.service.currentPage) {
+                        me.service.currentPage = pageInt;
                     }
                 } else {
-                    me.service.results.currentPage = defaultCurrentPage;
-                }
-
-                if (search.take) {
-                    var takeInt = parseInt(search.take);
-
-                    if (!isNaN(takeInt) && takeInt > 0 && takeInt < maxItemsPerPage && takeInt != me.service.results.itemsPerPage) {
-                        me.service.results.itemsPerPage = takeInt;
-                    }
-                } else {
-                    me.service.results.itemsPerPage = defaultItemsPerPage;
+                    me.service.currentPage = defaultCurrentPage;
                 }
             },
             submitSearch: function(page) {
@@ -208,12 +189,10 @@
                     return;
                 }
 
-                console.log(page);
+                me.service.searchInProgress = true;
 
-                me.service.results.searchInProgress = true;
                 var localPlatform = me.service.platform;
                 var localSearchType = me.service.searchType;
-
                 var platformApiName = platform.getApiName(localPlatform);
                 var typeApiName = me.service.searchType === 'category' ? 'cat' : 'app';
 
@@ -234,22 +213,30 @@
                         addPlatform(data.categories);
                         addPlatform(data.apps);
 
-                        me.service.results.items = data.categories || data.apps;
-                        me.service.results.apps = data.apps;
-                        me.service.results.totalItems = data.total;
-                        me.service.results.currentPage = data.page;
-                        me.service.results.initialState = false;
-                        me.service.results.serverError = false;
-                        me.service.results.searchInProgress = false;
-                        me.service.results.searchType = localSearchType;
+                        console.log('success');
 
-                        if (data.suggestions && data.suggestions[0]) {
-                            me.service.results.suggestion = data.suggestions[0];
-                        }
+                            var newResults = {
+                                items: data.categories || data.apps,
+                                apps: data.apps,
+                                totalItems: data.total,
+                                initialState: false,
+                                serverError: false,
+                                searchType: localSearchType,
+                                suggestion: null
+                            };
+
+                            if (data.suggestions && data.suggestions[0]) {
+                                newResults.suggestion = data.suggestions[0];
+                            }
+
+                            me.service.results = newResults;
+                            me.service.searchInProgress = false;
+                            me.service.currentPage = data.page;
                     },
                     function(data) {
                         me.service.results.serverError = true;
-                        me.service.results.searchInProgress = false;
+                        me.service.searchInProgress = false;
+                        console.log('error');
                     }
                 );
             }

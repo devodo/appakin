@@ -15,5 +15,10 @@ textarea {
 // Remove Gray Highlight When Tapping Links in Mobile Safari
 // http://css-tricks.com/snippets/css/remove-gray-highlight-when-tapping-links-in-mobile-safari/
 * {
-  -webkit-tap-highlight-color:transparent;
+  -webkit-tap-highlight-color:transparent !important;
 }
+
+//html {
+//  -webkit-backface-visibility: hidden;
+//  overflow: hidden;
+//}

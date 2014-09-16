@@ -16,7 +16,7 @@ h1 {
   display: block;
   color: white;
   background-color: lighten($main-spot-colour, 5);
-  margin: 0px 0px 10px 0px;
+  margin: 0px 0px 6px 0px;
   padding: 18px 12px 6px 6px;
 
   @include mq($from: mobile-landscape) {
@@ -31,30 +31,31 @@ h1 {
   }
 }
 
-li.category-search-result {
-  h4 {
-    margin-bottom: 3px;
-    font-size: 18px;
-  }
+//li.category-search-result {
+//  h4 {
+//    margin-bottom: 3px;
+//    font-size: 18px;
+//  }
+//
+//  p {
+//    padding-bottom: 21px;
+//    font-size: 14px;
+//    color: $alt-black-colour;
+//  }
+//}
 
-  p {
-    margin-bottom: 21px;
-    font-size: 14px;
-    color: $alt-black-colour;
-  }
-}
-
-li.app-search-result {
-  h4 {
-    margin-bottom: 3px;
-    font-size: 18px;
-  }
-  p {
-    margin-bottom: 21px;
-    font-size: 14px;
-    color: $alt-black-colour;
-  }
-}
+li.app-search-result h4 { font-size: 32px;}
+//li.app-search-result {
+//  h4 {
+//    margin-bottom: 3px;
+//    font-size: 18px;
+//  }
+//  p {
+//    padding-bottom: 21px;
+//    font-size: 14px;
+//    color: $alt-black-colour;
+//  }
+//}
 
 footer .call-to-action {
   background-color: lighten($alt-spot-colour, 20);

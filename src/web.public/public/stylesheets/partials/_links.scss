@@ -114,6 +114,7 @@ footer .call-to-action {
 // PAGINATION
 
 ul.pagination {
+  @include clearfix;
 
   li {
     float: left;
@@ -165,7 +166,7 @@ ul.pagination {
   }
 
   li.active a {
-    border: 1px solid transparent;
+    border: 1px solid white;
     //color: black;
   }
 

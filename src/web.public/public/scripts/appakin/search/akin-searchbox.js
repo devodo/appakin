@@ -10,8 +10,6 @@
                 $scope.platform = platform;
                 $scope.status = { isOpen: false };
 
-                console.log('wat: ' + $scope.search.platform);
-
                 $scope.ddSelectOptions = [
                     {
                         text: $scope.platform.getStoreName('android'),

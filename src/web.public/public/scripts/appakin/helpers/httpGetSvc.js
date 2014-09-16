@@ -12,8 +12,6 @@
 
                 function resetCurrentRequest() {
                     if (currentRequest && currentRequest.active) {
-                        console.log('cancelling request');
-
                         clearPromises(currentRequest);
                         currentRequest.active = false;
                         currentRequest.timedOut = false;
@@ -22,7 +20,7 @@
 
                     // Create a new object and assign it to currentRequest.
                     currentRequest = {
-                        active: true,
+                        active: false,
                         timedOut: false,
                         cancelled: false
                     };
@@ -33,8 +31,10 @@
                     var url = webApiUrl + relativeUrl;
 
                     var localCurrentRequest = currentRequest;
+                    localCurrentRequest.active = true;
 
                     localCurrentRequest.requestCancelPromise = $q.defer();
+                    localCurrentRequest.url = url;
 
                     localCurrentRequest.requestTimeoutPromise = $timeout(
                         function() {
@@ -43,10 +43,6 @@
                             if (!localCurrentRequest.active) {
                                 return;
                             }
-
-//                            if (localCurrentRequest.timedOut) {
-//                                console.log('Server request has already timed out. url=' + url);
-//                            }
 
                             clearPromises(localCurrentRequest);
                             localCurrentRequest.timedOut = true;

@@ -1,11 +1,11 @@
 // STICKY FOOTER
 
 // http://pixelsvsbytes.com/blog/2011/09/sticky-css-footers-the-flexible-way/
-html, body { height: 100%; }
-body { display: table; min-width: 320px; width: 100%; }
-main { height: auto; }
-header, footer, main { display: table-row; }
-header, footer { height: 1px; }
+//html, body { height: 100%; }
+//body { display: table; min-width: 320px; width: 100%; }
+//main { height: auto; }
+//header, footer, main { display: table-row; }
+//header, footer { height: 1px; }
 
 // Sticky footer adjustment
 #home-page {
@@ -106,11 +106,14 @@ header {
 // MAIN
 
 main .main-wrapper {
+  //@include clearfix;
+
   max-width: $website-max-width;
   margin-left: auto;
   margin-right: auto;
   padding: 6px 6px 6px 6px;
-  margin-bottom: 40px;
+  margin-bottom: 20px;
+  //min-height: 300px;
 
   @include mq($from: mobile-landscape) {
     padding-left: 50px;
@@ -230,39 +233,39 @@ footer .footer-centering-wrapper {
   //width: 100%;
 
   .valid-results-wrapper {
-    display: table;
-    height: 100%;
-    width: 100%;
+//    display: table;
+//    height: 100%;
+//    width: 100%;
 
-    .list-wrapper { height: auto; }
-    .list-wrapper, .pagination-wrapper { display: table-row; }
-    .pagination-wrapper { height: 1px; }
+//    .list-wrapper { height: auto; }
+//    .list-wrapper, .pagination-wrapper { display: table-row; }
+//    .pagination-wrapper { height: 1px; }
 
     ul {
       margin-left: 6px;
     }
   }
 
-  .pagination-wrapper {
-    .centering-wrapper {
-      float: right;
-      position: relative;
-      left: -50%;
-      text-align: left;
-
-      @include mq($from: tablet) {
-        float: none;
-        left: 0px;
-      }
-
-      ul {
-        position: relative;
-        left: 50%;
-
-        @include mq($from: tablet) {
-          left: 0px;
-        }
-      }
-    }
-  }
+//  .pagination-wrapper {
+//    .centering-wrapper {
+//      float: right;
+//      position: relative;
+//      left: -50%;
+//      text-align: left;
+//
+//      @include mq($from: tablet) {
+//        float: none;
+//        left: 0px;
+//      }
+//
+//      ul {
+//        position: relative;
+//        left: 50%;
+//
+//        @include mq($from: tablet) {
+//          left: 0px;
+//        }
+//      }
+//    }
+//  }
 }

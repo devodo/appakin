@@ -1,4 +1,4 @@
-<div ng-show="category.data.name">
+<div id="category" class="main-wrapper" ng-show="category.data.name">
     <h1>{{category.data.name}} <span>for {{platform.getFriendlyName(category.data.platform)}}</span></h1>
     <p>{{category.data.desc}}</p>
     <ul ng-if="category.data.apps.length > 0">
