@@ -110,6 +110,7 @@ main .main-wrapper {
   margin-left: auto;
   margin-right: auto;
   padding: 6px 6px 6px 6px;
+  margin-bottom: 40px;
 
   @include mq($from: mobile-landscape) {
     padding-left: 50px;
