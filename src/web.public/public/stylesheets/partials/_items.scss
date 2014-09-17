@@ -1,13 +1,24 @@
+p.error,
+p.warning {
+  padding: 12px;
+  text-align: center;
+
+  @include mq($from: tablet) {
+    //margin-left: auto;
+    //margin-right: auto;
+    //display: inline-block;
+    max-width: 600px;
+  }
+}
+
 p.error {
-  padding: 10px 12px 12px 12px;
   background: tint($error-colour, 80);
   color: $error-colour;
 }
 
 p.warning {
-  padding: 12px;
-  background: tint($warning-colour, 80);
-  color: $warning-colour;
+  background: lighten($dark-background-colour, 45);
+  color: $text-light-colour;
 }
 
 h1 {
@@ -16,46 +27,44 @@ h1 {
   display: block;
   color: white;
   background-color: lighten($main-spot-colour, 5);
-  margin: 0px 0px 6px 0px;
+  margin: 0px 0px 12px 0px;
   padding: 18px 12px 6px 6px;
 
   @include mq($from: mobile-landscape) {
-    margin-bottom: 30px;
-
     background: none;
     border-bottom: 3px solid $main-spot-colour;
     margin-top: 12px;
-    margin-bottom: 30px;
+    margin-bottom: 24px;
     color: $text-light-colour;
     display: inline-block;
+    font-size: 28px;
   }
 }
 
-//li.category-search-result {
-//  h4 {
-//    margin-bottom: 3px;
-//    font-size: 18px;
-//  }
-//
-//  p {
-//    padding-bottom: 21px;
-//    font-size: 14px;
-//    color: $alt-black-colour;
-//  }
-//}
+li.category-search-result {
+  h4 {
+    margin-bottom: 3px;
+    font-size: 18px;
+  }
 
-li.app-search-result h4 { font-size: 32px;}
-//li.app-search-result {
-//  h4 {
-//    margin-bottom: 3px;
-//    font-size: 18px;
-//  }
-//  p {
-//    padding-bottom: 21px;
-//    font-size: 14px;
-//    color: $alt-black-colour;
-//  }
-//}
+  p {
+    padding-bottom: 21px;
+    font-size: 14px;
+    color: $alt-black-colour;
+  }
+}
+
+li.app-search-result {
+  h4 {
+    margin-bottom: 3px;
+    font-size: 18px;
+  }
+  p {
+    padding-bottom: 21px;
+    font-size: 14px;
+    color: $alt-black-colour;
+  }
+}
 
 footer .call-to-action {
   background-color: lighten($alt-spot-colour, 20);
@@ -72,4 +81,25 @@ footer .call-to-action {
   height: 2px;
   border-top: 1px solid black; //darken($dark-background-colour, 10);
   border-bottom: 1px solid lighten($dark-background-colour, 30);
+}
+
+.footer-copyright {
+  p {
+    font-size: 9px;
+    color: lighten($dark-background-colour, 15);
+    text-align: center;
+
+    img {
+      display: none;
+
+      @include mq($from: tablet) {
+        display: block;
+        position: absolute;
+        bottom: 16px;
+        right: 0px;
+        width: 200px;
+        height: 58px;
+      }
+    }
+  }
 }

@@ -1,17 +1,19 @@
 
-$main-spot-colour: #c5aa67;
-$alt-spot-colour: #6d96d5; //#5686cf; // #9cc243;
+$main-spot-colour: #ad832c;// #c5aa67;
+$alt-spot-colour: #6d96d5;
 $dark-background-colour: #626265;
 $light-background-colour: #c3d5d4;
 $icon-colour: darken($dark-background-colour, 5);
 $control-border-colour: darken($dark-background-colour, 10);
-$alt-black-colour: #78725b;
-$text-light-colour: darken($dark-background-colour, 10);
+$alt-black-colour: lighten(black, 20);;
+$text-light-colour: darken($dark-background-colour, 20);
 $error-colour: #a03d34;
-$warning-colour: $alt-black-colour;
+$warning-colour: $alt-spot-colour;
 $disabled-text-colour: #bbb;
 $normal-border-radius: 6px;
-$body-font-family: "HelveticaNeue-Light", "Helvetica Neue Light", "Helvetica Neue", Helvetica, Arial, "Lucida Grande", sans-serif;
+//$body-font-family: 300 "HelveticaNeue-Light", "Helvetica Neue Light", "Helvetica Neue", Helvetica, Arial, "Lucida Grande", sans-serif;
+$body-font-family: 400 14px/1.6 'Open Sans', Verdana, Helvetica, sans-serif;
+$header-font-family: 400 60px/1.3 'Bree Serif', Georgia, serif;
 $menu-arrow-size: 7px;
 $website-max-width: 1200px;
 

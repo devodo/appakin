@@ -21,3 +21,7 @@ $placeholder-text-colour-firefox-darken: 30%;
 :focus:-moz-placeholder { color: transparent; }
 :focus::-moz-placeholder { color: transparent; }
 :focus:-ms-input-placeholder { color: transparent; }
+
+input {
+  font: $body-font-family;
+}

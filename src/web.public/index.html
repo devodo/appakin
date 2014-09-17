@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html data-ng-app="appAkin" data-ng-strict-di data-ng-controller="AppAkin">
+<html data-ng-app="appAkin" data-ng-controller="AppAkin">
 <head>
     <meta charset="utf-8">
 	<meta name="language" content="english">
@@ -10,10 +10,11 @@
 	<title data-ng-bind="pageTitle.pageTitle">appAkin</title>
 
 	<!-- TODO: add Open Graph meta tags, and possibly Twitter and Google+ too. -->
-	
+
 	<!-- inject:appakin-styles --><link rel="stylesheet" href="/public/stylesheets/app-styles.css"><!-- endinject -->
 
     <link href='http://fonts.googleapis.com/css?family=Bree+Serif' rel='stylesheet' type='text/css'>
+    <link href="http://fonts.googleapis.com/css?family=Open+Sans" rel="stylesheet" type="text/css">
 
     <!--[if lt IE 9]>
     <script src="/bower_components/html5shiv/dist/html5shiv.js"></script>
@@ -22,9 +23,9 @@
     <!--<link rel="apple-touch-icon" href="/my-icon.png" /> make it 144x144 -->
 </head>
 <body>
-    <!--<header data-akin-header></header>-->
+    <header data-akin-header></header>
     <main data-ng-view></main>
-    <!--<footer data-akin-footer></footer>-->
+    <footer data-akin-footer></footer>
 
     <script src="/bower_components/angular/angular.js"></script>
     <script src="/bower_components/angular-route/angular-route.js"></script>

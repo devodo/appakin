@@ -1,31 +1,28 @@
-<div id="search-results" class="main-wrapper" ng-cloak
-     ng-if="search.results.searchType === 'app'">
-    <!--<h1 class="search-type" ng-if="search.searchType == 'category'">Categories&nbsp;&nbsp;<a href ng-click="setSearchType('app')">Click here for App results</a></h1>-->
-    <!--<h1 class="search-type" ng-if="search.searchType == 'app'">Apps&nbsp;&nbsp;<a href ng-click="setSearchType('category')">Click here for Category results</a></h1>-->
-    <!--<p class="error"-->
-       <!--ng-show="search.results.serverError && !search.searchInProgress">-->
-        <!--There was a problem getting your search result. Please try again, or if the problem persists please try later.-->
-    <!--</p>-->
-    <!--<div class="no-error-wrapper" ng-hide="search.results.serverError">-->
-        <!--<p class="warning"-->
-           <!--ng-show="search.results.items.length == 0 && !search.results.initialState && !search.searchInProgress">-->
-            <!--No results found.<span ng-show="search.results.suggestion"> Did you mean <a href="{{url.createSearchUrl(search.results.suggestion)}}">{{search.results.suggestion}}</a>?</span>-->
-        <!--</p>-->
-        <!--<div class="valid-results-wrapper"-->
-             <!--ng-show="search.results.items.length > 0"-->
-             <!--ng-class="search.searchInProgress ? 'disabled' : ''">-->
+<div id="search-results" class="main-wrapper" ng-cloak>
+    <h1 class="search-type" ng-if="search.searchType == 'category'">Categories&nbsp;&nbsp;<a href ng-click="setSearchType('app')">Click here for App results</a></h1>
+    <h1 class="search-type" ng-if="search.searchType == 'app'">Apps&nbsp;&nbsp;<a href ng-click="setSearchType('category')">Click here for Category results</a></h1>
+    <p class="error" ng-show="search.results.serverError && !search.searchInProgress">
+        There was a problem getting your search result. Please try again, or if the problem persists please try later.
+    </p>
+    <div class="no-error-wrapper" ng-hide="search.results.serverError">
+        <p class="warning"
+           ng-show="search.results.items.length == 0 && !search.results.initialState && !search.searchInProgress">
+            No results found.<span ng-show="search.results.suggestion"> Did you mean <a href="{{url.createSearchUrl(search.results.suggestion)}}">{{search.results.suggestion}}</a>?</span>
+        </p>
+        <div class="valid-results-wrapper"
+             ng-show="search.results.items.length > 0"
+             ng-class="search.searchInProgress ? 'disabled' : ''">
             <div class="list-wrapper">
-                <!--<ul ng-show="search.results.searchType === 'category'">-->
-                    <!--<li ng-repeat="category in search.results.items"-->
-                        <!--class="category-search-result">-->
-                        <!--<h4><a href="{{ url.createCategoryUrl(category.platform, category.url) }}">{{category.name}}</a></h4>-->
-                        <!--<p>-->
-                            <!--{{category.shortDesc}}-->
-                        <!--</p>-->
-                    <!--</li>-->
-                <!--</ul>-->
-                <!--<ul ng-show="search.results.searchType === 'app'">-->
-                <ul>
+                <ul ng-show="search.results.searchType === 'category'">
+                    <li ng-repeat="category in search.results.items"
+                        class="category-search-result">
+                        <h4><a href="{{ url.createCategoryUrl(category.platform, category.url) }}">{{category.name}}</a></h4>
+                        <p>
+                            {{category.shortDesc}}
+                        </p>
+                    </li>
+                </ul>
+                <ul ng-show="search.results.searchType === 'app'">
                     <li ng-repeat="app in search.results.items track by app.url"
                         class="app-search-result">
                         <h4><a href="{{ url.createAppUrl(app.platform, app.url) }}">{{app.name}}</a></h4>
@@ -47,5 +44,5 @@
                 </div>
             </div>
         </div>
-    <!--</div>-->
-<!--</div>-->
+    </div>
+</div>

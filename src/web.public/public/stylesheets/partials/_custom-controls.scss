@@ -4,9 +4,9 @@ $platform-big-button-padding: 6px;
 $platform-big-button-margin: 10px;
 $platform-big-button-small-screen-size: 40px;
 $platform-big-button-large-screen-size: 50px;
-$platform-big-button-border-width: 2px;
+$platform-big-button-border-width: 3px;
 $platform-big-button-border-radius: $normal-border-radius;
-$platform-big-button-border-colour: $alt-spot-colour;
+$platform-big-button-border-colour: lighten($main-spot-colour, 5);
 
 #home-page .platform-input {
   display: table;
@@ -96,8 +96,8 @@ $platform-big-button-border-colour: $alt-spot-colour;
   input[type="radio"]:checked + div:before {
     border-color: rgba(90, 245, 12, 0);
     border-top-color: $platform-big-button-border-colour;
-    border-width: 13px;
-    margin-left: -13px;
+    border-width: 14px;
+    margin-left: -14px;
   }
 }
 
@@ -181,7 +181,7 @@ header .searchbox-wrapper {
 
 // SEARCHBOX
 
-$searchbox-button-colour: $main-spot-colour;
+$searchbox-button-colour: lighten($main-spot-colour, 25);
 $searchbox-border-colour: $control-border-colour;
 
 .search-input {
@@ -218,7 +218,7 @@ $searchbox-border-colour: $control-border-colour;
   }
 
   div button {
-    @include button(lighten($main-spot-colour, 15));
+    @include button($searchbox-button-colour);
 
     display: table-cell;
     width: 46px;
@@ -247,6 +247,8 @@ $searchbox-border-colour: $control-border-colour;
   margin-right: auto;
 
   div button {
+    //@include button(lighten($alt-spot-colour, 15));
+
     height: 28px;
     margin: 0 !important;
   }

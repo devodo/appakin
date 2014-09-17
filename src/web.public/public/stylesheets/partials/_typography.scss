@@ -11,8 +11,7 @@
 // BASIC FONT
 
 body {
-  font-family: $body-font-family;
-  font-weight: 300;
+  font: $body-font-family;
 }
 
 p {
@@ -24,7 +23,7 @@ p em {
 }
 
 h1 {
-  font-family: 'Bree Serif', serif;
+  font: $header-font-family;
 }
 
 // SEARCH RESULTS TEXT

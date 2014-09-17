@@ -5,7 +5,7 @@
     <li ng-if="directionLinks" ng-class="{disabled: noPrevious()}">
         <a href ng-click="selectPage(page - 1)" class="previous">{{getText('previous')}}</a>
     </li>
-    <li ng-repeat="page in pages track by $index" ng-class="{active: page.active}">
+    <li ng-if="!noPrevious() || !noNext()" ng-repeat="page in pages track by $index" ng-class="{active: page.active}">
         <a href ng-click="selectPage(page.number)">{{page.text}}</a>
     </li>
     <li ng-if="directionLinks" ng-class="{disabled: noNext()}">
