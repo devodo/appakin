@@ -1,6 +1,6 @@
 (function () {'use strict';
 
-    angular.module('appAkin').directive('akinSearchbox', function ($rootScope, platform) {
+    angular.module('appAkin').directive('akinSearchbox', function ($rootScope, platform, $timeout) {
         return {
             restrict: 'A',
             replace: true,
@@ -9,6 +9,13 @@
                 $scope.search = search;
                 $scope.platform = platform;
                 $scope.status = { isOpen: false };
+
+                $scope.submitSearch = function(value) {
+                    $timeout(function() {
+                        //console.log('searchTerm!! ' + search.searchTerm);
+                        search.submitSearch(1);
+                    }, 0);
+                }
 
                 $scope.ddSelectOptions = [
                     {

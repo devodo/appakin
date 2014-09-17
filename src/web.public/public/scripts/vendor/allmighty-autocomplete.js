@@ -4,6 +4,7 @@ var app = angular.module('allmighty.autocomplete', []);
 
 app.directive('autocomplete', function() {
     var index = -1;
+    var mainElement = null;
 
     return {
         restrict: 'E',
@@ -89,7 +90,10 @@ app.directive('autocomplete', function() {
                     $scope.searchFilter = suggestion;
                     if($scope.onSelect)
                         $scope.onSelect(suggestion);
+
+                    angular.element(mainElement.find('input')[0])[0].blur();
                 }
+
                 watching = false;
                 $scope.completing = false;
                 setTimeout(function(){watching = true;},1000);
@@ -99,13 +103,18 @@ app.directive('autocomplete', function() {
             $scope.clear = function() {
                 $scope.searchParam = '';
 
-                // TODO: focus on input box.
+                // TODO: focus on input box
+
+//                setTimeout(function() {
+//                    angular.element(mainElement.find('input')[0])[0].focus();
+//                }, 1000);
             }
 
         }],
         link: function(scope, element, attrs){
 
             var attr = '';
+            mainElement = element;
 
             // Default atts
             scope.attrs = {
@@ -129,6 +138,8 @@ app.directive('autocomplete', function() {
                     if(!scope.searchParam){
                         scope.completing = true;
                         scope.$apply();
+
+                        console.log('clicked');
                     }
                 };
             }

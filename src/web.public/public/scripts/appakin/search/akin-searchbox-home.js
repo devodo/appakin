@@ -5,9 +5,16 @@
             restrict: 'A',
             replace: true,
             templateUrl: '/public/templates/appakin/search/akin-searchbox-home.html',
-            controller: function ($scope, search) {
+            controller: function ($scope, $timeout, search) {
                 $scope.search = search;
                 $scope.platform = platform;
+
+                $scope.submitSearch = function(value) {
+                    $timeout(function() {
+                        //console.log('searchTerm!! ' + search.searchTerm);
+                        search.submitSearch(1);
+                    }, 0);
+                }
             }
         };
     });

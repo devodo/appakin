@@ -15,17 +15,21 @@
   }
 }
 
-header .akin-logo img {
-  width: 83px;
-  min-width: 83px;
-  height: 24px;
-  margin: 6px 6px 2px 6px;
+header .akin-logo {
+  display: inline-block;
 
-  @include mq($from: mobile-landscape) {
-    width: 121px;
-    min-width: 121px;
-    height: 35px;
-    margin: 0px 9px 0px 6px;
+  img {
+    width: 83px;
+    min-width: 83px;
+    height: 24px;
+    margin: 4px 6px 0px 6px;
+
+    @include mq($from: mobile-landscape) {
+      width: 121px;
+      min-width: 121px;
+      height: 35px;
+      margin: 0px 9px 0px 6px;
+    }
   }
 }
 
