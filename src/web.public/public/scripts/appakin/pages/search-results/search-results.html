@@ -1,6 +1,7 @@
 <div id="search-results" class="main-wrapper" ng-cloak>
-    <h1 class="search-type" ng-if="search.searchType == 'category'">Categories&nbsp;&nbsp;<a href="{{url.createSearchUrl(search.results.suggestion, 'app')}}">Click here for App results</a></h1>
-    <h1 class="search-type" ng-if="search.searchType == 'app'">Apps&nbsp;&nbsp;<a href="{{url.createSearchUrl(search.results.suggestion, 'category')}}">Click here for Category results</a></h1>
+    <h1 class="search-type" ng-if="search.searchType == 'category'">Categories&nbsp;&nbsp;<a href="{{url.createSearchUrl(search.results.resultSearchTerm, 'app')}}">Click here for App results</a></h1>
+    <h1 class="search-type" ng-if="search.searchType == 'app'">Apps&nbsp;&nbsp;<a href="{{url.createSearchUrl(search.results.resultSearchTerm, 'category')}}">Click here for Category results</a></h1>
+    <span us-spinner="{radius:20, width:8, length: 16}" spinner-key="spinner-1"></span>
     <p class="error" ng-show="search.results.serverError && !search.searchInProgress">
         There was a problem getting your search result. Please try again, or if the problem persists please try later.
     </p>

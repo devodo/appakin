@@ -3,7 +3,7 @@
       "test": "test dev",
       "connectionString": {
           "appakin-dev": "postgres://appakin:appakin@appakin-dev/appakin",
-          "appakin": "postgres://localhost/appakin"
+          "appakin": "postgres://postgres:password@localhost/appakin"
       },
       "search": {
           "solr": {

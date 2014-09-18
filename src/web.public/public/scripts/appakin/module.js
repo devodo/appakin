@@ -9,7 +9,8 @@
         'allmighty.autocomplete',
         'appAkin.config',
         'appAkin.http',
-        'debounce'
+        'debounce',
+        'angularSpinner'
     ]);
 
     appAkin.config(function ($routeProvider, $locationProvider) {
