@@ -247,8 +247,6 @@ $searchbox-border-colour: $control-border-colour;
   margin-right: auto;
 
   div button {
-    //@include button(lighten($alt-spot-colour, 15));
-
     height: 28px;
     margin: 0 !important;
   }

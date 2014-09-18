@@ -9,10 +9,8 @@
            ng-show="search.results.items.length == 0 && !search.results.initialState && !search.searchInProgress">
             No results found.<span ng-show="search.results.suggestion"> Did you mean <a href="{{url.createSearchUrl(search.results.suggestion, search.searchType)}}">{{search.results.suggestion}}</a>?</span>
         </p>
-        <div class="valid-results-wrapper"
-             ng-show="search.results.items.length > 0"
-             ng-class="search.searchInProgress ? 'disabled' : ''">
-            <div class="list-wrapper">
+        <div class="valid-results-wrapper" ng-show="search.results.items.length > 0">
+            <div class="list-wrapper" ng-class="search.searchInProgress ? 'disabled' : ''">
                 <ul ng-show="search.results.searchType === 'category'">
                     <li ng-repeat="category in search.results.items"
                         class="category-search-result">
