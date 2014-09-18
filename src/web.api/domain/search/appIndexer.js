@@ -3,7 +3,7 @@ var async = require('async');
 var appStoreRepo = require('../../repos/appStoreRepo');
 var solrCore = require('./solrCore').getAppSolrCore();
 
-var addApp = function(app, next) {
+var createSolrApp = function(app) {
     var isIphone = false;
     var isIPad = false;
 
@@ -34,13 +34,7 @@ var addApp = function(app, next) {
         popularity: app.popularity
     };
 
-    solrCore.client.add(appIndex, function(err, obj){
-        if(err){
-            return next(err);
-        }
-
-        return next(null, obj);
-    });
+    return appIndex;
 };
 
 var rebuild = function(batchSize, outputHandler, next) {
@@ -53,20 +47,20 @@ var rebuild = function(batchSize, outputHandler, next) {
             }
 
             if (apps.length === 0) {
-                return next();
+                solrCore.optimise(function(err) {
+                    next(err);
+                });
             }
 
             lastId = apps[apps.length - 1].id;
             outputHandler("Last app: " + apps[apps.length - 1].name);
 
-            var processApp = function(app, callback) {
-                addApp(app, function(err) {
-                    callback(err);
-                });
-            };
+            var solrApps = apps.map(function(app) {
+                return createSolrApp(app);
+            });
 
-            async.eachSeries(apps, processApp, function(err) {
-                if (err) {
+            solrCore.client.add(solrApps, function(err){
+                if(err){
                     return next(err);
                 }
 

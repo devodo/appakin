@@ -35,7 +35,7 @@ var addCategory = function(category, next) {
     });
 };
 
-var addApp = function(app, next) {
+var createSolrApp = function(app) {
     var nameDisplay = solrCore.preProcessDisplayText(app.name);
     var nameIndex = solrCore.preProcessIndexText(app.name);
 
@@ -53,13 +53,7 @@ var addApp = function(app, next) {
         solrApp.name_alt = nameAscii;
     }
 
-    solrCore.client.add(solrApp, function(err, obj){
-        if(err){
-            return next(err);
-        }
-
-        return next(null, obj);
-    });
+    return solrApp;
 };
 
 var addAllCategories = function(outputHandler, next) {
@@ -99,21 +93,21 @@ var addAllApps = function(lastId, batchSize, outputHandler, next) {
             }
 
             if (apps.length === 0) {
-                return next();
+                solrCore.optimise(function(err) {
+                    next(err);
+                });
             }
 
             lastId = apps[apps.length - 1].id;
 
             outputHandler("Last app name: " + apps[apps.length - 1].name);
 
-            var processApp = function(app, callback) {
-                addApp(app, function(err) {
-                    callback(err);
-                });
-            };
+            var solrApps = apps.map(function(app) {
+                return createSolrApp(app);
+            });
 
-            async.eachSeries(apps, processApp, function(err) {
-                if (err) {
+            solrCore.client.add(solrApps, function(err, obj){
+                if(err){
                     return next(err);
                 }
 
