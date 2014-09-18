@@ -94,7 +94,7 @@ var addAllApps = function(lastId, batchSize, outputHandler, next) {
 
             if (apps.length === 0) {
                 solrCore.optimise(function(err) {
-                    next(err);
+                    return next(err);
                 });
             }
 

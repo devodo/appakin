@@ -18,7 +18,7 @@ var writeResponse = function(response, message) {
 
 exports.init = function init(app) {
     app.post('/admin/search/auto/rebuild', function (req, res) {
-        var appBatchSize = 1000;
+        var appBatchSize = 10000;
         var lastId = 0;
 
         var outputHandler = function(msg) {
@@ -65,7 +65,7 @@ exports.init = function init(app) {
     });
 
     app.post('/admin/search/app/rebuild', function (req, res) {
-        var batchSize = 1000;
+        var batchSize = 10000;
 
         var outputHandler = function(msg) {
             writeResponse(res, msg);
