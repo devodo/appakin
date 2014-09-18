@@ -9,10 +9,10 @@
             createAppUrl: function(platform, urlName) {
                 return '/' + platform + '/app/' + urlName;
             },
-            createSearchUrl: function(query) {
+            createSearchUrl: function(query, searchType) {
                 return '/search?q='+encodeURIComponent(query) +
                     '&p='+encodeURIComponent(search.platform) +
-                    '&type='+encodeURIComponent(search.searchType);
+                    '&type='+encodeURIComponent(searchType);
             }
         };
     });

@@ -35,13 +35,19 @@
                 // being generated when the currentPage value possibly gets adjusted as part of controller initialisation.
                 $scope.pageChanged = function() {
                     console.log('page changed: ' + search.currentPage);
+
+                    //console.log(search.result.resultSearchTerm);
+                    if (search.results.resultSearchTerm) {
+                        search.searchTerm = search.results.resultSearchTerm;
+                    }
+
                     search.submitSearch(search.currentPage);
                 };
             }, 0);
 
-            $scope.$watch('search.currentPage', function() {
-                console.log('currentPage=' + search.currentPage);
-            })
+//            $scope.$watch('search.currentPage', function() {
+//                console.log('currentPage=' + search.currentPage);
+//            })
         });
 
 }()); // use strict

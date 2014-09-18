@@ -38,7 +38,8 @@
                 initialState: isInitialState,
                 serverError: false,
                 searchType: defaultSearchType,
-                suggestion: null
+                suggestion: null,
+                resultSearchTerm: null
             };
         }
 
@@ -191,6 +192,7 @@
 
                 me.service.searchInProgress = true;
 
+                var localSearchTerm = me.service.searchTerm;
                 var localPlatform = me.service.platform;
                 var localSearchType = me.service.searchType;
                 var platformApiName = platform.getApiName(localPlatform);
@@ -222,7 +224,8 @@
                                 initialState: false,
                                 serverError: false,
                                 searchType: localSearchType,
-                                suggestion: null
+                                suggestion: null,
+                                resultSearchTerm: localSearchTerm
                             };
 
                             if (data.suggestions && data.suggestions[0]) {
