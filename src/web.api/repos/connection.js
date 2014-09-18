@@ -49,7 +49,7 @@ var createConnection = function(next) {
     var connStr = config.connectionString.appakin;
     pg.connect(connStr, function(err, client, done) {
         if(err) {
-            next(err);
+            return next(err);
         }
 
         var connection = new Connection(client, done);
@@ -60,7 +60,7 @@ var createConnection = function(next) {
 exports.open = function(next) {
     createConnection(function(err, connection) {
         if(err) {
-            next(err);
+            return next(err);
         }
 
         next(null, connection);

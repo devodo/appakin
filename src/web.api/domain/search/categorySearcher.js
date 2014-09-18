@@ -11,13 +11,15 @@ var getHighlight = function(highlights, doc) {
     var hDoc = highlights[doc.id];
     if (!hDoc) { return null; }
 
-    var hDesc = hDoc.desc_split;
+    var hDesc = hDoc.desc;
     if (!hDesc || hDesc.length < 1) { return null; }
 
-    return hDesc[0];
+    return hDesc;
 };
 
 var getApps = function(expanded, doc) {
+    if (!expanded) { return []; }
+
     var appSection = expanded[doc.id];
     if (!appSection) { return []; }
 

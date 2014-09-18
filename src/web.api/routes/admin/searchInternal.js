@@ -17,7 +17,7 @@ var writeResponse = function(response, message) {
 };
 
 exports.init = function init(app) {
-    app.get('/admin/search/auto/rebuild', function (req, res) {
+    app.post('/admin/search/auto/rebuild', function (req, res) {
         var appBatchSize = 10000;
         var lastId = 0;
 
@@ -30,7 +30,7 @@ exports.init = function init(app) {
 
         autoIndexer.rebuild(lastId, appBatchSize, outputHandler, function(err) {
             if (err) {
-                log.err(err);
+                log.error(err);
                 outputHandler(JSON.stringify(err));
             }
             else {
@@ -41,7 +41,7 @@ exports.init = function init(app) {
         });
     });
 
-    app.get('/admin/search/cat/rebuild', function (req, res) {
+    app.post('/admin/search/cat/rebuild', function (req, res) {
         var numAppDescriptions = 20;
 
         var outputHandler = function(msg) {
@@ -53,7 +53,7 @@ exports.init = function init(app) {
 
         catIndexer.rebuild(numAppDescriptions, outputHandler, function(err) {
             if (err) {
-                log.err(err);
+                log.error(err);
                 outputHandler(JSON.stringify(err));
             }
             else {
@@ -64,7 +64,7 @@ exports.init = function init(app) {
         });
     });
 
-    app.get('/admin/search/app/rebuild', function (req, res) {
+    app.post('/admin/search/app/rebuild', function (req, res) {
         var batchSize = 10000;
 
         var outputHandler = function(msg) {
@@ -76,7 +76,7 @@ exports.init = function init(app) {
 
         appIndexer.rebuild(batchSize, outputHandler, function(err) {
             if (err) {
-                log.err(err);
+                log.error(err);
                 outputHandler(JSON.stringify(err));
             }
             else {
@@ -84,6 +84,32 @@ exports.init = function init(app) {
             }
 
             res.end();
+        });
+    });
+
+    app.get('/admin/search/cat/keywords/:catid', function (req, res) {
+        var categoryId = parseInt(req.params.catid, 10);
+
+        if (isNaN(categoryId)) {
+            return res.status(400).send('Bad query string');
+        }
+
+        catIndexer.getCategoryKeywords(categoryId, function(err, keywords) {
+            if (err) {
+                return res.status(500).json(err);
+            }
+
+            res.json(keywords);
+        });
+    });
+
+    app.post('/admin/search/cat/save_corpusfreq', function (req, res) {
+        catIndexer.saveCorpusTermFrequency(function(err) {
+            if (err) {
+                return res.status(500).json(err);
+            }
+
+            res.json({ "result": "success"});
         });
     });
 };

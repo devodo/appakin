@@ -2,11 +2,13 @@
   "development": {
       "test": "test dev",
       "connectionString": {
-          "appakin": "postgres://appakin:appakin@appakin-dev/appakin"
+          "appakin-dev": "postgres://appakin:appakin@appakin-dev/appakin",
+          "appakin": "postgres://localhost/appakin"
       },
       "search": {
           "solr": {
-              "host": "appakin-dev",
+              "host-dev": "appakin-dev",
+              "host": "localhost",
               "port": "8983",
               "cores": {
                   "auto": "appakin_auto",
