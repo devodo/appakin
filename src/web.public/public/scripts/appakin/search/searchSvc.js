@@ -14,7 +14,7 @@
 
             var searchApi = httpGet();
             var autoCompleteApi = httpGet();
-            var spinnerInstance = spinner();
+            var spinnerInstance = spinner('search-results');
 
             var debouncedAutoCompleteApi = debounce(
                 function(currentSearchTerm, currentPlatform) {

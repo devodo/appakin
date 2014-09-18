@@ -256,12 +256,13 @@ li.app-search-result h4 {
 }
 
 p.warning {
+
   a,
   a:link,
   a:visited,
   a:hover,
   a:active {
-    color: darken($main-spot-colour, 20);
+    color: darken($main-spot-colour, 10);
     font-weight: normal;
   }
 

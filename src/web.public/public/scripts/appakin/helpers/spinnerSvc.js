@@ -2,7 +2,7 @@
     'use strict';
 
     angular.module('appAkin').factory('spinner', function($timeout, usSpinnerService) {
-        var defaultDelayMs = 400;
+        var defaultDelayMs = 600;
 
         return function(key, delayMs) {
             delayMs = delayMs || defaultDelayMs;
