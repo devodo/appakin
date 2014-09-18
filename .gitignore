@@ -31,7 +31,7 @@ public-generated/
 .sass-cache/
 
 # Ignore development dependencies
-/node_modules/
+node_modules
 
 #IDE project files
 .idea
