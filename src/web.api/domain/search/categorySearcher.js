@@ -5,33 +5,62 @@ var urlUtil = require('../urlUtil');
 
 var PAGE_SIZE = 10;
 
-var getHighlight = function(highlights, doc) {
+var getHighlight = function(highlights, docId) {
     if (!highlights) { return null; }
 
-    var hDoc = highlights[doc.id];
+    var hDoc = highlights[docId];
     if (!hDoc) { return null; }
 
-    var hDesc = hDoc.desc;
-    if (!hDesc || hDesc.length < 1) { return null; }
+    if (!hDoc.desc && !hDoc.name) { return null; }
 
-    return hDesc;
+    return hDoc;
 };
 
-var getApps = function(expanded, doc) {
+var catChildRegex = /\-0$/;
+
+var isCategoryMatch = function(expanded, docId) {
+    if (!expanded) {
+        return false;
+    }
+
+    var appSection = expanded[docId];
+    if (!appSection) {
+        return false;
+    }
+
+    if (!appSection.docs || appSection.docs.length === 0) {
+        return false;
+    }
+
+    return docId + '-0' === appSection.docs[0].id;
+};
+
+var getApps = function(expanded, highlights, docId) {
     if (!expanded) { return []; }
 
-    var appSection = expanded[doc.id];
+    var appSection = expanded[docId];
     if (!appSection) { return []; }
 
-    var appDocs = appSection.docs;
+    var appDocs = appSection.docs.filter(function(appDoc) {
+        return !catChildRegex.test(appDoc.id);
+    });
+
     if (!appDocs) { return []; }
 
     return appDocs.map(function(appDoc) {
-        return {
+        var appResult = {
             name: appDoc.name,
             url: urlUtil.makeUrl(appDoc.url, appDoc.name),
             imageUrl: appDoc.image_url
         };
+
+        var highlight = getHighlight(highlights, appDoc.id);
+
+        if (highlight) {
+            appResult.highlight = highlight;
+        }
+
+        return appResult;
     });
 };
 
@@ -57,18 +86,21 @@ var search = function(queryStr, pageNum, next) {
         var expanded = obj.expanded;
 
         var categories = obj.response.docs.map(function(doc) {
-
-            var highlight = getHighlight(highlights, doc);
-            var apps = getApps(expanded, doc);
-
             var category = {
-                name: doc.name,
-                url: urlUtil.makeUrl(doc.url, doc.name),
-                apps: apps
+                name: doc.cat_name,
+                url: urlUtil.makeUrl(doc.url, doc.cat_name),
+                isCategoryMatch: isCategoryMatch(expanded, doc.id)
             };
+
+            var highlight = getHighlight(highlights, doc.id + '-0');
+            var apps = getApps(expanded, highlights, doc.id);
 
             if (highlight) {
                 category.highlight = highlight;
+            }
+
+            if (apps && apps.length > 0) {
+                category.apps = apps;
             }
 
             return category;

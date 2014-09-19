@@ -6,20 +6,20 @@ var text = require('../text');
 var log = require('../../logger');
 var fs = require('fs');
 
-var CATEGORY_TYPE = 1;
-var APP_TYPE = 2;
+var PARENT_TYPE = 1;
+var CHILD_TYPE = 2;
 
 var addCategory = function(category, apps, numAppDescriptions, next) {
-    var solrApps = apps.map(function(app) {
+    var children = apps.map(function(app) {
         return {
             id : category.id + '-' + app.id,
-            type: APP_TYPE,
+            type: CHILD_TYPE,
             "parent_id": category.id,
             name: app.name,
-            "app_desc": app.description,
+            desc: app.description,
             url: app.extId.replace(/\-/g, ''),
             "image_url": app.imageUrl,
-            position: app.position,
+            position: parseInt(app.position, 10) + 10,
             popularity: app.popularity
         };
     });
@@ -30,16 +30,25 @@ var addCategory = function(category, apps, numAppDescriptions, next) {
         appDescriptions.push(apps[i].description);
     }
 
+    var categoryChild = {
+        id : category.id + '-0',
+        type: CHILD_TYPE,
+        "parent_id": category.id,
+        name: category.name,
+        desc: appDescriptions.join('\n\n'),
+        position: 1,
+        popularity: category.popularity
+    };
+
+    children.push(categoryChild);
+
     var solrCategory = {
         id : category.id,
         "parent_id": category.id,
-        type: CATEGORY_TYPE,
-        name: category.name,
-        //desc: category.description,
-        desc: appDescriptions.join("\n\n"),
+        type: PARENT_TYPE,
+        cat_name: category.name,
         url: category.extId.replace(/\-/g, ''),
-        "_childDocuments_": solrApps,
-        popularity: category.popularity
+        "_childDocuments_": children
     };
 
     solrCore.client.add(solrCategory, function(err, obj){
