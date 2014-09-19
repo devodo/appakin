@@ -1,6 +1,12 @@
 (function () {
     'use strict';
 
+    angular.module('appAkin').filter('formatDescription', function($sanitize) {
+        return function (input) {
+            return input.replace(/\n/g, '<br>');
+        };
+    });
+
     angular.module('appAkin').filter('highlight', function ($sanitize) {
 
         var escapedRegexValue = /[-\/\\^$*+?.()|[\]{}]/g;

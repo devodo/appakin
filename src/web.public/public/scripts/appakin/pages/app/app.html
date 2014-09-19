@@ -1,13 +1,15 @@
-<div id="app" class="main-wrapper" ng-show="app.data.name">
-    <span us-spinner="{radius:15, width:6, length: 12, top: '150px'}" spinner-key="app-info"></span>
-    <h1>{{app.data.name}}&nbsp;&nbsp;<span>for {{platform.getFriendlyName(app.data.platform)}}</span></h1>
-    <p>{{app.data.description}}</p>
-    <ul ng-if="app.data.categories.length > 0">
-        <li ng-repeat="category in app.data.categories">
-            <h4><a href="{{ url.createCategoryUrl(category.platform, category.urlName) }}">{{category.name}}</a></h4>
-            <p>
-                {{category.shortDesc}}
-            </p>
-        </li>
-    </ul>
+<div id="app" class="main-wrapper" ng-show="app.data.name" ng-cloak>
+    <p class="error" ng-show="app.data.serverError">
+        <span class="icon"></span>There was a problem getting the app details. Please try again, or if the problem persists please try later.
+    </p>
+    <div class="no-error-wrapper" ng-hide="app.data.serverError">
+        <h1>{{app.data.name}}&nbsp;&nbsp;<span>for {{platform.getFriendlyName(app.data.platform)}}</span></h1>
+        <img src="{{app.data.artworkMediumUrl}}" width="100px" height="100px">
+        <p ng-bind-html="app.data.description | formatDescription"></p>
+        <ul ng-if="app.data.categories.length > 0">
+            <li ng-repeat="category in app.data.categories">
+                <h4><a href="{{ url.createCategoryUrl(category.platform, category.urlName) }}">{{category.name}}</a></h4>
+            </li>
+        </ul>
+    </div>
 </div>

@@ -43,7 +43,18 @@
             })
             .when('/:platform/app/:encodedId/:slug', {
                 templateUrl: '/public/templates/appakin/pages/app/app.html',
-                controller: 'AppCtrl'
+                controller: 'AppCtrl',
+                resolve: {
+                    appData: ['$route', 'appApi', function($route, appApi) {
+                        console.log('resolve: encodedId=' + $route.current.params.encodedId);
+
+                        return appApi.get(
+                            $route.current.params.platform,
+                            $route.current.params.encodedId,
+                            $route.current.params.slug
+                        );
+                    }]
+                }
             })
             .when('/privacy', {
                 templateUrl: '/public/templates/appakin/pages/privacy/privacy.html',

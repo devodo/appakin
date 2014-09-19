@@ -10,6 +10,9 @@
 
             search.resetSearchResults();
             search.updateSearchFromUrl();
+            var initialCurrentPage = search.currentPage;
+
+            console.log(search.currentPage);
 
             $scope.setSearchType = function(searchType) {
                 search.searchType = searchType;
@@ -29,7 +32,9 @@
                 // Have the search run after page load.
                 // One reason for doing this is to prevent the search being cancelled
                 // by the setting of the search.platform variable in the controller.
-                search.search(search.currentPage);
+
+                console.log(search.currentPage);
+                search.search(initialCurrentPage);
 
                 // Have to add this listener after the controller has initialised in order to prevent a second search request
                 // being generated when the currentPage value possibly gets adjusted as part of controller initialisation.

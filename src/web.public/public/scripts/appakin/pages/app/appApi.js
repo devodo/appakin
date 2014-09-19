@@ -1,44 +1,26 @@
 (function () {
     'use strict';
 
-    angular.module('appAkin').factory('appApi', function(webApiUrl, $timeout, $http, $q) {
-        var requestTimeoutMs = 4000;
+    angular.module('appAkin').factory('appApi', function(httpGet, $timeout, $http, $q) {
+        var appApi = httpGet();
 
         return {
-            get: function(platform, urlName, success, error) {
+            get: function(platform, encodedId, slug) {
+                var deferred = $q.defer();
 
-                var requestTimedOut = false;
-                var requestCancelPromise = $q.defer();
-
-                var requestTimeoutPromise = $timeout(
-                    function() {
-                        if (requestCancelPromise) {
-                            requestCancelPromise.resolve();
-                            requestCancelPromise = null;
-                        }
-
-                        requestTimedOut = true;
+                appApi(
+                    platform + '/app/' + encodedId + '/' + slug,
+                    function(data) {
+                        data.platform = platform;
+                        data.serverError = false;
+                        deferred.resolve(data);
                     },
-                    requestTimeoutMs);
-
-                console.log('Making app request: app=' + urlName + ' platform=' + platform);
-
-                $http
-                    .get(
-                        webApiUrl + platform + '/app/' + urlName, // TODO: url encoding?
-                        { timeout: requestCancelPromise.promise })
-                    .success(function(data) {
-                        success(data);
-                    })
-                    .error(function(data, status) {
-                        console.log('failed result: status=' + status + ' data=' + data);
-
-                        if (error) {
-                            if (status > 0 || (status === 0 && requestTimedOut)) {
-                                error(data);
-                            }
-                        }
+                    function(data) {
+                        data.serverError = true;
+                        deferred.resolve(data);
                     });
+
+                return deferred.promise;
             }
         };
     });
