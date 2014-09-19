@@ -1,6 +1,7 @@
 <div id="app" class="main-wrapper" ng-show="app.data.name">
-    <h1>{{app.data.name}} <span>for {{platform.getFriendlyName(app.data.platform)}}</span></h1>
-    <p>{{app.data.desc}}</p>
+    <span us-spinner="{radius:15, width:6, length: 12, top: '150px'}" spinner-key="app-info"></span>
+    <h1>{{app.data.name}}&nbsp;&nbsp;<span>for {{platform.getFriendlyName(app.data.platform)}}</span></h1>
+    <p>{{app.data.description}}</p>
     <ul ng-if="app.data.categories.length > 0">
         <li ng-repeat="category in app.data.categories">
             <h4><a href="{{ url.createCategoryUrl(category.platform, category.urlName) }}">{{category.name}}</a></h4>

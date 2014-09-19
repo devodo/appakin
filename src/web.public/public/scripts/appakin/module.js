@@ -3,6 +3,7 @@
     var appAkin = angular.module('appAkin', [
         'ngRoute',
         'ngCookies',
+        'ngSanitize',
         'ngTouch',
         'ngDropdowns',
         'ui.bootstrap.pagination',
@@ -36,11 +37,11 @@
                 controller: 'SearchResultsCtrl',
                 reloadOnSearch: false
             })
-            .when('/:platform/category/:categoryUrlName', {
+            .when('/:platform/category/:encodedId/:slug', {
                 templateUrl: '/public/templates/appakin/pages/category/category.html',
                 controller: 'CategoryCtrl'
             })
-            .when('/:platform/app/:appUrlName', {
+            .when('/:platform/app/:encodedId/:slug', {
                 templateUrl: '/public/templates/appakin/pages/app/app.html',
                 controller: 'AppCtrl'
             })

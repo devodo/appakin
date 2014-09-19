@@ -244,38 +244,6 @@ app.directive('autocomplete', function() {
     };
 });
 
-app.filter('highlight', ['$sce', function ($sce) {
-
-    var escapedRegexValue = /[-\/\\^$*+?.()|[\]{}]/g;
-
-    var escapeRegex = function(value) {
-        return value.replace(escapedRegexValue, '\\$&');
-    };
-
-    return function (input, searchParam) {
-        if (typeof input === 'function') {
-            return '';
-        }
-
-        if (searchParam) {
-            searchParam = escapeRegex(searchParam);
-
-            var words = searchParam.split(/\ /);
-            words.forEach(function(part, index, theArray) {
-                theArray[index] = '\\b' + part;
-            });
-
-            var exp = new RegExp('(' + words.join('|') + ')', 'gi');
-
-            if (words.length) {
-                input = input.replace(exp, "<em>$1</em>");
-            }
-        }
-
-        return $sce.trustAsHtml(input);
-    };
-}]);
-
 app.directive('suggestion', function(){
     return {
         restrict: 'A',
