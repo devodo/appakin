@@ -116,12 +116,13 @@ main .main-wrapper {
   padding: 6px 6px 20px 6px;
 
   @include mq($from: mobile-landscape) {
-    padding-left: 50px;
-    padding-right: 50px;
+    padding-left: 60px;
+    padding-right: 60px;
   }
 
-  @include mq($from: tablet) {
+  @include mq($from: desktop) {
     padding-left: 140px;
+    padding-right: 140px;
   }
 }
 

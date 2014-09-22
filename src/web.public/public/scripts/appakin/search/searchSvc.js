@@ -32,7 +32,7 @@
                 return {
                     items: [],
                     totalItems: 0,
-                    initialState: isInitialState,
+                    //initialState: isInitialState,
                     serverError: false,
                     searchType: defaultSearchType,
                     suggestion: null,

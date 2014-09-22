@@ -1,8 +1,9 @@
 (function () {
     'use strict';
 
-    angular.module('appAkin').factory('url', function(search) {
+    angular.module('appAkin').factory('url', function(search, $rootScope) {
         var appleAppStoreImageUrlRegex = /jpg$|png$/;
+
         return {
             createCategoryUrl: function(platform, urlName) {
                 return '/' + platform + '/category/' + urlName;
@@ -18,8 +19,7 @@
             createAppleAppStoreImageUrl: function(originalUrl, requiredSize) {
                 var strippedUrl = originalUrl.replace(appleAppStoreImageUrlRegex, '');
                 console.log(strippedUrl);
-                var result = strippedUrl + requiredSize + 'x' + requiredSize + '-75.png';
-                return result;
+                return strippedUrl + requiredSize + 'x' + requiredSize + '-75.png';
             }
         };
     });

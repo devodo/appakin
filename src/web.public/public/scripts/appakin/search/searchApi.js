@@ -9,7 +9,7 @@
                 var deferred = $q.defer();
 
                 if (search.searchTerm === '') {
-                    search.results.initialState = false;
+                    //search.results.initialState = false;
                     deferred.resolve();
                     return;
                 }
@@ -45,7 +45,7 @@
                             items: data.categories || data.apps,
                             apps: data.apps,
                             totalItems: data.total,
-                            initialState: false,
+                            //initialState: false,
                             serverError: false,
                             searchType: localSearchType,
                             suggestion: null,

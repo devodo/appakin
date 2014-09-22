@@ -10,14 +10,16 @@
                 loading.started();
 
                 appApi(
-                        platform + '/app/' + encodedId + '/' + slug,
+                    platform + '/app/' + encodedId + '/' + slug,
                     function (data) {
                         data.serverError = false;
                         handleResponse(data);
                     },
                     function (data) {
+                        data = {data: data};
                         data.serverError = true;
                         handleResponse(data);
+                        console.log('GOT ERROR');
                     });
 
                 function handleResponse(data) {

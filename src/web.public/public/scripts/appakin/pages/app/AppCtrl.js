@@ -1,7 +1,7 @@
 (function () {'use strict';
 
     angular.module('appAkin')
-        .controller('AppCtrl', function($scope, $route, search, pageTitle, app, url, platform) {
+        .controller('AppCtrl', function($scope, $timeout, $route, search, pageTitle, app, url, platform) {
             var appData = $route.current.locals.appData;
 
             if (appData && !appData.serverError) {
@@ -18,6 +18,10 @@
             $scope.platform = platform;
 
             app.updateSearch();
+
+            $timeout(function() {
+                console.log($scope.app.data);
+            }, 2000);
         });
 
 }()); // use strict

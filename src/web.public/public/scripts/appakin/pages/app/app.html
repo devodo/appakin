@@ -1,13 +1,13 @@
-<div id="app" class="main-wrapper" ng-show="app.data.name" ng-cloak>
+<div id="app" class="main-wrapper" ng-cloak>
     <p class="error" ng-show="app.data.serverError">
         <span class="icon"></span>There was a problem getting the app details. Please try again, or if the problem persists please try later.
     </p>
-    <div class="no-error-wrapper" ng-hide="app.data.serverError">
+    <div class="no-error-wrapper" ng-if="!app.data.serverError">
         <h1>{{app.data.name}}&nbsp;&nbsp;<span>for {{platform.getFriendlyName(app.data.platform)}}</span></h1>
         <a href="{{ app.data.storeUrl }}" target="_blank">
             <img src="{{ url.createAppleAppStoreImageUrl(app.data.artworkMediumUrl, 175) }}" width="175px" height="175px">
         </a>
-        <p ng-bind-html="app.data.description | formatDescription"></p>
+        <p class="body-text" ng-bind-html="app.data.description | formatDescription"></p>
         <ul ng-if="app.data.categories.length > 0">
             <li ng-repeat="category in app.data.categories">
                 <h4><a href="{{ url.createCategoryUrl(category.platform, category.urlName) }}">{{category.name}}</a></h4>

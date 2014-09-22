@@ -1,10 +1,15 @@
-<div id="category" class="main-wrapper" ng-show="category.data.name">
-    <h1>{{category.data.name}} <span>for {{platform.getFriendlyName(category.data.platform)}}</span></h1>
-    <p>{{category.data.description}}</p>
-    <ul>
-        <li ng-repeat="app in category.data.apps track by app.url" class="app-search-result">
-            <a href="{{ url.createAppUrl(category.data.platform, app.url) }}" ><img src="{{app.artworkSmallUrl}}" width="57px" height="57px"></a>
-            <h4><a href="{{ url.createAppUrl(category.data.platform, app.url) }}" ng-bind="app.name | trim: 50"></a></h4>
-        </li>
-    </ul>
+<div id="category" class="main-wrapper">
+    <p class="error" ng-show="category.data.serverError">
+        <span class="icon"></span>There was a problem getting the category details. Please try again, or if the problem persists please try later.
+    </p>
+    <div class="no-error-wrapper" ng-if="!category.data.serverError">
+        <h1>{{category.data.name}} <span>for {{platform.getFriendlyName(category.data.platform)}}</span></h1>
+        <p class="body-text">{{category.data.description}}</p>
+        <ul>
+            <li ng-repeat="app in category.data.apps track by app.url" class="app-search-result">
+                <a href="{{ url.createAppUrl(category.data.platform, app.url) }}" ><img src="{{app.artworkSmallUrl}}" width="57px" height="57px"></a>
+                <h4><a href="{{ url.createAppUrl(category.data.platform, app.url) }}" ng-bind="app.name | trim: 50"></a></h4>
+            </li>
+        </ul>
+    </div>
 </div>
