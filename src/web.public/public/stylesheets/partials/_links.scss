@@ -215,35 +215,16 @@ ul.pagination {
   }
 }
 
-// CATEGORY SEARCH RESULT
+// SEARCH RESULT
 
-li.category-search-result h4 {
-  a,
-  a:link,
-  a:visited,
-  a:hover,
-  a:active {
-    color: darken($alt-spot-colour, 10);
-    font-weight: normal;
-  }
-
-  a,
-  a:link,
-  a:visited,
-  a:active {
-    text-decoration: none;
-  }
-}
-
-// APP SEARCH RESULT
-
+li.category-search-result h4,
 li.app-search-result h4 {
   a,
   a:link,
   a:visited,
   a:hover,
   a:active {
-    color: darken($alt-spot-colour, 10);
+    color: $main-links-colour;
     font-weight: normal;
   }
 
@@ -254,6 +235,8 @@ li.app-search-result h4 {
     text-decoration: none;
   }
 }
+
+// WARNINGS
 
 p.warning {
 

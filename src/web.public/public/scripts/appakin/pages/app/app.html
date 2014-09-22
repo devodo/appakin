@@ -4,7 +4,9 @@
     </p>
     <div class="no-error-wrapper" ng-hide="app.data.serverError">
         <h1>{{app.data.name}}&nbsp;&nbsp;<span>for {{platform.getFriendlyName(app.data.platform)}}</span></h1>
-        <img src="{{app.data.artworkMediumUrl}}" width="100px" height="100px">
+        <a href="{{ app.data.storeUrl }}" target="_blank">
+            <img src="{{ url.createAppleAppStoreImageUrl(app.data.artworkMediumUrl, 175) }}" width="175px" height="175px">
+        </a>
         <p ng-bind-html="app.data.description | formatDescription"></p>
         <ul ng-if="app.data.categories.length > 0">
             <li ng-repeat="category in app.data.categories">

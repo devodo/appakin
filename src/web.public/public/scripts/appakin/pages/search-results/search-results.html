@@ -1,7 +1,6 @@
 <div id="search-results" class="main-wrapper" ng-cloak>
     <h1 class="search-type" ng-if="search.searchType == 'category'">Categories&nbsp;&nbsp;<a href="{{url.createSearchUrl(search.results.resultSearchTerm, 'app')}}">Click here for App results</a></h1>
     <h1 class="search-type" ng-if="search.searchType == 'app'">Apps&nbsp;&nbsp;<a href="{{url.createSearchUrl(search.results.resultSearchTerm, 'category')}}">Click here for Category results</a></h1>
-    <span us-spinner="{radius:15, width:6, length: 12, top: '150px'}" spinner-key="search-results"></span>
     <p class="error" ng-show="search.results.serverError && !search.searchInProgress">
         <span class="icon"></span>There was a problem getting your search result. Please try again, or if the problem persists please try later.
     </p>
@@ -24,7 +23,7 @@
                 <ul ng-show="search.results.searchType === 'app'">
                     <li ng-repeat="app in search.results.items track by app.url"
                         class="app-search-result">
-                        <img src="{{app.imageUrl}}" width="57px" height="57px">
+                        <a href="{{ url.createAppUrl(app.platform, app.url) }}" ><img src="{{app.imageUrl}}" width="57px" height="57px"></a>
                         <h4><a href="{{ url.createAppUrl(app.platform, app.url) }}" ng-bind-html="app.name | trim: 50 | highlight: search.searchTerm"></a></h4>
                         <p ng-bind-html="app.highlight"></p>
                     </li>
