@@ -4,13 +4,17 @@
 html, body { height: 100%; }
 body { display: table; min-width: 320px; width: 100%; }
 main { height: auto; }
-header, footer, main { display: table-row; }
+header, main, footer { display: table-row; }
 header, footer { height: 1px; }
 
 // Sticky footer adjustment
 #home-page {
   margin-top: 30px;
   margin-bottom: 150px;
+}
+
+main {
+  position: relative;
 }
 
 // HEADER LAYOUT
@@ -105,7 +109,7 @@ header {
 main .main-wrapper {
   @include clearfix;
 
-  position: relative; // positioning parent for spinners.
+  //position: relative; // positioning parent for spinners.
   max-width: $website-max-width;
   margin-left: auto;
   margin-right: auto;

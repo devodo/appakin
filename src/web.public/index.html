@@ -28,8 +28,12 @@
     <![endif]-->
 </head>
 <body>
+
     <header data-akin-header></header>
-    <main data-ng-view></main>
+    <main>
+        <span class="spinner-wrapper" us-spinner="{radius:15, width:6, length: 12}" spinner-key="loading"></span>
+        <div ng-view></div>
+    </main>
     <footer data-akin-footer></footer>
 
     <script src="/bower_components/angular/angular.js"></script>

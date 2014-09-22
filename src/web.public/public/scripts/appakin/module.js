@@ -46,8 +46,6 @@
                 controller: 'AppCtrl',
                 resolve: {
                     appData: ['$route', 'appApi', function($route, appApi) {
-                        console.log('resolve: encodedId=' + $route.current.params.encodedId);
-
                         return appApi.get(
                             $route.current.params.platform,
                             $route.current.params.encodedId,

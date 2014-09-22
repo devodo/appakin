@@ -155,3 +155,20 @@ footer .call-to-action {
     }
   }
 }
+
+.spinner {
+  position: fixed !important;
+}
+
+.spinner:before {
+  display: block;
+  position: absolute;
+  left: -50px;
+  top: -50px;
+  width: 100px;
+  height: 100px;
+  background-color: rgba(100, 100, 100, 0.3);
+  @include border-top-radius(12px);
+  @include border-bottom-radius(12px);
+  content: " "
+}
