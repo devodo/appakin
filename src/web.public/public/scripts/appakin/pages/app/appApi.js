@@ -9,20 +9,16 @@
                 var deferred = $q.defer();
                 loading.started();
 
-                //$timeout(function() {
-
-                    appApi(
-                            platform + '/app/' + encodedId + '/' + slug,
-                        function (data) {
-                            data.serverError = false;
-                            handleResponse(data);
-                        },
-                        function (data) {
-                            data.serverError = true;
-                            handleResponse(data);
-                        });
-
-                //}, 2000);
+                appApi(
+                        platform + '/app/' + encodedId + '/' + slug,
+                    function (data) {
+                        data.serverError = false;
+                        handleResponse(data);
+                    },
+                    function (data) {
+                        data.serverError = true;
+                        handleResponse(data);
+                    });
 
                 function handleResponse(data) {
                     data.platform = platform;

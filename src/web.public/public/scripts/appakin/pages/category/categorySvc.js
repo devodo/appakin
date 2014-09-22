@@ -1,7 +1,7 @@
 (function () {
     'use strict';
 
-    angular.module('appAkin').factory('category', function($routeParams, categoryApi, search, platform, pageTitle) {
+    angular.module('appAkin').factory('category', function($routeParams, search, platform) {
         var me = this;
 
         me.service = {
@@ -12,18 +12,6 @@
                 if (urlPlatform && search.platform != urlPlatform) {
                     search.platform = urlPlatform;
                 }
-            },
-            get: function() {
-                var urlPlatform = $routeParams.platform;
-                var urlName = $routeParams.categoryUrlName;
-
-                categoryApi.get(
-                    urlPlatform, urlName,
-                    function(data) {
-                        me.service.data = data;
-                        pageTitle.setPageTitle(data.name + ' for ' + platform.getFriendlyName(data.platform));
-                    }
-                );
             }
         };
 

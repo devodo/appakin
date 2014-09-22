@@ -39,7 +39,16 @@
             })
             .when('/:platform/category/:encodedId/:slug', {
                 templateUrl: '/public/templates/appakin/pages/category/category.html',
-                controller: 'CategoryCtrl'
+                controller: 'CategoryCtrl',
+                resolve: {
+                    categoryData: ['$route', 'categoryApi', function($route, categoryApi) {
+                        return categoryApi.get(
+                            $route.current.params.platform,
+                            $route.current.params.encodedId,
+                            $route.current.params.slug
+                        )
+                    }]
+                }
             })
             .when('/:platform/app/:encodedId/:slug', {
                 templateUrl: '/public/templates/appakin/pages/app/app.html',

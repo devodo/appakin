@@ -2,16 +2,22 @@
 
     angular.module('appAkin')
         .controller('AppCtrl', function($scope, $route, search, pageTitle, app, url, platform) {
-            pageTitle.setPageTitle('');
+            var appData = $route.current.locals.appData;
+
+            if (appData && !appData.serverError) {
+                pageTitle.setPageTitle(appData.name);
+            } else {
+                pageTitle.setPageTitle('');
+            }
+
             search.resetSearchTerm();
-            app.data = $route.current.locals.appData;
+            app.data = appData;
 
             $scope.app = app;
             $scope.url = url;
             $scope.platform = platform;
 
             app.updateSearch();
-            //app.get();
         });
 
 }()); // use strict

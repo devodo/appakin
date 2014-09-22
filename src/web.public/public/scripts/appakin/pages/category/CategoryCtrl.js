@@ -1,15 +1,22 @@
 (function () {'use strict';
 
-    angular.module('appAkin').controller('CategoryCtrl', function($scope, search, pageTitle, category, url,platform) {
-        pageTitle.setPageTitle('');
+    angular.module('appAkin').controller('CategoryCtrl', function($scope, $route, search, pageTitle, category, url,platform) {
+        var categoryData = $route.current.locals.categoryData;
+
+        if (categoryData && !categoryData.serverError) {
+            pageTitle.setPageTitle(categoryData.name);
+        } else {
+            pageTitle.setPageTitle('');
+        }
+
         search.resetSearchTerm();
+        category.data = categoryData;
 
         $scope.category = category;
         $scope.url = url;
         $scope.platform = platform;
 
         category.updateSearch();
-        category.get();
     });
 
 }()); // use strict
