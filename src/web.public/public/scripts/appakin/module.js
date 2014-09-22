@@ -35,7 +35,19 @@
             .when('/search', {
                 templateUrl: '/public/templates/appakin/pages/search-results/search-results.html',
                 controller: 'SearchResultsCtrl',
-                reloadOnSearch: false
+                //reloadOnSearch: false
+                resolve: {
+                    searchData: ['$route', 'search', 'searchApi', function($route, search, searchApi) {
+                        search.updateSearchFromUrl();
+
+                        return searchApi.get(
+                            $route.current.params.p,
+                            $route.current.params.q,
+                            $route.current.params.type,
+                            $route.current.params.page
+                        );
+                    }]
+                }
             })
             .when('/:platform/category/:encodedId/:slug', {
                 templateUrl: '/public/templates/appakin/pages/category/category.html',
@@ -46,7 +58,7 @@
                             $route.current.params.platform,
                             $route.current.params.encodedId,
                             $route.current.params.slug
-                        )
+                        );
                     }]
                 }
             })

@@ -2,19 +2,14 @@
     'use strict';
 
     angular.module('appAkin').factory('search',
-        function(httpGet, debounce, $timeout, $location, $rootScope, platform, spinner) {
+        function(httpGet, debounce, $timeout, $location, $rootScope, platform) {
             var me = this;
-            var defaultItemsPerPage = 10;
-            var maxItemsPerPage = 50;
             var defaultCurrentPage = 1;
             var debounceTimeoutMs = 200;
             var searchResultsPagePath = '/search';
             var defaultSearchType = 'category';
             var searchTypeRegex = /(category|app)/;
-
-            var searchApi = httpGet();
             var autoCompleteApi = httpGet();
-            var spinnerInstance = spinner('search-results');
 
             var debouncedAutoCompleteApi = debounce(
                 function(currentSearchTerm, currentPlatform) {
@@ -71,9 +66,6 @@
                     debouncedAutoCompleteApi.cancel();
                     autoCompleteApi.cancel();
                     me.service.autoComplete.terms = [];
-                },
-                cancelSearch: function() {
-                    searchApi.cancel();
                 },
                 updateAutoCompleteTerms: function(typed) {
                     var currentSearchTerm = me.service.searchTerm;
@@ -174,78 +166,8 @@
                         search.type = me.service.searchType;
                     }
 
-                    // If the exact same search is being submitted on the search results page,
-                    // we need to manually call search();
-                    if ($location.path() === searchResultsPagePath && me.service.urlMatchesSearch(page)) {
-                        console.log('direct search');
-                        me.service.search(page);
-                    }
-                    else {
-                        console.log('redirecting to search: q=' + me.service.searchTerm + ' p=' + me.service.platform + ' page=' + page);
-                        $location.path(searchResultsPagePath).search(search);
-                    }
-                },
-                // Call submitSearch() rather than search() directly.
-                search : function(page) {
-                    if (me.service.searchTerm === '') {
-                        me.service.results.initialState = false;
-                        return;
-                    }
-
-                    me.service.searchInProgress = true;
-
-                    var localSearchTerm = me.service.searchTerm;
-                    var localPlatform = me.service.platform;
-                    var localSearchType = me.service.searchType;
-                    var platformApiName = platform.getApiName(localPlatform);
-                    var typeApiName = me.service.searchType === 'category' ? 'cat' : 'app';
-
-                    function addPlatform(arr) {
-                        if (!arr) { return; }
-
-                        var i;
-                        for (i = 0; i < arr.length; ++i) {
-                            arr[i].platform = localPlatform;
-                        }
-                    }
-
-                    spinnerInstance();
-
-                    searchApi(
-                        platformApiName + '/search/' + typeApiName +
-                            '?q='+encodeURIComponent(me.service.searchTerm) +
-                            '&p='+encodeURIComponent(page),
-                        function(data) {
-                            addPlatform(data.categories);
-                            addPlatform(data.apps);
-
-                            var newResults = {
-                                items: data.categories || data.apps,
-                                apps: data.apps,
-                                totalItems: data.total,
-                                initialState: false,
-                                serverError: false,
-                                searchType: localSearchType,
-                                suggestion: null,
-                                resultSearchTerm: localSearchTerm
-                            };
-
-                            if (data.suggestions && data.suggestions[0]) {
-                                newResults.suggestion = data.suggestions[0];
-                            }
-
-                            me.service.results = newResults;
-                            me.service.searchInProgress = false;
-                            me.service.currentPage = data.page;
-                            spinnerInstance.stop();
-                        },
-                        function(data) {
-                            me.service.results.serverError = true;
-                            me.service.searchInProgress = false;
-                            spinnerInstance.stop();
-                            //console.log('error');
-                        }
-                    );
+                    console.log('redirecting to search: q=' + me.service.searchTerm + ' p=' + me.service.platform + ' page=' + page);
+                    $location.path(searchResultsPagePath).search(search);
                 }
             };
 
