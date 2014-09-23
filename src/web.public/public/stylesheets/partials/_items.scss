@@ -179,7 +179,43 @@ footer .call-to-action {
   font-size: 16px;
 
   h1 {
-    //margin-bottom: 6px;
+    font-size: 24px;
+    line-height: 28px;
+    font-weight: bold;
+    display: block;
+    //color: $main-spot-colour;
+
+    //border: 1px solid $main-spot-colour;
+
+    //@include border-top-radius(3px);
+    //@include border-bottom-radius(3px);
+
+    border: 0px;
+    border-bottom: 1px solid lighten($control-border-colour, 60);
+    background-color: transparent;
+    padding: 6px;
+    padding-bottom: 18px;
+    margin-bottom: 15px;
+
+    //background-color: lighten($main-spot-colour,30);
+    color: black;
+    //margin: 0px 0px 12px 0px;
+    //padding: 18px 12px 6px 6px;
+
+    @include mq($from: mobile-landscape) {
+//      background: none;
+//      border-bottom: 3px solid $main-spot-colour;
+//      margin-top: 12px;
+//      margin-bottom: 24px;
+//      color: $text-light-colour;
+//      display: inline-block;
+//      font-size: 28px;
+    }
+
+    span {
+      font-weight: normal;
+      font-size: 14px;
+    }
   }
 
   .app-icon {
@@ -245,6 +281,7 @@ footer .call-to-action {
     border-top: 1px solid lighten($control-border-colour, 60);
     border-bottom: 1px solid lighten($control-border-colour, 60);
     padding: 6px;
+    //margin-top: 18px;
     margin-bottom: 21px;
 
     .label {
@@ -257,6 +294,11 @@ footer .call-to-action {
       margin-bottom: 15px;
       //color: $alt-black-colour;
       //text-align: center;
+
+      .label {
+        width: auto;
+        display: inline;
+      }
     }
   }
 
@@ -269,7 +311,7 @@ footer .call-to-action {
     .less {
       display: block;
       width: 100px;
-      margin: 6px auto 6px auto;
+      margin: 12px auto 6px auto;
       text-align: center;
       border: 1px solid lighten($control-border-colour, 60);
       @include border-top-radius(6px);
@@ -370,12 +412,20 @@ footer .call-to-action {
     }
 
     ul {
-     width: 296px;
+      width: 200px;
 
       li img {
-        width: 296px;
+        width: 200px;
         height: auto;
       }
+    }
+
+    .screen-shot-wrapper {
+      width: 208px;
+      margin-left: auto;
+      margin-right: auto;
+      border: 1px solid lighten($control-border-colour, 60);
+      padding: 3px;
     }
   }
 

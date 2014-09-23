@@ -45,7 +45,6 @@
                             items: data.categories || data.apps,
                             apps: data.apps,
                             totalItems: data.total,
-                            //initialState: false,
                             serverError: false,
                             searchType: localSearchType,
                             suggestion: null,

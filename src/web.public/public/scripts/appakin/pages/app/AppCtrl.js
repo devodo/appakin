@@ -1,7 +1,8 @@
 (function () {'use strict';
 
     angular.module('appAkin')
-        .controller('AppCtrl', function($scope, $timeout, $route, search, pageTitle, app, url, platform) {
+        .controller('AppCtrl',
+            function($scope, $route, search, pageTitle, app, url, platform, display, firstParagraphFilter) {
             var appData = $route.current.locals.appData;
             var monthNames = [
                 "Jan", "Feb", "Mar", "Apr", "May", "Jun",
@@ -15,6 +16,7 @@
 
             search.resetSearchTerm();
             app.data = appData;
+            app.data.firstParagraph = firstParagraphFilter(app.data.description);
 
             $scope.app = app;
             $scope.url = url;
@@ -22,6 +24,10 @@
 
             $scope.display = {
                 fullDescription: false
+            };
+
+            $scope.getLinkTarget = function() {
+                return display.isIOS ? '_self' : '_blank';
             };
 
             $scope.toggleFullDescription = function() {
