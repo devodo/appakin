@@ -179,21 +179,18 @@ footer .call-to-action {
   font-size: 16px;
 
   h1 {
-    margin-bottom: 6px;
-  }
-
-  .seller-name {
-    margin-bottom: 12px;
-    color: $alt-black-colour;
-
-    span {
-      //font-weight: bold;
-      color: black;
-    }
+    //margin-bottom: 6px;
   }
 
   .app-icon {
     float: left;
+  }
+
+  .download-button {
+    img {
+      width: 126px;
+      height: 38px;
+    }
   }
 
   .basic-info {
@@ -242,13 +239,6 @@ footer .call-to-action {
       @include border-top-radius(3px);
       @include border-bottom-radius(3px);
     }
-
-    .download-button {
-      img {
-        width: 126px;
-        height: 38px;
-      }
-    }
   }
 
   .technical-info {
@@ -261,6 +251,12 @@ footer .call-to-action {
       color: $text-light-colour;
       width: 170px;
       display: inline-block;
+    }
+
+    .seller {
+      margin-bottom: 15px;
+      //color: $alt-black-colour;
+      //text-align: center;
     }
   }
 
@@ -320,7 +316,7 @@ footer .call-to-action {
   }
 
   .app-categories,
-  .screenshots {
+  .screen-shots {
     padding: 0px 6px;
     margin-bottom: 12px;
 
@@ -342,7 +338,16 @@ footer .call-to-action {
 //    }
   }
 
-  .screenshots {
+  .screen-shot-wrapper {
+    margin-bottom: 12px;
+
+    h3 {
+      color: $text-light-colour;
+      margin-bottom: 6px;
+    }
+  }
+
+  .screen-shots {
 
     .rn-carousel-control-next,
     .rn-carousel-control-prev
@@ -374,5 +379,8 @@ footer .call-to-action {
     }
   }
 
-
+//  .download-button-wrapper {
+//    width: 126px;
+//    margin: 0px auto;
+//  }
 }

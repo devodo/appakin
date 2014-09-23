@@ -4,7 +4,6 @@
     </p>
     <div class="no-error-wrapper" ng-if="!app.data.serverError">
         <h1>{{app.data.censoredName}}</h1>
-        <p class="seller-name">by <span>{{app.data.sellerName}}</span></p>
         <a class="app-icon" href="{{ app.data.storeUrl }}" target="_blank">
             <img src="{{ url.createAppleAppStoreImageUrl(app.data.artworkMediumUrl, 175) }}" width="175px" height="175px">
         </a>
@@ -27,6 +26,7 @@
             </a>
         </div>
         <div class="technical-info">
+            <p class="seller">By {{app.data.sellerName}}</p>
             <p class="age-rating"><span class="label">Advisory rating</span>&nbsp;{{app.data.advisoryRating}} years</p>
             <p class="language"><span class="label">Size</span>&nbsp;{{formatSize(app.data.fileSizeBytes)}}</p>
             <p class="os-version"><span class="label">Minimum iOS version</span>&nbsp;{{app.data.minOsVersion}}</p>
@@ -53,13 +53,23 @@
                 </li>
             </ul>
         </div>
-        <div class="screenshots">
-            <h2>Screenshots</h2>
-            <ul rn-carousel rn-carousel-buffered rn-carousel-control>
-                <li ng-repeat="screenShotUrl in getScreenShotsUrls()">
-                    <img src="{{screenShotUrl}}">
-                </li>
-            </ul>
+        <div class="screen-shots">
+            <div ng-if="app.data.screenShotUrls.length > 0" class="screen-shot-wrapper">
+                <h2>iPhone Screen Shots</h2>
+                <ul rn-carousel rn-carousel-buffered rn-carousel-control>
+                    <li ng-repeat="screenShotUrl in app.data.screenShotUrls">
+                        <img src="{{screenShotUrl}}">
+                    </li>
+                </ul>
+            </div>
+            <div ng-if="app.data.ipadScreenShotUrls.length > 0" class="screen-shot-wrapper">
+                <h2>iPad Screen Shots</h2>
+                <ul rn-carousel rn-carousel-buffered rn-carousel-control>
+                    <li ng-repeat="screenShotUrl in app.data.ipadScreenShotUrls">
+                        <img src="{{screenShotUrl}}">
+                    </li>
+                </ul>
+            </div>
         </div>
     </div>
 </div>
