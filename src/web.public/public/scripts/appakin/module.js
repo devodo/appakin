@@ -11,7 +11,8 @@
         'appAkin.config',
         'appAkin.http',
         'debounce',
-        'angularSpinner'
+        'angularSpinner',
+        'angular-carousel'
     ]);
 
     appAkin.config(function ($routeProvider, $locationProvider) {

@@ -256,3 +256,31 @@ p.warning {
     text-decoration: none;
   }
 }
+
+// GENERIC: BASIC
+
+a.basic,
+a.basic:link,
+a.basic:visited,
+a.basic:active,
+a.basic:hover {
+  text-decoration: none;
+}
+
+// GENERIC: BODY LINK
+
+a.body-link,
+a.body-link:link,
+a.body-link:visited,
+a.body-link:hover,
+a.body-link:active {
+  color: $main-links-colour;
+  font-weight: normal;
+}
+
+a.body-link,
+a.body-link:link,
+a.body-link:visited,
+a.body-link:active {
+  text-decoration: none;
+}

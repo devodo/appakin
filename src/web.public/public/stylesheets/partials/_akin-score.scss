@@ -1,0 +1,91 @@
+$score-icon-small-dimension: 14px;
+$score-icon-large-dimension: 14px;
+
+.akin-score {
+  position: relative;
+  display: block;
+
+  span {
+    position: absolute;
+    display: block;
+  }
+
+  span.icon {
+    font-size: $score-icon-small-dimension;
+    line-height: $score-icon-small-dimension;
+    width: $score-icon-small-dimension;
+    height: $score-icon-small-dimension;
+    font-family: "icomoon";
+    top: 0px;
+    text-align: center;
+
+    @include mq($from: mobile-landscape) {
+      font-size: $score-icon-large-dimension;
+      line-height: $score-icon-large-dimension;
+      width: $score-icon-large-dimension;
+      height: $score-icon-large-dimension;
+    }
+  }
+
+  span.icon:before {
+    color: $main-spot-colour;
+  }
+
+  span.vote-count {
+    top: 2px;
+    font-size: 12px;
+    line-height: $score-icon-small-dimension;
+    right: 0px;
+  }
+
+  span.empty:before {
+    font-family: "icomoon";
+    content: ".";
+  }
+
+  span.half-filled:before {
+    font-family: "icomoon";
+    content: ";";
+  }
+
+  span.filled:before {
+    font-family: "icomoon";
+    content: ":";
+  }
+
+  .zero {
+    left: 0px;
+  }
+
+  .one {
+    left: $score-icon-small-dimension;
+
+    @include mq($from: mobile-landscape) {
+      left: $score-icon-large-dimension;
+    }
+  }
+
+  .two {
+    left: $score-icon-small-dimension * 2;
+
+    @include mq($from: mobile-landscape) {
+      left: $score-icon-large-dimension * 2;
+    }
+  }
+
+  .three {
+    left: $score-icon-small-dimension * 3;
+
+    @include mq($from: mobile-landscape) {
+      left: $score-icon-large-dimension * 3;
+    }
+  }
+
+  .four {
+    left: $score-icon-small-dimension * 4;
+
+    @include mq($from: mobile-landscape) {
+      left: $score-icon-large-dimension * 4;
+    }
+  }
+}

@@ -19,7 +19,6 @@
                         data = {data: data};
                         data.serverError = true;
                         handleResponse(data);
-                        console.log('GOT ERROR');
                     });
 
                 function handleResponse(data) {

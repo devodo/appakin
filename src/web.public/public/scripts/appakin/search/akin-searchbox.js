@@ -12,7 +12,6 @@
 
                 $scope.submitSearch = function(value) {
                     $timeout(function() {
-                        //console.log('searchTerm!! ' + search.searchTerm);
                         search.submitSearch(1);
                     }, 0);
                 }

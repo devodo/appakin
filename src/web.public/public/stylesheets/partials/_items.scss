@@ -174,3 +174,205 @@ footer .call-to-action {
   @include border-bottom-radius(12px);
   content: " "
 }
+
+#app {
+  font-size: 16px;
+
+  h1 {
+    margin-bottom: 6px;
+  }
+
+  .seller-name {
+    margin-bottom: 12px;
+    color: $alt-black-colour;
+
+    span {
+      //font-weight: bold;
+      color: black;
+    }
+  }
+
+  .app-icon {
+    float: left;
+  }
+
+  .basic-info {
+    @include clearfix;
+    font-size: 14px;
+    width: 126px;
+    margin-left: 181px;
+    margin-bottom: 9px;
+
+    .rating {
+      margin-bottom: 22px;
+
+      p {
+        color: $alt-black-colour;
+        font-size: 12px;
+        text-transform: uppercase;
+      }
+    }
+
+    .akin-score span.vote-count {
+      color: $text-light-colour;
+    }
+
+    .price {
+      font-size: 20px;
+      line-height: 34px;
+      font-weight: bold;
+      margin-bottom: 8px;
+      text-align: center;
+      height: 34px;
+      //width: 126px;
+      background-color: lighten($main-spot-colour, 30);
+      @include border-top-radius(3px);
+      @include border-bottom-radius(3px);
+    }
+
+    .device {
+      display: inline-block;
+      font-size: 12px;
+      //text-transform: uppercase;
+      margin-right: 1px;
+      margin-bottom: 5px;
+      padding: 1px 2px;
+      //background-color: lighten($main-spot-colour, 30);
+      border: 1px solid lighten($control-border-colour, 40);
+      @include border-top-radius(3px);
+      @include border-bottom-radius(3px);
+    }
+
+    .download-button {
+      img {
+        width: 126px;
+        height: 38px;
+      }
+    }
+  }
+
+  .technical-info {
+    border-top: 1px solid lighten($control-border-colour, 60);
+    border-bottom: 1px solid lighten($control-border-colour, 60);
+    padding: 6px;
+    margin-bottom: 21px;
+
+    .label {
+      color: $text-light-colour;
+      width: 170px;
+      display: inline-block;
+    }
+  }
+
+  .description {
+    padding: 0px 6px;
+    //border-bottom: 1px solid lighten($control-border-colour, 60);
+    margin-bottom: 12px;
+
+    .more,
+    .less {
+      display: block;
+      width: 100px;
+      margin: 6px auto 6px auto;
+      text-align: center;
+      border: 1px solid lighten($control-border-colour, 60);
+      @include border-top-radius(6px);
+      @include border-bottom-radius(6px);
+    }
+
+    span:before {
+      //display: block;
+      font-size: 20pt;
+      line-height: 20pt;
+      //margin-bottom: 12px;
+      font-family: "icomoon";
+      color: lighten($icon-colour, 20);
+      //text-align: center;
+    }
+
+    .less span:before {
+      content: "\\";
+    }
+
+    .more span:before {
+      content: "/";
+    }
+  }
+
+  h2 {
+    font-weight: bold;
+    font-size: 14px;
+    text-transform: uppercase;
+    display: block;
+    color: $main-spot-colour;
+    //background-color: lighten($main-spot-colour, 30);
+    margin: 0px 0px 12px 0px;
+    padding: 6px; //12px 12px 6px 6px;
+    text-align: center;
+    //border: 1px solid lighten($main-spot-colour, 0);
+    //@include border-top-radius(6px);
+    //@include border-bottom-radius(6px);
+
+    border-bottom: 1px solid lighten($main-spot-colour, 0);
+    padding-bottom: 3px;
+    text-align: left;
+    padding-left: 0px;
+  }
+
+  .app-categories,
+  .screenshots {
+    padding: 0px 6px;
+    margin-bottom: 12px;
+
+    h4 {
+      font-size: 18px;
+    }
+
+//    h4:after {
+//      //display: inline-block;
+//      font-size: 12pt;
+//      line-height: 12pt;
+//      margin-left: 6px;
+//      //margin-bottom: 12px;
+//      font-family: "icomoon";
+//      color: lighten($icon-colour, 20);
+//      //text-align: center;
+//      content: ">";
+//      text-align: bottom;
+//    }
+  }
+
+  .screenshots {
+
+    .rn-carousel-control-next,
+    .rn-carousel-control-prev
+    {
+      color: white;
+    }
+
+    .rn-carousel-control-next:before {
+      font-size: 20pt;
+      line-height: 20pt;
+      font-family: "icomoon";
+      content: ">";
+    }
+
+    .rn-carousel-control-prev:before {
+      font-size: 20pt;
+      line-height: 20pt;
+      font-family: "icomoon";
+      content: "<";
+    }
+
+    ul {
+     width: 296px;
+
+      li img {
+        width: 296px;
+        height: auto;
+      }
+    }
+  }
+
+
+}

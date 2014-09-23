@@ -3,15 +3,63 @@
         <span class="icon"></span>There was a problem getting the app details. Please try again, or if the problem persists please try later.
     </p>
     <div class="no-error-wrapper" ng-if="!app.data.serverError">
-        <h1>{{app.data.name}}&nbsp;&nbsp;<span>for {{platform.getFriendlyName(app.data.platform)}}</span></h1>
-        <a href="{{ app.data.storeUrl }}" target="_blank">
+        <h1>{{app.data.censoredName}}</h1>
+        <p class="seller-name">by <span>{{app.data.sellerName}}</span></p>
+        <a class="app-icon" href="{{ app.data.storeUrl }}" target="_blank">
             <img src="{{ url.createAppleAppStoreImageUrl(app.data.artworkMediumUrl, 175) }}" width="175px" height="175px">
         </a>
-        <p class="body-text" ng-bind-html="app.data.description | formatDescription"></p>
-        <ul ng-if="app.data.categories.length > 0">
-            <li ng-repeat="category in app.data.categories">
-                <h4><a href="{{ url.createCategoryUrl(category.platform, category.urlName) }}">{{category.name}}</a></h4>
-            </li>
-        </ul>
+        <div class="basic-info">
+            <p class="price">{{formatPrice(app.data.price)}}</p>
+            <div class="rating">
+                <p>Current Rating</p>
+                <div akin-score score="app.data.userRatingCurrent" votes="app.data.ratingCountCurrent"></div>
+            </div>
+            <div class="rating">
+                <p>Overall Rating</p>
+                <div akin-score score="app.data.userRating" votes="formatVoteCount(app.data.ratingCount)"></div>
+            </div>
+            <p class="supported-devices">
+                <span class="device" ng-repeat="device in getSupportedDevices(app.data.supportedDevices)">{{device}}</span>
+            </p>
+            <a class="download-button" href="{{ app.data.storeUrl }}" target="_blank">
+                <!-- Do fallback: <img src="image.svg" onerror="this.onerror=null; this.src='image.png'">-->
+                <img src="/public/images/Download_on_the_App_Store_Badge_US-UK_135x40.svg">
+            </a>
+        </div>
+        <div class="technical-info">
+            <p class="age-rating"><span class="label">Advisory rating</span>&nbsp;{{app.data.advisoryRating}} years</p>
+            <p class="language"><span class="label">Size</span>&nbsp;{{formatSize(app.data.fileSizeBytes)}}</p>
+            <p class="os-version"><span class="label">Minimum iOS version</span>&nbsp;{{app.data.minOsVersion}}</p>
+            <p class="last-updated"><span class="label">Last updated</span>&nbsp;{{formatDate(app.data.dateModified)}}</p>
+        </div>
+        <div class="description">
+            <h2>Description</h2>
+            <div ng-show="display.fullDescription">
+                <p class="body-text" ng-bind-html="app.data.description | formatDescription"></p>
+                <a class="less basic" href ng-click="toggleFullDescription()"><span></span></a>
+                <!--<button type="button" ng-click="toggleFullDescription()">Less</button>-->
+            </div>
+            <div ng-hide="display.fullDescription">
+                <p class="body-text" ng-bind-html="app.data.description | firstParagraph | formatDescription"></p>
+                <a class="more basic" href ng-click="toggleFullDescription()"><span></span></a>
+                <!--<button type="button" ng-click="toggleFullDescription()">More</button>-->
+            </div>
+        </div>
+        <div class="app-categories">
+            <h2>Related Categories</h2>
+            <ul ng-if="app.data.categories.length > 0">
+                <li ng-repeat="category in app.data.categories">
+                    <h4><a class="body-link" href="{{ url.createCategoryUrl(app.data.platform, category.url) }}">{{category.name}}</a></h4>
+                </li>
+            </ul>
+        </div>
+        <div class="screenshots">
+            <h2>Screenshots</h2>
+            <ul rn-carousel rn-carousel-buffered rn-carousel-control>
+                <li ng-repeat="screenShotUrl in getScreenShotsUrls()">
+                    <img src="{{screenShotUrl}}">
+                </li>
+            </ul>
+        </div>
     </div>
 </div>

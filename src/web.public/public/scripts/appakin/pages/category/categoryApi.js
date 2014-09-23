@@ -16,6 +16,7 @@
                         handleResponse(data);
                     },
                     function (data) {
+                        data = {data: data};
                         data.serverError = true;
                         handleResponse(data);
                     });
