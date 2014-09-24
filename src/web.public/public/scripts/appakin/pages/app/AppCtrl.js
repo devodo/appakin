@@ -46,7 +46,7 @@
 
             $scope.formatVoteCount = function(voteCount) {
                 if (voteCount > 1000000) {
-                    return '99,999+';
+                    return (Math.round(voteCount / 10000) / 100) + ' m';
                 }
 
                 if (voteCount > 1000) {

@@ -13,6 +13,13 @@
                     platform + '/app/' + encodedId + '/' + slug,
                     function (data) {
                         data.serverError = false;
+
+                        if (data.screenShotUrls && data.screenShotUrls.length > 0) {
+                            data.screenShotUrl = data.screenShotUrls[0];
+                        } else if (data.ipadScreenShotUrls && data.ipadScreenShotUrls.length > 0) {
+                            data.screenShotUrl = data.ipadScreenShotUrls[0];
+                        }
+
                         handleResponse(data);
                     },
                     function (data) {

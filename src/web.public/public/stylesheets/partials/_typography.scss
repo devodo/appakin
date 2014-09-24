@@ -15,7 +15,11 @@ body {
 }
 
 p {
-  line-height: 1.2em;
+  line-height: 1.6em;
+}
+
+p.tight-lines {
+  line-height: 1.3em;
 }
 
 p em {
@@ -29,7 +33,7 @@ h1 {
 // SEARCH RESULTS TEXT
 
 #search-results .disabled {
-  a, p, h4 {
+  a, p, h4, em {
     color: $disabled-text-colour!important;
   }
 }

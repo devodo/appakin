@@ -2,7 +2,7 @@
     'use strict';
 
     angular.module('appAkin').factory('search',
-        function(httpGet, debounce, $timeout, $location, $rootScope, platform) {
+        function(httpGet, debounce, $timeout, $location, $rootScope, $route, platform) {
             var me = this;
             var defaultCurrentPage = 1;
             var debounceTimeoutMs = 200;
@@ -168,6 +168,7 @@
 
                     console.log('redirecting to search: q=' + me.service.searchTerm + ' p=' + me.service.platform + ' page=' + page);
                     $location.path(searchResultsPagePath).search(search);
+                    $route.reload();
                 }
             };
 

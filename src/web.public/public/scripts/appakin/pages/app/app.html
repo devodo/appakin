@@ -5,10 +5,10 @@
     <div class="no-error-wrapper" ng-if="!app.data.serverError">
         <h1>{{app.data.censoredName}}</h1>
         <div class="basic-info-wrapper">
-            <a class="app-icon" href="{{ app.data.storeUrl }}" target="{{ getLinkTarget() }}">
-                <img src="{{ url.createAppleAppStoreImageUrl(app.data.artworkMediumUrl, 175) }}" width="175px" height="175px">
-            </a>
             <div class="basic-info">
+                <a class="app-icon" href="{{ app.data.storeUrl }}" target="{{ getLinkTarget() }}">
+                    <img src="{{ url.createAppleAppStoreImageUrl(app.data.artworkMediumUrl, 175) }}">
+                </a>
                 <p class="price">{{formatPrice(app.data.price)}}</p>
                 <div class="rating">
                     <p>Current Rating</p>
@@ -26,18 +26,24 @@
                     <img src="/public/images/Download_on_the_App_Store_Badge_US-UK_135x40.svg">
                 </a>
             </div>
+            <img class="app-screenshot img-border" ng-if="app.data.screenShotUrl"
+                 src="{{app.data.screenShotUrl}}">
         </div>
         <div class="description">
             <!--<h2>Description</h2>-->
             <div ng-show="display.fullDescription">
                 <p class="body-text" ng-bind-html="app.data.description | formatDescription"></p>
-                <a class="less basic" href ng-click="toggleFullDescription()"><span></span></a>
+                <!--<a class="less basic" href ng-click="toggleFullDescription()"><span></span></a>-->
             </div>
             <div ng-hide="display.fullDescription">
                 <p class="body-text" ng-bind-html="app.data.firstSection | formatDescription"></p>
                 <a class="more basic" href ng-click="toggleFullDescription()"
                    ng-hide="app.data.firstSection === app.data.description"><span></span></a>
             </div>
+            <a class="download-button" href="{{ app.data.storeUrl }}" target="{{ getLinkTarget() }}">
+                <!-- Do fallback: <img src="image.svg" onerror="this.onerror=null; this.src='image.png'">-->
+                <img src="/public/images/Download_on_the_App_Store_Badge_US-UK_135x40.svg">
+            </a>
         </div>
         <div class="technical-info">
             <h2>Details</h2>

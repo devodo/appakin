@@ -175,14 +175,25 @@ footer .call-to-action {
   content: " "
 }
 
+.img-border {
+  border: 1px solid lighten($control-border-colour, 60);
+  padding: 3px;
+}
+
 #app {
   font-size: 16px;
+
+  .test {
+    width: 180px;
+    height: auto;
+  }
 
   h1 {
     font-size: 24px;
     line-height: 28px;
     font-weight: bold;
     display: block;
+
     //color: $main-spot-colour;
 
     //border: 1px solid $main-spot-colour;
@@ -193,8 +204,8 @@ footer .call-to-action {
     border: 0px;
     border-bottom: 1px solid lighten($control-border-colour, 60);
     background-color: transparent;
-    padding: 6px;
-    padding-bottom: 18px;
+    padding: 6px 6px 18px 6px;
+    //padding-bottom: 18px;
     margin-bottom: 15px;
 
     //background-color: lighten($main-spot-colour,30);
@@ -203,23 +214,21 @@ footer .call-to-action {
     //padding: 18px 12px 6px 6px;
 
     @include mq($from: mobile-landscape) {
-//      background: none;
-//      border-bottom: 3px solid $main-spot-colour;
-//      margin-top: 12px;
-//      margin-bottom: 24px;
-//      color: $text-light-colour;
-//      display: inline-block;
-//      font-size: 28px;
-    }
-
-    span {
-      font-weight: normal;
-      font-size: 14px;
+      //      background: none;
+      //      border-bottom: 3px solid $main-spot-colour;
+      //      margin-top: 12px;
+      //      margin-bottom: 24px;
+      //      color: $text-light-colour;
+      //      display: inline-block;
+      //      font-size: 28px;
     }
   }
 
-  .app-icon {
-    float: left;
+  .app-screenshot {
+    float: right;
+    margin-bottom: 9px;
+    width: 175px;
+    height: auto;
   }
 
   .download-button {
@@ -230,10 +239,12 @@ footer .call-to-action {
   }
 
   .basic-info-wrapper {
+    @include clearfix;
     width: 308px;
     margin-left: auto;
     //margin-left: 0px;
     margin-right: auto;
+    //border-bottom: 1px solid lighten($control-border-colour, 60);
 
     @include mq($from: mobile-wide) {
       width: 335px;
@@ -252,14 +263,29 @@ footer .call-to-action {
     width: 126px;
     //margin-left: 181px;
     margin-bottom: 9px;
-    float: right;
+    float: left;
+
+    .app-icon {
+      display: block;
+      margin-bottom: 9px;
+
+      img {
+        width: 126px;
+        height: 126px;
+      }
+    }
+
+    .rating p,
+    .device {
+      font-size: 12px;
+      line-height: 16px;
+    }
 
     .rating {
       margin-bottom: 22px;
 
       p {
         color: $alt-black-colour;
-        font-size: 12px;
         text-transform: uppercase;
       }
     }
@@ -283,7 +309,7 @@ footer .call-to-action {
 
     .device {
       display: inline-block;
-      font-size: 12px;
+      //font-size: 12px;
       //text-transform: uppercase;
       margin-right: 1px;
       margin-bottom: 5px;
@@ -333,9 +359,16 @@ footer .call-to-action {
 
   .description {
     clear: both;
-    padding: 0px 6px;
-    //border-bottom: 1px solid lighten($control-border-colour, 60);
+    padding: 18px 6px 0px 6px;
+    border-top: 1px solid lighten($control-border-colour, 60);
+    //margin-top: 9px;
     margin-bottom: 12px;
+
+    p {
+      word-wrap: break-word;
+      //display: inline-block;
+      word-break: break-word;
+    }
 
     .more,
     .less {
@@ -364,6 +397,17 @@ footer .call-to-action {
 
     .more span:before {
       content: "/";
+    }
+
+    .download-button {
+      width: 180px;
+      display: block;
+      margin: 18px auto 12px auto;
+
+      img {
+        width: 180px;
+        height: 53px;
+      }
     }
   }
 
