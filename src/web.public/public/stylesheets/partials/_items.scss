@@ -229,12 +229,30 @@ footer .call-to-action {
     }
   }
 
+  .basic-info-wrapper {
+    width: 308px;
+    margin-left: auto;
+    //margin-left: 0px;
+    margin-right: auto;
+
+    @include mq($from: mobile-wide) {
+      width: 335px;
+    }
+
+    @include mq($from: tablet) {
+      width: 308px;
+      margin-left: 0px;
+      float: left;
+    }
+  }
+
   .basic-info {
     @include clearfix;
     font-size: 14px;
     width: 126px;
-    margin-left: 181px;
+    //margin-left: 181px;
     margin-bottom: 9px;
+    float: right;
 
     .rating {
       margin-bottom: 22px;
@@ -278,11 +296,18 @@ footer .call-to-action {
   }
 
   .technical-info {
-    border-top: 1px solid lighten($control-border-colour, 60);
-    border-bottom: 1px solid lighten($control-border-colour, 60);
-    padding: 6px;
+    //clear: both;
+    //border-top: 1px solid lighten($control-border-colour, 60);
+    //border-bottom: 1px solid lighten($control-border-colour, 60);
+    //padding: 6px;
     //margin-top: 18px;
-    margin-bottom: 21px;
+    //margin-bottom: 21px;
+
+//    @include mq($from: tablet) {
+//      float: left;
+//      clear: none;
+//      margin-left: 18px;
+//    }
 
     .label {
       color: $text-light-colour;
@@ -290,8 +315,12 @@ footer .call-to-action {
       display: inline-block;
     }
 
+    p {
+      line-height: 24px;
+    }
+
     .seller {
-      margin-bottom: 15px;
+      margin-bottom: 12px;
       //color: $alt-black-colour;
       //text-align: center;
 
@@ -303,6 +332,7 @@ footer .call-to-action {
   }
 
   .description {
+    clear: both;
     padding: 0px 6px;
     //border-bottom: 1px solid lighten($control-border-colour, 60);
     margin-bottom: 12px;
@@ -358,7 +388,8 @@ footer .call-to-action {
   }
 
   .app-categories,
-  .screen-shots {
+  .screen-shots,
+  .technical-info {
     padding: 0px 6px;
     margin-bottom: 12px;
 

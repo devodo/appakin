@@ -10,24 +10,25 @@
         };
     });
 
-    angular.module('appAkin').filter('firstParagraph', function($window) {
-        var maxParagraphLength = 500;
+    angular.module('appAkin').filter('firstSection', function($window) {
+        var maxSectionLength = 500;
 
         return function(input) {
-            if (input.length <= maxParagraphLength) {
+            if (input.length <= maxSectionLength) {
                 return input;
             }
 
-            var indexOfFirstNewline = input.indexOf('\n');
+            var trimmedInput = input.substring(0, maxSectionLength).trim();
 
-            if (indexOfFirstNewline > 0 && indexOfFirstNewline < maxParagraphLength) {
-                return input.substring(0, indexOfFirstNewline);
+            var indexOfNewline = trimmedInput.lastIndexOf('\n');
+
+            if (indexOfNewline > 0) {
+                return input.substring(0, indexOfNewline);
             }
 
-            var trimmedInput = input.substring(0, maxParagraphLength).trim();
             var indexOfLastSpace = trimmedInput.lastIndexOf(' ');
 
-            if (indexOfLastSpace > (maxParagraphLength / 2)) {
+            if (indexOfLastSpace > (maxSectionLength / 2)) {
                 return trimmedInput.substring(0, indexOfLastSpace);
             }
 

@@ -2,7 +2,7 @@
 
     angular.module('appAkin')
         .controller('AppCtrl',
-            function($scope, $route, search, pageTitle, app, url, platform, display, firstParagraphFilter) {
+            function($scope, $route, search, pageTitle, app, url, platform, display, firstSectionFilter) {
             var appData = $route.current.locals.appData;
             var monthNames = [
                 "Jan", "Feb", "Mar", "Apr", "May", "Jun",
@@ -16,7 +16,7 @@
 
             search.resetSearchTerm();
             app.data = appData;
-            app.data.firstParagraph = firstParagraphFilter(app.data.description);
+            app.data.firstSection = firstSectionFilter(app.data.description);
 
             $scope.app = app;
             $scope.url = url;
