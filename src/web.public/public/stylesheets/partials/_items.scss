@@ -524,19 +524,19 @@ footer .call-to-action {
     .rn-carousel-control-next,
     .rn-carousel-control-prev
     {
-      color: white;
+      color: $main-spot-colour;
     }
 
     .rn-carousel-control-next:before {
-      font-size: 20pt;
-      line-height: 20pt;
+      font-size: 24pt;
+      line-height: 24pt;
       font-family: "icomoon";
       content: ">";
     }
 
     .rn-carousel-control-prev:before {
-      font-size: 20pt;
-      line-height: 20pt;
+      font-size: 24pt;
+      line-height: 24pt;
       font-family: "icomoon";
       content: "<";
     }
