@@ -23,18 +23,10 @@
                     <h6>AGE RATING</h6>
                     <p>{{app.data.advisoryRating}}</p>
                 </div>
-                <!--<div class="sidebar-section">-->
-                    <!--<h6>Size</h6>-->
-                    <!--<p>{{formatSize(app.data.fileSizeBytes)}}</p>-->
-                <!--</div>-->
                 <div class="ios-version single-line-sidebar-section">
                     <h6>iOS VERSION</h6>
                     <p>{{app.data.minOsVersion}}+</p>
                 </div>
-                <!--<div class="sidebar-section">-->
-                    <!--<h6>Last Updated</h6>-->
-                    <!--<p>{{formatDate(app.data.dateModified)}}</p>-->
-                <!--</div>-->
                 <div class="supported-devices sidebar-section">
                     <span class="device tag-border" ng-repeat="device in getSupportedDevices(app.data.supportedDevices)">{{device}}</span>
                 </div>
@@ -45,6 +37,12 @@
             </div>
         </div>
         <div class="body-wrapper">
+            <div class="mobile-download-button">
+                <a class="download-button" href="{{ app.data.storeUrl }}" target="{{ getLinkTarget() }}">
+                    <!-- Do fallback: <img src="image.svg" onerror="this.onerror=null; this.src='image.png'">-->
+                    <img src="/public/images/Download_on_the_App_Store_Badge_US-UK_135x40.svg">
+                </a>
+            </div>
             <div class="description">
                 <!--<h2>Description</h2>-->
                 <div ng-show="display.fullDescription">
@@ -82,10 +80,6 @@
                     </div>
                 </div>
             </div>
-            <!--<a class="download-button" href="{{ app.data.storeUrl }}" target="{{ getLinkTarget() }}">-->
-                <!--&lt;!&ndash; Do fallback: <img src="image.svg" onerror="this.onerror=null; this.src='image.png'">&ndash;&gt;-->
-                <!--<img src="/public/images/Download_on_the_App_Store_Badge_US-UK_135x40.svg">-->
-            <!--</a>-->
             <div class="app-categories" ng-if="app.data.categories.length > 0">
                 <h2>RELATED CATEGORIES</h2>
                 <ul>

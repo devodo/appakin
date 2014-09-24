@@ -180,6 +180,13 @@ footer .call-to-action {
   padding: 3px;
 }
 
+.control-border {
+  border: 1px solid lighten($control-border-colour, 60);
+  @include border-top-radius(6px);
+  @include border-bottom-radius(6px);
+  padding: 3px;
+}
+
 .highlighted {
   background-color: lighten($main-spot-colour, 30);
   @include border-top-radius(3px);
@@ -217,15 +224,32 @@ footer .call-to-action {
     }
   }
 
-  .download-button {
+  .mobile-download-button {
     clear: both;
-    width: 180px;
-    display: block;
-    margin: 18px auto 0px auto;
+    border-top: 1px solid lighten($control-border-colour, 60);
+    padding-top: 6px;
 
-    img {
-      width: 180px;
-      height: 53px;
+    @include mq($from: mobile-landscape) {
+      display: none;
+    }
+
+    .download-button {
+      width: 308px;
+      padding: 6px 0px;
+      display: block;
+      clear: both;
+      margin-left: auto;
+      margin-right: auto;
+      margin-bottom: 6px;
+      border: none;
+
+      img {
+        width: 135px;
+        height: 40px;
+        margin-left: auto;
+        margin-right: auto;
+        display: block;
+      }
     }
   }
 
@@ -373,10 +397,16 @@ footer .call-to-action {
     .download-button {
       width: 126px;
       margin: 0px;
+      margin-top: 12px;
+      display: none;
+
+      @include mq($from: mobile-landscape) {
+        display: block;
+      }
 
       @include mq($from: tablet) {
         width: 175px;
-        margin-top: 6px;
+        //margin-top: 6px;
       }
 
       img {
