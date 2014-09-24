@@ -194,6 +194,11 @@ footer .call-to-action {
 }
 
 #app {
+
+  .no-error-wrapper {
+    position: relative;
+  }
+
   h1 {
     font-size: 24px;
     line-height: 28px;
@@ -225,12 +230,9 @@ footer .call-to-action {
   }
 
   .sidebar {
-    //@include clearfix;
     width: 308px;
     margin-left: auto;
-    //margin-left: 0px;
     margin-right: auto;
-    //border-bottom: 1px solid lighten($control-border-colour, 60);
 
     @include mq($from: mobile-wide) {
       width: 335px;
@@ -245,8 +247,6 @@ footer .call-to-action {
 
     @include mq($from: tablet) {
       width: 175px;
-      //margin-left: 0px;
-      //float: left;
     }
   }
 
@@ -293,12 +293,9 @@ footer .call-to-action {
 
     h6 {
       color: $alt-black-colour;
-      text-transform: uppercase;
     }
 
     p {
-      //font-size: 14px;
-      //line-height: 18px;
       font-size: 12px;
       line-height: 16px;
 
@@ -317,25 +314,17 @@ footer .call-to-action {
     }
 
     p {
-      //margin-left: 6px;
       position: absolute;
       right: 0px;
       bottom: 0px;
-      //font-weight: bold;
     }
   }
 
   .basic-info {
     @include clearfix;
-    //font-size: 14px;
     width: 126px;
-    //margin-left: 181px;
     margin-bottom: 9px;
     float: right;
-
-    @include mq($from: mobile-landscape) {
-      //margin-right: 18px;
-    }
 
     @include mq($from: tablet) {
       width: 175px;
@@ -350,7 +339,6 @@ footer .call-to-action {
 
       p {
         color: $alt-black-colour;
-        text-transform: uppercase;
       }
     }
 
@@ -365,7 +353,6 @@ footer .call-to-action {
       margin-bottom: 2px;
       text-align: center;
       height: 34px;
-      //width: 126px;
 
       @include mq($from: tablet) {
         margin-bottom: 8px;
@@ -375,10 +362,7 @@ footer .call-to-action {
     .supported-devices {
       .device {
         display: inline-block;
-        //font-size: 12px;
-        //text-transform: uppercase;
         margin-right: 1px;
-       // margin-bottom: 5px;
 
         @include mq($from: tablet) {
           margin-right: 6px;
@@ -408,19 +392,6 @@ footer .call-to-action {
   }
 
   .technical-info {
-    //clear: both;
-    //border-top: 1px solid lighten($control-border-colour, 60);
-    //border-bottom: 1px solid lighten($control-border-colour, 60);
-    //padding: 6px;
-    //margin-top: 18px;
-    //margin-bottom: 21px;
-
-//    @include mq($from: tablet) {
-//      float: left;
-//      clear: none;
-//      margin-left: 18px;
-//    }
-
     .label {
       color: $text-light-colour;
       width: 170px;
@@ -433,8 +404,6 @@ footer .call-to-action {
 
     .seller {
       margin-bottom: 12px;
-      //color: $alt-black-colour;
-      //text-align: center;
 
       .label {
         width: auto;
@@ -444,7 +413,6 @@ footer .call-to-action {
   }
 
   .body-wrapper {
-    max-width: 600px;
     @include mq($from: mobile-landscape) {
       margin-left: 140px;
     }
@@ -452,26 +420,26 @@ footer .call-to-action {
     @include mq($from: tablet) {
       margin-left: 189px;
     }
+
+    @include mq($from: desktop) {
+      margin-right: 260px;
+    }
   }
 
   .description {
     clear: both;
     padding: 18px 6px 0px 6px;
     border-top: 1px solid lighten($control-border-colour, 60);
-    //margin-top: 9px;
-
     margin-bottom: 12px;
 
     @include mq($from: mobile-landscape) {
       clear: none;
       border-top: none;
       padding-top: 0px;
-      //margin-left: 140px;
     }
 
     p {
       word-wrap: break-word;
-      //display: inline-block;
       word-break: break-word;
     }
 
@@ -487,13 +455,10 @@ footer .call-to-action {
     }
 
     span:before {
-      //display: block;
       font-size: 20pt;
       line-height: 20pt;
-      //margin-bottom: 12px;
       font-family: "icomoon";
       color: lighten($icon-colour, 20);
-      //text-align: center;
     }
 
     .less span:before {
@@ -508,16 +473,11 @@ footer .call-to-action {
   h2 {
     font-weight: bold;
     font-size: 14px;
-    text-transform: uppercase;
     display: block;
     color: $main-spot-colour;
-    //background-color: lighten($main-spot-colour, 30);
     margin: 0px 0px 12px 0px;
-    padding: 6px; //12px 12px 6px 6px;
+    padding: 6px;
     text-align: center;
-    //border: 1px solid lighten($main-spot-colour, 0);
-    //@include border-top-radius(6px);
-    //@include border-bottom-radius(6px);
 
     border-bottom: 1px solid lighten($main-spot-colour, 0);
     padding-bottom: 3px;
@@ -534,23 +494,10 @@ footer .call-to-action {
     h4 {
       font-size: 18px;
     }
-
-//    h4:after {
-//      //display: inline-block;
-//      font-size: 12pt;
-//      line-height: 12pt;
-//      margin-left: 6px;
-//      //margin-bottom: 12px;
-//      font-family: "icomoon";
-//      color: lighten($icon-colour, 20);
-//      //text-align: center;
-//      content: ">";
-//      text-align: bottom;
-//    }
   }
 
   .screen-shot-wrapper {
-    margin-bottom: 12px;
+    margin-bottom: 3px;
 
     h3 {
       color: $text-light-colour;
@@ -562,17 +509,15 @@ footer .call-to-action {
     clear: both;
     @include clearfix;
 
-    .iphone-screen-shots,
-    .ipad-screen-shots {
-      @include mq($from: tablet) {
-        width: 198px;
-        float: left;
-      }
+    @include mq($from: desktop) {
+      position: absolute;
+      right: 0px;
+      top: 75px;
     }
 
-    .iphone-screen-shots {
-      @include mq($from: tablet) {
-        margin-right: 3px;
+    h2 {
+      @include mq($from: desktop) {
+        display: none;
       }
     }
 
@@ -596,24 +541,27 @@ footer .call-to-action {
       content: "<";
     }
 
+    .label {
+      margin: 0px;
+      font-size: 14px;
+      line-height: 18px;
+      color: $text-light-colour;
+      text-align: center;
+    }
+
     ul {
-      width: 190px;
+      width: 232px;
 
       li img {
-        width: 190px;
+        width: 232px;
         height: auto;
       }
     }
 
     .screen-shot-wrapper {
-      width: 198px;
+      width: 240px;
       margin-left: auto;
       margin-right: auto;
     }
   }
-
-//  .download-button-wrapper {
-//    width: 126px;
-//    margin: 0px auto;
-//  }
 }

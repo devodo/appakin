@@ -12,15 +12,15 @@
             <div class="basic-info">
                 <p class="price highlighted">{{formatPrice(app.data.price)}}</p>
                 <div class="rating sidebar-section" ng-if="app.data.userRatingCurrent">
-                    <h6>Current Rating</h6>
+                    <h6>CURRENT RATING</h6>
                     <div akin-score score="app.data.userRatingCurrent" votes="app.data.ratingCountCurrent"></div>
                 </div>
                 <div class="rating sidebar-section" ng-if="app.data.userRating">
-                    <h6>Overall Rating</h6>
+                    <h6>OVERALL RATING</h6>
                     <div akin-score score="app.data.userRating" votes="formatVoteCount(app.data.ratingCount)"></div>
                 </div>
                 <div class="age-rating single-line-sidebar-section">
-                    <h6>Age Rating</h6>
+                    <h6>AGE RATING</h6>
                     <p>{{app.data.advisoryRating}}</p>
                 </div>
                 <!--<div class="sidebar-section">-->
@@ -28,7 +28,7 @@
                     <!--<p>{{formatSize(app.data.fileSizeBytes)}}</p>-->
                 <!--</div>-->
                 <div class="ios-version single-line-sidebar-section">
-                    <h6>iOS Version</h6>
+                    <h6>iOS VERSION</h6>
                     <p>{{app.data.minOsVersion}}+</p>
                 </div>
                 <!--<div class="sidebar-section">-->
@@ -58,8 +58,9 @@
                 </div>
             </div>
             <div class="screen-shots">
-                <div class="iphone-screen-shots" ng-if="app.data.screenShotUrls.length > 0">
-                    <h2>iPhone Screen Shots</h2>
+                <div class="iphone-screen-shots"
+                     ng-if="app.data.screenShotUrls.length > 0">
+                    <h2>SCREEN SHOTS</h2>
                     <div class="screen-shot-wrapper img-border">
                         <ul rn-carousel rn-carousel-buffered rn-carousel-control>
                             <li ng-repeat="screenShotUrl in app.data.screenShotUrls">
@@ -67,9 +68,11 @@
                             </li>
                         </ul>
                     </div>
+                    <p class="label">iPhone Screen Shots</p>
                 </div>
-                <div class="ipad-screen-shots" ng-if="app.data.ipadScreenShotUrls.length > 0">
-                    <h2>iPad Screen Shots</h2>
+                <div class="ipad-screen-shots"
+                     ng-if="app.data.screenShotUrls.length == 0 && app.data.ipadScreenShotUrls.length > 0">
+                    <h2>iPAD SCREEN SHOTS</h2>
                     <div class="screen-shot-wrapper img-border">
                         <ul rn-carousel rn-carousel-buffered rn-carousel-control>
                             <li ng-repeat="screenShotUrl in app.data.ipadScreenShotUrls">
@@ -84,7 +87,7 @@
                 <!--<img src="/public/images/Download_on_the_App_Store_Badge_US-UK_135x40.svg">-->
             <!--</a>-->
             <div class="app-categories" ng-if="app.data.categories.length > 0">
-                <h2>Related Categories</h2>
+                <h2>RELATED CATEGORIES</h2>
                 <ul>
                     <li ng-repeat="category in app.data.categories">
                         <h4><a class="body-link" href="{{ url.createCategoryUrl(app.data.platform, category.url) }}">{{category.name}}</a></h4>
@@ -92,7 +95,7 @@
                 </ul>
             </div>
             <div class="technical-info">
-                <h2>Details</h2>
+                <h2>DETAILS</h2>
                 <p class="seller"><span class="label">By</span>&nbsp;{{app.data.sellerName}}</p>
                 <p class="language"><span class="label">Size</span>&nbsp;{{formatSize(app.data.fileSizeBytes)}}</p>
                 <p class="last-updated"><span class="label">Last updated</span>&nbsp;{{formatDate(app.data.dateModified)}}</p>

@@ -120,7 +120,7 @@ main .main-wrapper {
     padding-right: 60px;
   }
 
-  @include mq($from: desktop) {
+  @include mq($from: wide) {
     padding-left: 140px;
     padding-right: 140px;
   }
