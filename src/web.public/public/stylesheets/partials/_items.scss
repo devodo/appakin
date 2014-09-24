@@ -180,66 +180,52 @@ footer .call-to-action {
   padding: 3px;
 }
 
+.highlighted {
+  background-color: lighten($main-spot-colour, 30);
+  @include border-top-radius(3px);
+  @include border-bottom-radius(3px);
+}
+
+.tag-border {
+  padding: 1px 2px;
+  border: 1px solid lighten($control-border-colour, 40);
+  @include border-top-radius(3px);
+  @include border-bottom-radius(3px);
+}
+
 #app {
-  font-size: 16px;
-
-  .test {
-    width: 180px;
-    height: auto;
-  }
-
   h1 {
     font-size: 24px;
     line-height: 28px;
     font-weight: bold;
     display: block;
-
-    //color: $main-spot-colour;
-
-    //border: 1px solid $main-spot-colour;
-
-    //@include border-top-radius(3px);
-    //@include border-bottom-radius(3px);
-
     border: 0px;
     border-bottom: 1px solid lighten($control-border-colour, 60);
     background-color: transparent;
     padding: 6px 6px 18px 6px;
-    //padding-bottom: 18px;
     margin-bottom: 15px;
-
-    //background-color: lighten($main-spot-colour,30);
     color: black;
-    //margin: 0px 0px 12px 0px;
-    //padding: 18px 12px 6px 6px;
 
-    @include mq($from: mobile-landscape) {
-      //      background: none;
-      //      border-bottom: 3px solid $main-spot-colour;
-      //      margin-top: 12px;
-      //      margin-bottom: 24px;
-      //      color: $text-light-colour;
-      //      display: inline-block;
-      //      font-size: 28px;
+    @include mq($from: tablet) {
+      font-size: 32px;
+      line-height: 36px;
     }
-  }
-
-  .app-screenshot {
-    float: right;
-    margin-bottom: 9px;
-    width: 175px;
-    height: auto;
   }
 
   .download-button {
+    clear: both;
+    width: 180px;
+    display: block;
+    margin: 18px auto 0px auto;
+
     img {
-      width: 126px;
-      height: 38px;
+      width: 180px;
+      height: 53px;
     }
   }
 
-  .basic-info-wrapper {
-    @include clearfix;
+  .sidebar {
+    //@include clearfix;
     width: 308px;
     margin-left: auto;
     //margin-left: 0px;
@@ -250,39 +236,117 @@ footer .call-to-action {
       width: 335px;
     }
 
-    @include mq($from: tablet) {
-      width: 308px;
+    @include mq($from: mobile-landscape) {
+      width: 126px;
       margin-left: 0px;
+      margin-right: 0px;
       float: left;
+    }
+
+    @include mq($from: tablet) {
+      width: 175px;
+      //margin-left: 0px;
+      //float: left;
+    }
+  }
+
+  .app-icon-wrapper {
+    display: block;
+    margin-bottom: 9px;
+    float: left;
+    position: relative;
+
+    img.app-icon {
+      width: 175px;
+      height: 175px;
+
+      @include mq($from: mobile-landscape) {
+        width: 126px;
+        height: 126px;
+      }
+
+      @include mq($from: tablet) {
+        width: 175px;
+        height: 175px;
+      }
+    }
+
+    img.app-store-icon {
+      position: absolute;
+      left: 20px;
+      bottom: 24px;
+      width: 80px;
+    }
+  }
+
+  .sidebar-section,
+  .single-line-sidebar-section {
+    font-size: 12px;
+    line-height: 16px;
+    margin-bottom: 4px;
+
+    @include mq($from: tablet) {
+      font-size: 14px;
+      line-height: 18px;
+      margin-bottom: 6px;
+    }
+
+    h6 {
+      color: $alt-black-colour;
+      text-transform: uppercase;
+    }
+
+    p {
+      //font-size: 14px;
+      //line-height: 18px;
+      font-size: 12px;
+      line-height: 16px;
+
+      @include mq($from: tablet) {
+        font-size: 14px;
+        line-height: 18px;
+      }
+    }
+  }
+
+  .single-line-sidebar-section {
+    position: relative;
+
+    h6, p {
+      display: inline-block;
+    }
+
+    p {
+      //margin-left: 6px;
+      position: absolute;
+      right: 0px;
+      bottom: 0px;
+      //font-weight: bold;
     }
   }
 
   .basic-info {
     @include clearfix;
-    font-size: 14px;
+    //font-size: 14px;
     width: 126px;
     //margin-left: 181px;
     margin-bottom: 9px;
-    float: left;
+    float: right;
 
-    .app-icon {
-      display: block;
-      margin-bottom: 9px;
-
-      img {
-        width: 126px;
-        height: 126px;
-      }
+    @include mq($from: mobile-landscape) {
+      //margin-right: 18px;
     }
 
-    .rating p,
-    .device {
-      font-size: 12px;
-      line-height: 16px;
+    @include mq($from: tablet) {
+      width: 175px;
     }
 
     .rating {
-      margin-bottom: 22px;
+      margin-bottom: 20px;
+
+      @include mq($from: tablet) {
+        margin-bottom: 28px;
+      }
 
       p {
         color: $alt-black-colour;
@@ -298,26 +362,48 @@ footer .call-to-action {
       font-size: 20px;
       line-height: 34px;
       font-weight: bold;
-      margin-bottom: 8px;
+      margin-bottom: 2px;
       text-align: center;
       height: 34px;
       //width: 126px;
-      background-color: lighten($main-spot-colour, 30);
-      @include border-top-radius(3px);
-      @include border-bottom-radius(3px);
+
+      @include mq($from: tablet) {
+        margin-bottom: 8px;
+      }
     }
 
-    .device {
-      display: inline-block;
-      //font-size: 12px;
-      //text-transform: uppercase;
-      margin-right: 1px;
-      margin-bottom: 5px;
-      padding: 1px 2px;
-      //background-color: lighten($main-spot-colour, 30);
-      border: 1px solid lighten($control-border-colour, 40);
-      @include border-top-radius(3px);
-      @include border-bottom-radius(3px);
+    .supported-devices {
+      .device {
+        display: inline-block;
+        //font-size: 12px;
+        //text-transform: uppercase;
+        margin-right: 1px;
+       // margin-bottom: 5px;
+
+        @include mq($from: tablet) {
+          margin-right: 6px;
+        }
+      }
+    }
+
+    .download-button {
+      width: 126px;
+      margin: 0px;
+
+      @include mq($from: tablet) {
+        width: 175px;
+        margin-top: 6px;
+      }
+
+      img {
+        width: 126px;
+        height: 38px;
+
+        @include mq($from: tablet) {
+          width: 175px;
+          height: 52px;
+        }
+      }
     }
   }
 
@@ -357,12 +443,31 @@ footer .call-to-action {
     }
   }
 
+  .body-wrapper {
+    max-width: 600px;
+    @include mq($from: mobile-landscape) {
+      margin-left: 140px;
+    }
+
+    @include mq($from: tablet) {
+      margin-left: 189px;
+    }
+  }
+
   .description {
     clear: both;
     padding: 18px 6px 0px 6px;
     border-top: 1px solid lighten($control-border-colour, 60);
     //margin-top: 9px;
+
     margin-bottom: 12px;
+
+    @include mq($from: mobile-landscape) {
+      clear: none;
+      border-top: none;
+      padding-top: 0px;
+      //margin-left: 140px;
+    }
 
     p {
       word-wrap: break-word;
@@ -397,17 +502,6 @@ footer .call-to-action {
 
     .more span:before {
       content: "/";
-    }
-
-    .download-button {
-      width: 180px;
-      display: block;
-      margin: 18px auto 12px auto;
-
-      img {
-        width: 180px;
-        height: 53px;
-      }
     }
   }
 
@@ -465,6 +559,22 @@ footer .call-to-action {
   }
 
   .screen-shots {
+    clear: both;
+    @include clearfix;
+
+    .iphone-screen-shots,
+    .ipad-screen-shots {
+      @include mq($from: tablet) {
+        width: 198px;
+        float: left;
+      }
+    }
+
+    .iphone-screen-shots {
+      @include mq($from: tablet) {
+        margin-right: 3px;
+      }
+    }
 
     .rn-carousel-control-next,
     .rn-carousel-control-prev
@@ -487,20 +597,18 @@ footer .call-to-action {
     }
 
     ul {
-      width: 200px;
+      width: 190px;
 
       li img {
-        width: 200px;
+        width: 190px;
         height: auto;
       }
     }
 
     .screen-shot-wrapper {
-      width: 208px;
+      width: 198px;
       margin-left: auto;
       margin-right: auto;
-      border: 1px solid lighten($control-border-colour, 60);
-      padding: 3px;
     }
   }
 

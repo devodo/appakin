@@ -1,5 +1,5 @@
 $score-icon-small-dimension: 14px;
-$score-icon-large-dimension: 14px;
+$score-icon-large-dimension: 20px;
 
 .akin-score {
   position: relative;
@@ -19,7 +19,7 @@ $score-icon-large-dimension: 14px;
     top: 0px;
     text-align: center;
 
-    @include mq($from: mobile-landscape) {
+    @include mq($from: tablet) {
       font-size: $score-icon-large-dimension;
       line-height: $score-icon-large-dimension;
       width: $score-icon-large-dimension;
@@ -36,6 +36,11 @@ $score-icon-large-dimension: 14px;
     font-size: 12px;
     line-height: $score-icon-small-dimension;
     right: 0px;
+
+    @include mq($from: tablet) {
+      font-size: 14px;
+      line-height: $score-icon-large-dimension;
+    }
   }
 
   span.empty:before {
@@ -60,7 +65,7 @@ $score-icon-large-dimension: 14px;
   .one {
     left: $score-icon-small-dimension;
 
-    @include mq($from: mobile-landscape) {
+    @include mq($from: tablet) {
       left: $score-icon-large-dimension;
     }
   }
@@ -68,7 +73,7 @@ $score-icon-large-dimension: 14px;
   .two {
     left: $score-icon-small-dimension * 2;
 
-    @include mq($from: mobile-landscape) {
+    @include mq($from: tablet) {
       left: $score-icon-large-dimension * 2;
     }
   }
@@ -76,7 +81,7 @@ $score-icon-large-dimension: 14px;
   .three {
     left: $score-icon-small-dimension * 3;
 
-    @include mq($from: mobile-landscape) {
+    @include mq($from: tablet) {
       left: $score-icon-large-dimension * 3;
     }
   }
@@ -84,7 +89,7 @@ $score-icon-large-dimension: 14px;
   .four {
     left: $score-icon-small-dimension * 4;
 
-    @include mq($from: mobile-landscape) {
+    @include mq($from: tablet) {
       left: $score-icon-large-dimension * 4;
     }
   }
