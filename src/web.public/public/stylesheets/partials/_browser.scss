@@ -22,3 +22,7 @@ textarea {
 img:-moz-loading {
   visibility: hidden;
 }
+
+img {
+  -ms-interpolation-mode: bicubic;
+}

@@ -11,7 +11,7 @@
     });
 
     angular.module('appAkin').filter('firstSection', function($window) {
-        var maxSectionLength = 500;
+        var maxSectionLength = 400;
 
         return function(input) {
             if (input.length <= maxSectionLength) {

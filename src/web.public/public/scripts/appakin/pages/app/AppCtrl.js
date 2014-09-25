@@ -49,8 +49,8 @@
                     return (Math.round(voteCount / 10000) / 100) + ' m';
                 }
 
-                if (voteCount > 1000) {
-                    return Math.floor(voteCount / 1000) + ',' + voteCount % 1000;
+                if (voteCount >= 1000) {
+                    return Math.floor(voteCount / 1000) + ',' + ('000' + voteCount % 1000).slice(-3);
                 }
 
                 return voteCount;

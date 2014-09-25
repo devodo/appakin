@@ -1,3 +1,15 @@
+
+// underline on click
+a.underline-on-click:link, a.underline-on-click:visited, a.underline-on-click:focus, a.underline-on-click:hover { text-decoration: none; }
+a.underline-on-click:active { text-decoration: underline; }
+
+// never underline
+a.never-underline:link, a.never-underline:visited, a.never-underline:focus, a.never-underline:active, a.never-underline:hover { text-decoration: none; }
+
+// underline on hover
+a.underline-on-hover:link, a.underline-on-hover:visited, a.underline-on-hover:focus, a.underline-on-hover:active { text-decoration: none; }
+a.underline-on-hover:hover { text-decoration: underline; }
+
 // SOCIAL MEDIA
 
 .social-media-links {
@@ -31,6 +43,13 @@
   }
 }
 
+// AKIN LOGO
+
+.akin-logo-link {
+  display: inline-block;
+  vertical-align: middle;
+}
+
 // AUTOCOMPLETE CLEAR BUTTON
 
 .autocomplete {
@@ -53,64 +72,51 @@
   }
 }
 
-// AD
+// CALL TO ACTION
 
-footer .call-to-action {
-  font-size: 14px;
-
-  a, a:link, a:visited, a:hover, a:active {
+footer {
+  .call-to-action-link {
+    display: block;
+    font-size: 14px;
+    margin: 0px 6px;
+    background-color: lighten($alt-spot-colour, 20);
+    height: 28px;
+    line-height: 28px;
+    text-align: center;
+    border: 1px solid $control-border-colour;
+    border-bottom: none;
+    @include border-top-radius(6px);
+    text-shadow: 0px 1px 0px darken(white, 10);
     color: $alt-black-colour;
-    text-decoration: none;
     font-weight: normal;
+
+    @include mq($from: mobile-landscape) {
+      font-size: 16px;
+    }
   }
 
-  a:hover {
-    text-decoration: underline;
-  }
-
-  a em {
-    font-weight: bold;
+  .call-to-action-link:active {
+    background-color: lighten($alt-spot-colour, 10);
+    text-shadow: none;
   }
 }
 
-// FOOTER NAVIGATION
+// FOOTER MENU
 
-.footer-nav ul li {
-  color: white;
+.footer-menu ul li {
+  color: lighten($main-spot-colour, 20);
+  font-size: 16px;
+
+  @include mq($from: tablet) {
+    font-size: 20px;
+  }
 
   a {
     float: left;
     text-align: center;
     white-space: nowrap;
-    //padding: 3px 0px;
     padding-bottom: 6px;
-
-    @include mq($from: tablet) {
-      font-size: 20px !important;
-    }
-  }
-
-  a,
-  a:link,
-  a:visited,
-  a:hover,
-  a:active {
-    color: white;
-    font-weight: normal;
-    font-size: 16px;
-
     color: lighten($main-spot-colour, 20);
-  }
-
-  a,
-  a:link,
-  a:visited,
-  a:active {
-    text-decoration: none;
-  }
-
-  a:hover {
-    text-decoration: underline;
   }
 }
 
