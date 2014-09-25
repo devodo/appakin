@@ -14,9 +14,9 @@
                     var lowerScore = Math.floor(score);
                     var upperScore = lowerScore + 1;
 
-                    if (index < lowerScore || (index === lowerScore && score > (lowerScore + 0.66))) {
+                    if (index < lowerScore || (index === lowerScore && score > (lowerScore + 0.75))) {
                         return 'filled';
-                    } else if (index >= upperScore || (index === lowerScore && score < (lowerScore + 0.33))) {
+                    } else if (index >= upperScore || (index === lowerScore && score < (lowerScore + 0.25))) {
                         return 'empty';
                     }
 

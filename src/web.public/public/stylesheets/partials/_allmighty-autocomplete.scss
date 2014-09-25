@@ -3,21 +3,16 @@
 .autocomplete{
   width: 100%;
   position: relative;
-  padding: 0 3px;
-
-  @include mq($from: mobile-landscape) {
-    padding: 0;
-  }
 }
 
 .autocomplete ul {
   position: absolute;
   left: 0;
-  top: 28px;
+  top: 27px;
   width: 100%;
-  border-left: 1px solid $control-border-colour;
-  border-right: 1px solid $control-border-colour;
-  border-bottom: 1px solid $control-border-colour;
+  //border-left: 1px solid $control-border-colour;
+  //border-right: 1px solid $control-border-colour;
+  //border-bottom: 1px solid $control-border-colour;
   z-index: 1;
   background-color: white;
   padding-bottom: 3px;
