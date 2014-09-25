@@ -17,26 +17,32 @@ a.underline-on-hover:hover { text-decoration: underline; }
     display: block;
     width: 32px;
     height: 32px;
-
     font-family: "icomoon";
     font-size: 28px;
     text-align: center;
-  }
-
-  a,
-  a:link,
-  a:visited,
-  a:hover,
-  a:active {
-    text-decoration: none;
+    color: $main-spot-colour;
   }
 
   a.facebook {
     margin-right: 2px;
+    //color: #3a579b;
+  }
+
+  a.facebook:after {
+    content: "[";
+  }
+
+  a.facebook:active,
+  a.facebook:hover {
     color: #3a579b;
   }
 
-  a.twitter {
+  a.twitter:after {
+    content: "]";
+  }
+
+  a.twitter:active,
+  a.twitter:hover {
     color: #598dca;
   }
 }

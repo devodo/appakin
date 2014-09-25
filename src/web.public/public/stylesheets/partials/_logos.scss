@@ -21,6 +21,10 @@ header .akin-logo {
     height: 32px;
     margin: 0px 6px 0px 6px;
   }
+
+  @include mq($from: wide) {
+    margin: 0px 16px 0px 15px;
+  }
 }
 
 footer .akin-logo {

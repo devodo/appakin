@@ -6,8 +6,7 @@
         <h1>{{app.data.censoredName}}</h1>
         <div class="sidebar">
             <a class="app-icon-wrapper" href="{{ app.data.storeUrl }}" target="{{ getLinkTarget() }}">
-                <img class="app-icon" src="{{ url.createAppleAppStoreImageUrl(app.data.artworkMediumUrl, 175) }}">
-                <!--<img class="app-store-icon" src="/public/images/Download_on_the_App_Store_Badge_US-UK_135x40.svg">-->
+                <img class="app-icon" alt=" " src="{{ url.createAppleAppStoreImageUrl(app.data.artworkMediumUrl, 175) }}">
             </a>
             <div class="basic-info">
                 <p class="price highlighted">{{formatPrice(app.data.price)}}</p>
