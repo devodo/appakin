@@ -184,58 +184,96 @@ header .searchbox-wrapper {
 $searchbox-button-colour: lighten($main-spot-colour, 25);
 $searchbox-border-colour: $control-border-colour;
 
+//#home-page .autocomplete input[type="text"] {
+//  border: 1px solid lighten($main-spot-colour, 10);
+//  border-right-width: 0px;
+//  height: 28px;
+//  line-height: 28px;
+//}
+
+#home-page .search-input .autocomplete {
+  //border: 1px solid lighten($dark-background-colour, 40);
+  //@include border-top-radius(2px);
+  //@include border-bottom-radius(2px);
+  padding: 0px;
+
+  .input-wrapper input[type="text"] {
+    border: 1px solid lighten($dark-background-colour, 40);
+    border-right: none;
+  }
+
+  .submit-button-wrapper button {
+    border: 1px solid lighten($dark-background-colour, 40);
+    border-left: none;
+  }
+
+.input-wrapper {
+  //vertical-align: middle;
+  //border-width: 0px;
+  //margin: 0;
+  //padding: 0;
+  //position: absolute;
+
+}
+}
+
 .search-input {
-  div {
+  .autocomplete {
     display: table;
     width: 100%;
   }
 
-  div span.wrapper {
+  .autocomplete .input-wrapper {
     display: table-cell;
     width: 100%;
     vertical-align: middle;
-  }
 
-  div input[type="text"] {
-    display: table-cell;
-    vertical-align: middle;
-    width: 100%;
-    font-size: 16px;
-    height: 28px;
-    padding: 3px 30px 3px 3px;
-    line-height: 28px;
-    //margin-left: 3px;
-    margin-bottom: 3px;
+    input[type="text"] {
+      width: 100%;
+      font-size: 16px;
+      height: 28px;
+      padding: 0px 30px 0px 3px;
+      line-height: 28px;
+      -webkit-appearance: none;
+      -moz-appearance: none;
+      border: 0;
 
-    -webkit-appearance: none;
-    -moz-appearance: none;
-    border: 1px solid $searchbox-border-colour;
-    border-right-width: 0px;
-
-    @include mq($from: mobile-landscape) {
-      margin-bottom: 0px;
+      @include mq($from: mobile-landscape) {
+        margin-bottom: 0px;
+      }
     }
   }
 
-  div button {
-    @include button($searchbox-button-colour);
-
+  .autocomplete .submit-button-wrapper {
     display: table-cell;
-    width: 46px;
-    height: 26px;
-    margin: 1px 0 0 0 !important;
-    background-color: black;
+    height: 28px;
     vertical-align: middle;
-    padding: 0px 7px;
 
-    @include border-top-radius(0);
-    @include border-bottom-radius(0);
-
-    .icon:after
-    {
+    button {
+      text-shadow: 0px 1px 0px darken(white, 20);
+      @include linear-gradient(to top, #daa537, #d5b168, $fallback: #daa537);
+      margin: 0px;
+      //padding: 0px 7px;
+      border: none;
+      border-image-width: 0px;
+      width: 46px;
+      height: 28px;
+      line-height: 24px;
+      font-size: 16px;
+      //margin: 1px 0 0 0 !important;
+      background-color: black;
+      //vertical-align: middle;
       font-family: "icomoon";
-      content: "!";
       color: $icon-colour;
+      padding: 0px;
+      @include border-top-radius(0);
+      @include border-bottom-radius(0);
+
+//      .icon:after {
+//        font-family: "icomoon";
+//        content: "!";
+//        color: $icon-colour;
+//      }
     }
   }
 }
@@ -247,7 +285,7 @@ $searchbox-border-colour: $control-border-colour;
   margin-right: auto;
 
   div button {
-    height: 28px;
-    margin: 0 !important;
+    //height: 28px;
+    //margin: 0 !important;
   }
 }

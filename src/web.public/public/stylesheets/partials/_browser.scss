@@ -26,3 +26,8 @@ img:-moz-loading {
 img {
   -ms-interpolation-mode: bicubic;
 }
+
+// Remove clear button from text input fields in IE10+.
+input[type="text"]::-ms-clear {
+  display: none;
+}

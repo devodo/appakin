@@ -1,5 +1,5 @@
 <div class="autocomplete {{ attrs.class }}" id="{{ attrs.id }}">
-    <span class="wrapper">
+    <span class="input-wrapper">
         <input
             type="text"
             ng-model="searchParam"
@@ -11,7 +11,9 @@
             autocorrect="off"/>
         <a class="clear-search" href ng-click="clear()"><span class="icon"></span></a>
     </span>
-    <button type="submit"><span class="icon"></span></button>
+    <span class="submit-button-wrapper">
+        <button type="submit">!</button>
+    </span>
     <ul ng-show="completing && suggestions.length > 0">
         <li
                 suggestion

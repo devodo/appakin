@@ -43,6 +43,8 @@ footer {
 // HEADER LAYOUT
 
 header {
+  @include clearfix;
+
   .home-header-wrapper {
     max-width: $website-max-width;
     margin-left: auto;
