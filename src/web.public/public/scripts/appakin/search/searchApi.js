@@ -39,6 +39,13 @@
                         '&p='+encodeURIComponent(page),
                     function(data) {
                         addPlatform(data.categories);
+
+                        if (data.categories) {
+                            for (var i = 0; i < data.categories.length; ++i) {
+                                addPlatform(data.categories[i].apps);
+                            }
+                        }
+
                         addPlatform(data.apps);
 
                         var newResults = {

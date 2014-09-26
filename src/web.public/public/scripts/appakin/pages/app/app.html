@@ -6,7 +6,7 @@
         <h1>{{app.data.censoredName}}</h1>
         <div class="sidebar">
             <a class="app-icon-wrapper" href="{{ app.data.storeUrl }}" target="{{ getLinkTarget() }}">
-                <img class="app-icon" alt=" " src="{{ url.createAppleAppStoreImageUrl(app.data.artworkMediumUrl, 175) }}">
+                <img class="app-icon" ng-src="{{ url.createAppleAppStoreImageUrl(app.data.artworkMediumUrl, 175) }}">
             </a>
             <div class="basic-info">
                 <p class="price highlighted">{{formatPrice(app.data.price)}}</p>
@@ -61,7 +61,7 @@
                     <div class="screen-shot-wrapper img-border">
                         <ul rn-carousel rn-carousel-buffered rn-carousel-control>
                             <li ng-repeat="screenShotUrl in app.data.screenShotUrls">
-                                <img src="{{screenShotUrl}}">
+                                <img ng-src="{{screenShotUrl}}">
                             </li>
                         </ul>
                     </div>
@@ -73,7 +73,7 @@
                     <div class="screen-shot-wrapper img-border">
                         <ul rn-carousel rn-carousel-buffered rn-carousel-control>
                             <li ng-repeat="screenShotUrl in app.data.ipadScreenShotUrls">
-                                <img src="{{screenShotUrl}}">
+                                <img ng-src="{{screenShotUrl}}">
                             </li>
                         </ul>
                     </div>

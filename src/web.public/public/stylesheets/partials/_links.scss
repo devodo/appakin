@@ -1,4 +1,9 @@
 
+a, a:link, a:visited, a:hover, a:active {
+  color: $main-links-colour;
+  font-weight: normal;
+}
+
 // underline on click
 a.underline-on-click:link, a.underline-on-click:visited, a.underline-on-click:focus, a.underline-on-click:hover { text-decoration: none; }
 a.underline-on-click:active { text-decoration: underline; }
@@ -137,14 +142,14 @@ ul.pagination {
       display: inline-block;
       min-width: 32px;
       min-height: 30px;
-      border: 1px solid $control-border-colour;
+      border: 1px solid lighten($control-border-colour, 60);
       margin-right: 4px;
       text-align: center;
       font-size: 14px;
       line-height: 30px;
       height: 32px;
-      @include border-top-radius(4px);
-      @include border-bottom-radius(4px);
+      @include border-top-radius(6px);
+      @include border-bottom-radius(6px);
     }
 
     a,
@@ -190,44 +195,6 @@ ul.pagination {
 
   li.disabled a {
     visibility: hidden;
-  }
-}
-
-// SEARCH TYPE
-
-.search-type {
-
-  a,
-  a:link,
-  a:visited,
-  a:hover,
-  a:active {
-    color: white;
-    font-weight: normal;
-    font-size: 14px;
-  }
-
-  @include mq($from: mobile-landscape) {
-    a,
-    a:link,
-    a:visited,
-    a:hover,
-    a:active {
-      color: $text-light-colour;
-      //font-weight: normal;
-      //font-size: 14px;
-    }
-  }
-
-  a:hover {
-    text-decoration: underline !important;
-  }
-
-  a,
-  a:link,
-  a:visited,
-  a:active {
-    text-decoration: none;
   }
 }
 

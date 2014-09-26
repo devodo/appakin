@@ -23,18 +23,14 @@ p.tight-lines {
   line-height: 1.3em;
 }
 
-p em {
+em {
   font-weight: bold;
+}
+
+p.body-text {
+  max-width: 500px;
 }
 
 h1 {
   font: $header-font-family;
-}
-
-// SEARCH RESULTS TEXT
-
-#search-results .disabled {
-  a, p, h4, em {
-    color: $disabled-text-colour!important;
-  }
 }

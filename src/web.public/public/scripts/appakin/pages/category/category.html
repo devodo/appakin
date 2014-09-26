@@ -7,7 +7,7 @@
         <p class="body-text">{{category.data.description}}</p>
         <ul>
             <li ng-repeat="app in category.data.apps track by app.url" class="app-search-result">
-                <a href="{{ url.createAppUrl(category.data.platform, app.url) }}" ><img src="{{app.artworkSmallUrl}}" width="57px" height="57px"></a>
+                <a href="{{ url.createAppUrl(category.data.platform, app.url) }}" ><img ng-src="{{app.artworkSmallUrl}}" width="57px" height="57px"></a>
                 <h4><a href="{{ url.createAppUrl(category.data.platform, app.url) }}" ng-bind="app.name | trim: 50"></a></h4>
             </li>
         </ul>

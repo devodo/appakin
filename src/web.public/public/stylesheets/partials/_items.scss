@@ -3,13 +3,6 @@ p.warning {
   padding: 12px;
   text-align: center;
   line-height: 16pt;
-
-  @include mq($from: tablet) {
-    //margin-left: auto;
-    //margin-right: auto;
-    //display: inline-block;
-    // max-width: 600px;
-  }
 }
 
 p.error {
@@ -43,32 +36,47 @@ p.warning {
 }
 
 h1 {
-  font-size: 22px;
+  font-size: 24px;
+  line-height: 28px;
   font-weight: bold;
   display: block;
-  color: white;
-  background-color: lighten($main-spot-colour, 5);
-  margin: 0px 0px 12px 0px;
-  padding: 18px 12px 6px 6px;
+  border: 0px;
+  border-bottom: 1px solid lighten($control-border-colour, 60);
+  background-color: transparent;
+  padding: 6px 6px 18px 6px;
+  margin-bottom: 12px;
+  color: black;
+  position: relative;
 
-  @include mq($from: mobile-landscape) {
-    background: none;
-    border-bottom: 3px solid $main-spot-colour;
-    margin-top: 12px;
-    margin-bottom: 24px;
-    color: $text-light-colour;
-    display: inline-block;
-    font-size: 28px;
+  @include mq($from: tablet) {
+    font-size: 32px;
+    line-height: 36px;
   }
 
-  span {
+  a, a:link, a:visited, a:hover, a:active {
+    vertical-align: middle;
+    font: $body-font-family;
     font-weight: normal;
     font-size: 14px;
+    line-height: 20px;
+    color: $alt-black-colour;
+    display: inline-block;
+    //padding: 3px 12px;
+    padding-left: 12px;
+    padding-right: 12px;
+    position: absolute;
+    right: 0px;
   }
 }
 
-p.body-text {
-  max-width: 500px;
+#search-results {
+  h1 {
+    max-width: 552px;
+  }
+
+  .list-wrapper {
+    margin-bottom: 18px;
+  }
 }
 
 .category-search-result,
@@ -88,13 +96,77 @@ p.body-text {
   }
 }
 
+.category-search-result {
+  clear: both;
+  margin-bottom: 12px;
+  max-width: 550px;
+  border-bottom: 1px solid lighten($control-border-colour, 60);
+
+  @include mq($from: mobile-landscape) {
+    border-bottom: none;
+    margin-bottom: 15px;
+  }
+
+  .category-apps {
+    //margin-left: 30px;
+  }
+
+  ul {
+    @include clearfix;
+
+    border: 1px solid lighten($control-border-colour, 60);
+    @include border-top-radius(6px);
+    @include border-bottom-radius(6px);
+    padding: 3px;
+
+    li {
+      float: left;
+      width: 40px + 110px;
+
+//      a {
+//        width: 40px;
+//      }
+
+      h4 {
+        font-size: 14px;
+        line-height: 18px;
+        width: 105px;
+      }
+
+      a, h4 {
+        display: inline-block;
+        vertical-align: top;
+      }
+
+      img {
+        //border: 1px solid white;
+        @include border-top-radius(9px);
+        @include border-bottom-radius(9px);
+      }
+    }
+  }
+
+  p {
+    word-wrap: break-word;
+    word-break: break-word;
+  }
+
+  p.description {
+    color: $dark-background-colour !important;
+  }
+}
+
 .app-search-result {
   @include clearfix;
   margin-bottom: 12px;
   padding-bottom: 12px;
   max-width: 550px;
-
   border-bottom: 1px solid lighten($control-border-colour, 60);
+
+  @include mq($from: mobile-landscape) {
+    border-bottom: none;
+    margin-bottom: 15px;
+  }
 
   h4, p {
     margin-left: 57px + 6px;
@@ -114,7 +186,7 @@ p.body-text {
     margin-top: 2px;
     margin-right: 6px;
 
-    border: 1px solid white;
+    //border: 1px solid white;
     @include border-top-radius(12px);
     @include border-bottom-radius(12px);
   }
@@ -178,24 +250,6 @@ p.body-text {
 
   .no-error-wrapper {
     position: relative;
-  }
-
-  h1 {
-    font-size: 24px;
-    line-height: 28px;
-    font-weight: bold;
-    display: block;
-    border: 0px;
-    border-bottom: 1px solid lighten($control-border-colour, 60);
-    background-color: transparent;
-    padding: 6px 6px 18px 6px;
-    margin-bottom: 15px;
-    color: black;
-
-    @include mq($from: tablet) {
-      font-size: 32px;
-      line-height: 36px;
-    }
   }
 
   .mobile-download-button {
@@ -380,7 +434,6 @@ p.body-text {
 
       @include mq($from: tablet) {
         width: 175px;
-        //margin-top: 6px;
       }
 
       img {
@@ -417,9 +470,6 @@ p.body-text {
   }
 
   .body-wrapper {
-    //@include clearfix;
-    //position: relative;
-
     @include mq($from: mobile-landscape) {
       margin-left: 140px;
     }
@@ -438,6 +488,7 @@ p.body-text {
     padding: 18px 6px 0px 6px;
     border-top: 1px solid lighten($control-border-colour, 60);
     margin-bottom: 12px;
+    max-width: 500px;
 
     @include mq($from: mobile-landscape) {
       clear: none;
@@ -513,9 +564,6 @@ p.body-text {
   }
 
   .screen-shots {
-    //clear: both;
-    //@include clearfix;
-
     @include mq($from: desktop) {
       position: absolute;
       right: 0px;
@@ -570,5 +618,15 @@ p.body-text {
       margin-left: auto;
       margin-right: auto;
     }
+  }
+}
+
+#search-results .disabled {
+  a, p, h4, em {
+    color: $disabled-text-colour!important;
+  }
+
+  img {
+    opacity: 0.4;
   }
 }
