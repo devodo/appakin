@@ -2,7 +2,7 @@
     'use strict';
 
     angular.module('appAkin').factory('url', function(search, $rootScope) {
-        var appleAppStoreImageUrlRegex = /jpg$|png$/;
+        var appleAppStoreImageUrlRegex = /jpg$|png$|tif$/;
 
         return {
             createCategoryUrl: function(platform, urlName) {

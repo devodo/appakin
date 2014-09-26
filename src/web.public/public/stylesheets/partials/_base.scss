@@ -19,4 +19,20 @@ $header-font-family: 400 60px/1.3 'Bree Serif', Georgia, serif;
 $menu-arrow-size: 7px;
 $website-max-width: 1200px;
 
-@import "modules/retina";
+// ICONS
+
+$cross-icon: "+";
+$search-icon: "!";
+$category-icon: "=";
+$left-icon: "<";
+$right-icon: ">";
+$up-icon: "\\";
+$down-icon: "/";
+$empty-star-icon: ".";
+$half-star-icon: ";";
+$full-star-icon: ":";
+$facebook-icon: "[";
+$twitter-icon: "]";
+
+// Not currently in use
+//@import "modules/retina";

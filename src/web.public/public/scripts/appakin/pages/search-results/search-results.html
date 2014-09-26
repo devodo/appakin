@@ -20,25 +20,37 @@
                 <ul ng-show="search.results.searchType === 'category'">
                     <li ng-repeat="category in search.results.items"
                         class="category-search-result">
-                        <h4><a href="{{ url.createCategoryUrl(category.platform, category.url) }}">{{category.name}}</a></h4>
-                        <!--<p class="description"-->
-                           <!--ng-if="category.highlight && category.highlight.desc.length > 0"-->
-                           <!--ng-bind-html="category.highlight.desc[0]">-->
-                        <!--</p>-->
-
-                        <ul class="category-apps" ng-if="category.apps.length > 0">
-                            <li class="category-app"ng-repeat="app in category.apps">
-                                <a href="{{ url.createAppUrl(app.platform, app.url) }}" ><img ng-src="{{app.imageUrl}}" width="40px" height="40px"></a>
-                                <h4><a href="{{ url.createAppUrl(app.platform, app.url) }}" ng-bind-html="app.name | trim: 20"></a></h4>
-                            </li>
-                        </ul>
+                        <h4>
+                            <a class="underline-on-hover"
+                               ng-bind-html="category.highlight && category.highlight.name_split ? category.highlight.name_split : category.name"
+                               href="{{ url.createCategoryUrl(category.platform, category.url) }}"></a>
+                        </h4>
+                        <div class="category-match" ng-if="category.isCategoryMatch">
+                            <p class="description" ng-bind-html="category.highlight.desc[0]"></p>
+                            <a class="more-link underline-on-hover" href="{{ url.createCategoryUrl(category.platform, category.url) }}">Click for apps...</a>
+                        </div>
+                        <div class="app-match" ng-if="!category.isCategoryMatch">
+                            <ul class="category-apps">
+                                <li class="category-app"ng-repeat="app in category.apps | limitTo: 3">
+                                    <a class="img-wrapper" href="{{ url.createAppUrl(app.platform, app.url) }}" ><img ng-src="{{app.imageUrl}}" width="40px" height="40px"></a>
+                                    <h6><a class="underline-on-click" href="{{ url.createAppUrl(app.platform, app.url) }}" ng-bind-html="app.name | trim: 30"></a></h4>
+                                </li>
+                            </ul>
+                            <a class="more-link underline-on-hover" href="{{ url.createCategoryUrl(category.platform, category.url) }}">Click for all apps...</a>
+                        </div>
                     </li>
                 </ul>
                 <ul ng-show="search.results.searchType === 'app'">
                     <li ng-repeat="app in search.results.items track by app.url"
                         class="app-search-result">
-                        <a href="{{ url.createAppUrl(app.platform, app.url) }}" ><img ng-src="{{app.imageUrl}}" width="57px" height="57px"></a>
-                        <h4><a href="{{ url.createAppUrl(app.platform, app.url) }}" ng-bind-html="app.name | trim: 50 | highlight: search.searchTerm"></a></h4>
+                        <a href="{{ url.createAppUrl(app.platform, app.url) }}">
+                            <img ng-src="{{app.imageUrl}}" width="57px" height="57px">
+                        </a>
+                        <h4>
+                            <a class="underline-on-hover"
+                               href="{{ url.createAppUrl(app.platform, app.url) }}"
+                               ng-bind-html="app.name | trim: 50 | highlight: search.searchTerm"></a>
+                        </h4>
                         <p class="tight-lines" ng-bind-html="app.highlight"></p>
                     </li>
                 </ul>

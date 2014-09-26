@@ -11,8 +11,7 @@ $platform-big-button-border-colour: lighten($main-spot-colour, 5);
 #home-page .platform-input {
   display: table;
   width: ($platform-big-button-small-screen-size + ($platform-big-button-border-width * 2) + ($platform-big-button-padding * 2)) * 3 + ($platform-big-button-margin * 4);
-  margin-left: auto;
-  margin-right: auto;
+  @include centred-margins;
   margin-bottom: 16px;
 
   @include mq($from: tablet) {
@@ -114,7 +113,6 @@ header .searchbox-wrapper {
       padding: 0px 8px;
       font-weight: normal;
       width: 140px;
-      //min-width: 140px;
       display: block;
       position: relative;
       border: 1px solid lighten($control-border-colour, 30);
@@ -131,16 +129,10 @@ header .searchbox-wrapper {
 
       .caret:after
       {
+        @include icon($down-icon);
         position: absolute;
         right: 6px;
-        font-family: "icomoon";
-        content: "/";
-        color: white;
       }
-    }
-
-    .dropdown {
-      border: 1px solid $control-border-colour;
     }
   }
 
@@ -200,18 +192,11 @@ $searchbox-border-colour: $control-border-colour;
     input[type="text"] {
       width: 100%;
       display: block;
-      font-size: 16px;
       height: 28px;
+      @include body-text;
       padding: 0px 30px 0px 3px;
-      line-height: 26px;
-      -webkit-appearance: none;
-      -moz-appearance: none;
-      border: 0;
+      border: none;
       @include border-left-radius(2px);
-
-      @include mq($from: mobile-landscape) {
-        margin-bottom: 0px;
-      }
     }
   }
 
@@ -221,25 +206,12 @@ $searchbox-border-colour: $control-border-colour;
     vertical-align: middle;
 
     button {
-      display: block;
-      text-shadow: 0px 1px 0px darken(white, 20);
-      @include linear-gradient(to top, $main-spot-colour, lighten($main-spot-colour, 20), $fallback: lighten($main-spot-colour, 20));
-      margin: 0px;
-      border: none;
-      border-image-width: 0px;
+      @include akin-fancy-button;
       width: 46px;
-      height: 28px;
-      line-height: 22px;
-      font-size: 16px;
       background-color: black;
       font-family: "icomoon";
       color: $icon-colour;
-      padding: 0px;
       @include border-right-radius(2px);
-    }
-
-    button:active {
-      @include linear-gradient(to top, darken(#daa537, 15), darken(#d5b168, 15), $fallback: darken(#daa537, 15));
     }
   }
 }
@@ -247,17 +219,19 @@ $searchbox-border-colour: $control-border-colour;
 #home-page .search-input {
   width: 95%;
   max-width: 400px;
-  margin-left: auto;
-  margin-right: auto;
+  @include centred-margins;
 
   .autocomplete{
+    .input-wrapper input[type="text"],
+    .submit-button-wrapper button {
+      border: 1px solid $dark-background-colour;
+    }
+
     .input-wrapper input[type="text"] {
-      border: 1px solid lighten($dark-background-colour, 0);
       border-right: none;
     }
 
     .submit-button-wrapper button {
-      border: 1px solid lighten($dark-background-colour, 0);
       border-left: none;
     }
   }

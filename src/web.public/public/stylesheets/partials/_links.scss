@@ -22,7 +22,6 @@ a.underline-on-hover:hover { text-decoration: underline; }
     display: block;
     width: 32px;
     height: 32px;
-    font-family: "icomoon";
     font-size: 28px;
     text-align: center;
     color: $main-spot-colour;
@@ -30,21 +29,17 @@ a.underline-on-hover:hover { text-decoration: underline; }
 
   a.facebook {
     margin-right: 2px;
-    //color: #3a579b;
   }
 
-  a.facebook:after {
-    content: "[";
-  }
+  a.facebook:after { @include icon($facebook-icon); }
+  a.twitter:after { @include icon($twitter-icon); }
 
   a.facebook:active,
   a.facebook:hover {
     color: #3a579b;
   }
 
-  a.twitter:after {
-    content: "]";
-  }
+
 
   a.twitter:active,
   a.twitter:hover {
@@ -169,23 +164,12 @@ ul.pagination {
     }
   }
 
-  li a.next:before
-  {
-    font-family: "icomoon";
-    content: ">";
-    color: $icon-colour;
-  }
-
-  li a.previous:before
-  {
-    font-family: "icomoon";
-    content: "<";
-    color: $icon-colour;
-  }
+  li a.next { color: $icon-colour; }
+  li a.next:before { @include icon($right-icon); }
+  li a.previous:before { @include icon($left-icon); }
 
   li.active a {
     border: 1px solid white;
-    //color: black;
   }
 
   li a.next,

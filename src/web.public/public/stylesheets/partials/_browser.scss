@@ -9,6 +9,7 @@
 input,
 textarea {
   -webkit-appearance: none;
+  -moz-appearance: none;
   -webkit-border-radius: 0;
 }
 
@@ -23,6 +24,7 @@ img:-moz-loading {
   visibility: hidden;
 }
 
+// IE jpg resizing algorithm.
 img {
   -ms-interpolation-mode: bicubic;
 }
@@ -31,3 +33,26 @@ img {
 input[type="text"]::-ms-clear {
   display: none;
 }
+
+// Placeholder text styling
+
+$placeholder-text-colour: lighten($text-light-colour, 20);
+$placeholder-text-colour-firefox-darken: 30%;
+
+::-webkit-input-placeholder {
+  color: $placeholder-text-colour;
+}
+:-moz-placeholder { /* Firefox 18- */
+  color: shade($placeholder-text-colour, $placeholder-text-colour-firefox-darken);
+}
+::-moz-placeholder {  /* Firefox 19+ */
+  color: shade($placeholder-text-colour, $placeholder-text-colour-firefox-darken);
+}
+:-ms-input-placeholder {
+  color: $placeholder-text-colour;
+}
+
+:focus::-webkit-input-placeholder { color: transparent; }
+:focus:-moz-placeholder { color: transparent; }
+:focus::-moz-placeholder { color: transparent; }
+:focus:-ms-input-placeholder { color: transparent; }

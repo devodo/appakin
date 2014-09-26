@@ -1,8 +1,14 @@
 p.error,
 p.warning {
-  padding: 12px;
+  padding: 12px 24px;
   text-align: center;
   line-height: 16pt;
+
+  .icon:before {
+    @include very-large-icon;
+    margin-bottom: 12px;
+    display: block;
+  }
 }
 
 p.error {
@@ -10,27 +16,16 @@ p.error {
   color: $error-colour;
 
   .icon:before {
-    display: block;
-    font-size: 36pt;
-    line-height: 36pt;
-    margin-bottom: 12px;
-    font-family: "icomoon";
-    content: "+";
-    color: $error-colour;
+    @include icon($cross-icon);
   }
 }
 
 p.warning {
-  background: lighten($dark-background-colour, 45);
-  color: $text-light-colour;
+  background: lighten($dark-background-colour, 50);
+  color: black;
 
   .icon:before {
-    display: block;
-    font-size: 36pt;
-    line-height: 36pt;
-    margin-bottom: 12px;
-    font-family: "icomoon";
-    content: "!";
+    @include icon($search-icon);
     color: $icon-colour;
   }
 }
@@ -77,6 +72,11 @@ h1 {
   .list-wrapper {
     margin-bottom: 18px;
   }
+
+  p.error,
+  p.warning {
+    max-width: 550px;
+  }
 }
 
 .category-search-result,
@@ -94,17 +94,40 @@ h1 {
       color: darken($alt-black-colour, 10);
     }
   }
+
+  .more-link {
+    font-size: 14px;
+    line-height: 18px;
+  }
 }
 
 .category-search-result {
   clear: both;
-  margin-bottom: 12px;
+  margin-bottom: 24px;
   max-width: 550px;
   border-bottom: 1px solid lighten($control-border-colour, 60);
 
   @include mq($from: mobile-landscape) {
     border-bottom: none;
-    margin-bottom: 15px;
+    margin-bottom: 30px;
+  }
+
+  h4 {
+    margin-bottom: 6px;
+
+    a {
+      font-size: 24px;
+      line-height: 28px;
+      font-weight: bold;
+    }
+  }
+
+  h4:before {
+    @include icon($category-icon);
+    @include large-icon;
+    margin-right: 6px;
+    color: lighten($dark-background-colour, 40);
+    vertical-align: text-bottom;
   }
 
   .category-apps {
@@ -114,28 +137,43 @@ h1 {
   ul {
     @include clearfix;
 
-    border: 1px solid lighten($control-border-colour, 60);
-    @include border-top-radius(6px);
-    @include border-bottom-radius(6px);
-    padding: 3px;
+    //border-bottom: 1px solid lighten($control-border-colour, 60);
+    //padding-bottom: 9px;
+
+    //border: 1px solid lighten($control-border-colour, 60);
+    //@include border-top-radius(6px);
+    //@include border-bottom-radius(6px);
+    //padding: 3px;
 
     li {
       float: left;
-      width: 40px + 110px;
+      width: 180px;
 
 //      a {
 //        width: 40px;
 //      }
 
-      h4 {
+      h6 {
         font-size: 14px;
         line-height: 18px;
-        width: 105px;
+        width: 125px;
+        margin-left: 45px;
       }
 
-      a, h4 {
-        display: inline-block;
-        vertical-align: top;
+//      a, h6 {
+//        display: inline-block;
+//        vertical-align: top;
+//      }
+
+      a.img-wrapper {
+        width: 40px;
+        height: 40px;
+        display: block;
+        float: left;
+      }
+
+      a {
+        color: lighten($dark-background-colour, 20) !important;
       }
 
       img {
@@ -266,16 +304,14 @@ h1 {
       padding: 6px 0px;
       display: block;
       clear: both;
-      margin-left: auto;
-      margin-right: auto;
+      @include centred-margins;
       margin-bottom: 6px;
       border: none;
 
       img {
         width: 135px;
         height: 40px;
-        margin-left: auto;
-        margin-right: auto;
+        @include centred-margins;
         display: block;
       }
     }
@@ -283,8 +319,7 @@ h1 {
 
   .sidebar {
     width: 308px;
-    margin-left: auto;
-    margin-right: auto;
+    @include centred-margins;
 
     @include mq($from: mobile-wide) {
       width: 335px;
@@ -345,6 +380,13 @@ h1 {
 
     h6 {
       color: $alt-black-colour;
+      font-size: 12px;
+      line-height: 16px;
+
+      @include mq($from: tablet) {
+        font-size: 14px;
+        line-height: 18px;
+      }
     }
 
     p {
@@ -513,19 +555,12 @@ h1 {
     }
 
     span:before {
-      font-size: 20pt;
-      line-height: 20pt;
-      font-family: "icomoon";
+      @include large-icon;
       color: lighten($icon-colour, 20);
     }
 
-    .less span:before {
-      content: "\\";
-    }
-
-    .more span:before {
-      content: "/";
-    }
+    .less span:before { @include icon($up-icon); }
+    .more span:before { @include icon($down-icon); }
   }
 
   h2 {
@@ -576,25 +611,10 @@ h1 {
       }
     }
 
-    .rn-carousel-control-next,
-    .rn-carousel-control-prev
-    {
-      color: $main-spot-colour;
-    }
-
-    .rn-carousel-control-next:before {
-      font-size: 24pt;
-      line-height: 24pt;
-      font-family: "icomoon";
-      content: ">";
-    }
-
-    .rn-carousel-control-prev:before {
-      font-size: 24pt;
-      line-height: 24pt;
-      font-family: "icomoon";
-      content: "<";
-    }
+    .rn-carousel-control-next, .rn-carousel-control-prev { color: $main-spot-colour; }
+    .rn-carousel-control-next:before, .rn-carousel-control-prev:before { @include large-icon; }
+    .rn-carousel-control-next:before { @include icon($right-icon); }
+    .rn-carousel-control-prev:before { @include icon($left-icon); }
 
     .label {
       margin: 0px;
@@ -615,8 +635,7 @@ h1 {
 
     .screen-shot-wrapper {
       width: 240px;
-      margin-left: auto;
-      margin-right: auto;
+      @include centred-margins;
     }
   }
 }

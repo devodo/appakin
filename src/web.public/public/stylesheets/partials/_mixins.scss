@@ -1,0 +1,61 @@
+
+// ICONS
+
+@mixin icon($content) {
+  font-family: "icomoon";
+  content: $content;
+}
+
+@mixin large-icon {
+  font-size: 24pt;
+  line-height: 24pt;
+}
+
+@mixin very-large-icon {
+  font-size: 36pt;
+  line-height: 36pt;
+}
+
+// TYPOGRAPHY
+
+@mixin body-text {
+  font-size: 16px;
+  line-height: 26px; // 1.6em
+}
+
+@mixin small-body-text {
+  font-size: 14px;
+  line-height: 20px;
+}
+
+@mixin small-text {
+  font-size: 12px;
+  line-height: 14px;
+}
+
+// BOX MODEL
+
+@mixin centred-margins {
+  margin-left: auto;
+  margin-right: auto;
+}
+
+// CONTROLS
+
+@mixin akin-fancy-button {
+  display: block;
+  text-shadow: 0px 1px 0px darken(white, 20);
+  @include linear-gradient(to top, $main-spot-colour, lighten($main-spot-colour, 20), $fallback: lighten($main-spot-colour, 20));
+  margin: 0px;
+  border: none;
+  border-image-width: 0px;
+  height: 28px;
+  line-height: 22px;
+  font-size: 16px;
+  padding: 0px;
+  cursor: pointer;
+
+  &:active {
+    @include linear-gradient(to top, darken(#daa537, 15), darken(#d5b168, 15), $fallback: darken(#daa537, 15));
+  }
+}

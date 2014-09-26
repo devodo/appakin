@@ -43,17 +43,13 @@
     display: block;
     width: 28px;
     height: 28px;
-    text-align: center;
     line-height: 28px;
-
-//    @include mq($from: mobile-landscape) {
-//      right: 46px;
-//    }
+    text-align: center;
 
     .icon:before {
-      font-family: "icomoon";
-      content: "+";
+      @include icon($cross-icon);
       color: lighten($icon-colour, 20);
+      display: block;
     }
   }
 }

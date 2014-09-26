@@ -33,7 +33,6 @@ footer {
   }
 }
 
-
 // Sticky footer adjustment
 #home-page {
   margin-top: 30px;
@@ -47,8 +46,7 @@ header {
 
   .home-header-wrapper {
     max-width: $website-max-width;
-    margin-left: auto;
-    margin-right: auto;
+    @include centred-margins;
 
     ul.social-media-links {
       float: right;
@@ -67,8 +65,7 @@ header {
 
     .search-header-inner-wrapper {
       max-width: $website-max-width;
-      margin-left: auto;
-      margin-right: auto;
+      @include centred-margins;
       margin-bottom: 3px;
 
       @include mq($from: mobile-landscape) {
@@ -132,11 +129,14 @@ header {
 
 // MAIN
 
+p.body-text {
+  max-width: 500px;
+}
+
 main .main-wrapper {
   @include clearfix;
   max-width: $website-max-width;
-  margin-left: auto;
-  margin-right: auto;
+  @include centred-margins;
   padding: 6px 6px 20px 6px;
 
   @include mq($from: mobile-landscape) {
@@ -154,8 +154,7 @@ main .main-wrapper {
 
 footer .call-to-action-link-wrapper {
   max-width: 500px;
-  margin-left: auto;
-  margin-right: auto;
+  @include centred-margins;
 }
 
 footer .footer-background-wrapper {
@@ -219,8 +218,7 @@ footer .footer-centering-wrapper {
 
 .copyright-wrapper {
   clear: both;
-  margin-left: auto;
-  margin-right: auto;
+  @include centred-margins;
 
   @include mq($from: mobile-landscape) {
     position: absolute;
@@ -233,12 +231,6 @@ footer .footer-centering-wrapper {
 // SEARCH RESULTS PAGE
 
 #search-results {
-
-//  .valid-results-wrapper {
-//    ul {
-//      margin-left: 0px;
-//    }
-//  }
 
   .pagination-wrapper {
     .centering-wrapper {

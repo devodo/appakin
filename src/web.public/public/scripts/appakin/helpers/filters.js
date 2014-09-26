@@ -29,10 +29,10 @@
             var indexOfLastSpace = trimmedInput.lastIndexOf(' ');
 
             if (indexOfLastSpace > (maxSectionLength / 2)) {
-                return trimmedInput.substring(0, indexOfLastSpace);
+                return trimmedInput.substring(0, indexOfLastSpace) + ' ...';
             }
 
-            return trimmedInput;
+            return trimmedInput + ' ...';
         };
     });
 

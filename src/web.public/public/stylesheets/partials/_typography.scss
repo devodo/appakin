@@ -8,29 +8,22 @@
   url('/public/fonts/icomoon.svg#svgFontName') format('svg'); /* Legacy iOS */
 }
 
-// BASIC FONT
+h1 {
+  font: $header-font-family;
+}
 
-body {
+h2, h3, h4, h5, h6, body, input {
   font: $body-font-family;
 }
 
 p {
-  font-size: 16px;
-  line-height: 1.6em;
+   @include body-text;
 }
 
 p.tight-lines {
-  line-height: 1.3em;
+  line-height: 1.3em; //21px?
 }
 
 em {
   font-weight: bold;
-}
-
-p.body-text {
-  max-width: 500px;
-}
-
-h1 {
-  font: $header-font-family;
 }

@@ -1,96 +1,59 @@
 $score-icon-small-dimension: 14px;
 $score-icon-large-dimension: 20px;
 
+@mixin score-icon-size($dimension) {
+  font-size: $dimension;
+  line-height: $dimension;
+  width: $dimension;
+  height: $dimension;
+}
+
+@mixin score-x-offset($i) {
+  left: $score-icon-small-dimension * $i;
+
+  @include mq($from: tablet) {
+    left: $score-icon-large-dimension * $i;
+  }
+}
+
 .akin-score {
   position: relative;
   display: block;
 
-  span {
+  .icon,
+  .vote-count {
     position: absolute;
     display: block;
   }
 
-  span.icon {
-    font-size: $score-icon-small-dimension;
-    line-height: $score-icon-small-dimension;
-    width: $score-icon-small-dimension;
-    height: $score-icon-small-dimension;
-    font-family: "icomoon";
+  .icon {
     top: 0px;
     text-align: center;
+    @include score-icon-size($score-icon-small-dimension);
 
     @include mq($from: tablet) {
-      font-size: $score-icon-large-dimension;
-      line-height: $score-icon-large-dimension;
-      width: $score-icon-large-dimension;
-      height: $score-icon-large-dimension;
+      @include score-icon-size($score-icon-large-dimension);
     }
   }
 
-  span.icon:before {
-    color: $main-spot-colour;
-  }
+  .icon:before { color: $main-spot-colour; }
+  .icon.empty:before { @include icon($empty-star-icon); }
+  .icon.half-filled:before { @include icon($half-star-icon); }
+  .icon.filled:before { @include icon($full-star-icon); }
 
-  span.vote-count {
+  .zero  { @include score-x-offset(0); }
+  .one   { @include score-x-offset(1); }
+  .two   { @include score-x-offset(2); }
+  .three { @include score-x-offset(3); }
+  .four  { @include score-x-offset(4); }
+
+  .vote-count {
     top: 2px;
-    font-size: 12px;
-    line-height: $score-icon-small-dimension;
     right: 0px;
+    @include small-text;
 
     @include mq($from: tablet) {
-      font-size: 14px;
-      line-height: $score-icon-large-dimension;
-    }
-  }
-
-  span.empty:before {
-    font-family: "icomoon";
-    content: ".";
-  }
-
-  span.half-filled:before {
-    font-family: "icomoon";
-    content: ";";
-  }
-
-  span.filled:before {
-    font-family: "icomoon";
-    content: ":";
-  }
-
-  .zero {
-    left: 0px;
-  }
-
-  .one {
-    left: $score-icon-small-dimension;
-
-    @include mq($from: tablet) {
-      left: $score-icon-large-dimension;
-    }
-  }
-
-  .two {
-    left: $score-icon-small-dimension * 2;
-
-    @include mq($from: tablet) {
-      left: $score-icon-large-dimension * 2;
-    }
-  }
-
-  .three {
-    left: $score-icon-small-dimension * 3;
-
-    @include mq($from: tablet) {
-      left: $score-icon-large-dimension * 3;
-    }
-  }
-
-  .four {
-    left: $score-icon-small-dimension * 4;
-
-    @include mq($from: tablet) {
-      left: $score-icon-large-dimension * 4;
+      @include small-body-text;
     }
   }
 }
