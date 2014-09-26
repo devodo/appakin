@@ -33,7 +33,7 @@ footer .akin-logo {
   @include mq($from: tablet) {
     display: block;
     position: absolute;
-    bottom: 16px;
+    bottom: 20px;
     right: 0px;
     width: 200px;
     height: 53px;
@@ -41,8 +41,5 @@ footer .akin-logo {
 }
 
 .logo-for-pinterest {
-  opacity: 0;
-  position: absolute;
-  top: 0px;
-  left: -500px;
+  @include positioned-off-the-page;
 }

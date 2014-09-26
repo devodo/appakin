@@ -237,7 +237,7 @@ h1 {
 }
 
 .copyright-wrapper p {
-  font-size: 9px;
+  @include tiny-text;
   color: lighten($dark-background-colour, 25);
   text-align: center;
 }

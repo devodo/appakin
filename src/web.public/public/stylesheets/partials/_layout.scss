@@ -1,19 +1,24 @@
 // STICKY FOOTER
 
+$small-footer-height: 87px;
+$medium-footer-height: 92px;
+$large-footer-height: 137px;
+
 html {
   position: relative;
   min-height: 100%;
+  min-width: 320px;
 }
 
 body {
-  margin: 0px 0px 85px;
+  margin: 0px 0px $small-footer-height;
 
   @include mq($from: mobile-landscape) {
-    margin: 0px 0px 92px;
+    margin: 0px 0px $medium-footer-height;
   }
 
   @include mq($from: tablet) {
-    margin: 0px 0px 137px;
+    margin: 0px 0px $large-footer-height;
   }
 }
 
@@ -22,14 +27,14 @@ footer {
   left: 0px;
   bottom: 0px;
   width: 100%;
-  height: 85px;
+  height: $small-footer-height;
 
   @include mq($from: mobile-landscape) {
-    height: 92px;
+    height: $medium-footer-height;
   }
 
   @include mq($from: tablet) {
-    height: 137px;
+    height: $large-footer-height;
   }
 }
 
@@ -201,6 +206,7 @@ footer .footer-centering-wrapper {
   ul {
     position: relative;
     left: 50%;
+    @include clearfix;
 
     @include mq($from: mobile-landscape) {
       left: 0px;
@@ -223,7 +229,7 @@ footer .footer-centering-wrapper {
   @include mq($from: mobile-landscape) {
     position: absolute;
     right: 0px;
-    bottom: 13px;
+    bottom: 12px;
     margin-right: 30px;
   }
 }
