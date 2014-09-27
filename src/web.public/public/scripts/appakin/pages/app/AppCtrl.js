@@ -9,9 +9,9 @@
                 "Jul", "Aug", "Sept", "Oct", "Nov", "Dec" ];
 
             if (appData && !appData.serverError) {
-                pageTitle.setPageTitle(appData.name);
+                pageTitle.setPageTitle(appData.name + ' on appAkin');
             } else {
-                pageTitle.setPageTitle('');
+                pageTitle.setPageTitle('appAkin');
             }
 
             search.resetSearchTerm();

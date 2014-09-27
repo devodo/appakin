@@ -54,10 +54,18 @@
 
 // CONTROLS
 
-@mixin akin-fancy-button {
-  display: block;
-  text-shadow: 0px 1px 0px darken(white, 20);
+@mixin main-spot-colour-gradient-background {
   @include linear-gradient(to top, $main-spot-colour, lighten($main-spot-colour, 20), $fallback: lighten($main-spot-colour, 20));
+  text-shadow: 0px 1px 0px darken(white, 30);
+
+  &:active {
+    @include linear-gradient(to top, darken(#daa537, 15), darken(#d5b168, 15), $fallback: darken(#daa537, 15));
+  }
+}
+
+@mixin akin-fancy-button {
+  @include main-spot-colour-gradient-background;
+  display: block;
   margin: 0px;
   border: none;
   border-image-width: 0px;
@@ -66,8 +74,4 @@
   font-size: 16px;
   padding: 0px;
   cursor: pointer;
-
-  &:active {
-    @include linear-gradient(to top, darken(#daa537, 15), darken(#d5b168, 15), $fallback: darken(#daa537, 15));
-  }
 }

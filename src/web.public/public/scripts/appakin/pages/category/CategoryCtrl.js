@@ -4,9 +4,9 @@
         var categoryData = $route.current.locals.categoryData;
 
         if (categoryData && !categoryData.serverError) {
-            pageTitle.setPageTitle(categoryData.name);
+            pageTitle.setPageTitle(categoryData.name + ' on appAkin');
         } else {
-            pageTitle.setPageTitle('');
+            pageTitle.setPageTitle('appAkin');
         }
 
         search.resetSearchTerm();

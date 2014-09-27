@@ -83,16 +83,15 @@ footer {
     display: block;
     font-size: 14px;
     margin: 0px 6px;
-    background-color: lighten($alt-spot-colour, 20);
     height: 28px;
     line-height: 28px;
     text-align: center;
     border: 1px solid $control-border-colour;
     border-bottom: none;
     @include border-top-radius(6px);
-    text-shadow: 0px 1px 0px darken(white, 10);
     color: black;
     font-weight: normal;
+    @include main-spot-colour-gradient-background;
 
     @include mq($from: mobile-landscape) {
       font-size: 16px;

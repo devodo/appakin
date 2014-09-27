@@ -2,7 +2,7 @@
 
     angular.module('appAkin').controller('SearchResultsCtrl',
         function($scope, $timeout, $location, pageTitle, search, url) {
-            pageTitle.setPageTitle('Search Results');
+            pageTitle.setPageTitle('appAkin Search Results');
 
             $scope.search = search;
             $scope.url = url;
