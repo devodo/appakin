@@ -11,7 +11,7 @@
         <span class="icon"></span>There was a problem getting your search result. Please try again, or if the problem persists please try later.
     </p>
     <div class="no-error-wrapper" ng-if="!search.results.serverError">
-        <p class="warning"
+        <p class="info underline-on-hover"
            ng-show="search.results.items.length == 0">
             <span class="icon"></span>No results found.<span ng-show="search.results.suggestion"><br/>Did you mean <a href="{{url.createSearchUrl(search.results.suggestion, search.searchType)}}">{{search.results.suggestion}}</a>?</span>
         </p>

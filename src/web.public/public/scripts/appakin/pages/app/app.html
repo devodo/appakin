@@ -43,14 +43,12 @@
                 </a>
             </div>
             <div class="description">
-                <!--<h2>Description</h2>-->
                 <div ng-show="display.fullDescription">
                     <p class="body-text" ng-bind-html="app.data.description | formatDescription"></p>
-                    <!--<a class="less basic" href ng-click="toggleFullDescription()"><span></span></a>-->
                 </div>
                 <div ng-hide="display.fullDescription">
                     <p class="body-text" ng-bind-html="app.data.firstSection | formatDescription"></p>
-                    <a class="more basic" href ng-click="toggleFullDescription()"
+                    <a class="more never-underline" href ng-click="toggleFullDescription()"
                        ng-hide="app.data.firstSection === app.data.description"><span></span></a>
                 </div>
             </div>
@@ -83,7 +81,7 @@
                 <h2>RELATED CATEGORIES</h2>
                 <ul>
                     <li ng-repeat="category in app.data.categories">
-                        <h4><a class="body-link" href="{{ url.createCategoryUrl(app.data.platform, category.url) }}">{{category.name}}</a></h4>
+                        <h4><a class="body-link underline-on-hover" href="{{ url.createCategoryUrl(app.data.platform, category.url) }}">{{category.name}}</a></h4>
                     </li>
                 </ul>
             </div>

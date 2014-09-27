@@ -55,7 +55,7 @@ header {
 
     ul.social-media-links {
       float: right;
-      padding: 2px 4px 0px 0px;
+      padding-right: 4px;
 
       li {
         float: left;
@@ -155,6 +155,17 @@ main .main-wrapper {
   }
 }
 
+// PAGINATION
+
+ul.pagination {
+  @include clearfix;
+
+  li {
+    float: left;
+    list-style-type: none;
+  }
+}
+
 // FOOTER
 
 footer .call-to-action-link-wrapper {
@@ -216,6 +227,16 @@ footer .footer-centering-wrapper {
       float: left;
       position: relative; // for IE
       list-style-type: none;
+      color: lighten($main-spot-colour, 20);
+      font-size: 16px;
+
+      @include mq($from: tablet) {
+        font-size: 20px;
+      }
+
+      a {
+        float: left;
+      }
     }
   }
 }

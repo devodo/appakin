@@ -1,4 +1,3 @@
-
 a, a:link, a:visited, a:hover, a:active {
   color: $main-links-colour;
   font-weight: normal;
@@ -34,17 +33,8 @@ a.underline-on-hover:hover { text-decoration: underline; }
   a.facebook:after { @include icon($facebook-icon); }
   a.twitter:after { @include icon($twitter-icon); }
 
-  a.facebook:active,
-  a.facebook:hover {
-    color: #3a579b;
-  }
-
-
-
-  a.twitter:active,
-  a.twitter:hover {
-    color: #598dca;
-  }
+  a.facebook:active, a.facebook:hover { color: $facebook-colour; }
+  a.twitter:active, a.twitter:hover { color: $twitter-colour; }
 }
 
 // AKIN LOGO
@@ -59,14 +49,6 @@ a.underline-on-hover:hover { text-decoration: underline; }
 .autocomplete {
   a {
     font-size: 16px !important;
-  }
-
-  a.clear-search,
-  a.clear-search:link,
-  a.clear-search:visited,
-  a.clear-search:hover,
-  a.clear-search:active {
-    text-decoration: none;
     color: lighten($alt-black-colour, 10);
   }
 
@@ -106,16 +88,8 @@ footer {
 
 // FOOTER MENU
 
-.footer-menu ul li {
-  color: lighten($main-spot-colour, 20);
-  font-size: 16px;
-
-  @include mq($from: tablet) {
-    font-size: 20px;
-  }
-
+.footer-menu {
   a {
-    float: left;
     text-align: center;
     white-space: nowrap;
     padding-bottom: 6px;
@@ -126,40 +100,21 @@ footer {
 // PAGINATION
 
 ul.pagination {
-  @include clearfix;
-
   li {
-    float: left;
-    list-style-type: none;
-
     a {
       display: inline-block;
       min-width: 32px;
-      min-height: 30px;
-      border: 1px solid lighten($control-border-colour, 60);
+      height: 32px;
+      border: 1px solid $light-drawing-colour;
       margin-right: 4px;
       text-align: center;
-      font-size: 14px;
+      @include small-body-text;
       line-height: 30px;
-      height: 32px;
       @include border-top-radius(6px);
       @include border-bottom-radius(6px);
-    }
 
-    a,
-    a:link,
-    a:visited,
-    a:hover,
-    a:active {
       color: $alt-black-colour;
       font-weight: normal;
-    }
-
-    a,
-    a:link,
-    a:visited,
-    a:active {
-      text-decoration: none;
     }
   }
 
@@ -185,68 +140,17 @@ ul.pagination {
 
 li.category-search-result h4,
 li.app-search-result h4 {
-  a,
-  a:link,
-  a:visited,
-  a:hover,
-  a:active {
+  a {
     color: $main-links-colour;
     font-weight: normal;
-  }
-
-  a,
-  a:link,
-  a:visited,
-  a:active {
-    text-decoration: none;
   }
 }
 
 // WARNINGS
 
-p.warning {
-
-  a,
-  a:link,
-  a:visited,
-  a:hover,
-  a:active {
+p.info {
+  a {
     color: darken($main-spot-colour, 10);
     font-weight: normal;
   }
-
-  a,
-  a:link,
-  a:visited,
-  a:active {
-    text-decoration: none;
-  }
-}
-
-// GENERIC: BASIC
-
-a.basic,
-a.basic:link,
-a.basic:visited,
-a.basic:active,
-a.basic:hover {
-  text-decoration: none;
-}
-
-// GENERIC: BODY LINK
-
-a.body-link,
-a.body-link:link,
-a.body-link:visited,
-a.body-link:hover,
-a.body-link:active {
-  color: $main-links-colour;
-  font-weight: normal;
-}
-
-a.body-link,
-a.body-link:link,
-a.body-link:visited,
-a.body-link:active {
-  text-decoration: none;
 }

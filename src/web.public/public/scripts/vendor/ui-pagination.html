@@ -1,17 +1,17 @@
 <ul class="pagination" ng-class="{disabled: totalItems == 0}">
     <li ng-if="boundaryLinks" ng-class="{disabled: noPrevious()}">
-        <a href ng-click="selectPage(1)">{{getText('first')}}</a>
+        <a href ng-click="selectPage(1)" class="never-underline">{{getText('first')}}</a>
     </li>
     <li ng-if="directionLinks" ng-class="{disabled: noPrevious()}">
-        <a href ng-click="selectPage(page - 1)" class="previous">{{getText('previous')}}</a>
+        <a href ng-click="selectPage(page - 1)" class="previous never-underline">{{getText('previous')}}</a>
     </li>
     <li ng-if="!noPrevious() || !noNext()" ng-repeat="page in pages track by $index" ng-class="{active: page.active}">
-        <a href ng-click="selectPage(page.number)">{{page.text}}</a>
+        <a href ng-click="selectPage(page.number)" class="never-underline">{{page.text}}</a>
     </li>
     <li ng-if="directionLinks" ng-class="{disabled: noNext()}">
-        <a href ng-click="selectPage(page + 1)" class="next">{{getText('next')}}</a>
+        <a href ng-click="selectPage(page + 1)" class="next never-underline">{{getText('next')}}</a>
     </li>
     <li ng-if="boundaryLinks" ng-class="{disabled: noNext()}">
-        <a href ng-click="selectPage(totalPages)">{{getText('last')}}</a>
+        <a href ng-click="selectPage(totalPages)" class="never-underline">{{getText('last')}}</a>
     </li>
 </ul>
