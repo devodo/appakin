@@ -18,6 +18,16 @@
 
 // TYPOGRAPHY
 
+@mixin page-title-text {
+  font-size: 24px;
+  line-height: 28px;
+}
+
+@mixin large-page-title-text {
+  font-size: 32px;
+  line-height: 36px;
+}
+
 @mixin body-text {
   font-size: 16px;
   line-height: 26px; // 1.6em
@@ -74,4 +84,29 @@
   font-size: 16px;
   padding: 0px;
   cursor: pointer;
+}
+
+@mixin control-border {
+  border: 1px solid $light-drawing-colour;
+  @include border-top-radius(6px);
+  @include border-bottom-radius(6px);
+  padding: 3px;
+}
+
+@mixin akin-basic-button {
+  @include control-border;
+  vertical-align: middle;
+  font: $body-font-family;
+  font-weight: normal;
+  @include small-body-text;
+  color: $alt-black-colour;
+  display: inline-block;
+  padding-left: 12px;
+  padding-right: 12px;
+  text-align: center;
+  display: block;
+
+  &:active {
+    background-color: $light-drawing-colour;
+  }
 }

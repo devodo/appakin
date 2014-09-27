@@ -14,6 +14,12 @@ a.never-underline:link, a.never-underline:visited, a.never-underline:focus, a.ne
 a.underline-on-hover:link, a.underline-on-hover:visited, a.underline-on-hover:focus, a.underline-on-hover:active { text-decoration: none; }
 a.underline-on-hover:hover { text-decoration: underline; }
 
+// <a> as button
+
+a.basic-button {
+  @include akin-basic-button
+}
+
 // SOCIAL MEDIA
 
 .social-media-links {

@@ -1,11 +1,11 @@
 <div id="search-results" class="main-wrapper" ng-cloak>
     <h1 class="search-type" ng-if="search.searchType == 'category'">
         Categories&nbsp;&nbsp;
-        <a class="control-border never-underline" href="{{url.createSearchUrl(search.results.resultSearchTerm, 'app')}}">App Results</a>
+        <a class="never-underline basic-button" href="{{url.createSearchUrl(search.results.resultSearchTerm, 'app')}}">App Results</a>
     </h1>
     <h1 class="search-type" ng-if="search.searchType == 'app'">
         Apps&nbsp;&nbsp;
-        <a class="control-border never-underline" href="{{url.createSearchUrl(search.results.resultSearchTerm, 'category')}}">Category Results</a>
+        <a class="never-underline basic-button" href="{{url.createSearchUrl(search.results.resultSearchTerm, 'category')}}">Category Results</a>
     </h1>
     <p class="error" ng-show="search.results.serverError">
         <span class="icon"></span>There was a problem getting your search result. Please try again, or if the problem persists please try later.
