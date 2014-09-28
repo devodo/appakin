@@ -4,14 +4,14 @@ a, a:link, a:visited, a:hover, a:active {
 }
 
 // underline on click
-a.underline-on-click:link, a.underline-on-click:visited, a.underline-on-click:focus, a.underline-on-click:hover { text-decoration: none; }
+a.underline-on-click, a.underline-on-click:link, a.underline-on-click:visited, a.underline-on-click:focus, a.underline-on-click:hover { text-decoration: none; }
 a.underline-on-click:active { text-decoration: underline; }
 
 // never underline
-a.never-underline:link, a.never-underline:visited, a.never-underline:focus, a.never-underline:active, a.never-underline:hover { text-decoration: none; }
+a.never-underline, a.never-underline:link, a.never-underline:visited, a.never-underline:focus, a.never-underline:active, a.never-underline:hover { text-decoration: none; }
 
 // underline on hover
-a.underline-on-hover:link, a.underline-on-hover:visited, a.underline-on-hover:focus, a.underline-on-hover:active { text-decoration: none; }
+a.underline-on-hover, a.underline-on-hover:link, a.underline-on-hover:visited, a.underline-on-hover:focus, a.underline-on-hover:active { text-decoration: none; }
 a.underline-on-hover:hover { text-decoration: underline; }
 
 // <a> as button

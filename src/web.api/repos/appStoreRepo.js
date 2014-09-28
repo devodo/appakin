@@ -105,7 +105,7 @@ var getCategoryByExtId = function (client, extId, next) {
 
 var getCategoryApps = function(client, categoryId, skip, take, next) {
     var queryStr =
-        "SELECT a.ext_id, a.name, a.artwork_small_url, ca.position\n" +
+        "SELECT a.ext_id, a.name, a.artwork_small_url, substring(a.description from 0 for 150) as short_description, ca.position\n" +
         "FROM appstore_app a\n" +
         "JOIN category_app ca ON a.app_id = ca.app_id\n" +
         "WHERE ca.category_id = $1\n" +
@@ -124,6 +124,7 @@ var getCategoryApps = function(client, categoryId, skip, take, next) {
                 extId: item.ext_id,
                 name: item.name,
                 artworkSmallUrl: item.artwork_small_url,
+                shortDescription: item.short_description,
                 position: item.position
             };
         });

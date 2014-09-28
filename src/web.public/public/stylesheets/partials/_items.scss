@@ -32,6 +32,12 @@ p.info {
   }
 }
 
+p.hint {
+  color: darken($light-drawing-colour, 10);
+  @include small-body-text;
+  margin-bottom: 12px;
+}
+
 // Page title
 
 h1 {
@@ -52,13 +58,15 @@ h1 {
 
   .basic-button {
     position: absolute;
+    top: 6px;
     right: 0px;
   }
 }
 
 #search-results {
   h1 {
-    max-width: 552px;
+    max-width: 550px;
+    margin-bottom: 3px;
   }
 
   .list-wrapper {
@@ -103,58 +111,85 @@ h1 {
   }
 }
 
+// Category bullets
+li.category-search-result:before {
+  float: left;
+  @include icon($category-icon);
+  color: lighten($dark-background-colour, 40);
+  //vertical-align: text-bottom;
+  width: 18px;
+  font-size: 16px;
+  line-height: 16px;
+  padding-top: 4px;
+
+  @include mq($from: mobile-landscape) {
+    width: 22px;
+    font-size: 18px;
+    line-height: 18px;
+    padding-top: 5px;
+  }
+}
+
 .category-search-result {
   clear: both;
-  margin-bottom: 24px;
-  max-width: 550px;
+  padding-bottom: 9px;
+  margin-bottom: 12px;
+  //max-width: 550px;
   border-bottom: 1px solid $light-drawing-colour;
 
   @include mq($from: mobile-landscape) {
+    padding-bottom: 0px;
     border-bottom: none;
-    margin-bottom: 30px;
+    margin-bottom: 12px;
   }
 
   h4 {
-    margin-bottom: 6px;
+    margin-bottom: 9px;
+    font-weight: bold;
+    font-size: 18px;
+    line-height: 22px;
+    margin-left: 20px;
 
-    a {
-      font-size: 24px;
-      line-height: 28px;
-      font-weight: bold;
+    @include mq($from: mobile-landscape) {
+      font-size: 22px;
+      line-height: 26px;
+      margin-left: 24px;
     }
   }
 
-  h4:before {
-    @include icon($category-icon);
-    @include large-icon;
-    margin-right: 6px;
-    color: lighten($dark-background-colour, 40);
-    vertical-align: text-bottom;
-  }
-
   ul {
+    clear: both;
     @include clearfix;
 
     li {
       float: left;
-      width: 180px;
+      width: 154px;
+      margin-bottom: 6px;
 
       h6 {
         font-size: 14px;
         line-height: 18px;
-        width: 125px;
-        margin-left: 45px;
+        width: 111px;
+        margin-left: 40px;
+        margin-right: 3px;
+        height: 37px;
+        overflow: hidden;
+
+        a {
+
+         // height: 37px;
+        }
       }
 
       a.img-wrapper {
-        width: 40px;
-        height: 40px;
+        width: 37px;
+        height: 37px;
         display: block;
         float: left;
       }
 
       a {
-        color: lighten($dark-background-colour, 20) !important;
+        //color: lighten($dark-background-colour, 20) !important;
       }
 
       img {
@@ -162,11 +197,6 @@ h1 {
         @include border-bottom-radius(9px);
       }
     }
-  }
-
-  p {
-    word-wrap: break-word;
-    word-break: break-word;
   }
 
   p.description {

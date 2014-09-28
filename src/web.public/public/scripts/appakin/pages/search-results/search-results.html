@@ -15,6 +15,9 @@
            ng-show="search.results.items.length == 0">
             <span class="icon"></span>No results found.<span ng-show="search.results.suggestion"><br/>Did you mean <a href="{{url.createSearchUrl(search.results.suggestion, search.searchType)}}">{{search.results.suggestion}}</a>?</span>
         </p>
+        <p class="hint" ng-if="search.searchType == 'category'">
+            Click on a category to see all of the apps in it.
+        </p>
         <div class="valid-results-wrapper" ng-show="search.results.items.length > 0">
             <div class="list-wrapper" ng-class="search.searchInProgress ? 'disabled' : ''">
                 <ul ng-show="search.results.searchType === 'category'">
@@ -27,17 +30,16 @@
                         </h4>
                         <div class="category-match" ng-if="category.isCategoryMatch">
                             <p class="description" ng-bind-html="category.highlight.desc[0]"></p>
-                            <a class="more-link underline-on-hover" href="{{ url.createCategoryUrl(category.platform, category.url) }}">Click for apps...</a>
                         </div>
                         <div class="app-match" ng-if="!category.isCategoryMatch">
                             <ul class="category-apps">
-                                <li class="category-app"ng-repeat="app in category.apps | limitTo: 3">
-                                    <a class="img-wrapper" href="{{ url.createAppUrl(app.platform, app.url) }}" ><img ng-src="{{app.imageUrl}}" width="40px" height="40px"></a>
-                                    <h6><a class="underline-on-click" href="{{ url.createAppUrl(app.platform, app.url) }}" ng-bind-html="app.name | trim: 30"></a></h4>
+                                <li class="category-app"ng-repeat="app in category.apps | limitTo: 4">
+                                    <a class="img-wrapper" href="{{ url.createAppUrl(app.platform, app.url) }}" ><img ng-src="{{app.imageUrl}}" width="37px" height="37px"></a>
+                                    <h6><a class="underline-on-hover" href="{{ url.createAppUrl(app.platform, app.url) }}" ng-bind-html="app.name | trim: 30"></a></h4>
                                 </li>
                             </ul>
-                            <a class="more-link underline-on-hover" href="{{ url.createCategoryUrl(category.platform, category.url) }}">Click for all apps...</a>
-                        </div>
+                          </div>
+                        <!--<a class="more-link underline-on-hover" href="{{ url.createCategoryUrl(category.platform, category.url) }}">All apps in this category...</a>-->
                     </li>
                 </ul>
                 <ul ng-show="search.results.searchType === 'app'">
