@@ -1,6 +1,6 @@
 // STICKY FOOTER
 
-$small-footer-height: 87px;
+$small-footer-height: 80px;
 $medium-footer-height: 92px;
 $large-footer-height: 137px;
 
@@ -40,8 +40,9 @@ footer {
 
 // Sticky footer adjustment
 #home-page {
-  margin-top: 30px;
-  margin-bottom: 270px;
+  padding-top: 30px;
+  //margin-top: 30px;
+  padding-bottom: 170px;
 }
 
 // HEADER LAYOUT
@@ -181,7 +182,7 @@ footer .footer-background-wrapper {
 
 footer .footer-centering-wrapper {
   @include clearfix;
-
+  height: 48px;
   padding-bottom: 2px;
   position: relative;
   max-width: $website-max-width;

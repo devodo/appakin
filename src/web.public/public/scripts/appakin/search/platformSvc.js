@@ -30,8 +30,9 @@
             defaultPlatform: defaultPlatform,
             normalisePlatform: normalisePlatform,
             getInitialPlatform: function() {
-                // TODO: active this return statement before launch.
-                //return defaultPlatform;
+                return defaultPlatform;
+
+                // All the below is only for when we support multiple platforms.
 
                 // First try setting platform from URL.
                 var platform = normalisePlatform($location.search().p);

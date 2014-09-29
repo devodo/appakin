@@ -98,8 +98,11 @@ footer {
   a {
     text-align: center;
     white-space: nowrap;
-    padding-bottom: 6px;
     color: lighten($main-spot-colour, 20);
+
+    @include mq($from: mobile-landscape) {
+      padding-bottom: 6px;
+    }
   }
 }
 
