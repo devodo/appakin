@@ -5,7 +5,7 @@ $platform-big-button-margin: 10px;
 $platform-big-button-small-screen-size: 50px;
 $platform-big-button-large-screen-size: 60px;
 $platform-big-button-border-width: 3.2px; // Bizarre hack for firefox.
-$platform-big-button-border-radius: $normal-border-radius;
+$platform-big-button-border-radius: $normal-border-radius * 2;
 $platform-big-button-border-colour: lighten($main-spot-colour, 5);
 
 #home-page .platform-static {

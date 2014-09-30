@@ -46,21 +46,21 @@ footer {
 
 // HEADER LAYOUT
 
+ul.social-media-links {
+  float: right;
+  padding-right: 4px;
+
+  li {
+    float: left;
+  }
+}
+
 header {
   @include clearfix;
 
   .home-header-wrapper {
     max-width: $website-max-width;
     @include centred-margins;
-
-    ul.social-media-links {
-      float: right;
-      padding-right: 4px;
-
-      li {
-        float: left;
-      }
-    }
   }
 
   .search-header-outer-wrapper {

@@ -15,7 +15,6 @@ a.underline-on-hover, a.underline-on-hover:link, a.underline-on-hover:visited, a
 a.underline-on-hover:hover { text-decoration: underline; }
 
 // <a> as button
-
 a.basic-button {
   @include akin-basic-button
 }
