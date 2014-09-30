@@ -6,7 +6,7 @@
             var defaultRequestTimeoutMs = 4000;
 
             return function(requestTimeoutMs) {
-                var requestTimeoutMs = requestTimeoutMs || defaultRequestTimeoutMs;
+                requestTimeoutMs = requestTimeoutMs || defaultRequestTimeoutMs;
 
                 var currentRequest;
 

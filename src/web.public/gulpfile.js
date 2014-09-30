@@ -123,7 +123,7 @@ gulp.task('build:stylesheets', ['build:clean', 'build:config'], function () {
             function(path) {
                 path.basename = 'app-styles';
             }))
-        .pipe(plugins.minifyCss())
+        .pipe(plugins.minifyCss({noAdvanced:true}))
         .pipe(plugins.size({ showFiles: true }))
         .pipe(plugins.rev())
         .pipe(gulp.dest(buildRoot + '/public/stylesheets/'))
@@ -133,8 +133,8 @@ gulp.task('build:stylesheets', ['build:clean', 'build:config'], function () {
 gulp.task('build:index-html', ['build:scripts', 'build:stylesheets', 'build:templates'], function() {
     return gulp
 	    .src(indexHtmlPath)
-        .pipe(inject('./public/stylesheets/app-styles*.css', buildRoot, 'appakin-styles'))
-        .pipe(inject('./public/scripts/app-scripts*.js', buildRoot, 'appakin-scripts'))
+        .pipe(inject('./stylesheets/app-styles*.css', buildRoot + '/public', 'appakin-styles'))
+        .pipe(inject('./scripts/app-scripts*.js', buildRoot + '/public', 'appakin-scripts'))
         //.pipe(inject('./public/templates/app-templates*.js', buildRoot, 'appakin-templates'))
         .pipe(gulp.dest(buildRoot))
 		.on('error', handleError);
@@ -200,9 +200,9 @@ gulp.task('build:cdnify', ['build:index-html', 'build:stylesheets'], function() 
                         cdn: '//ajax.googleapis.com/ajax/libs/angularjs/${ version }/angular-cookies.min.js'
                     },
                     {
-                        file: '/bower_components/html5shiv/dist/html5shiv.js',
-                        package: 'html5shiv',
-                        cdn: '//cdnjs.cloudflare.com/ajax/libs/html5shiv/${ version }/html5shiv.min.js'
+                        file: '/bower_components/angular-sanitize/angular-sanitize.js',
+                        package: 'angular-sanitize',
+                        cdn: '//ajax.googleapis.com/ajax/libs/angularjs/${ version }/angular-sanitize.min.js'
                     }
                 ]
 			}))

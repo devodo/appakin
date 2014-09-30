@@ -14,7 +14,7 @@
                     $timeout(function() {
                         search.submitSearch(1);
                     }, 0);
-                }
+                };
 
                 $scope.ddSelectOptions = [
                     {

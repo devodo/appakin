@@ -33,35 +33,35 @@
                 return defaultPlatform;
 
                 // All the below is only for when we support multiple platforms.
-
-                // First try setting platform from URL.
-                var platform = normalisePlatform($location.search().p);
-                    //$routeParams.p);
-                console.log('platform from url: ' + platform);
-
-                if (platform === undefined) {
-                    // Set platform from cookie.
-                    platform = normalisePlatform($cookies.platform);
-
-                    console.log('platform from cookie: ' + platform);
-                }
-
-                if (platform === undefined) {
-                    // Set platform to client if client is mobile.
-                    platform = getPlatformIfMobileClient();
-
-                    console.log('platform from mobile client: ' + platform);
-                }
-
-                if (platform === undefined) {
-                    // Fallback.
-                    platform = defaultPlatform;
-                }
-
-                console.log('Final initial platform: ' + platform);
-
-                $cookies.platform = platform;
-                return platform;
+//
+//                // First try setting platform from URL.
+//                var platform = normalisePlatform($location.search().p);
+//                    //$routeParams.p);
+//                console.log('platform from url: ' + platform);
+//
+//                if (platform === undefined) {
+//                    // Set platform from cookie.
+//                    platform = normalisePlatform($cookies.platform);
+//
+//                    console.log('platform from cookie: ' + platform);
+//                }
+//
+//                if (platform === undefined) {
+//                    // Set platform to client if client is mobile.
+//                    platform = getPlatformIfMobileClient();
+//
+//                    console.log('platform from mobile client: ' + platform);
+//                }
+//
+//                if (platform === undefined) {
+//                    // Fallback.
+//                    platform = defaultPlatform;
+//                }
+//
+//                console.log('Final initial platform: ' + platform);
+//
+//                $cookies.platform = platform;
+//                return platform;
             },
             persistPlatform: function(platform) {
                 var normalisedPlatform = normalisePlatform(platform);

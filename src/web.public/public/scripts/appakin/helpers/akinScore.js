@@ -21,7 +21,7 @@
                     }
 
                     return 'half-filled';
-                }
+                };
 
                 $scope.getIndexClass = function(index) {
                     switch (index) {
@@ -31,7 +31,7 @@
                         case 3: return 'three';
                         default: return 'four';
                     }
-                }
+                };
             }
         };
     });
