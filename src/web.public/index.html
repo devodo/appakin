@@ -23,12 +23,26 @@
     <link rel="apple-touch-icon" sizes="76x76" href="/images/touch-icon-ipad.png">
     <link rel="apple-touch-icon" sizes="120x120" href="/images/touch-icon-iphone-retina.png">
     <link rel="apple-touch-icon" sizes="152x152" href="/images/touch-icon-ipad-retina.png">
-
-    <!--[if lt IE 9]>
-    <script src="/bower_components/html5shiv/dist/html5shiv.js"></script>
-    <![endif]-->
 </head>
 <body>
+    <!--[if lte IE 8]>
+    <link rel="stylesheet" href="/public/stylesheets/vendor/ie8-overlay.css">
+    <div id="ie8_overlay_bg"></div>
+    <div id="ie8_overlay">
+        <img class="akin-logo" src="/images/appakin-logo-light.svg">
+        <h1>You are using an outdated version of Internet Explorer</h1>
+        <p>
+            Unfortunately, Internet Explorer 8 and earlier are not supported by this Web site.
+            We recommend that you switch to a modern Web browser, either the latest version
+            of Internet Explorer or one of the other available Web browsers.
+        </p>
+        <p class="small">
+            See <a href="http://browsehappy.com/" target="_blank">Browse Happy</a>
+            for your options and for more information.
+        </p>
+    </div>
+    <![endif]-->
+
     <img class="logo-for-pinterest" src="/images/touch-icon-ipad-retina.png" alt="appAkin">
 
     <header data-akin-header id="header"></header>

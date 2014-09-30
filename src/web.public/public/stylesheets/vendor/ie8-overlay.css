@@ -1,0 +1,74 @@
+html, body{
+    height: 100%;
+    overflow: hidden;
+    padding-top:50px;
+}
+#ie8_overlay_bg{
+    display: block;
+    height: 100%;
+    width: 100%;
+    background: #fff;
+    position: absolute;
+    left:0;
+    top:0;
+    z-index: 999;
+}
+#ie8_overlay{
+    display: block;
+    position: relative;
+    z-index: 1000;
+    text-align: left;
+    background: #fff;
+    width: 620px;
+    margin: 0 auto;
+    padding:25px 30px;
+    border: 10px solid #363636;
+}
+#ie8_overlay h1{
+    font-size: 18px;
+    line-height: 24px;
+    font-family: 'Noto Sans', sans-serif;
+    text-transform: none;
+    text-align: center;
+    color: #000;
+    margin: 0 0 10px 0;
+    font-weight: bold;
+}
+#ie8_overlay img{
+    display: block;
+    width: 200px;
+    margin-left: auto;
+    margin-right: auto;
+}
+#ie8_overlay p{
+    color: #222;
+    font-weight: normal;
+    font-size: 14px;
+    line-height: 20px;
+    text-align: center;
+}
+#ie8_overlay div{
+    width: 183px;
+    padding-left:100px;
+    float: left;
+    height: 100px;
+}
+#ie8_overlay div p a{
+    color: #777;
+    text-decoration: none;
+    font-size: 14px;
+    background: none;
+}
+#ie8_overlay p a:hover{
+    color: #000;
+    text-decoration: none;
+    background:none;
+}
+#ie8_overlay a{
+    text-decoration: underline;
+}
+#ie8_overlay .small{
+    font-size: 12px;
+    line-height: 16px;
+    margin-top: 6px;
+}

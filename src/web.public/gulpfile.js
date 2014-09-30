@@ -156,6 +156,7 @@ gulp.task('build:copy', ['build:clean'], function() {
             './routes/**/*.*',
             './views/**/*.*',
             './public/fonts/*.*',
+            './public/stylesheets/vendor/*.css',
             './*.*',
             '!./bower.json', '!./gulpfile.js', '!./index.html'
 		];
@@ -166,9 +167,6 @@ gulp.task('build:copy', ['build:clean'], function() {
     fsSync.copy('./public/scripts/appakin/pages/privacy/privacy.html',
             buildRoot + '/public/templates/appakin/pages/privacy/privacy.html');
 
-    //'!./public/scripts/appakin/pages/terms/terms.html',
-    //    '!./public/scripts/appakin/pages/privacy/privacy.html'
-		
 	return gulp
 	    .src(filesToCopy, {base: './'})
 	    .pipe(gulp.dest(buildRoot))
