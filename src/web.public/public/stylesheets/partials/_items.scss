@@ -691,7 +691,7 @@ li.category-search-result:before {
     border-bottom: 1px solid $light-drawing-colour;
     padding: 12px 0px 12px 18px;
     margin-bottom: 24px;
-
+    max-width: 550px;
 
     a {
       color: $main-spot-colour;

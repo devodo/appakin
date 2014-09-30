@@ -129,6 +129,11 @@
     width: 0;
     position: absolute;
     pointer-events: none;
+
+    // Target IE
+    @media screen and (-ms-high-contrast: active), (-ms-high-contrast: none) {
+      top: 99.99%; // bizarre IE hack; should be 100%
+    }
   }
   &:after {
     border-color: transparent;

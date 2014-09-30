@@ -98,6 +98,7 @@ header .searchbox-wrapper {
       font-size: 14px;
       line-height: 28px;
       padding: 0px 8px;
+      padding-left: 18px;
       font-weight: normal;
       width: 140px;
       display: block;
@@ -105,7 +106,7 @@ header .searchbox-wrapper {
       border: 1px solid lighten($control-border-colour, 30);
       @include border-top-radius(2px);
       @include border-bottom-radius(2px);
-      cursor: pointer;
+      cursor: auto;
       text-align: left;
       background-color: transparent;
       color: white;
