@@ -8,6 +8,12 @@
             controller: function ($scope, search) {
                 $scope.search = search;
                 $scope.platform = platform;
+
+                $scope.submitSearch = function(value) {
+                    $timeout(function() {
+                        search.submitSearch(1);
+                    }, 0);
+                };
             }
         };
     });
