@@ -155,6 +155,55 @@ main .main-wrapper {
   }
 }
 
+#about,
+#raters {
+  max-width: 600px;
+
+  @include mq($from: tablet) {
+    max-width: $website-max-width;
+    padding-left: 130px;
+    padding-right: 150px;
+  }
+
+  @include mq($from: wide) {
+    @include centred-margins;
+    padding-left: 150px;
+
+    .about-section {
+      float: left;
+      width: 50%;
+
+      p {
+        margin-right: 24px;
+      }
+    }
+  }
+
+  .contact-details {
+    clear: both;
+    max-width: 400px;
+    padding: 0px 12px;
+    @include centred-margins;
+
+    @include mq($from: mobile-landscape) {
+      padding: 0px !important;
+      margin-top: 30px;
+      margin-bottom: 30px;
+      width: 440px;
+      max-width: 440px;
+    }
+
+    .contact-details-section {
+      @include clearfix;
+
+      @include mq($from: mobile-landscape) {
+        float: left;
+        width: 220px;
+      }
+    }
+  }
+}
+
 // PAGINATION
 
 ul.pagination {
