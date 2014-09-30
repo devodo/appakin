@@ -7,13 +7,13 @@
 }
 
 @mixin large-icon {
-  font-size: 24pt;
-  line-height: 24pt;
+  font-size: 24px;
+  line-height: 24px;
 }
 
 @mixin very-large-icon {
-  font-size: 36pt;
-  line-height: 36pt;
+  font-size: 36px;
+  line-height: 36px;
 }
 
 // TYPOGRAPHY
@@ -26,6 +26,11 @@
 @mixin large-page-title-text {
   font-size: 32px;
   line-height: 36px;
+}
+
+@mixin large-body-text {
+  font-size: 18px;
+  line-height: 28px;
 }
 
 @mixin body-text {
@@ -108,5 +113,33 @@
 
   &:active {
     background-color: $light-drawing-colour;
+  }
+}
+
+// Down arrow
+
+@mixin down-arrow($left, $border-colour, $size) {
+  &:after,
+  &:before {
+    top: 100%;
+    left: $left;
+    border: solid transparent;
+    content: " ";
+    height: 0;
+    width: 0;
+    position: absolute;
+    pointer-events: none;
+  }
+  &:after {
+    border-color: transparent;
+    border-top-color: $body-background-colour;
+    border-width: $size;
+    margin-left: 0px - $size;
+  }
+  &:before {
+    border-color: transparent;
+    border-top-color: $border-colour;
+    border-width: $size + 4px;
+    margin-left: 0px - $size - 4px;
   }
 }
