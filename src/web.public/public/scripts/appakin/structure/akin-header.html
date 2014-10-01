@@ -1,10 +1,10 @@
-<div ng-show="location.path() === '/'" class="home-header-wrapper">
+<div ng-show="locationData.onHomePage" class="home-header-wrapper">
     <ul class="social-media-links">
         <li><a href="http://www.facebook.com" class="facebook never-underline" target="_blank"></a></li>
         <li><a href="http://www.twitter.com" class="twitter never-underline" target="_blank"></a></li>
     </ul>
 </div>
-<div ng-hide="location.path() === '/'" class="search-header-outer-wrapper">
+<div ng-hide="locationData.onHomePage" class="search-header-outer-wrapper">
     <div class="search-header-inner-wrapper">
         <a class="akin-logo-link" href="/" tabindex="-1">
             <img class="akin-logo" src="/images/appakin-logo-light.svg">

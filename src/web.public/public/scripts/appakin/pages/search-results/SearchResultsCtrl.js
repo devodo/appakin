@@ -22,10 +22,6 @@
                 search.submitSearch(1);
             };
 
-            //$scope.$on('userChangedPlatform', function(event) {
-            //    search.submitSearch(1);
-            //});
-
             $scope.pageChanged = function() {
                 if (search.results.resultSearchTerm) {
                     search.searchTerm = search.results.resultSearchTerm;

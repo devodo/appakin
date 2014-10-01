@@ -6,7 +6,17 @@
             replace: false,
             templateUrl: '/public/templates/appakin/structure/akin-header.html',
             controller: function ($scope, $location) {
-                $scope.location = $location;
+                $scope.locationData = {
+                    onHomePage: onHomePage()
+                };
+
+                $scope.$on('$routeChangeSuccess', function () {
+                   $scope.locationData.onHomePage = onHomePage();
+                });
+
+                function onHomePage() {
+                    return $location.path() === '/';
+                }
             }
         };
     });
