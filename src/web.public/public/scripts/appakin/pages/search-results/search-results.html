@@ -1,27 +1,33 @@
 <div id="search-results" class="main-wrapper" ng-cloak>
-    <h1 class="search-type category" ng-if="search.searchType == 'category'">
+    <h1 class="search-type category" ng-if="isCategorySearch">
         Categories&nbsp;&nbsp;
-        <a class="never-underline basic-button" href="{{url.createSearchUrl(search.results.resultSearchTerm, 'app')}}">App Results</a>
+        <a class="never-underline basic-button"
+           href="{{url.createSearchUrl(resultSearchTerm, 'app')}}">App Results</a>
     </h1>
-    <h1 class="search-type app" ng-if="search.searchType == 'app'">
+    <h1 class="search-type app" ng-if="isAppSearch">
         Apps&nbsp;&nbsp;
-        <a class="never-underline basic-button" href="{{url.createSearchUrl(search.results.resultSearchTerm, 'category')}}">Category Results</a>
+        <a class="never-underline basic-button"
+           href="{{url.createSearchUrl(resultSearchTerm, 'category')}}">Category Results</a>
     </h1>
-    <p class="error" ng-show="search.results.serverError">
-        <span class="icon"></span>There was a problem getting your search result. Please try again, or if the problem persists please try later.
+    <p class="error" ng-show="serverError">
+        <span class="icon"></span>There was a problem getting your search result.
+        Please try again, or if the problem persists please try later.
     </p>
-    <div class="no-error-wrapper" ng-if="!search.results.serverError">
+    <div class="no-error-wrapper" ng-if="!serverError">
         <p class="info underline-on-hover"
-           ng-show="search.results.items.length == 0">
-            <span class="icon"></span>No results found.<span ng-show="search.results.suggestion"><br/>Did you mean <a href="{{url.createSearchUrl(search.results.suggestion, search.searchType)}}">{{search.results.suggestion}}</a>?</span>
+           ng-show="!hasResults">
+            <span class="icon"></span>No results found.<br/>
+            <span ng-show="suggestion">Did you mean
+                <a href="{{url.createSearchUrl(suggestion, searchType)}}">{{suggestion}}</a>?
+            </span>
         </p>
-        <p class="hint" ng-if="search.searchType == 'category' && search.results.items.length">
+        <p class="hint" ng-if="isCategorySearch && hasResults">
             Click on a category to see all of its apps.
         </p>
-        <div class="valid-results-wrapper" ng-show="search.results.items.length > 0">
+        <div class="valid-results-wrapper" ng-show="hasResults">
             <div class="list-wrapper" ng-class="search.searchInProgress ? 'disabled' : ''">
-                <ul ng-show="search.results.searchType === 'category'">
-                    <li ng-repeat="category in search.results.items"
+                <ul ng-show="isCategorySearch">
+                    <li ng-repeat="category in resultItems"
                         class="category-search-result">
                         <h4>
                             <a class="underline-on-hover"
@@ -39,11 +45,10 @@
                                 </li>
                             </ul>
                           </div>
-                        <!--<a class="more-link underline-on-hover" href="{{ url.createCategoryUrl(category.platform, category.url) }}">All apps in this category...</a>-->
                     </li>
                 </ul>
-                <ul ng-show="search.results.searchType === 'app'">
-                    <li ng-repeat="app in search.results.items track by app.url"
+                <ul ng-show="isAppSearch">
+                    <li ng-repeat="app in resultItems track by app.url"
                         class="app-search-result">
                         <a href="{{ url.createAppUrl(app.platform, app.url) }}">
                             <img ng-src="{{app.imageUrl}}" width="57px" height="57px">
@@ -51,7 +56,7 @@
                         <h4>
                             <a class="underline-on-hover"
                                href="{{ url.createAppUrl(app.platform, app.url) }}"
-                               ng-bind-html="app.name | trim: 50 | highlight: search.searchTerm"></a>
+                               ng-bind-html="app.name | trim: 50 | highlight: resultSearchTerm"></a>
                         </h4>
                         <p class="tight-lines" ng-bind-html="app.highlight"></p>
                     </li>
@@ -60,8 +65,8 @@
             <div class="pagination-wrapper">
                 <div class="centering-wrapper">
                     <div pagination
-                         ng-show="search.results.totalItems > 0"
-                         total-items="search.results.totalItems"
+                         ng-show="resultTotalItems > 0"
+                         total-items="resultTotalItems"
                          max-size="numPages"
                          ng-model="search.currentPage"
                          ng-change="pageChanged()"
