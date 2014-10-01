@@ -6,6 +6,11 @@
   content: $content;
 }
 
+@mixin medium-icon {
+  font-size: 20px;
+  line-height: 20px;
+}
+
 @mixin large-icon {
   font-size: 24px;
   line-height: 24px;
@@ -147,4 +152,10 @@
     border-width: $size + 4px;
     margin-left: 0px - $size - 4px;
   }
+}
+
+// Images
+
+@mixin app-icon-shadow {
+  box-shadow: 0px 2px 2px #888;
 }

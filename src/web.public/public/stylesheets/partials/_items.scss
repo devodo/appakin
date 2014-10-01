@@ -34,7 +34,7 @@ p.info {
 
 p.hint {
   color: darken($light-drawing-colour, 10);
-  @include small-body-text;
+  @include small-text;
   margin-bottom: 12px;
 }
 
@@ -57,20 +57,40 @@ h1 {
   margin-bottom: 12px;
   color: $main-heading-colour;
 
+  color: $main-spot-colour;
+  border: 3px solid $main-spot-colour;
+  @include border-top-radius(12px);
+  @include border-bottom-radius(12px);
+  padding-top: 18px;
+  padding-bottom: 6px;
+
+  @include mq($from: mobile-landscape) {
+    margin-top: 12px;
+    margin-bottom: 30px;
+    border: 0px;
+    border-bottom: 2px solid $main-spot-colour; // $light-drawing-colour;
+    @include border-bottom-radius(0px);
+  }
+
   @include mq($from: tablet) {
     @include large-page-title-text;
   }
 
   .basic-button {
     position: absolute;
-    top: 6px;
-    right: 0px;
+    bottom: 6px;
+    right: 6px;
+    border-color: $main-spot-colour;
+    color: $main-spot-colour;
   }
 }
 
 #search-results {
-  h1 {
+  h1, p.hint {
     max-width: 550px;
+  }
+
+  h1.category {
     margin-bottom: 3px;
   }
 
@@ -81,6 +101,11 @@ h1 {
   p.error,
   p.info {
     max-width: 550px;
+  }
+
+  p.hint {
+    text-align: center;
+    margin-bottom: 18px;
   }
 
   .disabled {
@@ -98,12 +123,13 @@ h1 {
 .app-search-result {
   h4 {
     margin-bottom: 3px;
-    font-size: 18px;
+    @include large-body-text;
   }
 
   p {
-    font-size: 14px;
+    @include small-body-text;
     color: $alt-black-colour;
+    margin-left: 6px;
 
     em {
       color: darken($alt-black-colour, 10);
@@ -117,48 +143,76 @@ h1 {
 }
 
 // Category bullets
-li.category-search-result:before {
-  float: left;
-  @include icon($category-icon);
-  color: lighten($dark-background-colour, 40);
-  //vertical-align: text-bottom;
-  width: 18px;
-  font-size: 16px;
-  line-height: 16px;
-  padding-top: 4px;
-
-  @include mq($from: mobile-landscape) {
-    width: 22px;
-    font-size: 18px;
-    line-height: 18px;
-    padding-top: 5px;
-  }
-}
+//li.category-search-result:before {
+//  float: left;
+//  @include icon($category-icon);
+//  color: lighten($dark-background-colour, 40);
+//  //vertical-align: text-bottom;
+//  width: 18px;
+//  font-size: 16px;
+//  line-height: 16px;
+//  padding-top: 4px;
+//
+//  @include mq($from: mobile-landscape) {
+//    width: 22px;
+//    font-size: 18px;
+//    line-h//eight: 18px;
+//    padding-top: 5px;
+//  }
+//}
 
 .category-search-result {
   clear: both;
   padding-bottom: 9px;
   margin-bottom: 12px;
   //max-width: 550px;
-  border-bottom: 1px solid $light-drawing-colour;
+  //border-bottom: 1px solid $light-drawing-colour;
 
   @include mq($from: mobile-landscape) {
     padding-bottom: 0px;
-    border-bottom: none;
-    margin-bottom: 12px;
+    //border-bottom: none;
+    margin-bottom: 18px;
   }
 
   h4 {
+    position: relative;
     margin-bottom: 9px;
     font-weight: bold;
     font-size: 18px;
     line-height: 22px;
-    margin-left: 20px;
+    //margin-left: 20px;
+    border: 2px solid $main-spot-colour;
+    @include border-top-radius(6px);
+    @include border-bottom-radius(6px);
+    padding: 6px;
+    padding-right: 30px;
 
     @include mq($from: mobile-landscape) {
       font-size: 22px;
       line-height: 26px;
-      margin-left: 24px;
+      //margin-left: 24px;
+      border: none;
+      margin-bottom: 3px;
+      padding-left: 0px;
+    }
+  }
+
+  h4:after {
+    position: absolute;
+    @include icon($fancy-right-icon);
+    @include medium-icon;
+    color: lighten($main-spot-colour, 30);
+    top: 6px;
+    right: 3px;
+
+    @include mq($from: mobile-landscape) {
+      display: none;
+      //position: relative;
+      //display: inline;
+      //top: auto; // 0px;
+      //left: auto; //0px;
+      //margin-left: 3px;
+      //line-height: 24px;
     }
   }
 
@@ -200,6 +254,7 @@ li.category-search-result:before {
       img {
         @include border-top-radius(9px);
         @include border-bottom-radius(9px);
+        @include app-icon-shadow;
       }
     }
   }
@@ -240,6 +295,7 @@ li.category-search-result:before {
     margin-right: 6px;
     @include border-top-radius(12px);
     @include border-bottom-radius(12px);
+    @include app-icon-shadow;
   }
 }
 
@@ -574,7 +630,6 @@ li.category-search-result:before {
     color: $main-spot-colour;
     margin: 0px 0px 12px 0px;
     padding: 6px;
-    text-align: center;
     border-bottom: 1px solid lighten($main-spot-colour, 0);
     padding-bottom: 3px;
     text-align: left;

@@ -1,9 +1,9 @@
 <div id="search-results" class="main-wrapper" ng-cloak>
-    <h1 class="search-type" ng-if="search.searchType == 'category'">
+    <h1 class="search-type category" ng-if="search.searchType == 'category'">
         Categories&nbsp;&nbsp;
         <a class="never-underline basic-button" href="{{url.createSearchUrl(search.results.resultSearchTerm, 'app')}}">App Results</a>
     </h1>
-    <h1 class="search-type" ng-if="search.searchType == 'app'">
+    <h1 class="search-type app" ng-if="search.searchType == 'app'">
         Apps&nbsp;&nbsp;
         <a class="never-underline basic-button" href="{{url.createSearchUrl(search.results.resultSearchTerm, 'category')}}">Category Results</a>
     </h1>
@@ -15,8 +15,8 @@
            ng-show="search.results.items.length == 0">
             <span class="icon"></span>No results found.<span ng-show="search.results.suggestion"><br/>Did you mean <a href="{{url.createSearchUrl(search.results.suggestion, search.searchType)}}">{{search.results.suggestion}}</a>?</span>
         </p>
-        <p class="hint" ng-if="search.searchType == 'category'">
-            Click on a category to see all of the apps in it.
+        <p class="hint" ng-if="search.searchType == 'category' && search.results.items.length">
+            Click on a category to see all of its apps.
         </p>
         <div class="valid-results-wrapper" ng-show="search.results.items.length > 0">
             <div class="list-wrapper" ng-class="search.searchInProgress ? 'disabled' : ''">
@@ -29,7 +29,7 @@
                                href="{{ url.createCategoryUrl(category.platform, category.url) }}"></a>
                         </h4>
                         <div class="category-match" ng-if="category.isCategoryMatch">
-                            <p class="description" ng-bind-html="category.highlight.desc[0]"></p>
+                            <p class="description" ng-bind-html="'&hellip; ' + category.highlight.desc[0] + ' &hellip;'"></p>
                         </div>
                         <div class="app-match" ng-if="!category.isCategoryMatch">
                             <ul class="category-apps">
