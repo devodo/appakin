@@ -10,7 +10,7 @@ $alt-black-colour: $dark-background-colour; //lighten(black, 20);
 $text-light-colour: lighten($dark-background-colour, 20);
 $error-colour: #a03d34;
 $warning-colour: $alt-spot-colour;
-$main-links-colour: darken($alt-spot-colour, 10);
+$main-links-colour: $main-spot-colour; // darken($alt-spot-colour, 10);
 $disabled-text-colour: #bbb;
 $normal-border-radius: 6px;
 $body-font-family: 400 16px/1.6 'Noto Sans', sans-serif;
