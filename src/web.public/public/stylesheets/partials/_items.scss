@@ -51,28 +51,29 @@ h1 {
   font-weight: bold;
   display: block;
   border: 0px;
-  border-bottom: 1px solid $light-drawing-colour;
+  border-bottom: 2px solid $main-spot-colour;
   background-color: transparent;
   padding: 6px 6px 18px 6px;
   margin-bottom: 12px;
   color: $main-heading-colour;
 
   color: $main-spot-colour;
-  border: 3px solid $main-spot-colour;
-  @include border-top-radius(12px);
-  @include border-bottom-radius(12px);
+  //border: 3px solid $main-spot-colour;
+  //@include border-top-radius(12px);
+  //@include border-bottom-radius(12px);
   padding-top: 18px;
   padding-bottom: 6px;
+  padding-left: 0px;
 
   @include mq($from: mobile-landscape) {
     margin-top: 12px;
     margin-bottom: 30px;
     border: 0px;
     border-bottom: 2px solid $main-spot-colour; // $light-drawing-colour;
-    @include border-bottom-radius(0px);
+    //@include border-bottom-radius(0px);
   }
 
-  @include mq($from: tablet) {
+  @include mq($from: mobile-landscape) {
     @include large-page-title-text;
   }
 
@@ -85,11 +86,13 @@ h1 {
   }
 }
 
-#search-results {
-  h1, p.hint {
-    max-width: 550px;
-  }
+#search-results h1,
+#search-results p.hint,
+#app h1 {
+  max-width: 550px;
+}
 
+#search-results {
   h1.category {
     margin-bottom: 3px;
   }
@@ -163,58 +166,59 @@ h1 {
 
 .category-search-result {
   clear: both;
-  padding-bottom: 9px;
+  padding-bottom: 12px;
   margin-bottom: 12px;
   //max-width: 550px;
-  //border-bottom: 1px solid $light-drawing-colour;
+  border-bottom: 1px solid $main-spot-colour;
 
   @include mq($from: mobile-landscape) {
     padding-bottom: 0px;
-    //border-bottom: none;
+    border-bottom: none;
     margin-bottom: 18px;
   }
 
   h4 {
     position: relative;
-    margin-bottom: 9px;
+    margin-bottom: 3px;
     font-weight: bold;
-    font-size: 18px;
-    line-height: 22px;
+    font-size: 20px;
+    line-height: 24px;
     //margin-left: 20px;
-    border: 2px solid $main-spot-colour;
-    @include border-top-radius(6px);
-    @include border-bottom-radius(6px);
-    padding: 6px;
-    padding-right: 30px;
+    //border: 2px solid $main-spot-colour;
+    //@include border-top-radius(6px);
+    //@include border-bottom-radius(6px);
+    //padding: 6px;
+    //padding-right: 30px;
 
     @include mq($from: mobile-landscape) {
       font-size: 22px;
       line-height: 26px;
+      margin-bottom: 9px;
       //margin-left: 24px;
-      border: none;
-      margin-bottom: 3px;
-      padding-left: 0px;
+      //border: none;
+      //margin-bottom: 3px;
+      //padding-left: 0px;
     }
   }
 
-  h4:after {
-    position: absolute;
-    @include icon($fancy-right-icon);
-    @include medium-icon;
-    color: lighten($main-spot-colour, 30);
-    top: 6px;
-    right: 3px;
-
-    @include mq($from: mobile-landscape) {
-      display: none;
-      //position: relative;
-      //display: inline;
-      //top: auto; // 0px;
-      //left: auto; //0px;
-      //margin-left: 3px;
-      //line-height: 24px;
-    }
-  }
+//  h4:after {
+//    position: absolute;
+//    @include icon($fancy-right-icon);
+//    @include medium-icon;
+//    color: lighten($main-spot-colour, 30);
+//    top: 6px;
+//    right: 3px;
+//
+//    @include mq($from: mobile-landscape) {
+//      display: none;
+//      //position: relative;
+//      //display: inline;
+//      //top: auto; // 0px;
+//      //left: auto; //0px;
+//      //margin-left: 3px;
+//      //line-height: 24px;
+//    }
+//  }
 
   ul {
     clear: both;
