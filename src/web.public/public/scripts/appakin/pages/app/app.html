@@ -55,7 +55,7 @@
             <div class="screen-shots">
                 <div class="iphone-screen-shots"
                      ng-if="app.data.screenShotUrls.length > 0">
-                    <h2>SCREEN SHOTS</h2>
+                    <h2>SCREENSHOTS</h2>
                     <div class="screen-shot-wrapper img-border">
                         <ul rn-carousel rn-carousel-buffered rn-carousel-control>
                             <li ng-repeat="screenShotUrl in app.data.screenShotUrls">
@@ -63,11 +63,11 @@
                             </li>
                         </ul>
                     </div>
-                    <p class="label">iPhone Screen Shots</p>
+                    <p class="label">iPhone Screenshots</p>
                 </div>
                 <div class="ipad-screen-shots"
                      ng-if="app.data.screenShotUrls.length == 0 && app.data.ipadScreenShotUrls.length > 0">
-                    <h2>iPAD SCREEN SHOTS</h2>
+                    <h2>iPAD SCREENSHOTS</h2>
                     <div class="screen-shot-wrapper img-border">
                         <ul rn-carousel rn-carousel-buffered rn-carousel-control>
                             <li ng-repeat="screenShotUrl in app.data.ipadScreenShotUrls">
@@ -75,6 +75,7 @@
                             </li>
                         </ul>
                     </div>
+                    <p class="label">iPad Screenshots</p>
                 </div>
             </div>
             <div class="app-categories" ng-if="app.data.categories.length > 0">

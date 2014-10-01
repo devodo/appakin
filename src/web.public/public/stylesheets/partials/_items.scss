@@ -681,9 +681,7 @@ li.category-search-result:before {
   }
 
   p {
-    @include clearfix;
     @include large-body-text;
-    margin-bottom: 30px;
     max-width: 400px;
     padding: 0px 12px;
     @include centred-margins;
@@ -761,6 +759,29 @@ li.category-search-result:before {
         height: 34px;
         font-size: 34px;
       }
+    }
+  }
+}
+
+#about {
+  p {
+    @include clearfix;
+    margin-bottom: 30px;
+  }
+}
+
+#raters {
+  p {
+    margin-bottom: 12px;
+
+    @include mq($from: wide) {
+      //@include centred-margins;
+      float: left;
+      width: 300px;
+      margin-left: 12px;
+      margin-right: 12px;
+
+      //padding-left: 150px;
     }
   }
 }
