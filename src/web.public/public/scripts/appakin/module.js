@@ -12,7 +12,8 @@
         'appAkin.http',
         'debounce',
         'angularSpinner',
-        'angular-carousel'
+        'angular-carousel',
+        'ngStorage'
     ]);
 
     appAkin.config(function ($routeProvider, $locationProvider) {

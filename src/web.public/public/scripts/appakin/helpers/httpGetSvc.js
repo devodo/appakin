@@ -2,7 +2,7 @@
     'use strict';
 
     angular.module('appAkin.http', [])
-        .service('httpGet', function($timeout, $http, $q, webApiUrl) {
+        .service('httpGet', function($timeout, $http, $q, webApiUrl, $sessionStorage) {
             var defaultRequestTimeoutMs = 4000;
 
             return function(requestTimeoutMs) {
@@ -27,8 +27,23 @@
                 }
 
                 function doRequest(relativeUrl, success, error) {
+
                     resetCurrentRequest();
                     var url = webApiUrl + relativeUrl;
+                    console.log('invoked do request: url=' + url);
+
+                    var cachedData = $sessionStorage[url];
+                    if (cachedData) {
+                        // TODO: check data
+                        console.log('got data from session cache');
+
+                        currentRequest.active = false;
+                        if (success) {
+                            success(cachedData);
+                        }
+
+                        return;
+                    }
 
                     var localCurrentRequest = currentRequest;
                     localCurrentRequest.active = true;
@@ -58,6 +73,12 @@
                                 timeout: localCurrentRequest.requestCancelPromise.promise
                             })
                         .success(function(data) {
+                            console.log('Successful search: url=' + url);
+
+                            if (data) {
+                                $sessionStorage[url] = data;
+                            }
+
                             if (success) {
                                 success(data);
                             }

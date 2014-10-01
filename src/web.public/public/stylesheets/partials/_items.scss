@@ -5,6 +5,8 @@ p.info {
   padding: 12px 24px;
   text-align: center;
   line-height: 16pt;
+  @include centred-margins;
+  margin-top: 50px;
 
   .icon:before {
     @include very-large-icon;
@@ -224,41 +226,60 @@ h1 {
     clear: both;
     @include clearfix;
 
+    $small-category-result-icon-dim: 37px;
+    $large-category-result-icon-dim: 60px;
+
     li {
       float: left;
-      width: 154px;
+      width: $small-category-result-icon-dim + 117px;
       margin-bottom: 6px;
+
+      @include mq($from: desktop) {
+        width: $large-category-result-icon-dim + 137px;
+      }
 
       h6 {
         font-size: 14px;
         line-height: 18px;
-        width: 111px;
-        margin-left: 40px;
+        width: $small-category-result-icon-dim + 74px;
+        margin-left: $small-category-result-icon-dim + 3px;
         margin-right: 3px;
-        height: 37px;
+        height: $small-category-result-icon-dim;
         overflow: hidden;
 
-        a {
-
-         // height: 37px;
+        @include mq($from: desktop) {
+          font-size: 16px;
+          line-height: 22px;
+          overflow: visible;
+          width: $large-category-result-icon-dim + 66px;
+          margin-left: $large-category-result-icon-dim + 6px;
+          height: $large-category-result-icon-dim;
         }
       }
 
       a.img-wrapper {
-        width: 37px;
-        height: 37px;
+        width: $small-category-result-icon-dim;
+        height: $small-category-result-icon-dim;
         display: block;
         float: left;
-      }
 
-      a {
-        //color: lighten($dark-background-colour, 20) !important;
+        @include mq($from: desktop) {
+          width: $large-category-result-icon-dim;
+          height: $large-category-result-icon-dim;
+        }
       }
 
       img {
         @include border-top-radius(9px);
         @include border-bottom-radius(9px);
         @include app-icon-shadow;
+        width: $small-category-result-icon-dim;
+        height: $small-category-result-icon-dim;
+
+        @include mq($from: desktop) {
+          width: $large-category-result-icon-dim;
+          height: $large-category-result-icon-dim;
+        }
       }
     }
   }

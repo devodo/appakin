@@ -166,9 +166,25 @@
                         search.type = me.service.searchType;
                     }
 
+                    var currentSearch = $location.search();
+
+                    var locationNotChanging =  $location.path() === searchResultsPagePath &&
+                        currentSearch.q === search.q &&
+                        currentSearch.p === search.p &&
+                        (currentSearch.page === search.page || (!currentSearch.page && !search.page)) &&
+                        (currentSearch.type === search.type || (!currentSearch.type && search.type === defaultSearchType));
+
+                    // console.log('locationPath=' + $location.path() +
+                    // '  q=' + currentSearch.q + ' p=' + currentSearch.p +
+                    // ' page=' + currentSearch.page + ' type=' + currentSearch.type);
+
                     console.log('redirecting to search: q=' + me.service.searchTerm + ' p=' + me.service.platform + ' page=' + page);
                     $location.path(searchResultsPagePath).search(search);
-                    $route.reload();
+
+                    if (locationNotChanging) {
+                        console.log('location not changing');
+                        $route.reload();
+                    }
                 }
             };
 
