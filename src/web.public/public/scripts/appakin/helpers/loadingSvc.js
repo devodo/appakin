@@ -2,7 +2,7 @@
     'use strict';
 
     angular.module('appAkin').factory('loading', function($timeout, usSpinnerService) {
-        var loadingDelayedThresholdMs = 1000;
+        var loadingDelayedThresholdMs = 2000;
         var me = this;
         var timeoutPromise = null;
 

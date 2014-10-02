@@ -51,7 +51,7 @@
                     <li ng-repeat="app in resultItems track by app.url"
                         class="app-search-result">
                         <a href="{{ url.createAppUrl(app.platform, app.url) }}">
-                            <img ng-src="{{app.imageUrl}}" width="57px" height="57px">
+                            <img ng-src="{{app.imageUrl}}">
                         </a>
                         <h4>
                             <a class="underline-on-hover"

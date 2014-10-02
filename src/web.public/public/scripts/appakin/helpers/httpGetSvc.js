@@ -3,7 +3,7 @@
 
     angular.module('appAkin.http', [])
         .service('httpGet', function($timeout, $http, $q, webApiUrl, apiCache) {
-            var defaultRequestTimeoutMs = 4000;
+            var defaultRequestTimeoutMs = 5000;
 
             return function(requestTimeoutMs) {
                 requestTimeoutMs = requestTimeoutMs || defaultRequestTimeoutMs;

@@ -7,7 +7,8 @@
             $scope.search = search;
             $scope.url = url;
             $scope.numPages = 5;
-            $scope.searchType = search.results.searchType; // could be replaced.
+
+            $scope.searchType = search.results.searchType;
             $scope.isCategorySearch = search.results.searchType == 'category';
             $scope.isAppSearch = search.results.searchType == 'app';
             $scope.serverError = search.results.serverError;
