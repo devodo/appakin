@@ -701,11 +701,15 @@ h1 {
     }
   }
 
+  .screen-shots-positioning-wrapper {
+    position: relative;
+  }
+
   .screen-shots {
     @include mq($from: desktop) {
       position: absolute;
-      right: 0px;
-      top: 72px;
+      right: -264px;
+      top: 0px;
     }
 
     h2 {

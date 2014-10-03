@@ -48,40 +48,42 @@
                     <img src="/images/app-store-badge.svg">
                 </a>
             </div>
-            <div class="description">
-                <div ng-show="display.fullDescription">
-                    <p class="body-text" ng-bind-html="app.data.description | formatDescription"></p>
-                </div>
-                <div ng-hide="display.fullDescription">
-                    <p class="body-text" ng-bind-html="app.data.firstSection | formatDescription"></p>
-                    <a class="more never-underline" href ng-click="toggleFullDescription()"
-                       ng-hide="app.data.firstSection === app.data.description"><span></span></a>
-                </div>
-            </div>
-            <div class="screen-shots">
-                <div class="iphone-screen-shots"
-                     ng-if="app.data.screenShotUrls.length > 0">
-                    <h2>SCREENSHOTS</h2>
-                    <div class="screen-shot-wrapper img-border">
-                        <ul rn-carousel rn-carousel-buffered rn-carousel-control>
-                            <li ng-repeat="screenShotUrl in app.data.screenShotUrls">
-                                <img ng-src="{{screenShotUrl}}" nopin="nopin">
-                            </li>
-                        </ul>
+            <div class="screen-shots-positioning-wrapper">
+                <div class="description">
+                    <div ng-show="display.fullDescription">
+                        <p class="body-text" ng-bind-html="app.data.description | formatDescription"></p>
                     </div>
-                    <p class="label">iPhone Screenshots</p>
-                </div>
-                <div class="ipad-screen-shots"
-                     ng-if="app.data.screenShotUrls.length == 0 && app.data.ipadScreenShotUrls.length > 0">
-                    <h2>iPAD SCREENSHOTS</h2>
-                    <div class="screen-shot-wrapper img-border">
-                        <ul rn-carousel rn-carousel-buffered rn-carousel-control>
-                            <li ng-repeat="screenShotUrl in app.data.ipadScreenShotUrls">
-                                <img ng-src="{{screenShotUrl}}" nopin="nopin">
-                            </li>
-                        </ul>
+                    <div ng-hide="display.fullDescription">
+                        <p class="body-text" ng-bind-html="app.data.firstSection | formatDescription"></p>
+                        <a class="more never-underline" href ng-click="toggleFullDescription()"
+                           ng-hide="app.data.firstSection === app.data.description"><span></span></a>
                     </div>
-                    <p class="label">iPad Screenshots</p>
+                </div>
+                <div class="screen-shots">
+                    <div class="iphone-screen-shots"
+                         ng-if="app.data.screenShotUrls.length > 0">
+                        <h2>SCREENSHOTS</h2>
+                        <div class="screen-shot-wrapper img-border">
+                            <ul rn-carousel rn-carousel-buffered rn-carousel-control>
+                                <li ng-repeat="screenShotUrl in app.data.screenShotUrls">
+                                    <img ng-src="{{screenShotUrl}}" nopin="nopin">
+                                </li>
+                            </ul>
+                        </div>
+                        <p class="label">iPhone Screenshots</p>
+                    </div>
+                    <div class="ipad-screen-shots"
+                         ng-if="app.data.screenShotUrls.length == 0 && app.data.ipadScreenShotUrls.length > 0">
+                        <h2>iPAD SCREENSHOTS</h2>
+                        <div class="screen-shot-wrapper img-border">
+                            <ul rn-carousel rn-carousel-buffered rn-carousel-control>
+                                <li ng-repeat="screenShotUrl in app.data.ipadScreenShotUrls">
+                                    <img ng-src="{{screenShotUrl}}" nopin="nopin">
+                                </li>
+                            </ul>
+                        </div>
+                        <p class="label">iPad Screenshots</p>
+                    </div>
                 </div>
             </div>
             <div class="app-categories" ng-if="app.data.categories.length > 0">
