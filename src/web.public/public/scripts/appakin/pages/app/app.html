@@ -17,7 +17,7 @@
                 <div class="rating sidebar-section" ng-if="app.data.userRatingCurrent">
                     <h6>CURRENT RATING</h6>
                     <div ng-if="app.data.ratingCountCurrent >= 5"
-                         akin-score score="app.data.userRatingCurrent" votes="app.data.ratingCountCurrent"></div>
+                         akin-score score="app.data.userRatingCurrent" votes="formatVoteCount(app.data.ratingCountCurrent)"></div>
                     <p ng-if="app.data.ratingCountCurrent < 5">&nbsp;&mdash;</p>
                 </div>
                 <div class="rating sidebar-section" ng-if="app.data.userRating && app.data.ratingCount >= 5">
