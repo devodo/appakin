@@ -7,10 +7,13 @@
         <p class="body-text">{{category.data.description}}</p>
         <ul>
             <li ng-repeat="app in category.data.apps track by app.url" class="app-search-result">
-                <a href="{{ url.createAppUrl(category.data.platform, app.url) }}" ><img ng-src="{{app.artworkSmallUrl}}" width="57px" height="57px"></a>
+                <a href="{{ url.createAppUrl(category.data.platform, app.url) }}">
+                    <img class="small" ng-src="{{app.artworkSmallUrl}}">
+                </a>
                 <h4><a class="underline-on-hover" href="{{ url.createAppUrl(category.data.platform, app.url) }}" ng-bind="app.name | trim: 50"></a></h4>
                 <p class="tight-lines">{{app.shortDescription}}</p>
             </li>
         </ul>
     </div>
 </div>
+<footer data-akin-footer></footer>
