@@ -772,7 +772,13 @@ h1 {
     }
   }
 
-  img {
+  .about-section {
+    @include mq($from: mobile-landscape) {
+      height: 300px;
+    }
+  }
+
+  .about-section img {
     width: 150px;
     height: 150px;
     display: block;
@@ -784,8 +790,10 @@ h1 {
     }
   }
 
-  p {
-    @include large-body-text;
+  .about-section p {
+    @include clearfix;
+    margin-bottom: 30px;
+    @include body-text;
     max-width: 400px;
     padding: 0px 12px;
     @include centred-margins;
@@ -796,7 +804,7 @@ h1 {
     }
   }
 
-  p.last {
+  .about-section p.last {
     @include mq($from: mobile-landscape) {
       margin-bottom: 0px;
     }
@@ -864,13 +872,6 @@ h1 {
         font-size: 34px;
       }
     }
-  }
-}
-
-#about {
-  p {
-    @include clearfix;
-    margin-bottom: 30px;
   }
 }
 
