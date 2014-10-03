@@ -823,7 +823,7 @@ h1 {
     //max-width: 550px;
     padding: 0px 12px;
 
-    a {
+    a.e-mail {
       color: $main-spot-colour;
     }
 
@@ -875,18 +875,22 @@ h1 {
   }
 }
 
-#raters {
+#raters .about-section {
+  height: auto;
+  width: auto;
+  
   p {
     margin-bottom: 12px;
 
     @include mq($from: wide) {
-      //@include centred-margins;
       float: left;
       width: 300px;
       margin-left: 12px;
       margin-right: 12px;
-
-      //padding-left: 150px;
     }
+  }
+
+  p:after {
+    display: none;
   }
 }

@@ -38,6 +38,11 @@
   line-height: 28px;
 }
 
+@mixin large-menu-text {
+  font-size: 20px;
+  line-height: 28px;
+}
+
 @mixin body-text {
   font-size: 16px;
   line-height: 26px; // 1.6em

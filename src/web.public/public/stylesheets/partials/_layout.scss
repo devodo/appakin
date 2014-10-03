@@ -277,10 +277,10 @@ footer .footer-centering-wrapper {
       position: relative; // for IE
       list-style-type: none;
       color: lighten($main-spot-colour, 20);
-      font-size: 16px;
+      @include body-text;
 
       @include mq($from: tablet) {
-        font-size: 20px;
+        @include large-menu-text;
       }
 
       a {
