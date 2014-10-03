@@ -55,24 +55,14 @@ h1 {
   border: 0px;
   border-bottom: 2px solid $main-spot-colour;
   background-color: transparent;
-  padding: 6px 6px 18px 6px;
-  margin-bottom: 12px;
-  color: $main-heading-colour;
-
+  padding: 6px 6px 6px 0px;
+  margin-bottom: 24px;
   color: $main-spot-colour;
-  //border: 3px solid $main-spot-colour;
-  //@include border-top-radius(12px);
-  //@include border-bottom-radius(12px);
-  padding-top: 18px;
-  padding-bottom: 6px;
-  padding-left: 0px;
 
   @include mq($from: mobile-landscape) {
     margin-top: 12px;
     margin-bottom: 30px;
-    border: 0px;
-    border-bottom: 2px solid $main-spot-colour; // $light-drawing-colour;
-    //@include border-bottom-radius(0px);
+    border-bottom: 2px solid $main-spot-colour;
   }
 
   @include mq($from: mobile-landscape) {
@@ -126,6 +116,10 @@ h1 {
 
 .category-search-result,
 .app-search-result {
+  border-bottom: 1px solid $main-spot-colour; //$light-drawing-colour;
+  padding-bottom: 12px;
+  margin-bottom: 12px;
+
   h4 {
     margin-bottom: 3px;
     @include large-body-text;
@@ -147,31 +141,11 @@ h1 {
   }
 }
 
-// Category bullets
-//li.category-search-result:before {
-//  float: left;
-//  @include icon($category-icon);
-//  color: lighten($dark-background-colour, 40);
-//  //vertical-align: text-bottom;
-//  width: 18px;
-//  font-size: 16px;
-//  line-height: 16px;
-//  padding-top: 4px;
-//
-//  @include mq($from: mobile-landscape) {
-//    width: 22px;
-//    font-size: 18px;
-//    line-h//eight: 18px;
-//    padding-top: 5px;
-//  }
-//}
-
 .category-search-result {
   clear: both;
-  padding-bottom: 12px;
-  margin-bottom: 12px;
-  //max-width: 550px;
-  border-bottom: 1px solid $main-spot-colour;
+  //padding-bottom: 12px;
+  //margin-bottom: 12px;
+  //border-bottom: 1px solid $main-spot-colour;
 
   @include mq($from: mobile-landscape) {
     padding-bottom: 0px;
@@ -185,42 +159,13 @@ h1 {
     font-weight: bold;
     font-size: 20px;
     line-height: 24px;
-    //margin-left: 20px;
-    //border: 2px solid $main-spot-colour;
-    //@include border-top-radius(6px);
-    //@include border-bottom-radius(6px);
-    //padding: 6px;
-    //padding-right: 30px;
 
     @include mq($from: mobile-landscape) {
       font-size: 22px;
       line-height: 26px;
       margin-bottom: 9px;
-      //margin-left: 24px;
-      //border: none;
-      //margin-bottom: 3px;
-      //padding-left: 0px;
     }
   }
-
-//  h4:after {
-//    position: absolute;
-//    @include icon($fancy-right-icon);
-//    @include medium-icon;
-//    color: lighten($main-spot-colour, 30);
-//    top: 6px;
-//    right: 3px;
-//
-//    @include mq($from: mobile-landscape) {
-//      display: none;
-//      //position: relative;
-//      //display: inline;
-//      //top: auto; // 0px;
-//      //left: auto; //0px;
-//      //margin-left: 3px;
-//      //line-height: 24px;
-//    }
-//  }
 
   ul {
     clear: both;
@@ -289,12 +234,17 @@ h1 {
   }
 }
 
+.category-search-result:last-of-type {
+  border-bottom: none;
+  padding-bottom: 0px;
+}
+
 .app-search-result {
   @include clearfix;
-  margin-bottom: 12px;
-  padding-bottom: 12px;
+  //margin-bottom: 12px;
+  //padding-bottom: 12px;
   max-width: 550px;
-  border-bottom: 1px solid $light-drawing-colour;
+  //border-bottom: 1px solid $light-drawing-colour;
 
   @include mq($from: mobile-landscape) {
     border-bottom: none;
@@ -323,23 +273,12 @@ h1 {
     @include border-top-radius(12px);
     @include border-bottom-radius(12px);
     @include app-icon-shadow;
-
-//    @include mq($from: mobile-landscape) {
-//      width: 80px;
-//      height: 80px;
-//      margin-right: 9px;
-//    }
   }
 }
 
-#category .app-search-result img {
-//  @include mq($from: mobile-landscape) {
-//    width: 80px;
-//    height: 80px;
-//    margin-right: 9px;
-//    @include border-top-radius(15px);
-//    @include border-bottom-radius(15px);
-//  }
+.app-search-result:last-of-type {
+  border-bottom: none;
+  padding-bottom: 0px;
 }
 
 .rule {

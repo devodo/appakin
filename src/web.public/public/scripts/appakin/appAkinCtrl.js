@@ -6,9 +6,10 @@
         function($scope, $location, pageTitle, $rootScope, loading, $document, $timeout, url, search, cache) {
             $scope.pageTitle = pageTitle;
 
+            var scrollCanBeCaptured = false;
+
             // Perform actions that crosscut the controllers.
             $rootScope.$on('$viewContentLoaded', function() {
-                //console.log('view content loaded');
                 $timeout(
                     function() {
                         var urlKey = $location.url();
@@ -22,10 +23,13 @@
                             var key = createScrollCacheKey(urlKey);
                             var scrollValue = cache.get(key);
 
+                            //console.log('Got scroll key: ' + key + ' - value ' + scrollValue);
+
                             if (scrollValue > 0) {
-                                //console.log('Got scroll key: ' + key + ' - scrolling to ' + scrollValue);
+                                console.log('Scrolling to ' + scrollValue);
                                 $document.scrollTop(scrollValue);
                             } else {
+                                console.log('Scrolling to top');
                                 $document.scrollTop(0);
                             }
                         } else {
@@ -40,20 +44,29 @@
 
                         // Ensure the global spinner disappears if it is visible.
                         loading.reset();
+
+                        scrollCanBeCaptured = true;
                     },
                     0);
             });
 
-            $rootScope.$on('$locationChangeStart', function(event, nextLocation, currentLocation) {
-                var urlKey = url.removeHost(currentLocation);
-                //console.log('locationchangestart urlKey: ' + urlKey);
+            $document.on('scroll', function() {
+                if (!scrollCanBeCaptured) {
+                    return;
+                }
+
+                var urlKey = $location.url();
 
                 if (url.onSearchResultsPage(urlKey) || url.onCategoryPage(urlKey)) {
                     var key = createScrollCacheKey(urlKey);
                     var value = $document.scrollTop();
-                    console.log('Setting scroll key: ' + key + ' value: ' + value);
+                    //console.log('Setting scroll key: ' + key + ' value: ' + value);
                     cache.set(key, value, false);
                 }
+            });
+
+            $rootScope.$on('$locationChangeStart', function(event, nextLocation, currentLocation) {
+                scrollCanBeCaptured = false;
             });
 
             function createScrollCacheKey(urlKey) {

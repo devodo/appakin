@@ -27,15 +27,15 @@
         <div class="valid-results-wrapper" ng-show="hasResults">
             <div class="list-wrapper" ng-class="search.searchInProgress ? 'disabled' : ''">
                 <ul ng-show="isCategorySearch">
-                    <li ng-repeat="category in resultItems"
-                        class="category-search-result">
+                    <li ng-repeat="category in resultItems" class="category-search-result"
+                        ng-class="{'last':$last}">
                         <h4>
                             <a class="underline-on-hover"
                                ng-bind-html="category.highlight && category.highlight.name_split ? category.highlight.name_split : category.name"
                                href="{{ url.createCategoryUrl(category.platform, category.url) }}"></a>
                         </h4>
                         <div class="category-match" ng-if="category.isCategoryMatch">
-                            <p class="description" ng-bind-html="'&hellip; ' + category.highlight.desc[0] + ' &hellip;'"></p>
+                            <p class="description" ng-bind-html="category.highlight.desc[0] + ' &hellip;'"></p>
                         </div>
                         <div class="app-match" ng-if="!category.isCategoryMatch">
                             <ul class="category-apps">
@@ -48,17 +48,17 @@
                     </li>
                 </ul>
                 <ul ng-show="isAppSearch">
-                    <li ng-repeat="app in resultItems track by app.url"
-                        class="app-search-result">
+                    <li ng-repeat="app in resultItems track by app.url" class="app-search-result"
+                        ng-class="{last:$last}">
                         <a href="{{ url.createAppUrl(app.platform, app.url) }}">
                             <img ng-src="{{app.imageUrl}}">
                         </a>
                         <h4>
                             <a class="underline-on-hover"
                                href="{{ url.createAppUrl(app.platform, app.url) }}"
-                               ng-bind-html="app.name | trim: 50 | highlight: resultSearchTerm"></a>
+                               ng-bind-html="app.name | firstSection: 55 | highlight: resultSearchTerm"></a>
                         </h4>
-                        <p class="tight-lines" ng-bind-html="app.highlight"></p>
+                        <p class="tight-lines" ng-bind-html="app.highlight ? app.highlight + ' &hellip;' : ''"></p>
                     </li>
                 </ul>
             </div>

@@ -13,12 +13,14 @@
     angular.module('appAkin').filter('firstSection', function($window) {
         var maxSectionLength = 400;
 
-        return function(input) {
-            if (input.length <= maxSectionLength) {
+        return function(input, maxLength) {
+            maxLength = maxLength || maxSectionLength;
+
+            if (input.length <= maxLength) {
                 return input;
             }
 
-            var trimmedInput = input.substring(0, maxSectionLength).trim();
+            var trimmedInput = input.substring(0, maxLength).trim();
 
             var indexOfNewline = trimmedInput.lastIndexOf('\n');
 
@@ -28,7 +30,7 @@
 
             var indexOfLastSpace = trimmedInput.lastIndexOf(' ');
 
-            if (indexOfLastSpace > (maxSectionLength / 2)) {
+            if (indexOfLastSpace > (maxLength / 2)) {
                 return trimmedInput.substring(0, indexOfLastSpace) + ' ...';
             }
 
