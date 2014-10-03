@@ -30,7 +30,7 @@ exports.init = function init(app) {
             return res.status(400).send('Bad query string');
         }
 
-        catSearcher.search(query, pageNum, function(err, result) {
+        catSearcher.search(query, pageNum, function (err, result) {
             if (err) {
                 return res.status(500).send(err);
             }
