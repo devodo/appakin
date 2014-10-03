@@ -10,8 +10,8 @@
                 <a href="{{ url.createAppUrl(category.data.platform, app.url) }}">
                     <img class="small" ng-src="{{app.artworkSmallUrl}}">
                 </a>
-                <h4><a class="underline-on-hover" href="{{ url.createAppUrl(category.data.platform, app.url) }}" ng-bind="app.name | trim: 50"></a></h4>
-                <p class="tight-lines">{{app.shortDescription}}</p>
+                <h4><a class="underline-on-hover" href="{{ url.createAppUrl(category.data.platform, app.url) }}" ng-bind="app.name | firstSection: 50"></a></h4>
+                <p class="tight-lines">{{app.shortDescription | firstSection: 120}}</p>
             </li>
         </ul>
     </div>
