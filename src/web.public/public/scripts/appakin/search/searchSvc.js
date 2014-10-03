@@ -2,11 +2,10 @@
     'use strict';
 
     angular.module('appAkin').factory('search',
-        function(httpGet, debounce, $timeout, $location, $rootScope, $route, platform) {
+        function(httpGet, debounce, $timeout, $location, $rootScope, $route, platform, url) {
             var me = this;
             var defaultCurrentPage = 1;
             var debounceTimeoutMs = 200;
-            var searchResultsPagePath = '/search';
             var defaultSearchType = 'category';
             var searchTypeRegex = /(category|app)/;
             var autoCompleteApi = httpGet();
@@ -160,7 +159,9 @@
                         search.page = null;
                     }
 
-                    if ($location.path() !== searchResultsPagePath) {
+                    var onSearchResultsPage = url.onSearchResultsPage($location.path());
+
+                    if (!onSearchResultsPage) {
                         me.service.resetSearchType();
                     } else if (me.service.searchType !== defaultSearchType) {
                         search.type = me.service.searchType;
@@ -168,7 +169,8 @@
 
                     var currentSearch = $location.search();
 
-                    var locationNotChanging =  $location.path() === searchResultsPagePath &&
+                    var locationNotChanging =
+                        onSearchResultsPage &&
                         currentSearch.q === search.q &&
                         currentSearch.p === search.p &&
                         (currentSearch.page === search.page || (!currentSearch.page && !search.page)) &&
@@ -179,7 +181,7 @@
                     // ' page=' + currentSearch.page + ' type=' + currentSearch.type);
 
                     console.log('redirecting to search: q=' + me.service.searchTerm + ' p=' + me.service.platform + ' page=' + page);
-                    $location.path(searchResultsPagePath).search(search);
+                    $location.path(url.searchResultsPagePath).search(search);
 
                     if (locationNotChanging) {
                         console.log('location not changing');

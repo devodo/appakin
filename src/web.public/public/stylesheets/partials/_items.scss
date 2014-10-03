@@ -316,19 +316,29 @@ h1 {
 
   img {
     float: left;
-    width: 57px;
-    height: 57px;
+    width: 60px;
+    height: 60px;
     margin-top: 2px;
     margin-right: 6px;
     @include border-top-radius(12px);
     @include border-bottom-radius(12px);
     @include app-icon-shadow;
 
-    @include mq($from: mobile-landscape) {
-      width: 80px;
-      height: 80px;
-      margin-right: 9px;
-    }
+//    @include mq($from: mobile-landscape) {
+//      width: 80px;
+//      height: 80px;
+//      margin-right: 9px;
+//    }
+  }
+}
+
+#category .app-search-result img {
+  @include mq($from: mobile-landscape) {
+    width: 80px;
+    height: 80px;
+    margin-right: 9px;
+    @include border-top-radius(15px);
+    @include border-bottom-radius(15px);
   }
 }
 

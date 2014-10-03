@@ -13,7 +13,8 @@
         'debounce',
         'angularSpinner',
         'angular-carousel',
-        'ngStorage'
+        'ngStorage',
+        'duScroll'
     ]);
 
     appAkin.config(function ($routeProvider, $locationProvider) {

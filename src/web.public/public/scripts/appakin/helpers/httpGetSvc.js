@@ -2,7 +2,7 @@
     'use strict';
 
     angular.module('appAkin.http', [])
-        .service('httpGet', function($timeout, $http, $q, webApiUrl, apiCache) {
+        .service('httpGet', function($timeout, $http, $q, webApiUrl, cache) {
             var defaultRequestTimeoutMs = 5000;
 
             return function(requestTimeoutMs) {
@@ -32,7 +32,7 @@
                     var url = webApiUrl + relativeUrl;
                     console.log('invoked do request: url=' + url);
 
-                    var cachedData = apiCache.get(url);
+                    var cachedData = cache.get(url);
                     if (cachedData) {
                         currentRequest.active = false;
                         if (success) {
@@ -73,7 +73,7 @@
                             console.log('Successful search: url=' + url);
 
                             if (data) {
-                                apiCache.set(url, data);
+                                cache.set(url, data, true);
                             }
 
                             if (success) {

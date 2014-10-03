@@ -1,7 +1,7 @@
 (function () {
     'use strict';
 
-    angular.module('appAkin').factory('apiCache', function($sessionStorage) {
+    angular.module('appAkin').factory('cache', function($sessionStorage) {
         var cacheTtlMinutes = 30;
         var noCache = false;
 
@@ -10,11 +10,14 @@
         }
 
         return {
-            set: function(keyStr, value) {
-                $sessionStorage[keyStr] = {
-                    data: value,
-                    added: new Date()
-                };
+            set: function(keyStr, value, hasTtl) {
+                var data = { data: value };
+
+                if (hasTtl) {
+                    data.added = new Date();
+                }
+
+                $sessionStorage[keyStr] = data;
             },
             get: function(keyStr) {
                 if (noCache) {
@@ -24,13 +27,17 @@
                 var result = $sessionStorage[keyStr];
 
                 if (result) {
-                    if (result.added && addMinutes(new Date(result.added), cacheTtlMinutes) > new Date()) {
-                        console.log('Got data from session cache for key ' + keyStr);
+                    if (result.added) {
+                        if (addMinutes(new Date(result.added), cacheTtlMinutes) > new Date()) {
+                            console.log('Got data from session cache for key ' + keyStr);
+                            return result.data;
+                        } else {
+                            // clear this now old data out.
+                            $sessionStorage[keyStr] = null;
+                        }
+                    } else {
                         return result.data;
                     }
-
-                    // Clear the old or incomplete data out.
-                    $sessionStorage[keyStr] = null;
                 }
 
                 return null;

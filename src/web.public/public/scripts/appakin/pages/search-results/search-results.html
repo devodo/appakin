@@ -2,12 +2,12 @@
     <h1 class="search-type category" ng-if="isCategorySearch">
         Categories&nbsp;&nbsp;
         <a class="never-underline basic-button"
-           href="{{url.createSearchUrl(resultSearchTerm, 'app')}}">App Results</a>
+           href="{{url.createSearchUrl(resultSearchTerm, 'app', search.platform)}}">App Results</a>
     </h1>
     <h1 class="search-type app" ng-if="isAppSearch">
         Apps&nbsp;&nbsp;
         <a class="never-underline basic-button"
-           href="{{url.createSearchUrl(resultSearchTerm, 'category')}}">Category Results</a>
+           href="{{url.createSearchUrl(resultSearchTerm, 'category', search.platform)}}">Category Results</a>
     </h1>
     <p class="error" ng-show="serverError">
         <span class="icon"></span>There was a problem getting your search result.
@@ -18,7 +18,7 @@
            ng-show="!hasResults">
             <span class="icon"></span>No results found.<br/>
             <span ng-show="suggestion">Did you mean
-                <a href="{{url.createSearchUrl(suggestion, searchType)}}">{{suggestion}}</a>?
+                <a href="{{url.createSearchUrl(suggestion, searchType, search.platform)}}">{{suggestion}}</a>?
             </span>
         </p>
         <p class="hint" ng-if="isCategorySearch && hasResults">
