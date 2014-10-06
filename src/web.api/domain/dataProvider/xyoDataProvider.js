@@ -14,11 +14,15 @@ var crawlCategoryApps = function(category, numPages, next) {
         var parsePageSrc = function(pageSrc) {
             var $ = cheerio.load(pageSrc);
 
-            var itemList = $('div.search-results-list div.titleCont h2');
+            var itemList = $('div.search-results-list a');
 
-            $(itemList).each(function(index, h2) {
+            $(itemList).each(function(index, a) {
+                var url = $(a).attr('href');
+                var h2 = $(a).find('div.titleCont h2');
+
                 items.push({
-                    name: $(h2).text()
+                    name: $(h2).text(),
+                    url: url
                 });
             });
 
@@ -29,7 +33,7 @@ var crawlCategoryApps = function(category, numPages, next) {
             retrievePage(pageNumber + 1);
         };
 
-        var url = category.url + '?page=' + pageNumber;
+        var url = category.url + '?country=US&page=' + pageNumber;
         request(url, function (err, response, src) {
             if (err) {
                 return next(err);
@@ -135,7 +139,7 @@ var retrieveCategoryApps = function(category, batchId, numPages, next) {
             }
             duplicateCheck[app.name] = true;
 
-            xyoRepo.insertXyoCategoryApp(category.id, batchId, app.name, position, function(err) {
+            xyoRepo.insertXyoCategoryApp(category.id, batchId, app.name, app.url, position, function(err) {
                 if (err) {
                     return callback(err);
                 }

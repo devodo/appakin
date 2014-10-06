@@ -24,6 +24,25 @@ exports.init = function init(app) {
             res.json({"success": true});
         });
     });
+
+    app.post('/admin/xyo/retrieveAllCategoryApps', function (req, res) {
+        var batch = parseInt(req.body.batch, 10);
+
+        if (isNaN(batch)) {
+            return res.status(500).json({"error": "must specify batch id"});
+        }
+
+        xyoData.retrieveAllCategoryApps(batch, function(err) {
+            if (err) {
+                return res.status(500).json(err);
+            }
+
+            res.json({"success": true});
+        });
+    });
+
+
+
 };
 
 

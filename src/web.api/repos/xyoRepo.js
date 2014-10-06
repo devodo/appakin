@@ -134,17 +134,18 @@ var getXyoCategoriesMissingApps = function(client, batchId, next) {
     });
 };
 
-var insertXyoCategoryApp = function(client, xyoCategoryId, batchId, name, position, next) {
+var insertXyoCategoryApp = function(client, xyoCategoryId, batchId, name, url, position, next) {
     var queryStr =
         "INSERT INTO xyo_category_app(" +
-        "xyo_category_id, batch_id, name, position, date_created)\n" +
-        "VALUES ($1, $2, $3, $4, NOW())\n" +
+        "xyo_category_id, batch_id, name, app_url, position, date_created)\n" +
+        "VALUES ($1, $2, $3, $4, $5, NOW())\n" +
         "RETURNING id;";
 
     var queryParams = [
         xyoCategoryId,
         batchId,
         name,
+        url,
         position
     ];
 
@@ -233,13 +234,13 @@ exports.getXyoCategoriesMissingApps = function(batchId, next) {
     });
 };
 
-exports.insertXyoCategoryApp = function(categoryId, batchId, name, position, next) {
+exports.insertXyoCategoryApp = function(categoryId, batchId, name, url, position, next) {
     connection.open(function(err, conn) {
         if (err) {
             return next(err);
         }
 
-        insertXyoCategoryApp(conn.client, categoryId, batchId, name, position, function(err, id) {
+        insertXyoCategoryApp(conn.client, categoryId, batchId, name, url, position, function(err, id) {
             conn.close(err, function(err) {
                 next(err, id);
             });
