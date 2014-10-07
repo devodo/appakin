@@ -1,5 +1,6 @@
 'use strict';
 var appStoreData = require("../../domain/dataProvider/appStoreDataProvider");
+var appStoreRepo = require("../../repos/appStoreRepo");
 
 exports.init = function init(app) {
 
@@ -28,6 +29,64 @@ exports.init = function init(app) {
 
     app.post('/admin/appstore/lookup_missing_sources', function (req, res) {
         appStoreData.lookupMissingSourceApps(function(err) {
+            if (err) {
+                return res.status(500).json(err);
+            }
+
+            res.json({status: 'success'});
+        });
+    });
+
+    app.post('/admin/appstore/retrieve_app_charts', function (req, res) {
+        var batchId = parseInt(req.body.batch, 10);
+
+        if (isNaN(batchId)) {
+            return res.status(500).json({"error": "must specify batch id"});
+        }
+
+        appStoreData.retrieveAppCharts(batchId, function(err) {
+            if (err) {
+                return res.status(500).json(err);
+            }
+
+            res.json({status: 'success'});
+        });
+    });
+
+    app.post('/admin/appstore/lookup_missing_chart_apps', function (req, res) {
+        appStoreData.lookupMissingChartApps(function(err) {
+            if (err) {
+                return res.status(500).json(err);
+            }
+
+            res.json({status: 'success'});
+        });
+    });
+
+    app.post('/admin/appstore/reset_app_popularity', function (req, res) {
+        var batchId = parseInt(req.body.batch, 10);
+
+        if (isNaN(batchId)) {
+            return res.status(500).json({"error": "must specify batch id"});
+        }
+
+        appStoreRepo.resetAppPopularities(batchId, function(err) {
+            if (err) {
+                return res.status(500).json(err);
+            }
+
+            res.json({status: 'success'});
+        });
+    });
+
+    app.post('/admin/appstore/reset_category_popularity', function (req, res) {
+        var batchId = parseInt(req.body.batch, 10);
+
+        if (isNaN(batchId)) {
+            return res.status(500).json({"error": "must specify batch id"});
+        }
+
+        appStoreRepo.resetCategoryPopularities(batchId, function(err) {
             if (err) {
                 return res.status(500).json(err);
             }

@@ -644,7 +644,7 @@ exports.insertAppChartEntry = function(app, categoryId, position, batchId, next)
     });
 };
 
-exports.getMissingAppStorePopularApps = function(next) {
+exports.getMissingChartApps = function(next) {
     connection.open(function(err, conn) {
         if (err) {
             return next(err);

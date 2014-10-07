@@ -431,9 +431,9 @@ var retrieveMissingApp = function(apps, next) {
     processBatch();
 };
 
-var lookupMissingPopularApps = function(next) {
-    appStoreAdminRepo.getMissingAppStorePopularApps(function(err, results) {
-        log.debug("Found " + results.length + " missing popular apps");
+var lookupMissingChartApps = function(next) {
+    appStoreAdminRepo.getMissingChartApps(function(err, results) {
+        log.debug("Found " + results.length + " missing chart apps");
 
         if (err) {
             return next(err);
@@ -539,7 +539,7 @@ exports.retrieveAppSources = retrieveAppSources;
 exports.retrieveAllAppSources = retrieveAllAppSources;
 exports.lookupAppsBatched = lookupAppsBatched;
 exports.retrieveAppCharts = retrieveAppCharts;
-exports.lookupMissingPopularApps = lookupMissingPopularApps;
+exports.lookupMissingChartApps = lookupMissingChartApps;
 exports.lookupMissingSourceApps = lookupMissingSourceApps;
 exports.getCategories = getCategories;
 exports.insertMissingXyoCategories = insertMissingXyoCategories;

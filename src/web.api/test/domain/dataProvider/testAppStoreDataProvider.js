@@ -143,10 +143,10 @@ exports.group = {
         });
     },
 
-    lookupMissingPopularApps: function(test) {
+    lookupMissingChartApps: function(test) {
         return test.done(); //ignore test
 
-        appStoreData.lookupMissingPopularApps(function(err) {
+        appStoreData.lookupMissingChartApps(function(err) {
             test.expect(1);
             test.ok(!err, err);
             test.done();
