@@ -60,14 +60,14 @@ var addCategory = function(category, apps, numAppDescriptions, next) {
     });
 };
 
-var rebuild = function(numAppDescriptions, outputHandler, next) {
+var rebuild = function(numAppDescriptions, next) {
     appStoreRepo.getCategories(function (err, categories) {
         if (err) {
             return next(err);
         }
 
         var processCategory = function (category, callback) {
-            outputHandler("Adding category: " + category.name);
+            log.debug("Adding category: " + category.name);
             appStoreRepo.getCategoryAppsForIndex(category.id, function (err, apps) {
                 if (err) {
                     return callback(err);
@@ -84,13 +84,13 @@ var rebuild = function(numAppDescriptions, outputHandler, next) {
                 return next(err);
             }
 
-            outputHandler("Solr committing changes");
+            log.debug("Solr committing changes");
             solrCore.commit(function (err) {
                 if (err) {
                     return next(err);
                 }
 
-                outputHandler("Solr optimising");
+                log.debug("Solr optimising");
                 solrCore.optimise(function (err) {
                     next(err);
                 });

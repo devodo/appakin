@@ -5,17 +5,6 @@ var autoIndexer = require('../../domain/search/autoIndexer');
 var catIndexer = require('../../domain/search/categoryIndexer');
 var appIndexer = require('../../domain/search/appIndexer');
 
-var issueResponseHeaders = function(response) {
-    response.setHeader('Connection', 'Transfer-Encoding');
-    response.setHeader('Content-Type', 'text/html; charset=utf-8');
-    response.setHeader('Transfer-Encoding', 'chunked');
-};
-
-var writeResponse = function(response, message) {
-    log.debug(message);
-    response.write(message + '<br/>');
-};
-
 exports.init = function init(app) {
     app.post('/admin/search/auto/rebuild', function (req, res) {
         log.debug("Starting rebuild of auto complete index");
@@ -33,46 +22,29 @@ exports.init = function init(app) {
     app.post('/admin/search/cat/rebuild', function (req, res) {
         var numAppDescriptions = 20;
 
-        var outputHandler = function(msg) {
-            writeResponse(res, msg);
-        };
+        log.debug("Starting rebuild of category index");
 
-        issueResponseHeaders(res);
-        outputHandler("Starting rebuild of category index");
-
-        catIndexer.rebuild(numAppDescriptions, outputHandler, function(err) {
+        catIndexer.rebuild(numAppDescriptions, function(err) {
             if (err) {
                 log.error(err);
-                outputHandler(JSON.stringify(err));
-            }
-            else {
-                outputHandler("Rebuild completed successfully");
+                return res.status(500).json(err);
             }
 
-            res.end();
+            res.json({status: 'success'});
         });
     });
 
     app.post('/admin/search/app/rebuild', function (req, res) {
         var batchSize = 10000;
+        log.debug("Starting rebuild of app index");
 
-        var outputHandler = function(msg) {
-            writeResponse(res, msg);
-        };
-
-        issueResponseHeaders(res);
-        outputHandler("Starting rebuild of app index");
-
-        appIndexer.rebuild(batchSize, outputHandler, function(err) {
+        appIndexer.rebuild(batchSize, function(err) {
             if (err) {
                 log.error(err);
-                outputHandler(JSON.stringify(err));
-            }
-            else {
-                outputHandler("Rebuild completed successfully");
+                return res.status(500).json(err);
             }
 
-            res.end();
+            res.json({status: 'success'});
         });
     });
 

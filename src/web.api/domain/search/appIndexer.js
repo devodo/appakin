@@ -2,6 +2,7 @@
 var async = require('async');
 var appStoreRepo = require('../../repos/appStoreRepo');
 var solrCore = require('./solrCore').getAppSolrCore();
+var log = require('../../logger');
 
 var createSolrApp = function(app) {
     var appIndex = {
@@ -23,9 +24,9 @@ var createSolrApp = function(app) {
     return appIndex;
 };
 
-var rebuild = function(batchSize, outputHandler, next) {
+var rebuild = function(batchSize, next) {
     var processBatch = function(lastId) {
-        outputHandler("Adding batch from id: " + lastId);
+        log.debug("Adding batch from id: " + lastId);
 
         appStoreRepo.getAppIndexBatch(lastId, batchSize, function(err, apps) {
             if (err) {
@@ -33,13 +34,14 @@ var rebuild = function(batchSize, outputHandler, next) {
             }
 
             if (apps.length === 0) {
+                log.debug("Optimising index");
                 return solrCore.optimise(function(err) {
                     next(err);
                 });
             }
 
             lastId = apps[apps.length - 1].id;
-            outputHandler("Last app: " + apps[apps.length - 1].name);
+            log.debug("Last app: " + apps[apps.length - 1].name);
 
             var solrApps = apps.map(function(app) {
                 return createSolrApp(app);
