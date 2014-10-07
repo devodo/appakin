@@ -259,33 +259,23 @@ var getAppStoreSourceItemBatch = function(client, startId, batchSize, next) {
     });
 };
 
-var getMissingAppChartApps = function(client, batchId, next) {
+var getMissingAppChartAppIds = function(client, next) {
     var queryStr =
-        "SELECT ap.id, ap.batch_id, ap.appstore_category_id, ap.store_app_id, ap.name, ap.position, ap.date_created\n" +
+        "SELECT distinct ap.store_app_id\n" +
         "FROM appstore_chart ap\n" +
         "LEFT JOIN appstore_app aa on ap.store_app_id = aa.store_app_id\n" +
-        "WHERE ap.batch_id = $1\n" +
-        "AND aa.app_id is null\n" +
-        "ORDER BY ap.id;";
+        "WHERE aa.app_id is null";
 
-    client.query(queryStr, [batchId], function (err, result) {
+    client.query(queryStr, function (err, result) {
         if (err) {
             return next(err);
         }
 
-        var items = result.rows.map(function(item) {
-            return {
-                id: item.id,
-                batchId: item.batch_id,
-                appStoreCategoryId: item.appstore_category_id,
-                storeAppId: item.store_app_id,
-                name: item.name,
-                position: item.position,
-                dateCreated: item.date_created
-            };
+        var appIds = result.rows.map(function(item) {
+            return item.store_app_id;
         });
 
-        next(null, items);
+        next(null, appIds);
     });
 };
 
@@ -645,13 +635,13 @@ exports.insertAppChartEntry = function(app, categoryId, position, batchId, next)
     });
 };
 
-exports.getMissingChartApps = function(batchId, next) {
+exports.getMissingChartAppIds = function(next) {
     connection.open(function(err, conn) {
         if (err) {
             return next(err);
         }
 
-        getMissingAppChartApps(conn.client, batchId, function(err, results) {
+        getMissingAppChartAppIds(conn.client, function(err, results) {
             conn.close(err, function(err) {
                 next(err, results);
             });

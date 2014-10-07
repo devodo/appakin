@@ -402,11 +402,7 @@ var lookupAppsBatched = function(startId, batchSize, next) {
     });
 };
 
-var retrieveMissingApp = function(apps, next) {
-    var appIds = apps.map(function(appSource) {
-        return appSource.storeAppId;
-    });
-
+var retrieveMissingApps = function(appIds, next) {
     var processBatch = function() {
         var batch = [];
         var maxItunesBatchSize = 200;
@@ -431,15 +427,15 @@ var retrieveMissingApp = function(apps, next) {
     processBatch();
 };
 
-var lookupMissingChartApps = function(batchId, next) {
-    appStoreAdminRepo.getMissingChartApps(batchId, function(err, results) {
-        log.debug("Found " + results.length + " missing chart apps");
+var lookupMissingChartApps = function(next) {
+    appStoreAdminRepo.getMissingChartAppIds(function(err, appIds) {
+        log.debug("Found " + appIds.length + " missing chart apps");
 
         if (err) {
             return next(err);
         }
 
-        retrieveMissingApp(results, next);
+        retrieveMissingApps(appIds, next);
     });
 };
 
@@ -451,7 +447,11 @@ var lookupMissingSourceApps = function(next) {
             return next(err);
         }
 
-        retrieveMissingApp(results, next);
+        var appIds = results.map(function(appSource) {
+            return appSource.storeAppId;
+        });
+
+        retrieveMissingApps(appIds, next);
     });
 };
 
