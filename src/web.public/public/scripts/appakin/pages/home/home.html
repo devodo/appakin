@@ -1,4 +1,4 @@
-<div id="home-page">
+<div id="home-page" ng-class="{ extended: autocompleteFocused }">
     <img class="akin-logo" src="/images/appakin-logo-dark.svg">
     <div class="platform-static">
         <div class="platform-img-wrapper android">
@@ -13,6 +13,6 @@
             <img class="soon-overlay" src="/images/soon.svg">
         </div>
     </div>
-    <div akin-searchbox-home></div>
+    <div id="searchbox-home" akin-searchbox-home></div>
 </div>
-<footer data-akin-footer></footer>
+<footer akin-footer></footer>

@@ -1,13 +1,13 @@
 <div>
     <form ng-submit="search.submitSearch(1)" class="searchbox">
         <fieldset class="search-input">
-            <autocomplete ng-model="search.searchTerm"
-                          placeholder="search.getPlaceholderText()"
-                          click-activation="true"
-                          data="search.autoComplete.terms"
-                          on-type="search.updateAutoCompleteTerms"
-                          on-select="submitSearch"
-                          is-active="search.autoComplete.active"></autocomplete>
+            <search-input
+                ng-model="search.searchTerm"
+                placeholder="search.getPlaceholderText()"
+                data="search.autoComplete.terms"
+                on-type="search.updateAutoCompleteTerms"
+                on-select="submitSearch"
+                is-active="search.autoComplete.active"></search-input>
         </fieldset>
     </form>
 </div>

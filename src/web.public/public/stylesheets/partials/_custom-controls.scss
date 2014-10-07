@@ -167,39 +167,94 @@ $searchbox-border-colour: $control-border-colour;
 }
 
 .search-input {
-  .autocomplete {
+  .search-input-wrapper {
     display: table;
     width: 100%;
-  }
+    position: relative;
 
-  .autocomplete .input-wrapper {
-    display: table-cell;
-    width: 100%;
-    vertical-align: middle;
-
-    input[type="text"] {
-      width: 100%;
-      display: block;
-      height: 28px;
-      @include body-text;
-      padding: 0px 30px 0px 3px;
-      border: none;
-      @include border-left-radius(2px);
+    em {
+      font-weight: bold;
     }
-  }
 
-  .autocomplete .submit-button-wrapper {
-    display: table-cell;
-    height: 28px;
-    vertical-align: middle;
+    .input-wrapper {
+      display: table-cell;
+      width: 100%;
+      vertical-align: middle;
 
-    button {
-      @include akin-fancy-button;
-      width: 46px;
-      background-color: black;
-      font-family: "icomoon";
-      color: $icon-colour;
-      @include border-right-radius(2px);
+      input[type="text"] {
+        width: 100%;
+        display: block;
+        height: 28px;
+        @include body-text;
+        padding: 0px 3px 0px 3px;
+        border: none;
+        @include border-left-radius(2px);
+      }
+    }
+
+    .button-wrapper {
+      display: table-cell;
+      height: 28px;
+      vertical-align: middle;
+
+      button.submit-button {
+        @include akin-fancy-button;
+        @include main-spot-colour-gradient-background;
+        width: 46px;
+        background-color: black;
+        font-family: "icomoon";
+        color: $icon-colour;
+        @include border-right-radius(2px);
+      }
+
+      button.submit-button:before {
+        @include icon($search-icon);
+      }
+
+      button.clear-button {
+        @include akin-fancy-button;
+        width: 28px;
+        font-family: "icomoon";
+        color: $icon-colour;
+        border-left: none;
+        border-right-width: 0px !important;
+        border-right: none;
+        background-color: white;
+      }
+
+      button.clear-button:before {
+        @include icon($cross-icon);
+      }
+    }
+
+    ul {
+      position: absolute;
+      left: 0px;
+      right: 1px;
+      top: 28px;
+      z-index: 1;
+      background-color: white;
+      padding-bottom: 3px;
+      box-shadow: 0px 2px 2px #888;
+      border-left: 1px solid $light-drawing-colour;
+      border-right: 1px solid $light-drawing-colour;
+
+      li {
+        display: block;
+        text-align: left;
+        list-style:none;
+        width: 100%;
+        padding: 3px 3px 3px 9px;
+        background-color: white;
+        line-height: 20px;
+        cursor: pointer;
+      }
+
+      li.active {
+        width: 100%;
+        background-color: $main-spot-colour;
+        color: white;
+      }
     }
   }
 }
@@ -209,9 +264,9 @@ $searchbox-border-colour: $control-border-colour;
   max-width: 400px;
   @include centred-margins;
 
-  .autocomplete{
+  .search-input-wrapper {
     .input-wrapper input[type="text"],
-    .submit-button-wrapper button {
+    .button-wrapper button {
       border: 1px solid $dark-background-colour;
     }
 
@@ -219,7 +274,7 @@ $searchbox-border-colour: $control-border-colour;
       border-right: none;
     }
 
-    .submit-button-wrapper button {
+    .button-wrapper button {
       border-left: none;
     }
   }

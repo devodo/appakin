@@ -1,13 +1,13 @@
 <div>
     <form ng-submit="search.submitSearch(1)" class="searchbox">
         <div class="search-input">
-            <autocomplete ng-model="search.searchTerm"
-                          placeholder="search.getPlaceholderText()"
-                          click-activation="true"
-                          data="search.autoComplete.terms"
-                          on-type="search.updateAutoCompleteTerms"
-                          on-select="submitSearch"
-                          is-active="search.autoComplete.active"></autocomplete>
+            <search-input
+                ng-model="search.searchTerm"
+                placeholder="search.getPlaceholderText()"
+                data="search.autoComplete.terms"
+                on-type="search.updateAutoCompleteTerms"
+                on-select="submitSearch"
+                is-active="search.autoComplete.active"></search-input>
         </div>
         <div class="platform-menu btn-group" dropdown is-open="status.isOpen">
             <button type="button" class="btn-menu">

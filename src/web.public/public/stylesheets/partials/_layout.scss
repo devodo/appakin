@@ -42,6 +42,26 @@ footer {
 #home-page {
   padding-top: 30px;
   padding-bottom: 150px;
+//
+//
+//  -webkit-transition: 1s linear;
+//  -moz-transition: 1s linear;
+//  -o-transition: 1s linear;
+//  transition: 1s linear;
+}
+
+#home-page.extended {
+  padding-bottom: 225px;
+}
+
+#home-page.extended-add {
+  -webkit-transition: 1s linear all; /* Chrome */
+  transition: 5s linear all;
+  padding-bottom: 150px;
+}
+
+#home-page.extended-add-active {
+  padding-bottom: 225px;
 }
 
 // HEADER LAYOUT

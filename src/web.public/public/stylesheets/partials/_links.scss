@@ -51,17 +51,17 @@ a.basic-button {
 
 // AUTOCOMPLETE CLEAR BUTTON
 
-.autocomplete {
-  a {
-    font-size: 16px !important;
-    color: lighten($alt-black-colour, 10);
-  }
-
-  a.clear-search:active {
-    color: black;
-    background-color: lighten($alt-black-colour, 20);
-  }
-}
+//.search-input-wrapper {
+//  a {
+//    font-size: 16px !important;
+//    color: lighten($alt-black-colour, 10);
+//  }
+//
+//  a.clear-search:active {
+//    //color: black;
+//    //background-color: lighten($alt-black-colour, 20);
+//  }
+//}
 
 // CALL TO ACTION
 

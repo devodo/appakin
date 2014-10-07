@@ -89,7 +89,6 @@
 }
 
 @mixin akin-fancy-button {
-  @include main-spot-colour-gradient-background;
   display: block;
   margin: 0px;
   border: none;

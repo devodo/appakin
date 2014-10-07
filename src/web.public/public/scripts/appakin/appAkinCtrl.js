@@ -69,8 +69,27 @@
                 scrollCanBeCaptured = false;
             });
 
+//            document.addEventListener('touchstart', function(e) {
+//                if (!isTextInput(e.target) && isTextInput(document.activeElement)) {
+//                    document.activeElement.blur();
+//                }
+//            }, false);
+
+//            $rootScope.$on('mousedown', function(event) {
+//                console.log('clicccccc');
+//                var activeElement = $document[0].activeElement;
+//
+//                if (!isTextInput(event.target) && isTextInput(activeElement)) {
+//                    activeElement.blur();
+//                }
+//            }, false);
+
             function createScrollCacheKey(urlKey) {
                 return 'scroll ' + urlKey;
+            }
+
+            function isTextInput(node) {
+                return ['INPUT', 'TEXTAREA'].indexOf(node.nodeName) !== -1;
             }
         });
 

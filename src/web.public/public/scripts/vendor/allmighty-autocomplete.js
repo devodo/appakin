@@ -133,13 +133,11 @@ app.directive('autocomplete', function() {
                 }
             }
 
-            if (attrs.clickActivation) {
+            if (attrs.clickActivation === 'true') {
                 element[0].onclick = function(e){
                     if(!scope.searchParam){
                         scope.completing = true;
                         scope.$apply();
-
-                        console.log('clicked');
                     }
                 };
             }

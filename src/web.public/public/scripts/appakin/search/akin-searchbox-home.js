@@ -1,6 +1,6 @@
 (function () {'use strict';
 
-    angular.module('appAkin').directive('akinSearchboxHome', function (platform) {
+    angular.module('appAkin').directive('akinSearchboxHome', function ($timeout, platform) {
         return {
             restrict: 'A',
             replace: true,
