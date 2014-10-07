@@ -4,23 +4,6 @@ var appStoreRepo = require('../../repos/appStoreRepo');
 var solrCore = require('./solrCore').getAppSolrCore();
 
 var createSolrApp = function(app) {
-    var isIphone = false;
-    var isIPad = false;
-
-    for (var i = 0; i < app.supportedDevices.length; i++) {
-        if (app.supportedDevices[i].indexOf('iPhone') > -1) {
-            isIphone = true;
-            break;
-        }
-    }
-
-    for (i = 0; i < app.supportedDevices.length; i++) {
-        if (app.supportedDevices[i].indexOf('iPad') > -1) {
-            isIPad = true;
-            break;
-        }
-    }
-
     var appIndex = {
         id : app.id,
         name: app.name,
@@ -28,11 +11,14 @@ var createSolrApp = function(app) {
         url: app.extId.replace(/\-/g, ''),
         "img_url" : app.imageUrl,
         price: app.price,
-        "is_iphone": isIphone,
-        "is_ipad": isIPad,
-        "is_free": !app.price || parseInt(app.price, 10) === 0,
         popularity: app.popularity
     };
+
+    var nameAscii = solrCore.asciiFold(app.name);
+
+    if (app.name !== nameAscii) {
+        appIndex.name_alt = nameAscii;
+    }
 
     return appIndex;
 };

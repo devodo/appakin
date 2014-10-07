@@ -18,26 +18,15 @@ var writeResponse = function(response, message) {
 
 exports.init = function init(app) {
     app.post('/admin/search/auto/rebuild', function (req, res) {
-        var appBatchSize = 10000;
-        var lastId = 0;
+        log.debug("Starting rebuild of auto complete index");
 
-        var outputHandler = function(msg) {
-            writeResponse(res, msg);
-        };
-
-        issueResponseHeaders(res);
-        outputHandler("Starting rebuild of auto complete index");
-
-        autoIndexer.rebuild(lastId, appBatchSize, outputHandler, function(err) {
+        autoIndexer.rebuild(function(err) {
             if (err) {
                 log.error(err);
-                outputHandler(JSON.stringify(err));
-            }
-            else {
-                outputHandler("Rebuild completed successfully");
+                return res.status(500).json(err);
             }
 
-            res.end();
+            res.json({status: 'success'});
         });
     });
 

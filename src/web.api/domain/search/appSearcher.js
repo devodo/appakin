@@ -4,16 +4,15 @@ var urlUtil = require('../urlUtil');
 
 var PAGE_SIZE = 10;
 
-var getHighlight = function(highlights, doc) {
+var getHighlight = function(highlights, docId) {
     if (!highlights) { return null; }
 
-    var hDoc = highlights[doc.id];
+    var hDoc = highlights[docId];
     if (!hDoc) { return null; }
 
-    var hDesc = hDoc.desc_split;
-    if (!hDesc || hDesc.length < 1) { return null; }
+    if (!hDoc.desc && !hDoc.name_split) { return null; }
 
-    return hDesc[0];
+    return hDoc;
 };
 
 var search = function(queryStr, pageNum, next) {
@@ -38,7 +37,7 @@ var search = function(queryStr, pageNum, next) {
 
         var apps = obj.response.docs.map(function(doc) {
 
-            var highlight = getHighlight(highlights, doc);
+            var highlight = getHighlight(highlights, doc.id);
 
             var app = {
                 name: doc.name,

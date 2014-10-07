@@ -2,6 +2,7 @@
 var async = require('async');
 var appStoreRepo = require('../../repos/appStoreRepo');
 var solrCore = require('./solrCore').getAutoSolrCore();
+var log = require('../../logger');
 
 var CATEGORY_TYPE = 1;
 var APP_TYPE = 2;
@@ -56,14 +57,14 @@ var createSolrApp = function(app) {
     return solrApp;
 };
 
-var addAllCategories = function(outputHandler, next) {
+var addAllCategories = function(next) {
     appStoreRepo.getCategories(function(err, categories) {
         if (err) {
             return next(err);
         }
 
         var processCategory = function(category, callback) {
-            outputHandler("Adding category: " + category.name);
+            log.debug("Adding category: " + category.name);
 
             addCategory(category, function(err) {
                 callback(err);
@@ -79,13 +80,40 @@ var addAllCategories = function(outputHandler, next) {
                 next(err);
             });
         });
-
     });
 };
 
-var addAllApps = function(lastId, batchSize, outputHandler, next) {
+var addChartApps = function(next) {
+    log.debug("Adding chart apps to index");
+
+    appStoreRepo.getChartAppIndex(function(err, apps) {
+        if (err) {
+            return next(err);
+        }
+
+        var solrApps = apps.map(function(app) {
+            return createSolrApp(app);
+        });
+
+        solrCore.client.add(solrApps, function(err){
+            if(err){
+                return next(err);
+            }
+
+            solrCore.commit(function(err) {
+                if (err) {
+                    return next(err);
+                }
+
+                next();
+            });
+        });
+    });
+};
+
+var addAllApps = function(lastId, batchSize, next) {
     var processBatch = function(lastId) {
-        outputHandler("Adding batch from id: " + lastId);
+        log.debug("Adding batch from id: " + lastId);
 
         appStoreRepo.getAppIndexBatch(lastId, batchSize, function(err, apps) {
             if (err) {
@@ -93,14 +121,12 @@ var addAllApps = function(lastId, batchSize, outputHandler, next) {
             }
 
             if (apps.length === 0) {
-                solrCore.optimise(function(err) {
-                    return next(err);
-                });
+                return next();
             }
 
             lastId = apps[apps.length - 1].id;
 
-            outputHandler("Last app name: " + apps[apps.length - 1].name);
+            log.debug("Last app name: " + apps[apps.length - 1].name);
 
             var solrApps = apps.map(function(app) {
                 return createSolrApp(app);
@@ -125,14 +151,30 @@ var addAllApps = function(lastId, batchSize, outputHandler, next) {
     processBatch(lastId);
 };
 
-var rebuild = function(lastId, batchSize, outputHandler, next) {
+var rebuildWithAllApps = function(lastId, batchSize, outputHandler, next) {
     addAllCategories(outputHandler, function(err) {
         if (err) { return next(err); }
 
         addAllApps(lastId, batchSize, outputHandler, function(err) {
             if (err) { return next(err); }
 
-            next();
+            solrCore.optimise(function(err) {
+                return next(err);
+            });
+        });
+    });
+};
+
+var rebuild = function(next) {
+    addAllCategories(function(err) {
+        if (err) { return next(err); }
+
+        addChartApps(function(err) {
+            if (err) { return next(err); }
+
+            solrCore.optimise(function(err) {
+                return next(err);
+            });
         });
     });
 };
