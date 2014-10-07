@@ -108,7 +108,9 @@ var getCategoryApps = function(client, categoryId, skip, take, next) {
         "SELECT a.ext_id, a.name, a.artwork_small_url, substring(a.description from 0 for 150) as short_description, ca.position\n" +
         "FROM appstore_app a\n" +
         "JOIN category_app ca ON a.app_id = ca.app_id\n" +
+        "LEFT JOIN category_app_exclude ca_e on ca.category_id = ca_e.category_id AND ca.app_id = ca_e.app_id\n" +
         "WHERE ca.category_id = $1\n" +
+        "AND ca_e.id IS NULL\n" +
         "ORDER BY ca.position\n" +
         "LIMIT $2 OFFSET $3;";
 
@@ -300,7 +302,9 @@ var getCategoryAppsForIndex = function(client, categoryId, next) {
         "FROM appstore_app a\n" +
         "JOIN category_app ca on a.app_id = ca.app_id\n" +
         "LEFT JOIN app_popularity ap on a.app_id = ap.app_id\n" +
+        "LEFT JOIN category_app_exclude ca_e on ca.category_id = ca_e.category_id AND ca.app_id = ca_e.app_id\n" +
         "WHERE ca.category_id = $1\n" +
+        "AND ca_e.id IS NULL\n" +
         "ORDER BY ca.position;";
 
     client.query(queryStr, [categoryId], function (err, result) {
