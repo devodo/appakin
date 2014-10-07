@@ -431,8 +431,8 @@ var retrieveMissingApp = function(apps, next) {
     processBatch();
 };
 
-var lookupMissingChartApps = function(next) {
-    appStoreAdminRepo.getMissingChartApps(function(err, results) {
+var lookupMissingChartApps = function(batchId, next) {
+    appStoreAdminRepo.getMissingChartApps(batchId, function(err, results) {
         log.debug("Found " + results.length + " missing chart apps");
 
         if (err) {

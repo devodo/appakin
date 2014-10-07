@@ -54,7 +54,13 @@ exports.init = function init(app) {
     });
 
     app.post('/admin/appstore/lookup_missing_chart_apps', function (req, res) {
-        appStoreData.lookupMissingChartApps(function(err) {
+        var batchId = parseInt(req.body.batch, 10);
+
+        if (isNaN(batchId)) {
+            return res.status(500).json({"error": "must specify batch id"});
+        }
+
+        appStoreData.lookupMissingChartApps(batchId, function(err) {
             if (err) {
                 return res.status(500).json(err);
             }
