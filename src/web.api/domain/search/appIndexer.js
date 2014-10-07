@@ -33,8 +33,8 @@ var rebuild = function(batchSize, outputHandler, next) {
             }
 
             if (apps.length === 0) {
-                solrCore.optimise(function(err) {
-                    return next(err);
+                return solrCore.optimise(function(err) {
+                    next(err);
                 });
             }
 
