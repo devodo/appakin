@@ -76,7 +76,7 @@
                          ng-if="app.data.screenShotUrls.length == 0 && app.data.ipadScreenShotUrls.length > 0">
                         <h2>iPAD SCREENSHOTS</h2>
                         <div class="screen-shot-wrapper img-border">
-                            <ul rn-carousel rn-carousel-buffered rn-carousel-control>
+                            <ul rn-carousel rn-carousel-buffered rn-carousel-indicator rn-carousel-control>
                                 <li ng-repeat="screenShotUrl in app.data.ipadScreenShotUrls">
                                     <img ng-src="{{screenShotUrl}}" nopin="nopin">
                                 </li>
