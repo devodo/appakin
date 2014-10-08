@@ -16,7 +16,6 @@
                     function() {
                         me.service.loadingDelayed = true;
                         usSpinnerService.spin('loading');
-                        console.log('triggered spinner');
                     },
                     loadingDelayedThresholdMs);
             },

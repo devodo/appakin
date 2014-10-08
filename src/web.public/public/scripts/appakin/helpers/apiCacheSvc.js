@@ -29,7 +29,7 @@
                 if (result) {
                     if (result.added) {
                         if (addMinutes(new Date(result.added), cacheTtlMinutes) > new Date()) {
-                            console.log('Got data from session cache for key ' + keyStr);
+                            //console.log('Got data from session cache for key ' + keyStr);
                             return result.data;
                         } else {
                             // clear this now old data out.

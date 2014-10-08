@@ -112,8 +112,6 @@
 
                     switch (keycode){
                         case key.esc:
-                            console.log('esc pressed');
-
                             // disable suggestions on escape
                             scope.select();
                             scope.setIndex(-1);

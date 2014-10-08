@@ -31,10 +31,10 @@
                             //console.log('Got scroll key: ' + key + ' - value ' + scrollValue);
 
                             if (scrollValue > 0) {
-                                console.log('Scrolling to ' + scrollValue);
+                                //console.log('Scrolling to ' + scrollValue);
                                 $document.scrollTop(scrollValue);
                             } else {
-                                console.log('Scrolling to top');
+                                //console.log('Scrolling to top');
                                 $document.scrollTop(0);
                             }
                         } else {
