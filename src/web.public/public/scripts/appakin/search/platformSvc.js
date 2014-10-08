@@ -66,7 +66,8 @@
             persistPlatform: function(platform) {
                 var normalisedPlatform = normalisePlatform(platform);
                 if (normalisedPlatform) {
-                    $cookies.platform = platform;
+                    // Reinstate when new platforms added.
+                    //$cookies.platform = platform;
                 }
             },
             getStoreName: function(platform) {
