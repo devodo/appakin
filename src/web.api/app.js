@@ -19,7 +19,7 @@ config.environment !== 'production' && app.use(logger({logger: log}));
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded());
 app.use(cookieParser());
-app.use(cors()); // TODO: what are the correct cors options to use?
+configureCors(app);
 initApiRoutes(app);
 app.use(notFoundHandler);
 app.use(logger.errorLogger({logger: log}));
@@ -43,6 +43,14 @@ function configureApp(app) {
     });
 }
 
+function configureCors(app) {
+    var corsOptions = {
+        origin: config.environment === 'production' ? 'http://www.appakin.com' : true
+    };
+
+    app.use(cors(corsOptions));          // for regular requests
+    app.options('*', cors(corsOptions)); // for preflight requests
+}
 
 function initApiRoutes(app) {
     var getFilesSync = function(dir, recurse) {
