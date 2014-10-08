@@ -180,11 +180,11 @@
                     // '  q=' + currentSearch.q + ' p=' + currentSearch.p +
                     // ' page=' + currentSearch.page + ' type=' + currentSearch.type);
 
-                    console.log('redirecting to search: q=' + me.service.searchTerm + ' p=' + me.service.platform + ' page=' + page);
+                    //console.log('redirecting to search: q=' + me.service.searchTerm + ' p=' + me.service.platform + ' page=' + page);
                     $location.path(url.searchResultsPagePath).search(search);
 
                     if (locationNotChanging) {
-                        console.log('location not changing');
+                        //console.log('location not changing');
                         $route.reload();
                     }
                 }

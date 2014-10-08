@@ -36,6 +36,7 @@ dd.directive('dropdownSelect', ['DropdownService', '$window',
                 });
 
                 $scope.$on('$destroy', function () {
+                    $element.unbind($clickEvent);
                     DropdownService.unregister($element);
                 });
             }],
@@ -138,6 +139,7 @@ dd.directive('dropdownMenu', ['$parse', '$compile', 'DropdownService', '$window'
                 });
 
                 $scope.$on('$destroy', function () {
+                    $element.unbind($clickEvent);
                     DropdownService.unregister(tpl);
                 });
             }]

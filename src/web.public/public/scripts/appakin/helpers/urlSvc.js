@@ -20,7 +20,6 @@
             },
             createAppleAppStoreImageUrl: function(originalUrl, requiredSize) {
                 var strippedUrl = originalUrl.replace(appleAppStoreImageUrlRegex, '');
-                console.log(strippedUrl);
                 return strippedUrl + requiredSize + 'x' + requiredSize + '-75.png';
             },
             searchResultsPagePath: searchResultsPagePath,

@@ -7,10 +7,15 @@
             $scope.pageTitle = pageTitle;
 
             var scrollCanBeCaptured = false;
+            var viewContentLoadedTimeout = null;
 
             // Perform actions that crosscut the controllers.
             $rootScope.$on('$viewContentLoaded', function() {
-                $timeout(
+                if (viewContentLoadedTimeout) {
+                    $timeout.cancel(viewContentLoadedTimeout);
+                }
+
+                viewContentLoadedTimeout = $timeout(
                     function() {
                         var urlKey = $location.url();
                         var onSearchResultsPage = url.onSearchResultsPage(urlKey);
@@ -60,7 +65,6 @@
                 if (url.onSearchResultsPage(urlKey) || url.onCategoryPage(urlKey)) {
                     var key = createScrollCacheKey(urlKey);
                     var value = $document.scrollTop();
-                    //console.log('Setting scroll key: ' + key + ' value: ' + value);
                     cache.set(key, value, false);
                 }
             });
@@ -69,27 +73,8 @@
                 scrollCanBeCaptured = false;
             });
 
-//            document.addEventListener('touchstart', function(e) {
-//                if (!isTextInput(e.target) && isTextInput(document.activeElement)) {
-//                    document.activeElement.blur();
-//                }
-//            }, false);
-
-//            $rootScope.$on('mousedown', function(event) {
-//                console.log('clicccccc');
-//                var activeElement = $document[0].activeElement;
-//
-//                if (!isTextInput(event.target) && isTextInput(activeElement)) {
-//                    activeElement.blur();
-//                }
-//            }, false);
-
             function createScrollCacheKey(urlKey) {
                 return 'scroll ' + urlKey;
-            }
-
-            function isTextInput(node) {
-                return ['INPUT', 'TEXTAREA'].indexOf(node.nodeName) !== -1;
             }
         });
 

@@ -2,17 +2,17 @@
     'use strict';
 
     angular.module('appAkin').factory('pageTitle', function() {
-        var self = this;
+        var me = this;
         var initialPageTitle = 'appAkin';
 
-        self.service = {
+        me.service = {
             pageTitle: initialPageTitle,
             setPageTitle: function(value) {
-                self.service.pageTitle = value;
+                me.service.pageTitle = value;
             }
         };
 
-        return self.service;
+        return me.service;
     });
 
 }()); // use strict

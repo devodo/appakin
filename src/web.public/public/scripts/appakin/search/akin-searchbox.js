@@ -9,12 +9,23 @@
                 $scope.search = search;
                 $scope.platform = platform;
                 $scope.status = { isOpen: false };
+                var submitSearchTimeout = null;
 
                 $scope.submitSearch = function(value) {
-                    $timeout(function() {
+                    if (submitSearchTimeout) {
+                        $timeout.cancel(submitSearchTimeout);
+                    }
+
+                    submitSearchTimeout = $timeout(function() {
                         search.submitSearch(1);
                     }, 0);
                 };
+
+                $scope.$on('$destroy', function() {
+                    if (submitSearchTimeout) {
+                        $timeout.cancel(submitSearchTimeout);
+                    }
+                });
 
                 // LEAVE THIS STUFF HERE! IT WILL BE REINSTATED LATER.
 

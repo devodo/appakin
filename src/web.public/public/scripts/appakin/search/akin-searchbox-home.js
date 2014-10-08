@@ -8,12 +8,23 @@
             controller: function ($scope, search) {
                 $scope.search = search;
                 $scope.platform = platform;
+                var submitSearchTimeout = null;
 
                 $scope.submitSearch = function(value) {
-                    $timeout(function() {
+                    if (submitSearchTimeout) {
+                        $timeout.cancel(submitSearchTimeout);
+                    }
+
+                    submitSearchTimeout = $timeout(function() {
                         search.submitSearch(1);
                     }, 0);
                 };
+
+                $scope.$on('$destroy', function() {
+                    if (submitSearchTimeout) {
+                        $timeout.cancel(submitSearchTimeout);
+                    }
+                });
             }
         };
     });

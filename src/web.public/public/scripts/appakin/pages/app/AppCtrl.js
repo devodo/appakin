@@ -6,7 +6,7 @@
             var appData = $route.current.locals.appData;
             var monthNames = [
                 "Jan", "Feb", "Mar", "Apr", "May", "Jun",
-                "Jul", "Aug", "Sept", "Oct", "Nov", "Dec" ];
+                "Jul", "Aug", "Sept", "Oct", "Nov", "Dec"];
 
             if (appData && !appData.serverError) {
                 pageTitle.setPageTitle(appData.name + ' on appAkin');
