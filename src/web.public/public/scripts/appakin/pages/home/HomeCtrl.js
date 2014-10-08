@@ -4,7 +4,6 @@
         pageTitle.setPageTitle('appAkin');
         search.resetSearchTerm();
         $scope.autocompleteFocused = false;
-        var homePageWrapper = angular.element(document.querySelector('#home-page'));
 
         $scope.$on('autocomplete.focused', function() {
             // probably a problem here with offsetTop not taking scrolling into account,

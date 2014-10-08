@@ -50,10 +50,8 @@ p.hint {
 h1 {
   position: relative;
   @include page-title-text;
-  //@include large-page-title-text;
   font-weight: bold;
   display: block;
-  //border: 0px;
   border-bottom: 2px solid $main-spot-colour;
   background-color: transparent;
   padding: 6px 6px 6px 0px;
@@ -117,7 +115,7 @@ h1 {
 
 .category-search-result,
 .app-search-result {
-  border-bottom: 1px solid $main-spot-colour; //$light-drawing-colour;
+  border-bottom: 1px solid $main-spot-colour;
   padding-bottom: 12px;
   margin-bottom: 12px;
 
@@ -242,10 +240,7 @@ h1 {
 
 .app-search-result {
   @include clearfix;
-  //margin-bottom: 12px;
-  //padding-bottom: 12px;
   max-width: 550px;
-  //border-bottom: 1px solid $light-drawing-colour;
 
   @include mq($from: mobile-landscape) {
     border-bottom: none;
@@ -568,7 +563,7 @@ h1 {
     }
 
     @include mq($from: desktop) {
-      margin-right: 260px;
+      margin-right: 290px;
     }
   }
 
@@ -648,7 +643,7 @@ h1 {
   .screen-shots {
     @include mq($from: desktop) {
       position: absolute;
-      right: -264px;
+      right: -294px;
       top: 0px;
     }
 
@@ -658,10 +653,26 @@ h1 {
       }
     }
 
-    .rn-carousel-control-next, .rn-carousel-control-prev { color: $main-spot-colour; }
-    .rn-carousel-control-next:before, .rn-carousel-control-prev:before { @include large-icon; }
+    .rn-carousel-control-next, .rn-carousel-control-prev { color: black; }
+
+    .rn-carousel-control-next:before,
+    .rn-carousel-control-prev:before {
+      @include large-icon;
+      background-color: rgba(255, 255, 255, 0.9);
+      padding: 3px;
+      @include border-top-radius(3px);
+      @include border-bottom-radius(3px);
+    }
+
     .rn-carousel-control-next:before { @include icon($right-icon); }
     .rn-carousel-control-prev:before { @include icon($left-icon); }
+
+    .rn-carousel-indicator {
+      height: 24px;
+      span {
+        line-height: 16px;
+      }
+    }
 
     .label {
       margin: 0px;
@@ -672,16 +683,21 @@ h1 {
     }
 
     ul {
-      width: 232px;
+      font-size:0;
 
-      li img {
-        width: 232px;
-        height: auto;
+      li {
+        box-sizing: border-box;
+        position:relative;
+
+        img {
+          width: 262px;
+          height: auto;
+        }
       }
     }
 
     .screen-shot-wrapper {
-      width: 240px;
+      width: 270px;
       @include centred-margins;
     }
   }
@@ -756,11 +772,6 @@ h1 {
 
   .contact-details {
     @include clearfix;
-    //border-top: 1px solid $light-drawing-colour;
-    //border-bottom: 1px solid $light-drawing-colour;
-    //padding: 12px 0px 12px 18px;
-    //margin-bottom: 15px;
-    //max-width: 550px;
     padding: 0px 12px;
 
     a.e-mail {
