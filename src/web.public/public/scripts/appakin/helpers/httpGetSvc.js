@@ -95,7 +95,7 @@
                             if (error) {
                                 if (status > 0 || (status === 0 && !cancelled)) {
                                     //console.log('Invoking error callback.');
-                                    error(data);
+                                    error(data || {});
                                 }
                             }
 
