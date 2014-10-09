@@ -139,7 +139,7 @@ var search = function(queryStr, pageNum, next) {
             var appResult = getApps(expanded, highlights, doc.id);
             var catScore = parseFloat(doc.score);
             var useChartApps = isCatMatch && appResult.maxScore / catScore < 0.05;
-            var apps = useChartApps ? getChartApps(doc.cat_chart, appResult.appsMap) : appResult.apps.splice(0, 5);
+            var apps = useChartApps ? getChartApps(doc.cat_chart, appResult.appsMap) : appResult.apps.splice(0, 6);
 
             if (highlight) {
                 category.highlight = highlight;

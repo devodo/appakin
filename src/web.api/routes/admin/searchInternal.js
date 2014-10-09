@@ -21,7 +21,7 @@ exports.init = function init(app) {
 
     app.post('/admin/search/cat/rebuild', function (req, res) {
         var numAppDescriptions = 10;
-        var numChartApps = 5;
+        var numChartApps = 6;
 
         log.debug("Starting rebuild of category index");
 
