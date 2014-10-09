@@ -9,7 +9,7 @@
                 <img class="app-icon" ng-src="{{ url.createAppleAppStoreImageUrl(app.data.artworkMediumUrl, 175) }}">
             </a>
             <div class="basic-info">
-                <p class="price highlighted">{{formatPrice(app.data.price)}}</p>
+                <p class="price highlighted">{{app.data.price | formatPrice}}</p>
                 <!--<div class="rating sidebar-section" ng-if="app.data.userRatingCurrent && app.data.ratingCountCurrent >= 5">-->
                     <!--<h6>CURRENT RATING</h6>-->
                     <!--<div akin-score score="app.data.userRatingCurrent" votes="app.data.ratingCountCurrent"></div>-->

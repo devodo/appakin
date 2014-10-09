@@ -4,14 +4,29 @@
     </p>
     <div class="no-error-wrapper" ng-if="!category.data.serverError">
         <h1>{{category.data.name}}</h1>
-        <p class="body-text">{{category.data.description}}</p>
+        <p class="body-text category-description">{{category.data.description}}</p>
         <ul>
-            <li ng-repeat="app in category.data.apps track by app.url" class="app-search-result">
-                <a href="{{ url.createAppUrl(category.data.platform, app.url) }}">
-                    <img class="small" ng-src="{{app.artworkSmallUrl}}">
-                </a>
-                <h4><a class="underline-on-hover" href="{{ url.createAppUrl(category.data.platform, app.url) }}" ng-bind="app.name | firstSection: 50"></a></h4>
-                <p class="tight-lines">{{app.shortDescription | firstSection: 120}}</p>
+            <li ng-repeat="app in category.data.apps track by app.url"
+                class="category-app"
+                ng-class="{'last':$last}">
+                <div class="info-wrapper">
+                    <div class="sidebar">
+                        <p class="position">{{app.position}}</p>
+                        <a href="{{ url.createAppUrl(category.data.platform, app.url) }}">
+                            <img class="small" ng-src="{{app.artworkSmallUrl}}">
+                        </a>
+                        <p class="price highlighted">{{app.price | formatPrice}}</p>
+                    </div>
+                    <!--<div class="thick-rule"></div>-->
+                    <div class="main-info">
+                        <h4>
+                            <a class="underline-on-hover"
+                               href="{{ url.createAppUrl(category.data.platform, app.url) }}"
+                               ng-bind="app.name"></a>
+                        </h4>
+                        <p class="tight-lines description">{{app.shortDescription | firstSection: 120}}</p>
+                    </div>
+                </div>
             </li>
         </ul>
     </div>

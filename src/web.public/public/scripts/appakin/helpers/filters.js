@@ -38,6 +38,18 @@
         };
     });
 
+    angular.module('appAkin').filter('formatPrice', function() {
+        return function(price) {
+            if (price === 0) {
+                return 'Free';
+            } else if (price < 100) {
+                return price + '¢';
+            }
+
+            return '$' + price / 100;
+        };
+    });
+
     angular.module('appAkin').filter('formatDescription', function($sanitize) {
         return function (input) {
             return input.replace(/\n/g, '<br>');

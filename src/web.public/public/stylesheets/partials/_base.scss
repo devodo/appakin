@@ -1,5 +1,6 @@
 
 $main-spot-colour: darken(#ad832c, 4);
+$pale-main-spot-colour: lighten($main-spot-colour, 30);
 $alt-spot-colour: #6d96d5;
 $dark-background-colour: #414142;
 $body-background-colour: white;
@@ -21,6 +22,9 @@ $facebook-colour: #3a579b;
 $twitter-colour: #598dca;
 $light-drawing-colour: lighten($control-border-colour, 60);
 $main-heading-colour: black;
+
+$small-category-result-icon-dim: 37px;
+$large-category-result-icon-dim: 57px;
 
 // ICONS
 

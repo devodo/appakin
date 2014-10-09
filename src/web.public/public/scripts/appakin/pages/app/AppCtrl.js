@@ -34,16 +34,6 @@
                 $scope.display.fullDescription = !$scope.display.fullDescription;
             };
 
-            $scope.formatPrice = function(price) {
-                if (price === 0) {
-                    return 'Free';
-                } else if (price < 100) {
-                    return price + '¢';
-                }
-
-                return '$' + price / 100;
-            };
-
             $scope.formatVoteCount = function(voteCount) {
                 if (voteCount > 1000000) {
                     return (Math.round(voteCount / 10000) / 100) + ' m';

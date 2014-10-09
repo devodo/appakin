@@ -114,10 +114,15 @@ h1 {
 }
 
 .category-search-result,
-.app-search-result {
-  border-bottom: 1px solid $main-spot-colour;
-  padding-bottom: 12px;
+.app-search-result,
+#category .category-app {
+  border-bottom: 1px solid $light-drawing-colour; // $main-spot-colour;
+  padding-bottom: 15px;
   margin-bottom: 12px;
+
+  @include mq($from: mobile-landscape) {
+    padding-bottom: 6px;
+  }
 
   h4 {
     margin-bottom: 3px;
@@ -127,7 +132,8 @@ h1 {
   p {
     @include small-body-text;
     color: $alt-black-colour;
-    margin-left: 6px;
+    //margin-bottom: 9px;
+    max-width: 550px;
 
     em {
       color: darken($alt-black-colour, 10);
@@ -142,9 +148,6 @@ h1 {
 
 .category-search-result {
   clear: both;
-  //padding-bottom: 12px;
-  //margin-bottom: 12px;
-  //border-bottom: 1px solid $main-spot-colour;
 
   @include mq($from: mobile-landscape) {
     padding-bottom: 0px;
@@ -154,7 +157,7 @@ h1 {
 
   h4 {
     position: relative;
-    margin-bottom: 6px;
+    //margin-bottom: 6px;
     font-weight: bold;
     font-size: 20px;
     line-height: 24px;
@@ -162,43 +165,60 @@ h1 {
     @include mq($from: mobile-landscape) {
       font-size: 22px;
       line-height: 26px;
-      margin-bottom: 9px;
+      //margin-bottom: 9px;
+    }
+
+    a {
+      text-decoration: underline;
     }
   }
 
   ul {
     clear: both;
     @include clearfix;
+    margin-top: 6px; //9px;
 
-    $small-category-result-icon-dim: 37px;
-    $large-category-result-icon-dim: 57px;
+//    border: 2px solid $main-spot-colour;
+//    @include border-top-radius(6px);
+//    @include border-bottom-radius(6px);
+//    padding: 6px 6px 2px 6px;
+
+    @include mq($from: mobile-landscape) {
+      border: none;
+      padding: 0px;
+    }
 
     li {
       float: left;
-      width: $small-category-result-icon-dim + 117px;
+      //width: $small-category-result-icon-dim + 117px;
+      width: 100%;
       margin-bottom: 6px;
 
       @include mq($from: desktop) {
-        width: $large-category-result-icon-dim + 137px;
+        width: 33%; // $large-category-result-icon-dim + 137px;
       }
 
       h6 {
         font-size: 14px;
         line-height: 18px;
-        width: $small-category-result-icon-dim + 74px;
-        margin-left: $small-category-result-icon-dim + 3px;
+        //width: $small-category-result-icon-dim + 74px;
+        margin-left: $small-category-result-icon-dim + 6px;
         margin-right: 3px;
-        height: $small-category-result-icon-dim;
+        //height: $small-category-result-icon-dim;
         overflow: hidden;
 
         @include mq($from: desktop) {
           font-size: 16px;
           line-height: 22px;
           overflow: visible;
-          width: $large-category-result-icon-dim + 66px;
+          //width: $large-category-result-icon-dim + 66px;
           margin-left: $large-category-result-icon-dim + 6px;
-          height: $large-category-result-icon-dim;
+          //height: $large-category-result-icon-dim;
         }
+      }
+
+      .description {
+        margin-left: $small-category-result-icon-dim + 6px;
       }
 
       a.img-wrapper {
@@ -230,6 +250,12 @@ h1 {
 
   p.description {
     color: $dark-background-colour !important;
+    margin-bottom: 9px;
+    @include small-text;
+
+    em {
+      color: lighten($dark-background-colour, 5);
+    }
   }
 }
 
@@ -238,7 +264,8 @@ h1 {
   padding-bottom: 0px;
 }
 
-.app-search-result {
+.app-search-result,
+#category .category-app {
   @include clearfix;
   max-width: 550px;
 
@@ -247,7 +274,7 @@ h1 {
     margin-bottom: 15px;
   }
 
-  h4, p {
+  h4, p, .thick-rule {
     margin-left: 57px + 6px;
     overflow: hidden !important;
   }
@@ -256,8 +283,9 @@ h1 {
     line-height: 22px;
   }
 
-  p {
+  p.description {
     color: $dark-background-colour !important;
+    margin-bottom: 0px;
   }
 
   img {
@@ -322,6 +350,119 @@ h1 {
   border: 1px solid lighten($control-border-colour, 40);
   @include border-top-radius(3px);
   @include border-bottom-radius(3px);
+}
+
+.thick-rule {
+  height: 2px;
+  //@include border-top-radius(2px);
+  //@include border-bottom-radius(2px);
+  background-color: $pale-main-spot-colour;
+  margin-bottom: 3px;
+}
+
+#category {
+  h1 {
+    margin-bottom: 18px;
+  }
+
+  .category-description {
+    margin-bottom: 21px;
+    line-height: 22px;
+  }
+
+  .category-app {
+    //border: none;
+    //border-top: 15px solid $pale-main-spot-colour;
+    padding-top: 3px;
+    border-color: $light-drawing-colour;
+
+    .sidebar {
+      float: left;
+      width: $large-category-result-icon-dim;
+
+      @include mq($from: mobile-landscape) {
+        padding-bottom: 6px;
+        width: $large-category-result-icon-dim * 2 + 6px;
+      }
+
+      .position {
+        @include border-top-radius(6px);
+        @include border-bottom-radius(6px);
+        padding: 1px 0px 1px 0px;
+        //background-color: $pale-main-spot-colour;
+        //color: white;
+        font-weight: bold;
+        margin-left: 0px;
+        //@include app-icon-shadow;
+        //text-shadow: 0px 1px 0px darken(white, 30);
+        margin-bottom: 3px;
+        text-align: center;
+
+        border: 2px solid $main-spot-colour;
+        color: $main-spot-colour;
+
+        width: 30px;
+        //margin-left: auto;
+        //margin-right: 0px;
+        @include centred-margins;
+
+        @include mq($from: mobile-landscape) {
+          float: left;
+          //width: $large-category-result-icon-dim;
+          width: 40px;
+          height: 40px;
+          @include border-top-radius(9px);
+          @include border-bottom-radius(9px);
+          line-height: 34px;
+          margin-left: 8px;
+          margin-top: 9px;
+        }
+      }
+
+      a {
+        display: block;
+        height: $large-category-result-icon-dim;
+        margin-bottom: 5px;
+
+        @include mq($from: mobile-landscape) {
+          margin-left: $large-category-result-icon-dim + 6px;
+          width: $large-category-result-icon-dim;
+        }
+      }
+
+      img {
+        float: none;
+        margin: 0px;
+        padding: 0px;
+      }
+
+      .price {
+        //float: left;
+        display: block;
+        width: 100%;
+        margin-left: 0px;
+        font-size: 14px;
+        line-height: 20px;
+        font-weight: bold;
+        //margin-bottom: 4px;
+        text-align: center;
+        //height: 34px;
+
+        @include mq($from: mobile-landscape) {
+          margin-left: $large-category-result-icon-dim + 6px;
+          width: auto;
+        }
+      }
+    }
+
+    .main-info {
+      h4, p {
+        @include mq($from: mobile-landscape) {
+          margin-left: ($large-category-result-icon-dim + 6px) * 2;
+        }
+      }
+    }
+  }
 }
 
 #app {
