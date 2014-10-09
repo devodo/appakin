@@ -54,6 +54,11 @@ var getApps = function(expanded, highlights, docId) {
 
     var appArray = [];
     var appsMap = {};
+    var maxScore = 0;
+    if (appDocs.length > 0) {
+        maxScore = parseFloat(appDocs[0].score);
+    }
+
     for (var i = 0; i < appDocs.length; i++) {
         var appDoc = appDocs[i];
 
@@ -75,7 +80,8 @@ var getApps = function(expanded, highlights, docId) {
 
     return {
         apps: appArray,
-        appsMap: appsMap
+        appsMap: appsMap,
+        maxScore: maxScore
     };
 };
 
@@ -131,7 +137,9 @@ var search = function(queryStr, pageNum, next) {
 
             var highlight = getHighlight(highlights, doc.id + '-0');
             var appResult = getApps(expanded, highlights, doc.id);
-            var apps = isCatMatch ? getChartApps(doc.cat_chart, appResult.appsMap) : appResult.apps.splice(0, 5);
+            var catScore = parseFloat(doc.score);
+            var useChartApps = isCatMatch && appResult.maxScore / catScore < 0.05;
+            var apps = useChartApps ? getChartApps(doc.cat_chart, appResult.appsMap) : appResult.apps.splice(0, 5);
 
             if (highlight) {
                 category.highlight = highlight;
