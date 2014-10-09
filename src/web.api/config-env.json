@@ -1,24 +1,24 @@
 {
-  "development": {
-      "test": "test dev",
-      "connectionString": {
-          "appakin-dev": "postgres://appakin:appakin@appakin-dev/appakin",
-          "appakin": "postgres://localhost/appakin"
-      },
-      "search": {
-          "solr": {
-              "host-dev": "appakin-dev",
-              "host": "localhost",
-              "port": "8983",
-              "cores": {
-                  "auto": "appakin_auto",
-                  "category": "appakin_cat",
-                  "app": "appakin_app"
-              }
-          }
-      }
-  },
-  "production": {
-      "test": "test production"
-  }
+    "common": {
+        "connectionString": {
+            "appakin": "postgres://appakin:appakin@appakin-dev/appakin"
+        },
+        "search": {
+            "solr": {
+                "host": "localhost",
+                "port": "8983",
+                "cores": {
+                    "auto": "appakin_auto",
+                    "category": "appakin_cat",
+                    "app": "appakin_app"
+                }
+            }
+        }
+    },
+    "development": {
+        "test": "test dev"
+    },
+    "production": {
+        "test": "test production"
+    }
 }
