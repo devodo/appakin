@@ -165,6 +165,30 @@ var retrieveApps = function(ids, next) {
     });
 };
 
+var updateApps = function(ids, next) {
+    getLookups(ids, function(err, results) {
+        if (err) {
+            return next(err);
+        }
+
+        async.eachSeries(results, function(result, callback) {
+            parseLookup(result, function(err, app) {
+                if (err) {
+                    return next(err);
+                }
+
+                appStoreAdminRepo.updateAppStoreApp(app, function(err) {
+                    if (err) {
+                        return callback(err);
+                    }
+
+                    callback();
+                });
+            });
+        }, next);
+    });
+};
+
 var retrieveCategories = function(next) {
     var url = 'https://itunes.apple.com/us/genre/ios/id36?mt=8';
 
@@ -374,7 +398,7 @@ var retrieveAllAppSources = function(next) {
     });
 };
 
-var lookupAppsBatched = function(startId, batchSize, next) {
+var lookupSourceAppsBatched = function(startId, batchSize, next) {
     appStoreAdminRepo.getAppStoreSourceItemBatch(startId, batchSize, function(err, results) {
         log.debug("Batch lookup start id: " + startId);
 
@@ -400,6 +424,38 @@ var lookupAppsBatched = function(startId, batchSize, next) {
             return next(null, lastId);
         });
     });
+};
+
+var updateAllAppsBatched = function(startId, batchSize, next) {
+    var processBatch = function(batchStartId) {
+        appStoreAdminRepo.getAppStoreIdBatch(batchStartId, batchSize, function(err, results) {
+            log.debug("Batch lookup start id: " + batchStartId);
+
+            if (err) {
+                return next(err);
+            }
+
+            if (results.length === 0) {
+                return next();
+            }
+
+            var lastId = results[results.length - 1].id;
+
+            var appIds = results.map(function(appSource) {
+                return appSource.storeAppId;
+            });
+
+            updateApps(appIds, function(err) {
+                if (err) {
+                    return next(err);
+                }
+
+                processBatch(lastId);
+            });
+        });
+    };
+
+    processBatch(startId);
 };
 
 var retrieveMissingApps = function(appIds, next) {
@@ -537,7 +593,8 @@ exports.retrieveApp = retrieveApp;
 exports.retrieveCategories = retrieveCategories;
 exports.retrieveAppSources = retrieveAppSources;
 exports.retrieveAllAppSources = retrieveAllAppSources;
-exports.lookupAppsBatched = lookupAppsBatched;
+exports.lookupSourceAppsBatched = lookupSourceAppsBatched;
+exports.updateAllAppsBatched = updateAllAppsBatched;
 exports.retrieveAppCharts = retrieveAppCharts;
 exports.lookupMissingChartApps = lookupMissingChartApps;
 exports.lookupMissingSourceApps = lookupMissingSourceApps;

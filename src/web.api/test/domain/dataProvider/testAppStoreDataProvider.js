@@ -113,7 +113,7 @@ exports.group = {
         return test.done(); //ignore test
 
         var mainLoop = function(startId, batchSize, next) {
-            appStoreData.lookupAppsBatched(startId, batchSize, function(err, lastId) {
+            appStoreData.lookupSourceAppsBatched(startId, batchSize, function(err, lastId) {
                 if (err) {
                     return next(err);
                 }

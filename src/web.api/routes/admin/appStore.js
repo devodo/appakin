@@ -1,6 +1,7 @@
 'use strict';
 var appStoreData = require("../../domain/dataProvider/appStoreDataProvider");
 var appStoreAdminRepo = require("../../repos/appStoreAdminRepo");
+var log = require('../../logger');
 
 exports.init = function init(app) {
 
@@ -56,6 +57,23 @@ exports.init = function init(app) {
     app.post('/admin/appstore/lookup_missing_chart_apps', function (req, res) {
         appStoreData.lookupMissingChartApps(function(err) {
             if (err) {
+                return res.status(500).json(err);
+            }
+
+            res.json({status: 'success'});
+        });
+    });
+
+    app.post('/admin/appstore/update_all_apps', function (req, res) {
+        var startId = parseInt(req.body.start, 10);
+
+        if (isNaN(startId)) {
+            return res.status(500).json({"error": "must specify start id"});
+        }
+
+        appStoreData.updateAllAppsBatched(startId, 200, function(err) {
+            if (err) {
+                log.error(err);
                 return res.status(500).json(err);
             }
 
