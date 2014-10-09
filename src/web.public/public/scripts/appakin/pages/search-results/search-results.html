@@ -39,7 +39,20 @@
                         </div>
                         <div class="app-match">
                             <ul class="category-apps">
-                                <li class="category-app"ng-repeat="app in category.apps | limitTo: 4">
+                                <li class="category-app"ng-repeat="app in category.apps | limitTo: 3">
+                                    <a class="img-wrapper" href="{{ url.createAppUrl(app.platform, app.url) }}" >
+                                        <img ng-src="{{app.imageUrl}}">
+                                    </a>
+                                    <h6>
+                                        <a class="underline-on-hover" href="{{ url.createAppUrl(app.platform, app.url) }}"
+                                           ng-bind-html="app.highlight.name_split ? app.highlight.name_split : app.name"></a>
+                                    </h6>
+                                    <p class="tight-lines description" ng-bind-html="app.highlight.desc ? app.highlight.desc + ' &hellip;' : ''"></p>
+                                </li>
+                            </ul>
+                            <ul class="category-apps extra-apps">
+                                <li class="category-app"
+                                    ng-repeat="app in category.apps | limitTo: 6 | limitTo: category.apps.length < 4 ? 0 : 3 - category.apps.length">
                                     <a class="img-wrapper" href="{{ url.createAppUrl(app.platform, app.url) }}" >
                                         <img ng-src="{{app.imageUrl}}">
                                     </a>

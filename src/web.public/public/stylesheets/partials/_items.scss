@@ -148,6 +148,7 @@ h1 {
 
 .category-search-result {
   clear: both;
+  padding-bottom: 9px;
 
   @include mq($from: mobile-landscape) {
     padding-bottom: 0px;
@@ -157,7 +158,7 @@ h1 {
 
   h4 {
     position: relative;
-    //margin-bottom: 6px;
+    margin-bottom: 6px;
     font-weight: bold;
     font-size: 20px;
     line-height: 24px;
@@ -176,7 +177,8 @@ h1 {
   ul {
     clear: both;
     @include clearfix;
-    margin-top: 6px; //9px;
+    //margin-top: 6px; //9px;
+
 
 //    border: 2px solid $main-spot-colour;
 //    @include border-top-radius(6px);
@@ -186,6 +188,7 @@ h1 {
     @include mq($from: mobile-landscape) {
       border: none;
       padding: 0px;
+      //margin-left: 9px;
     }
 
     li {
@@ -193,6 +196,10 @@ h1 {
       //width: $small-category-result-icon-dim + 117px;
       width: 100%;
       margin-bottom: 6px;
+
+      @include mq($from: mobile-landscape) {
+       margin-bottom: 9px;
+      }
 
       @include mq($from: desktop) {
         width: 33%; // $large-category-result-icon-dim + 137px;
@@ -219,6 +226,10 @@ h1 {
 
       .description {
         margin-left: $small-category-result-icon-dim + 6px;
+
+        @include mq($from: desktop) {
+          margin-left: $large-category-result-icon-dim + 6px;
+        }
       }
 
       a.img-wrapper {
@@ -248,14 +259,26 @@ h1 {
     }
   }
 
+  ul.extra-apps {
+    display: none;
+
+    @include mq($from: desktop) {
+      display: block;
+    }
+  }
+
   p.description {
     color: $dark-background-colour !important;
-    margin-bottom: 9px;
+    //margin-bottom: 9px;
     @include small-text;
 
     em {
       color: lighten($dark-background-colour, 5);
     }
+  }
+
+  .category-match p.description {
+    margin-bottom: 9px;
   }
 }
 
