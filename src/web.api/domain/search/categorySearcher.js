@@ -47,7 +47,11 @@ var getApps = function(expanded, highlights, docId) {
 
     if (!appDocs) { return []; }
 
-    return appDocs.map(function(appDoc) {
+    var appArray = [];
+    var appsMap = {};
+    for (var i = 0; i < appDocs.length; i++) {
+        var appDoc = appDocs[i];
+
         var appResult = {
             name: appDoc.name,
             url: urlUtil.makeUrl(appDoc.url, appDoc.name),
@@ -58,6 +62,32 @@ var getApps = function(expanded, highlights, docId) {
 
         if (highlight) {
             appResult.highlight = highlight;
+        }
+
+        appArray.push(appResult);
+        appsMap[appDoc.position] = appResult;
+    }
+
+    return {
+        apps: appArray,
+        appsMap: appsMap
+    };
+};
+
+var getChartApps = function(catChart, appsMap) {
+    if (!catChart) { return []; }
+
+    var chartApps = JSON.parse(catChart);
+
+    return chartApps.map(function(chartApp) {
+        var appResult = appsMap[chartApp.position];
+
+        if (!appResult) {
+            appResult = {
+                name: chartApp.name,
+                url: urlUtil.makeUrl(chartApp.url, chartApp.name),
+                imageUrl: chartApp.image_url
+            };
         }
 
         return appResult;
@@ -86,14 +116,17 @@ var search = function(queryStr, pageNum, next) {
         var expanded = obj.expanded;
 
         var categories = obj.response.docs.map(function(doc) {
+            var isCatMatch = isCategoryMatch(expanded, doc.id);
+
             var category = {
                 name: doc.cat_name,
                 url: urlUtil.makeUrl(doc.url, doc.cat_name),
-                isCategoryMatch: isCategoryMatch(expanded, doc.id)
+                isCategoryMatch: isCatMatch
             };
 
             var highlight = getHighlight(highlights, doc.id + '-0');
-            var apps = getApps(expanded, highlights, doc.id);
+            var appResult = getApps(expanded, highlights, doc.id);
+            var apps = isCatMatch ? getChartApps(doc.cat_chart, appResult.appsMap) : appResult.apps.splice(0, 5);
 
             if (highlight) {
                 category.highlight = highlight;

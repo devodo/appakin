@@ -9,7 +9,7 @@ var fs = require('fs');
 var PARENT_TYPE = 1;
 var CHILD_TYPE = 2;
 
-var addCategory = function(category, apps, numAppDescriptions, next) {
+var addCategory = function(category, apps, numAppDescriptions, numChartApps, next) {
     var children = apps.map(function(app) {
         return {
             id : category.id + '-' + app.id,
@@ -30,6 +30,18 @@ var addCategory = function(category, apps, numAppDescriptions, next) {
         appDescriptions.push(apps[i].description);
     }
 
+    var chartApps = [];
+
+    for (i = 0; i < numChartApps && i < apps.length; i++) {
+        var app = apps[i];
+        chartApps.push({
+            name: app.name,
+            url: app.extId.replace(/\-/g, ''),
+            "image_url": app.imageUrl,
+            position: parseInt(app.position, 10) + 10
+        });
+    }
+
     var categoryChild = {
         id : category.id + '-0',
         type: CHILD_TYPE,
@@ -48,6 +60,7 @@ var addCategory = function(category, apps, numAppDescriptions, next) {
         type: PARENT_TYPE,
         cat_name: category.name,
         url: category.extId.replace(/\-/g, ''),
+        "cat_chart": JSON.stringify(chartApps),
         "_childDocuments_": children
     };
 
@@ -60,7 +73,7 @@ var addCategory = function(category, apps, numAppDescriptions, next) {
     });
 };
 
-var rebuild = function(numAppDescriptions, next) {
+var rebuild = function(numAppDescriptions, numChartApps, next) {
     appStoreRepo.getCategories(function (err, categories) {
         if (err) {
             return next(err);
@@ -73,7 +86,7 @@ var rebuild = function(numAppDescriptions, next) {
                     return callback(err);
                 }
 
-                addCategory(category, apps, numAppDescriptions, function (err) {
+                addCategory(category, apps, numAppDescriptions, numChartApps, function (err) {
                     callback(err);
                 });
             });
