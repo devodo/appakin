@@ -11,7 +11,12 @@ var getHighlight = function(highlights, docId) {
     var hDoc = highlights[docId];
     if (!hDoc) { return null; }
 
-    if (!hDoc.desc && !hDoc.name_split) { return null; }
+    if (!hDoc.desc && !hDoc.cat_desc && !hDoc.name_split) { return null; }
+
+    if (hDoc.cat_desc) {
+        hDoc.desc = hDoc.cat_desc;
+        delete hDoc.cat_desc;
+    }
 
     return hDoc;
 };

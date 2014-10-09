@@ -47,7 +47,7 @@ var addCategory = function(category, apps, numAppDescriptions, numChartApps, nex
         type: CHILD_TYPE,
         "parent_id": category.id,
         name: category.name,
-        desc: appDescriptions.join('\n\n'),
+        cat_desc: appDescriptions.join('\n\n'),
         position: 1,
         popularity: category.popularity
     };
