@@ -305,6 +305,15 @@ h1 {
     }
   }
 
+  .more-wrapper {
+    clear: both;
+    @include clearfix;
+  }
+  a.more {
+    @include small-body-text;
+    float: right;
+  }
+
   p.description {
     color: $dark-background-colour !important;
     //margin-bottom: 9px;

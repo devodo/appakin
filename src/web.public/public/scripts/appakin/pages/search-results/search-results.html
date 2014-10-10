@@ -63,7 +63,13 @@
                                     <p class="tight-lines description" ng-bind-html="app.highlight.desc ? app.highlight.desc + ' &hellip;' : ''"></p>
                                 </li>
                             </ul>
-                          </div>
+                            <div class="more-wrapper">
+                                <a class="more underline-on-hover"
+                                   href="{{ url.createCategoryUrl(category.platform, category.url) }}">
+                                    All {{category.name}} apps&hellip;
+                                </a>
+                            </div>
+                        </div>
                     </li>
                 </ul>
                 <ul ng-show="isAppSearch">

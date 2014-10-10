@@ -3,6 +3,9 @@ a, a:link, a:visited, a:hover, a:active {
   font-weight: normal;
 }
 
+// underline
+a.underline, a.underline:link, a.underline:visited, a.underline:focus, a.underline:hover, a.underline:active { text-decoration: underline; }
+
 // underline on click
 a.underline-on-click, a.underline-on-click:link, a.underline-on-click:visited, a.underline-on-click:focus, a.underline-on-click:hover { text-decoration: none; }
 a.underline-on-click:active { text-decoration: underline; }
