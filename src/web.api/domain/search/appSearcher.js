@@ -10,14 +10,24 @@ var getHighlight = function(highlights, docId) {
     var hDoc = highlights[docId];
     if (!hDoc) { return null; }
 
-    if (!hDoc.desc && !hDoc.name_split) { return null; }
+    if (!hDoc.desc_split && !hDoc.name_split) { return null; }
+
+    if (hDoc.name_split) {
+        hDoc.name = hDoc.name_split;
+        delete hDoc.name_split;
+    }
+
+    if (hDoc.desc_split) {
+        hDoc.desc = hDoc.desc_split;
+        delete hDoc.desc_split;
+    }
 
     return hDoc;
 };
 
 var search = function(queryStr, pageNum, next) {
     var q = encodeURIComponent(solrCore.escapeSpecialChars(queryStr));
-    var solrQuery = 'rows=' + PAGE_SIZE + '&q=' + q;
+    var solrQuery = 'rows=' + PAGE_SIZE + '&qq=' + q + '&spellcheck.q=' + q;
 
     if (pageNum && pageNum > 1) {
         var start = (pageNum - 1) * PAGE_SIZE;

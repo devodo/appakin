@@ -11,11 +11,21 @@ var getHighlight = function(highlights, docId) {
     var hDoc = highlights[docId];
     if (!hDoc) { return null; }
 
-    if (!hDoc.desc && !hDoc.cat_desc && !hDoc.name_split) { return null; }
+    if (!hDoc.desc_split && !hDoc.cat_desc_split && !hDoc.name_split) { return null; }
 
-    if (hDoc.cat_desc) {
-        hDoc.desc = hDoc.cat_desc;
-        delete hDoc.cat_desc;
+    if (hDoc.name_split) {
+        hDoc.name = hDoc.name_split;
+        delete hDoc.name_split;
+    }
+
+    if (hDoc.cat_desc_split) {
+        hDoc.desc = hDoc.cat_desc_split;
+        delete hDoc.cat_desc_split;
+    }
+
+    if (hDoc.desc_split) {
+        hDoc.desc = hDoc.desc_split;
+        delete hDoc.desc_split;
     }
 
     return hDoc;
