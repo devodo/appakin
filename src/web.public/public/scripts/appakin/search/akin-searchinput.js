@@ -75,6 +75,7 @@
 
                     $scope.completing = false;
                     $scope.setIndex(-1);
+                    //$scope.inputElement[0].blur();
                 };
 
                 $scope.clear = function(e) {
