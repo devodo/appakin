@@ -4,14 +4,25 @@
     angular.module('appAkin').factory('cache', function($sessionStorage, $interval) {
         var cacheTtlMinutes = 30;
         var noCache = false;
-        var cacheScanMinutes = 1;
+        var cacheScanMinutes = 10;
 
         function addMinutes(date, minutes) {
             return new Date(date.getTime() + minutes*60000);
         }
 
         $interval(function() {
-            console.log('interval!')
+            var now = new Date();
+
+            for (var key in $sessionStorage) {
+                if (key.match(/^(?:data |scroll )/)) {
+                    var data = $sessionStorage[key];
+
+                    if (data && data.added && addMinutes(new Date(data.added), cacheTtlMinutes) < now) {
+                        delete $sessionStorage[key];
+                    }
+                }
+            }
+
         }, cacheScanMinutes * 60000);
 
         return {
@@ -25,6 +36,8 @@
                 $sessionStorage[keyStr] = data;
             },
             get: function(keyStr) {
+                var now = null;
+
                 if (noCache) {
                     return null;
                 }
@@ -33,12 +46,16 @@
 
                 if (result) {
                     if (result.added) {
-                        if (addMinutes(new Date(result.added), cacheTtlMinutes) > new Date()) {
+                        now = new Date();
+
+                        if (addMinutes(new Date(result.added), cacheTtlMinutes) > now) {
                             //console.log('Got data from session cache for key ' + keyStr);
+                            //result.added = now;
                             return result.data;
                         } else {
                             // clear this now old data out.
-                            $sessionStorage[keyStr] = null;
+                            delete $sessionStorage[keyStr];
+                            //$sessionStorage[keyStr] = null;
                         }
                     } else {
                         return result.data;

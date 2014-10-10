@@ -5,6 +5,10 @@
         .service('httpGet', function($timeout, $http, $q, webApiUrl, cache) {
             var defaultRequestTimeoutMs = 5000;
 
+            function createCacheKey(url) {
+                return 'data ' + url;
+            }
+
             return function(requestTimeoutMs) {
                 requestTimeoutMs = requestTimeoutMs || defaultRequestTimeoutMs;
 
@@ -30,9 +34,9 @@
 
                     resetCurrentRequest();
                     var url = webApiUrl + relativeUrl;
-                    console.log('invoked do request: url=' + url);
+                    //console.log('invoked do request: url=' + url);
 
-                    var cachedData = cache.get(url);
+                    var cachedData = cache.get(createCacheKey(url));
                     if (cachedData) {
                         currentRequest.active = false;
                         if (success) {
@@ -73,7 +77,7 @@
                             console.log('Successful search: url=' + url);
 
                             if (data) {
-                                cache.set(url, data, true);
+                                cache.set(createCacheKey(url), data, true);
                             }
 
                             if (success) {
