@@ -45,6 +45,22 @@ p.hint {
   @include small-body-text;
 }
 
+// more button
+
+.more-button {
+  @include akin-basic-button;
+  width: 100px;
+  @include centred-margins;
+  margin-top: 12px;
+  margin-bottom: 6px;
+
+  span:before {
+    @include large-icon;
+    color: lighten($icon-colour, 20);
+    @include icon($down-icon);
+  }
+}
+
 // Page title
 
 h1 {
@@ -308,10 +324,11 @@ h1 {
   .more-wrapper {
     clear: both;
     @include clearfix;
-  }
-  a.more {
-    @include small-body-text;
-    float: right;
+
+    a.more {
+      @include small-body-text;
+      float: right;
+    }
   }
 
   p.description {
@@ -404,6 +421,21 @@ h1 {
   content: " "
 }
 
+#category .spinner {
+  position: relative !important;
+  display: block;
+  //width: 30px;
+  height: 1px;
+  margin-top: 21px;
+  margin-bottom: 21px;
+  left: auto !important;
+  @include centred-margins;
+}
+
+#category .spinner:before {
+  display: none;
+}
+
 .img-border {
   border: 1px solid $light-drawing-colour;
   padding: 3px;
@@ -439,6 +471,14 @@ h1 {
     margin-bottom: 21px;
     line-height: 22px;
   }
+
+//  .more {
+//    @include akin-basic-button;
+//    width: 100px;
+//    @include centred-margins;
+//    margin-top: 12px;
+//    margin-bottom: 6px;
+//  }
 
   .category-app {
     //border: none;
@@ -816,8 +856,7 @@ h1 {
       word-break: break-word;
     }
 
-    .more,
-    .less {
+    .more {
       @include akin-basic-button;
       width: 100px;
       @include centred-margins;
@@ -830,7 +869,6 @@ h1 {
       color: lighten($icon-colour, 20);
     }
 
-    .less span:before { @include icon($up-icon); }
     .more span:before { @include icon($down-icon); }
   }
 

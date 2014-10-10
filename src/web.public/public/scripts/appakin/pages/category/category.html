@@ -8,28 +8,32 @@
         <ul>
             <li ng-repeat="app in category.data.apps track by app.url"
                 class="category-app"
-                ng-class="{'last':$last}">
-                <!--<p class="position">{{app.position}}</p>-->
+                ng-class="{'last':$last}"
+                ng-cloak>
                 <div class="info-wrapper">
                     <div class="sidebar">
-                        <p class="position">{{app.position}}</p>
+                        <p class="position" ng-bind="app.position"></p>
                         <a href="{{ url.createAppUrl(category.data.platform, app.url) }}">
                             <img class="small" ng-src="{{app.artworkSmallUrl}}">
                         </a>
-                        <p class="price highlighted">{{app.price | formatPrice}}</p>
+                        <p class="price highlighted" ng-bind="app.price | formatPrice"></p>
                     </div>
-                    <!--<div class="thick-rule"></div>-->
                     <div class="main-info">
                         <h4>
                             <a class="underline-on-hover"
                                href="{{ url.createAppUrl(category.data.platform, app.url) }}"
                                ng-bind="app.name"></a>
                         </h4>
-                        <p class="tight-lines description">{{app.shortDescription | firstSection: 120}}</p>
+                        <p class="tight-lines description"
+                           ng-bind="app.shortDescription | firstSection: 120"></p>
                     </div>
                 </div>
             </li>
         </ul>
-    </div>
+        <div class="loading-more-categories-spinner-wrapper" us-spinner="{radius:7, width:3, length: 6}" spinner-key="loading-more-categories">
+            <a class="more-button never-underline" href
+               ng-click="category.appendNextPage()"
+               ng-show="category.hasMorePages"><span></span></a>
+        </div>
 </div>
 <footer data-akin-footer></footer>

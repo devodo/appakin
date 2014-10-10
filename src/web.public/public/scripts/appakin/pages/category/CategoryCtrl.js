@@ -10,13 +10,17 @@
         }
 
         search.resetSearchTerm();
-        category.data = categoryData;
+        category.reset(categoryData);
 
         $scope.category = category;
         $scope.url = url;
         $scope.platform = platform;
 
         category.updateSearch();
+
+        $scope.$on('$destroy', function() {
+            category.cancel();
+        });
     });
 
 }()); // use strict
