@@ -1,13 +1,18 @@
 (function () {
     'use strict';
 
-    angular.module('appAkin').factory('cache', function($sessionStorage) {
+    angular.module('appAkin').factory('cache', function($sessionStorage, $interval) {
         var cacheTtlMinutes = 30;
         var noCache = false;
+        var cacheScanMinutes = 1;
 
         function addMinutes(date, minutes) {
             return new Date(date.getTime() + minutes*60000);
         }
+
+        $interval(function() {
+            console.log('interval!')
+        }, cacheScanMinutes * 60000);
 
         return {
             set: function(keyStr, value, hasTtl) {

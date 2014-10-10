@@ -77,15 +77,25 @@ h1 {
   }
 }
 
-#search-results h1,
-#search-results p.hint,
+//#search-results h1,
+//#search-results p.hint,
 #category h1 {
   max-width: 550px;
 }
 
 #search-results {
+  h1 {
+     border: none;
+  }
+
   h1.category {
-    margin-bottom: 3px;
+    //border: none;
+    //margin-bottom: 3px;
+    font-size: 24px;
+
+    @include mq($from: mobile-landscape) {
+      font-size: 30px;
+    }
   }
 
   .list-wrapper {
@@ -98,7 +108,7 @@ h1 {
   }
 
   p.hint {
-    text-align: center;
+    text-align: right;
     margin-bottom: 18px;
   }
 
@@ -149,6 +159,7 @@ h1 {
 .category-search-result {
   clear: both;
   padding-bottom: 9px;
+  border: none;
 
   @include mq($from: mobile-landscape) {
     padding-bottom: 0px;
@@ -163,10 +174,15 @@ h1 {
     font-size: 20px;
     line-height: 24px;
 
+    padding-bottom: 3px;
+    border-bottom: 2px solid $main-spot-colour;
+
     @include mq($from: mobile-landscape) {
       font-size: 22px;
       line-height: 26px;
-      //margin-bottom: 9px;
+      margin-bottom: 12px;
+
+
     }
 
     a {
@@ -399,6 +415,25 @@ h1 {
     padding-top: 3px;
     border-color: $light-drawing-colour;
 
+//    .position {
+//      @include border-top-radius(6px);
+//      @include border-bottom-radius(6px);
+//      padding: 1px 0px 1px 0px;
+//      font-weight: bold;
+//      margin-left: 0px;
+//      margin-bottom: 3px;
+//      text-align: center;
+//
+//      border: 2px solid $main-spot-colour;
+//      color: $main-spot-colour;
+//
+//      width: 40px;
+//      height: 40px;
+//      line-height: 34px;
+//      margin-bottom: 9px;
+//      @include centred-margins;
+//    }
+
     .sidebar {
       float: left;
       width: $large-category-result-icon-dim;
@@ -412,26 +447,27 @@ h1 {
         @include border-top-radius(6px);
         @include border-bottom-radius(6px);
         padding: 1px 0px 1px 0px;
-        //background-color: $pale-main-spot-colour;
-        //color: white;
         font-weight: bold;
         margin-left: 0px;
-        //@include app-icon-shadow;
-        //text-shadow: 0px 1px 0px darken(white, 30);
-        margin-bottom: 3px;
+        margin-bottom: 6px;
         text-align: center;
 
         border: 2px solid $main-spot-colour;
         color: $main-spot-colour;
 
-        width: 30px;
+        //width: 30px;
+        @include centred-margins;
+
+        width: 40px;
+        height: 40px;
+        @include border-top-radius(9px);
+        @include border-bottom-radius(9px);
+        line-height: 34px;
         //margin-left: auto;
         //margin-right: 0px;
-        @include centred-margins;
 
         @include mq($from: mobile-landscape) {
           float: left;
-          //width: $large-category-result-icon-dim;
           width: 40px;
           height: 40px;
           @include border-top-radius(9px);
