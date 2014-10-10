@@ -275,11 +275,33 @@ h1 {
     }
   }
 
+  ul {
+    @include mq($from: tablet) {
+      display: block;
+      width: 49.9%;
+      float: left;
+      clear: none;
+    }
+
+    @include mq($from: desktop) {
+      width: 100%;
+      float: none;
+      clear: both;
+    }
+  }
+
   ul.extra-apps {
     display: none;
 
-    @include mq($from: desktop) {
+    @include mq($from: tablet) {
       display: block;
+//      width: 49.9%;
+
+    }
+
+    @include mq($from: desktop) {
+      //display: block;
+      //width: 100%;
     }
   }
 
