@@ -9,7 +9,7 @@
         <a class="never-underline basic-button"
            href="{{url.createSearchUrl(resultSearchTerm, 'category', search.platform)}}">Category Results</a>
     </h1>
-    <p class="error" ng-show="serverError">
+    <p class="error" ng-if="serverError">
         <span class="icon"></span>There was a problem getting your search result.
         Please try again, or if the problem persists please try later.
     </p>
@@ -26,7 +26,7 @@
         <!--</p>-->
         <div class="valid-results-wrapper" ng-show="hasResults">
             <div class="list-wrapper" ng-class="search.searchInProgress ? 'disabled' : ''">
-                <ul ng-show="isCategorySearch">
+                <ul ng-if="isCategorySearch">
                     <li ng-repeat="category in resultItems" class="category-search-result"
                         ng-class="{'last':$last}">
                         <h4>
@@ -72,7 +72,7 @@
                         </div>
                     </li>
                 </ul>
-                <ul ng-show="isAppSearch">
+                <ul ng-if="isAppSearch">
                     <li ng-repeat="app in resultItems track by app.url" class="app-search-result"
                         ng-class="{last:$last}">
                         <a href="{{ url.createAppUrl(app.platform, app.url) }}">
