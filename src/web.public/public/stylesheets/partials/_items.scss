@@ -307,6 +307,8 @@ h2 {
 }
 
 .category-app-summary {
+  max-width: 550px;
+  
   @include mq($to: mobile-landscape) {
     border-bottom: 1px solid $light-drawing-colour;
     padding-bottom: 15px;
