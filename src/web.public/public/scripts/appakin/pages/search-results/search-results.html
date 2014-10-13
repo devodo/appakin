@@ -1,11 +1,11 @@
 <div id="search-results" class="main-wrapper" ng-cloak>
     <h1 class="search-type category" ng-if="isCategorySearch">
-        Categories&nbsp;&nbsp;
+        Category Results&nbsp;&nbsp;
         <a class="never-underline basic-button"
            href="{{url.createSearchUrl(resultSearchTerm, 'app', search.platform)}}">App Results</a>
     </h1>
     <h1 class="search-type app" ng-if="isAppSearch">
-        Apps&nbsp;&nbsp;
+        App Results&nbsp;&nbsp;
         <a class="never-underline basic-button"
            href="{{url.createSearchUrl(resultSearchTerm, 'category', search.platform)}}">Category Results</a>
     </h1>
@@ -31,7 +31,7 @@
                         ng-class="{'last':$last}">
                         <h4>
                             <a class="underline-on-hover"
-                               ng-bind-html="category.highlight && category.highlight.name_split ? category.highlight.name_split : category.name"
+                               ng-bind-html="category.highlight && category.highlight.name ? category.highlight.name : category.name"
                                href="{{ url.createCategoryUrl(category.platform, category.url) }}"></a>
                         </h4>
                         <div class="category-match" ng-if="category.isCategoryMatch">
@@ -45,7 +45,7 @@
                                     </a>
                                     <h6>
                                         <a class="underline-on-hover" href="{{ url.createAppUrl(app.platform, app.url) }}"
-                                           ng-bind-html="app.highlight.name_split ? app.highlight.name_split : app.name"></a>
+                                           ng-bind-html="app.highlight.name ? app.highlight.name : app.name"></a>
                                     </h6>
                                     <p class="tight-lines description" ng-bind-html="app.highlight.desc ? app.highlight.desc + ' &hellip;' : ''"></p>
                                 </li>
@@ -58,7 +58,7 @@
                                     </a>
                                     <h6>
                                         <a class="underline-on-hover" href="{{ url.createAppUrl(app.platform, app.url) }}"
-                                           ng-bind-html="app.highlight.name_split ? app.highlight.name_split : app.name"></a>
+                                           ng-bind-html="app.highlight.name ? app.highlight.name : app.name"></a>
                                     </h6>
                                     <p class="tight-lines description" ng-bind-html="app.highlight.desc ? app.highlight.desc + ' &hellip;' : ''"></p>
                                 </li>
@@ -81,7 +81,7 @@
                         <h4>
                             <a class="underline-on-hover"
                                href="{{ url.createAppUrl(app.platform, app.url) }}"
-                               ng-bind-html="app.highlight.name_split ? app.highlight.name_split : app.name"></a>
+                               ng-bind-html="app.highlight.name ? app.highlight.name : app.name"></a>
                         </h4>
                         <p class="tight-lines description" ng-bind-html="app.highlight.desc ? app.highlight.desc + ' &hellip;' : ''"></p>
                     </li>

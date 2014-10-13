@@ -1,8 +1,8 @@
 // STICKY FOOTER
 
-$small-footer-height: 80px;
-$medium-footer-height: 92px;
-$large-footer-height: 137px;
+$small-footer-height: 78px;
+$medium-footer-height: 90px;
+$large-footer-height: 135px;
 
 html {
   position: relative;
@@ -238,7 +238,7 @@ footer .call-to-action-link-wrapper {
 
 footer .footer-background-wrapper {
   background-color: $dark-background-colour;
-  padding-top: 2px;
+  //padding-top: 2px;
   @include linear-gradient(to top, darken($dark-background-colour, 10), $dark-background-colour, $fallback: $dark-background-colour);
 }
 

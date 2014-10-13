@@ -456,10 +456,23 @@ h1 {
 
 .thick-rule {
   height: 2px;
-  //@include border-top-radius(2px);
-  //@include border-bottom-radius(2px);
   background-color: $pale-main-spot-colour;
   margin-bottom: 3px;
+}
+
+#home-page {
+  .subtitle {
+    //width: 300px;
+    text-align: center;
+    display: block;
+    @include centred-margins;
+    margin-bottom: 18px;
+    //@include large-body-text;
+    font-size: 24px;
+    //color: $main-spot-colour;
+    color: #999; //$dark-background-colour;
+    //font-weight: bold;
+  }
 }
 
 #category {

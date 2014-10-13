@@ -3,7 +3,7 @@
   display: block;
   width: 200px;
   height: 53px;
-  margin: 0px auto 12px auto;
+  margin: 0px auto 3px auto;
 
   @include mq($from: tablet) {
     width: 250px;
