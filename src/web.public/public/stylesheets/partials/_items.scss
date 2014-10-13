@@ -323,9 +323,18 @@ h1 {
     clear: both;
     @include clearfix;
 
-    a.more {
+    .more  {
       @include small-body-text;
       float: right;
+    }
+
+    span:before {
+      @include small-icon;
+      color: lighten($main-spot-colour, 20);
+      @include icon($category-icon);
+      margin-left: 6px;
+      vertical-align: middle;
+      text-decoration: none !important;
     }
   }
 
