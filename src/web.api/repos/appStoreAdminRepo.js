@@ -135,7 +135,7 @@ var updateAppStoreApp = function(client, app, next) {
         "genres=$21, release_date=$22, bundle_id=$23, seller_name=$24, release_notes=$25,\n" +
         "min_os_version=$26, language_codes=$27, file_size_bytes=$28, advisory_rating=$29,\n" +
         "content_rating=$30, user_rating_current=$31, rating_count_current=$32,\n" +
-        "user_rating=$33, rating_count=$34, date_modified=NOW()\n" +
+        "user_rating=$33, rating_count=$34, date_modified=NOW(), date_deleted=NULL\n" +
         "WHERE store_app_id=$1;";
 
     var queryParams = [
