@@ -28,6 +28,32 @@
 
 // TYPOGRAPHY
 
+@mixin h3-title-small-mobile {
+  font-size: 14px;
+  line-height: 18px;
+}
+
+@mixin h3-title-small-wide {
+  font-size: 16px;
+  line-height: 22px;
+}
+
+@mixin h3-title-medium {
+  font-size: 18px;
+  line-height: 22px;
+}
+
+
+@mixin h2-text {
+  font-size: 22px;
+  line-height: 28px;
+}
+
+@mixin h2-mobile-text {
+  font-size: 20px;
+  line-height: 26px;
+}
+
 @mixin page-title-text {
   font-size: 24px;
   line-height: 28px;
@@ -58,7 +84,7 @@
   line-height: 20px;
 }
 
-@mixin small-text {
+@mixin very-small-body-text {
   font-size: 12px;
   line-height: 16px;
 }

@@ -1,3 +1,15 @@
+// VISIBLE BUT DISABLED CONTENT
+
+.disabled {
+  a, p, h4, em {
+    color: $disabled-text-colour !important;
+  }
+
+  img {
+    opacity: 0.4;
+  }
+}
+
 // ERROR AND INFO BOX STYLING
 
 p.error,
@@ -32,12 +44,6 @@ p.info {
     @include icon($search-icon);
     color: $icon-colour;
   }
-}
-
-p.hint {
-  color: darken($light-drawing-colour, 10);
-  @include small-text;
-  margin-bottom: 12px;
 }
 
 .trademark {
@@ -83,14 +89,19 @@ h1 {
   @include mq($from: mobile-landscape) {
     @include large-page-title-text;
   }
+}
 
-  .basic-button {
-    position: absolute;
-    bottom: 6px;
-    right: 0px;
-    border-color: $main-spot-colour;
-    color: $main-spot-colour;
-  }
+h1 .basic-button {
+  position: absolute;
+  bottom: 6px;
+  right: 0px;
+  border-color: $main-spot-colour;
+  color: $main-spot-colour;
+}
+
+h1 .basic-button:active {
+  background-color: $main-spot-colour;
+  color: white;
 }
 
 #category h1 {
@@ -99,223 +110,71 @@ h1 {
 
 #search-results {
   h1 {
-     border: none;
+    border: none;
   }
 
   h1.category {
-    //border: none;
-    //margin-bottom: 3px;
     font-size: 22px;
 
     @include mq($from: mobile-landscape) {
-      font-size: 30px;
-    }
-  }
-
-  .list-wrapper {
-    margin-bottom: 18px;
-  }
-
-  p.error,
-  p.info {
-    max-width: 550px;
-  }
-
-  p.hint {
-    text-align: right;
-    margin-bottom: 18px;
-  }
-
-  .disabled {
-    a, p, h4, em {
-      color: $disabled-text-colour!important;
-    }
-
-    img {
-      opacity: 0.4;
+      @include large-page-title-text;
     }
   }
 }
 
-.category-search-result,
-.app-search-result,
-#category .category-app {
-  border-bottom: 1px solid $light-drawing-colour; // $main-spot-colour;
-  padding-bottom: 15px;
+// H2
+
+h2 {
+  @include h2-mobile-text;
+  border-bottom: 1px solid $main-spot-colour;
+  padding-bottom: 1px; // weird
   margin-bottom: 12px;
 
   @include mq($from: mobile-landscape) {
-    padding-bottom: 6px;
-  }
-
-  h4 {
-    margin-bottom: 3px;
-    @include large-body-text;
-  }
-
-  p {
-    @include small-body-text;
-    color: $alt-black-colour;
-    //margin-bottom: 9px;
-    max-width: 550px;
-
-    em {
-      color: darken($alt-black-colour, 10);
-    }
-  }
-
-  .more-link {
-    font-size: 14px;
-    line-height: 18px;
+    @include h2-text;
   }
 }
 
-.category-search-result {
-  clear: both;
-  padding-bottom: 9px;
-  border: none;
+#search-results {
+  .category-search-result {
+    margin-bottom: 24px;
 
-  @include mq($from: mobile-landscape) {
-    padding-bottom: 0px;
-    border-bottom: none;
-    margin-bottom: 18px;
-  }
-
-  h4 {
-    position: relative;
-    margin-bottom: 6px;
-    font-weight: bold;
-    font-size: 20px;
-    line-height: 24px;
-
-    padding-bottom: 3px;
-    border-bottom: 2px solid $main-spot-colour;
-
-    @include mq($from: mobile-landscape) {
-      font-size: 22px;
-      line-height: 26px;
+    .category-description {
+      @include very-small-body-text;
+      color: $text-light-colour;
       margin-bottom: 12px;
-
-
     }
 
-    a {
-      text-decoration: underline;
-    }
-  }
+    .extra-apps {
+      display: none;
 
-  ul {
-    clear: both;
-    @include clearfix;
-    //margin-top: 6px; //9px;
-
-
-//    border: 2px solid $main-spot-colour;
-//    @include border-top-radius(6px);
-//    @include border-bottom-radius(6px);
-//    padding: 6px 6px 2px 6px;
-
-    @include mq($from: mobile-landscape) {
-      border: none;
-      padding: 0px;
-      //margin-left: 9px;
+      @include mq($from: tablet) {
+        display: block;
+      }
     }
 
-    li {
-      float: left;
-      //width: $small-category-result-icon-dim + 117px;
-      width: 100%;
-      margin-bottom: 6px;
-
-      @include mq($from: mobile-landscape) {
-       margin-bottom: 9px;
+    ul {
+      @include mq($from: tablet) {
+        display: block;
+        width: 49.9%;
+        float: left;
+        clear: none;
       }
 
       @include mq($from: desktop) {
-        width: 33%; // $large-category-result-icon-dim + 137px;
+        width: 100%;
+        float: none;
+        clear: both;
       }
 
-      h6 {
-        font-size: 14px;
-        line-height: 18px;
-        //width: $small-category-result-icon-dim + 74px;
-        margin-left: $small-category-result-icon-dim + 6px;
-        margin-right: 3px;
-        //height: $small-category-result-icon-dim;
-        overflow: hidden;
-
-        @include mq($from: desktop) {
-          font-size: 16px;
-          line-height: 22px;
-          overflow: visible;
-          //width: $large-category-result-icon-dim + 66px;
-          margin-left: $large-category-result-icon-dim + 6px;
-          //height: $large-category-result-icon-dim;
-        }
-      }
-
-      .description {
-        margin-left: $small-category-result-icon-dim + 6px;
-
-        @include mq($from: desktop) {
-          margin-left: $large-category-result-icon-dim + 6px;
-        }
-      }
-
-      a.img-wrapper {
-        width: $small-category-result-icon-dim;
-        height: $small-category-result-icon-dim;
-        display: block;
+      li {
         float: left;
+        width: 100%;
 
         @include mq($from: desktop) {
-          width: $large-category-result-icon-dim;
-          height: $large-category-result-icon-dim;
+          width: 33%;
         }
       }
-
-      img {
-        @include border-top-radius(9px);
-        @include border-bottom-radius(9px);
-        @include app-icon-shadow;
-        width: $small-category-result-icon-dim;
-        height: $small-category-result-icon-dim;
-
-        @include mq($from: desktop) {
-          width: $large-category-result-icon-dim;
-          height: $large-category-result-icon-dim;
-        }
-      }
-    }
-  }
-
-  ul {
-    @include mq($from: tablet) {
-      display: block;
-      width: 49.9%;
-      float: left;
-      clear: none;
-    }
-
-    @include mq($from: desktop) {
-      width: 100%;
-      float: none;
-      clear: both;
-    }
-  }
-
-  ul.extra-apps {
-    display: none;
-
-    @include mq($from: tablet) {
-      display: block;
-//      width: 49.9%;
-
-    }
-
-    @include mq($from: desktop) {
-      //display: block;
-      //width: 100%;
     }
   }
 
@@ -323,79 +182,220 @@ h1 {
     clear: both;
     @include clearfix;
 
-    .more  {
+    .more {
       @include small-body-text;
       float: right;
     }
 
     span:before {
       @include small-icon;
-      color: lighten($main-spot-colour, 20);
+      color: $light-drawing-colour; // lighten($main-spot-colour, 20);
       @include icon($category-icon);
       margin-left: 6px;
       vertical-align: middle;
       text-decoration: none !important;
     }
   }
+}
 
-  p.description {
-    color: $dark-background-colour !important;
-    @include small-text;
+// APP SUMMARY
 
-    em {
-      color: lighten($dark-background-colour, 5);
+.app-summary {
+  $app-summary-sidebar-wrapper-margin-right: 9px;
+
+  @include clearfix;
+  margin-bottom: 12px;
+
+  @include mq($from: desktop) {
+    margin-bottom: 12px;
+  }
+
+  .app-summary-sidebar-wrapper {
+    float: left;
+    margin-right: $app-summary-sidebar-wrapper-margin-right; // + 3px;
+
+    a {
+
+      img {
+        width: $large-category-result-icon-dim;
+        height: $large-category-result-icon-dim;
+        @include border-top-radius(12px);
+        @include border-bottom-radius(12px);
+        @include app-icon-shadow;
+        margin-top: 2px;
+      }
     }
   }
 
-  .category-match p.description {
-    margin-bottom: 9px;
+  .app-summary-body-wrapper {
+    margin-left: $large-category-result-icon-dim + $app-summary-sidebar-wrapper-margin-right;
+
+    @include mq($from: tablet) {
+      margin-right: 12px;
+    }
+
+    h3 {
+      @include h3-title-medium;
+      margin-bottom: 3px;
+    }
+
+    p {
+      @include very-small-body-text;
+      color: $text-light-colour;
+    }
   }
 }
 
-.category-search-result:last-of-type {
+.app-summary.last {
   border-bottom: none;
-  padding-bottom: 0px;
 }
 
-.app-search-result,
-#category .category-app {
-  @include clearfix;
+.category-search-app-summary {
+  $cat-app-summary-sidebar-wrapper-margin-right: 6px;
+
+  .app-summary-sidebar-wrapper {
+    margin-right: $cat-app-summary-sidebar-wrapper-margin-right;
+
+    @include mq($from: desktop) {
+      margin-right: $cat-app-summary-sidebar-wrapper-margin-right + 3px;
+    }
+
+    a {
+      img {
+        width: $small-category-result-icon-dim;
+        height: $small-category-result-icon-dim;
+        @include border-top-radius(9px);
+        @include border-bottom-radius(9px);
+        @include app-icon-shadow;
+        margin-top: 2px;
+
+        @include mq($from: desktop) {
+          width: $large-category-result-icon-dim;
+          height: $large-category-result-icon-dim;
+          @include border-top-radius(12px);
+          @include border-bottom-radius(12px);
+        }
+      }
+    }
+  }
+
+  .app-summary-body-wrapper {
+    margin-left: $small-category-result-icon-dim + $cat-app-summary-sidebar-wrapper-margin-right;
+
+    @include mq($from: desktop) {
+      margin-left: $large-category-result-icon-dim + $cat-app-summary-sidebar-wrapper-margin-right;
+    }
+
+    h3 {
+      @include h3-title-small-wide;
+    }
+  }
+}
+
+.app-search-app-summary {
+  margin-bottom: 15px;
   max-width: 550px;
 
+  @include mq($to: mobile-landscape) {
+    border-bottom: 1px solid $light-drawing-colour;
+    padding-bottom: 15px;
+  }
+
   @include mq($from: mobile-landscape) {
-    border-bottom: none;
-    margin-bottom: 15px;
-  }
-
-  h4, p, .thick-rule {
-    margin-left: 57px + 6px;
-    overflow: hidden !important;
-  }
-
-  h4 {
-    line-height: 22px;
-  }
-
-  p.description {
-    color: $dark-background-colour !important;
-    margin-bottom: 0px;
-  }
-
-  img {
-    float: left;
-    width: 57px;
-    height: 57px;
-    margin-top: 2px;
-    margin-right: 6px;
-    @include border-top-radius(12px);
-    @include border-bottom-radius(12px);
-    @include app-icon-shadow;
+    margin-bottom: 18px;
   }
 }
 
-.app-search-result:last-of-type {
-  border-bottom: none;
-  padding-bottom: 0px;
+.category-app-summary {
+  @include mq($to: mobile-landscape) {
+    border-bottom: 1px solid $light-drawing-colour;
+    padding-bottom: 15px;
+  }
+
+  .app-summary-sidebar-wrapper {
+    float: left;
+    width: $large-category-result-icon-dim;
+
+    @include mq($from: mobile-landscape) {
+      padding-bottom: 6px;
+      width: $large-category-result-icon-dim * 2 + 6px;
+    }
+
+    .position {
+      @include border-top-radius(6px);
+      @include border-bottom-radius(6px);
+      padding: 1px 0px 1px 0px;
+      font-weight: bold;
+      margin-left: 0px;
+      margin-bottom: 3px;
+      text-align: center;
+      border: 2px solid $main-spot-colour;
+      color: $main-spot-colour;
+      @include centred-margins;
+      width: 40px;
+      height: 40px;
+      @include border-top-radius(9px);
+      @include border-bottom-radius(9px);
+      line-height: 34px;
+
+      @include mq($from: mobile-landscape) {
+        float: left;
+        width: 40px;
+        height: 40px;
+        @include border-top-radius(9px);
+        @include border-bottom-radius(9px);
+        line-height: 34px;
+        margin-left: 8px;
+        margin-top: 9px;
+      }
+    }
+
+    a {
+      display: block;
+      height: $large-category-result-icon-dim;
+      margin-bottom: 7px;
+
+      @include mq($from: mobile-landscape) {
+        margin-left: $large-category-result-icon-dim + 6px;
+        width: $large-category-result-icon-dim;
+      }
+    }
+
+    img {
+      float: none;
+      margin: 0px;
+      padding: 0px;
+    }
+
+    .price {
+      display: block;
+      width: 100%;
+      margin-left: 0px;
+      font-size: 14px;
+      line-height: 20px;
+      font-weight: bold;
+      text-align: center;
+
+      @include mq($from: mobile-landscape) {
+        margin-left: $large-category-result-icon-dim + 6px;
+        width: auto;
+      }
+    }
+  }
+
+  .app-summary-body-wrapper {
+    p {
+      @include small-body-text;
+    }
+  }
+}
+
+// SEARCH RESULTS PAGE
+
+#search-results {
+  .valid-results-list-wrapper {
+    margin-bottom: 18px;
+  }
 }
 
 .rule {
@@ -468,149 +468,12 @@ h1 {
 
 #home-page {
   .subtitle {
-    //width: 300px;
     text-align: center;
     display: block;
     @include centred-margins;
     margin-bottom: 18px;
-    //@include large-body-text;
     font-size: 24px;
-    //color: $main-spot-colour;
-    color: #999; //$dark-background-colour;
-    //font-weight: bold;
-  }
-}
-
-#category {
-  h1 {
-    margin-bottom: 18px;
-  }
-
-  .category-description {
-    margin-bottom: 21px;
-    line-height: 22px;
-  }
-
-//  .more {
-//    @include akin-basic-button;
-//    width: 100px;
-//    @include centred-margins;
-//    margin-top: 12px;
-//    margin-bottom: 6px;
-//  }
-
-  .category-app {
-    //border: none;
-    //border-top: 15px solid $pale-main-spot-colour;
-    padding-top: 3px;
-    border-color: $light-drawing-colour;
-
-//    .position {
-//      @include border-top-radius(6px);
-//      @include border-bottom-radius(6px);
-//      padding: 1px 0px 1px 0px;
-//      font-weight: bold;
-//      margin-left: 0px;
-//      margin-bottom: 3px;
-//      text-align: center;
-//
-//      border: 2px solid $main-spot-colour;
-//      color: $main-spot-colour;
-//
-//      width: 40px;
-//      height: 40px;
-//      line-height: 34px;
-//      margin-bottom: 9px;
-//      @include centred-margins;
-//    }
-
-    .sidebar {
-      float: left;
-      width: $large-category-result-icon-dim;
-
-      @include mq($from: mobile-landscape) {
-        padding-bottom: 6px;
-        width: $large-category-result-icon-dim * 2 + 6px;
-      }
-
-      .position {
-        @include border-top-radius(6px);
-        @include border-bottom-radius(6px);
-        padding: 1px 0px 1px 0px;
-        font-weight: bold;
-        margin-left: 0px;
-        margin-bottom: 6px;
-        text-align: center;
-
-        border: 2px solid $main-spot-colour;
-        color: $main-spot-colour;
-
-        //width: 30px;
-        @include centred-margins;
-
-        width: 40px;
-        height: 40px;
-        @include border-top-radius(9px);
-        @include border-bottom-radius(9px);
-        line-height: 34px;
-        //margin-left: auto;
-        //margin-right: 0px;
-
-        @include mq($from: mobile-landscape) {
-          float: left;
-          width: 40px;
-          height: 40px;
-          @include border-top-radius(9px);
-          @include border-bottom-radius(9px);
-          line-height: 34px;
-          margin-left: 8px;
-          margin-top: 9px;
-        }
-      }
-
-      a {
-        display: block;
-        height: $large-category-result-icon-dim;
-        margin-bottom: 5px;
-
-        @include mq($from: mobile-landscape) {
-          margin-left: $large-category-result-icon-dim + 6px;
-          width: $large-category-result-icon-dim;
-        }
-      }
-
-      img {
-        float: none;
-        margin: 0px;
-        padding: 0px;
-      }
-
-      .price {
-        //float: left;
-        display: block;
-        width: 100%;
-        margin-left: 0px;
-        font-size: 14px;
-        line-height: 20px;
-        font-weight: bold;
-        //margin-bottom: 4px;
-        text-align: center;
-        //height: 34px;
-
-        @include mq($from: mobile-landscape) {
-          margin-left: $large-category-result-icon-dim + 6px;
-          width: auto;
-        }
-      }
-    }
-
-    .main-info {
-      h4, p {
-        @include mq($from: mobile-landscape) {
-          margin-left: ($large-category-result-icon-dim + 6px) * 2;
-        }
-      }
-    }
+    color: #999;
   }
 }
 
@@ -989,22 +852,6 @@ h1 {
       @include centred-margins;
     }
   }
-
-//  .chart-rating {
-//    display: inline-block;
-//    min-width: 30px;
-//    padding: 0px 4px;
-//    color: $main-spot-colour;
-//    border: 2px solid $main-spot-colour;
-//    @include border-top-radius(6px);
-//    @include border-bottom-radius(6px);
-//  }
-//
-//  .app-categories {
-//    h4 {
-//      display: inline-block;
-//    }
-//  }
 }
 
 #about,

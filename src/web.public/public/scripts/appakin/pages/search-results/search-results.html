@@ -25,65 +25,65 @@
             <!--Click on a category to see all of its apps.-->
         <!--</p>-->
         <div class="valid-results-wrapper" ng-show="hasResults">
-            <div class="list-wrapper" ng-class="search.searchInProgress ? 'disabled' : ''">
+            <div class="valid-results-list-wrapper" ng-class="search.searchInProgress ? 'disabled' : ''">
                 <ul ng-if="isCategorySearch">
-                    <li ng-repeat="category in resultItems" class="category-search-result"
-                        ng-class="{'last':$last}">
-                        <h4>
+                    <li ng-repeat="category in resultItems"
+                        class="category-search-result"
+                        ng-class="{ 'last': $last }">
+                        <h2>
                             <a class="underline-on-hover"
                                ng-bind-html="category.highlight && category.highlight.name ? category.highlight.name : category.name"
                                href="{{ url.createCategoryUrl(category.platform, category.url) }}"></a>
-                        </h4>
-                        <div class="category-match" ng-if="category.isCategoryMatch">
-                            <p class="description" ng-bind-html="'&hellip; ' + category.highlight.desc[0] + ' &hellip;'"></p>
-                        </div>
-                        <div class="app-match">
-                            <ul class="category-apps">
-                                <li class="category-app"ng-repeat="app in category.apps | limitTo: 3">
-                                    <a class="img-wrapper" href="{{ url.createAppUrl(app.platform, app.url) }}" >
+                        </h2>
+                        <p class="category-description"
+                           ng-if="category.isCategoryMatch"
+                           ng-bind-html="'&hellip; ' + (category.highlight.desc[0] | removeRules) + '&hellip;'"></p>
+                        <ul class="category-apps"
+                            ng-repeat="apps in category.partitionedApps"
+                            ng-class="{ 'extra-apps': $index === 1 }">
+                            <li class="app-summary category-search-app-summary"
+                                ng-repeat="app in apps">
+                                <div class="app-summary-sidebar-wrapper">
+                                    <a class="img-wrapper"
+                                       href="{{ url.createAppUrl(app.platform, app.url) }}" >
                                         <img ng-src="{{app.imageUrl}}">
                                     </a>
-                                    <h6>
+                                </div>
+                                <div class="app-summary-body-wrapper">
+                                    <h3>
                                         <a class="underline-on-hover" href="{{ url.createAppUrl(app.platform, app.url) }}"
                                            ng-bind-html="app.highlight.name ? app.highlight.name : app.name"></a>
-                                    </h6>
-                                    <p class="tight-lines description" ng-bind-html="app.highlight.desc ? app.highlight.desc + ' &hellip;' : ''"></p>
-                                </li>
-                            </ul>
-                            <ul class="category-apps extra-apps">
-                                <li class="category-app"
-                                    ng-repeat="app in category.apps | limitTo: 6 | limitTo: category.apps.length < 4 ? 0 : 3 - category.apps.length">
-                                    <a class="img-wrapper" href="{{ url.createAppUrl(app.platform, app.url) }}" >
-                                        <img ng-src="{{app.imageUrl}}">
-                                    </a>
-                                    <h6>
-                                        <a class="underline-on-hover" href="{{ url.createAppUrl(app.platform, app.url) }}"
-                                           ng-bind-html="app.highlight.name ? app.highlight.name : app.name"></a>
-                                    </h6>
-                                    <p class="tight-lines description" ng-bind-html="app.highlight.desc ? app.highlight.desc + ' &hellip;' : ''"></p>
-                                </li>
-                            </ul>
-                            <div class="more-wrapper">
-                                <a class="more underline-on-hover"
-                                   href="{{ url.createCategoryUrl(category.platform, category.url) }}">
-                                    View {{category.name}} Chart<span class="icon"></span>
-                                </a>
-                            </div>
+                                    </h3>
+                                    <p class="tight-lines description" ng-bind-html="(app.highlight.desc ? app.highlight.desc + '&hellip;' : '')  | removeRules"></p>
+                                </div>
+                            </li>
+                        </ul>
+                        <div class="more-wrapper">
+                            <a class="more underline-on-hover"
+                               href="{{ url.createCategoryUrl(category.platform, category.url) }}">
+                                View <em>{{category.name}}</em> Chart<span class="icon"></span>
+                            </a>
                         </div>
                     </li>
                 </ul>
                 <ul ng-if="isAppSearch">
-                    <li ng-repeat="app in resultItems track by app.url" class="app-search-result"
-                        ng-class="{last:$last}">
-                        <a href="{{ url.createAppUrl(app.platform, app.url) }}">
-                            <img ng-src="{{app.imageUrl}}">
-                        </a>
-                        <h4>
-                            <a class="underline-on-hover"
-                               href="{{ url.createAppUrl(app.platform, app.url) }}"
-                               ng-bind-html="app.highlight.name ? app.highlight.name : app.name"></a>
-                        </h4>
-                        <p class="tight-lines description" ng-bind-html="app.highlight.desc ? app.highlight.desc + ' &hellip;' : ''"></p>
+                    <li ng-repeat="app in resultItems track by app.url"
+                        class="app-summary app-search-app-summary"
+                        ng-class="{ last: $last }">
+                        <div class="app-summary-sidebar-wrapper">
+                            <a href="{{ url.createAppUrl(app.platform, app.url) }}">
+                                <img ng-src="{{app.imageUrl}}">
+                            </a>
+                        </div>
+                        <div class="app-summary-body-wrapper">
+                            <h3>
+                                <a class="underline-on-hover"
+                                   href="{{ url.createAppUrl(app.platform, app.url) }}"
+                                   ng-bind-html="app.highlight.name ? app.highlight.name : app.name"></a>
+                            </h3>
+                            <p class="tight-lines description"
+                               ng-bind-html="(app.highlight.desc ? app.highlight.desc + '&hellip;' : '')  | removeRules"></p>
+                        </div>
                     </li>
                 </ul>
             </div>

@@ -50,7 +50,7 @@ $score-icon-large-dimension: 20px;
   .vote-count {
     top: 2px;
     right: 0px;
-    @include small-text;
+    @include very-small-body-text;
 
     @include mq($from: tablet) {
       @include small-body-text;

@@ -38,19 +38,31 @@
                         '?q='+encodeURIComponent(localSearchTerm) +
                         '&p='+encodeURIComponent(page),
                     function(data) {
+                        var currentCategory;
+
                         addPlatform(data.categories);
 
                         if (data.categories) {
                             for (var i = 0; i < data.categories.length; ++i) {
-                                addPlatform(data.categories[i].apps);
+                                currentCategory = data.categories[i];
+                                addPlatform(currentCategory.apps);
+
+                                if (currentCategory.apps) {
+                                    currentCategory.partitionedApps = [];
+                                    currentCategory.partitionedApps.push(currentCategory.apps.slice(0, 3));
+
+                                    if (currentCategory.apps.length > 3) {
+                                        currentCategory.partitionedApps.push(currentCategory.apps.slice(3, 6));
+                                    }
+                                }
                             }
                         }
 
-                        addPlatform(data.apps);
+                        //addPlatform(data.apps);
 
                         var newResults = {
                             items: data.categories || data.apps,
-                            apps: data.apps,
+                            //apps: data.apps,
                             totalItems: data.total,
                             serverError: false,
                             searchType: localSearchType,

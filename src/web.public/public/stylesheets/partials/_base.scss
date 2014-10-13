@@ -8,7 +8,7 @@ $light-background-colour: #c3d5d4;
 $icon-colour: darken($dark-background-colour, 5);
 $control-border-colour: darken($dark-background-colour, 10);
 $alt-black-colour: $dark-background-colour; //lighten(black, 20);
-$text-light-colour: lighten($dark-background-colour, 20);
+$text-light-colour: lighten($dark-background-colour, 10);
 $error-colour: #a03d34;
 $warning-colour: $alt-spot-colour;
 $main-links-colour: $main-spot-colour; // darken($alt-spot-colour, 10);
@@ -23,8 +23,8 @@ $twitter-colour: #598dca;
 $light-drawing-colour: lighten($control-border-colour, 60);
 $main-heading-colour: black;
 
-$small-category-result-icon-dim: 37px;
-$large-category-result-icon-dim: 57px;
+$small-category-result-icon-dim: 37px; // rename
+$large-category-result-icon-dim: 57px; // TODO rename
 
 // ICONS
 
