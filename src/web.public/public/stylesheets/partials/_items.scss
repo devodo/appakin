@@ -87,14 +87,12 @@ h1 {
   .basic-button {
     position: absolute;
     bottom: 6px;
-    right: 6px;
+    right: 0px;
     border-color: $main-spot-colour;
     color: $main-spot-colour;
   }
 }
 
-//#search-results h1,
-//#search-results p.hint,
 #category h1 {
   max-width: 550px;
 }
@@ -107,7 +105,7 @@ h1 {
   h1.category {
     //border: none;
     //margin-bottom: 3px;
-    font-size: 24px;
+    font-size: 22px;
 
     @include mq($from: mobile-landscape) {
       font-size: 30px;
