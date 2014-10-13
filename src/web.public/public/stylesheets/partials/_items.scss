@@ -340,7 +340,6 @@ h1 {
 
   p.description {
     color: $dark-background-colour !important;
-    //margin-bottom: 9px;
     @include small-text;
 
     em {
@@ -990,6 +989,22 @@ h1 {
       @include centred-margins;
     }
   }
+
+//  .chart-rating {
+//    display: inline-block;
+//    min-width: 30px;
+//    padding: 0px 4px;
+//    color: $main-spot-colour;
+//    border: 2px solid $main-spot-colour;
+//    @include border-top-radius(6px);
+//    @include border-bottom-radius(6px);
+//  }
+//
+//  .app-categories {
+//    h4 {
+//      display: inline-block;
+//    }
+//  }
 }
 
 #about,
