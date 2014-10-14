@@ -38,23 +38,11 @@
                         '?q='+encodeURIComponent(localSearchTerm) +
                         '&p='+encodeURIComponent(page),
                     function(data) {
-                        var currentCategory;
-
                         addPlatform(data.categories);
 
                         if (data.categories) {
                             for (var i = 0; i < data.categories.length; ++i) {
-                                currentCategory = data.categories[i];
-                                addPlatform(currentCategory.apps);
-
-                                if (currentCategory.apps) {
-                                    currentCategory.partitionedApps = [];
-                                    currentCategory.partitionedApps.push(currentCategory.apps.slice(0, 3));
-
-                                    if (currentCategory.apps.length > 3) {
-                                        currentCategory.partitionedApps.push(currentCategory.apps.slice(3, 6));
-                                    }
-                                }
+                                addPlatform(data.categories[i].apps);
                             }
                         }
 
@@ -62,7 +50,6 @@
 
                         var newResults = {
                             items: data.categories || data.apps,
-                            //apps: data.apps,
                             totalItems: data.total,
                             serverError: false,
                             searchType: localSearchType,
@@ -74,6 +61,7 @@
                             newResults.suggestion = data.suggestions[0];
                         }
 
+                        search.resetSearchResults();
                         search.results = newResults;
                         search.searchInProgress = false;
                         search.currentPage = data.page;
@@ -85,8 +73,6 @@
                         search.resetSearchResults();
                         search.results.serverError = true;
                         search.searchInProgress = false;
-                        //console.log('error');
-
                         data.serverError = true;
                         handleResponse(data);
                     }

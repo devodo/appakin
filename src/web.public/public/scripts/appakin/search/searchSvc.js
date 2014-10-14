@@ -31,7 +31,6 @@
                 return {
                     items: [],
                     totalItems: 0,
-                    //initialState: isInitialState,
                     serverError: false,
                     searchType: defaultSearchType,
                     suggestion: null,
@@ -184,7 +183,6 @@
                     $location.path(url.searchResultsPagePath).search(search);
 
                     if (locationNotChanging) {
-                        //console.log('location not changing');
                         $route.reload();
                     }
                 }

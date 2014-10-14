@@ -14,8 +14,7 @@
         Please try again, or if the problem persists please try later.
     </p>
     <div class="no-error-wrapper" ng-if="!serverError">
-        <p class="info underline-on-hover"
-           ng-show="!hasResults">
+        <p class="info underline-on-hover" ng-if="!hasResults">
             <span class="icon"></span>No results found.<br/>
             <span ng-show="suggestion">Did you mean
                 <a href="{{url.createSearchUrl(suggestion, searchType, search.platform)}}">{{suggestion}}</a>?
@@ -24,7 +23,7 @@
         <!--<p class="hint" ng-if="isCategorySearch && hasResults">-->
             <!--Click on a category to see all of its apps.-->
         <!--</p>-->
-        <div class="valid-results-wrapper" ng-show="hasResults">
+        <div class="valid-results-wrapper" ng-if="hasResults">
             <div class="valid-results-list-wrapper" ng-class="search.searchInProgress ? 'disabled' : ''">
                 <ul ng-if="isCategorySearch">
                     <li ng-repeat="category in resultItems"
@@ -62,29 +61,6 @@
                                  ng-class="{'two-in-row': ($index % 2) === 1, 'three-in-row': ($index % 3) === 2}">
                             </div>
                         </ul>
-
-                        <!--<ul class="category-apps"-->
-                            <!--ng-repeat="apps in category.partitionedApps"-->
-                            <!--ng-class="{ 'extra-apps': $index === 1 }">-->
-                            <!--<li class="app-summary category-search-app-summary"-->
-                                <!--ng-repeat="app in apps">-->
-                                <!--<div class="app-summary-sidebar-wrapper">-->
-                                    <!--<a class="img-wrapper"-->
-                                       <!--href="{{ url.createAppUrl(app.platform, app.url) }}" >-->
-                                        <!--<img ng-src="{{app.imageUrl}}">-->
-                                    <!--</a>-->
-                                <!--</div>-->
-                                <!--<div class="app-summary-body-wrapper">-->
-                                    <!--<h3>-->
-                                        <!--<a class="underline-on-hover" href="{{ url.createAppUrl(app.platform, app.url) }}"-->
-                                           <!--ng-bind-html="app.highlight.name ? app.highlight.name : app.name"></a>-->
-                                    <!--</h3>-->
-                                    <!--<p class="tight-lines description" ng-bind-html="(app.highlight.desc ? app.highlight.desc + '&hellip;' : '')  | removeRules"></p>-->
-                                <!--</div>-->
-                            <!--</li>-->
-                        <!--</ul>-->
-
-
                         <div class="more-wrapper">
                             <a class="more underline-on-hover"
                                href="{{ url.createCategoryUrl(category.platform, category.url) }}">
