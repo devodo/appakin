@@ -12,7 +12,7 @@ var search = function(queryStr, pageNum, next) {
     var q = solrCore.escapeSpecialChars(queryStr);
     var solrQuery = 'rows=' + PAGE_SIZE + '&qq=' + encodeURIComponent(q);
 
-    var requestHandler = useLong ? 'custom_long' : 'custom';
+    var requestHandler = useLong ? 'custom_long' : 'custom_long';
 
     solrCore.client.get(requestHandler, solrQuery, function (err, obj) {
         if (err) {
