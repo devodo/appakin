@@ -12,16 +12,16 @@
                 var submitSearchTimeout = null;
 
                 $scope.submitSearch = function(value) {
-                    // TODO: find a way to wrap this in a directive?
-                    if ("activeElement" in document) {
-                        document.activeElement.blur();
-                    }
-
                     if (submitSearchTimeout) {
                         $timeout.cancel(submitSearchTimeout);
                     }
 
                     submitSearchTimeout = $timeout(function() {
+                        // TODO: find a way to wrap this in a directive?
+                        if ("activeElement" in document) {
+                            document.activeElement.blur();
+                        }
+
                         search.submitSearch(1);
                     }, 0);
                 };
