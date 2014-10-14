@@ -238,6 +238,45 @@ var getAppIndexBatch = function(client, lastId, limit, next) {
     });
 };
 
+var getCategoryAppsIndexBatch = function(client, lastId, limit, next) {
+    var queryStr =
+        "SELECT a.app_id, a.ext_id, a.name, a.description, a.store_url, a.supported_devices,\n" +
+        "a.artwork_small_url, a.price, ap.popularity\n" +
+        "FROM appstore_app a\n" +
+        "JOIN category_app ca on a.app_id = ca.app_id\n" +
+        "LEFT JOIN app_popularity ap on a.app_id = ap.app_id\n" +
+        "WHERE a.app_id > $1\n" +
+        "AND a.name is not null\n" +
+        "ORDER BY a.app_id\n" +
+        "limit $2;";
+
+    var queryParams = [
+        lastId,
+        limit
+    ];
+
+    client.query(queryStr, queryParams, function (err, result) {
+        if (err) {
+            return next(err);
+        }
+
+        var items = result.rows.map(function(item) {
+            return {
+                id: item.app_id,
+                extId: item.ext_id,
+                name: item.name,
+                description: item.description,
+                supportedDevices: item.supported_devices,
+                imageUrl: item.artwork_small_url,
+                price: item.price,
+                popularity: item.popularity
+            };
+        });
+
+        next(null, items);
+    });
+};
+
 var getChartAppIndex = function(client, next) {
     var queryStr =
         "SELECT a.app_id, a.ext_id, a.name, a.description, a.store_url, a.supported_devices,\n" +
@@ -410,6 +449,20 @@ exports.getAppIndexBatch = function(lastId, limit, next) {
         }
 
         getAppIndexBatch(conn.client, lastId, limit, function(err, results) {
+            conn.close(err, function(err) {
+                next(err, results);
+            });
+        });
+    });
+};
+
+exports.getCategoryAppsIndexBatch = function(lastId, limit, next) {
+    connection.open(function(err, conn) {
+        if (err) {
+            return next(err);
+        }
+
+        getCategoryAppsIndexBatch(conn.client, lastId, limit, function(err, results) {
             conn.close(err, function(err) {
                 next(err, results);
             });

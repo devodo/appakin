@@ -1,11 +1,13 @@
 'use strict';
 var slugid = require('slugid');
 var slug = require('slug');
+var unidecode = require('unidecode');
 
 var MAX_NAME_LENGTH = 25;
 
 var slugifyName = function(name) {
-    var slugName = slug(name);
+    var decoded = unidecode(name);
+    var slugName = slug(decoded);
     var nameLength = Math.min(slugName.length, MAX_NAME_LENGTH);
     var shortName = slugName.substring(0, nameLength).toLowerCase();
     if (shortName[shortName.length - 1] === '-') {

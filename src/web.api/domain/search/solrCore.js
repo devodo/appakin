@@ -77,6 +77,47 @@ SolrCore.prototype.getSuggestions = function(spellCheckSection) {
     return results;
 };
 
+SolrCore.prototype.stopwords_en =
+{
+    "a": true,
+    "an": true,
+    "and": true,
+    "are": true,
+    "as": true,
+    "at": true,
+    "be": true,
+    "but": true,
+    "by": true,
+    "for": true,
+    "if": true,
+    "in": true,
+    "into": true,
+    "is": true,
+    "it": true,
+    "no": true,
+    "not": true,
+    "of": true,
+    "on": true,
+    "or": true,
+    "such": true,
+    "that": true,
+    "the": true,
+    "their": true,
+    "then": true,
+    "there": true,
+    "these": true,
+    "they": true,
+    "this": true,
+    "to": true,
+    "was": true,
+    "will": true,
+    "with": true,
+    "&": true,
+    "-": true,
+    "—": true,
+    ":": true
+};
+
 var createSolrCore = function(coreName) {
     var host = config.search.solr.host;
     var port = config.search.solr.port;

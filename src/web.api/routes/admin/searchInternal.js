@@ -9,7 +9,10 @@ exports.init = function init(app) {
     app.post('/admin/search/auto/rebuild', function (req, res) {
         log.debug("Starting rebuild of auto complete index");
 
-        autoIndexer.rebuild(function(err) {
+        var batchSize = 10000;
+        var maxNgramDepth = 6;
+
+        autoIndexer.rebuild(batchSize, maxNgramDepth, function(err) {
             if (err) {
                 log.error(err);
                 return res.status(500).json(err);
