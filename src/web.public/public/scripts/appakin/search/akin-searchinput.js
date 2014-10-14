@@ -81,6 +81,7 @@
                 $scope.clear = function(e) {
                     $scope.searchParam = '';
                     e.preventDefault();
+                    e.stopPropagation();
                 };
 
                 $scope.$on('$destroy', function() {

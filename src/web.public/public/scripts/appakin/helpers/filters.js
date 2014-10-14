@@ -16,6 +16,10 @@
         return function(input, maxLength) {
             maxLength = maxLength || maxSectionLength;
 
+            if (!input) {
+                return input;
+            }
+
             if (input.length <= maxLength) {
                 return input;
             }

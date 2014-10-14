@@ -87,10 +87,9 @@
                     </li>
                 </ul>
             </div>
-            <div class="pagination-wrapper">
+            <div class="pagination-wrapper" ng-if="resultTotalItems > resultItems">
                 <div class="centering-wrapper">
                     <div pagination
-                         ng-show="resultTotalItems > 0"
                          total-items="resultTotalItems"
                          max-size="numPages"
                          ng-model="search.currentPage"

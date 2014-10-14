@@ -58,7 +58,7 @@
                             }
                         }
 
-                        //addPlatform(data.apps);
+                        addPlatform(data.apps);
 
                         var newResults = {
                             items: data.categories || data.apps,
