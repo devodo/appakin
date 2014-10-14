@@ -24,7 +24,7 @@
                 }
 
                 focusTimer = $timeout(function() {
-                    $document.scrollTop(offsetTop(searchbox) - 3);
+                    $document.scrollTop(offsetTop(searchbox) - 20);
                             //searchbox[0].offsetTop - 3);
                 }, 0);
             });

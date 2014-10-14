@@ -2,12 +2,12 @@
     <h1 class="search-type category" ng-if="::isCategorySearch">
         Category Results
         <a class="never-underline basic-button"
-           href="{{::url.createSearchUrl(resultSearchTerm, 'app', search.platform)}}">App Results&hellip;</a>
+           href="{{::url.createSearchUrl(resultSearchTerm, 'app', search.platform)}}">App Results</a>
     </h1>
     <h1 class="search-type app" ng-if="::isAppSearch">
         App Results
         <a class="never-underline basic-button"
-           href="{{::url.createSearchUrl(resultSearchTerm, 'category', search.platform)}}">Category Results&hellip;</a>
+           href="{{::url.createSearchUrl(resultSearchTerm, 'category', search.platform)}}">Category Results</a>
     </h1>
     <p class="error" ng-if="::serverError">
         <span class="icon"></span>There was a problem getting your search result.

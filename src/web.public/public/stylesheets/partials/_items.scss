@@ -98,18 +98,35 @@ h1 {
 }
 
 h1 a.basic-button {
+
   position: absolute;
   bottom: 6px;
   right: 0px;
-  border-color: $main-spot-colour;
+  //border-color: $main-spot-colour;
+  //color: $main-spot-colour;
+
+
+  //@include akin-fancy-button;
+  @include light-main-spot-colour-gradient-background;
+  //width: 46px;
+  background-color: black;
   color: $main-spot-colour;
-  padding-left: 9px;
-  padding-right: 9px;
+  @include control-border;
+  vertical-align: middle;
+  font: $body-font-family;
+  font-weight: normal;
+  @include small-body-text;
+  padding-left: 12px;
+  padding-right: 12px;
+  text-align: center;
+  display: block;
+  border-color: $main-spot-colour;
+  text-shadow: none;
 }
 
 h1 a.basic-button:active {
-  background-color: $main-spot-colour;
-  color: white;
+  //background-color: $main-spot-colour;
+  //color: white;
 }
 
 #category h1 {
@@ -264,6 +281,10 @@ h2 {
     p {
       @include very-small-body-text;
       color: $text-light-colour;
+
+      @include mq($from: mobile-landscape) {
+        @include small-body-text;
+      }
     }
   }
 }
@@ -310,6 +331,12 @@ h2 {
 
     h3 {
       @include h3-title-small-wide;
+    }
+
+    p {
+      @include mq($from: mobile-landscape) {
+        @include very-small-body-text;
+      }
     }
   }
 }
