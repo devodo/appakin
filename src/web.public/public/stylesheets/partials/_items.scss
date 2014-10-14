@@ -145,7 +145,7 @@ h2 {
       margin-bottom: 12px;
     }
 
-    .extra-apps {
+    .extra-app {
       display: none;
 
       @include mq($from: tablet) {
@@ -153,27 +153,40 @@ h2 {
       }
     }
 
-    ul {
+    li {
       @include mq($from: tablet) {
-        display: block;
-        width: 49.9%;
         float: left;
         clear: none;
       }
 
-      @include mq($from: desktop) {
-        width: 100%;
-        float: none;
-        clear: both;
+      @include mq($from: tablet) {
+        width: 49.9%;
       }
 
-      li {
-        float: left;
-        width: 100%;
+      @include mq($from: desktop) {
+        width: 33%;
+      }
+    }
 
-        @include mq($from: desktop) {
-          width: 33%;
-        }
+    .category-apps-row-end.two-in-row {
+      display: none;
+      clear: none;
+
+      @include mq($from: tablet, $to: desktop) {
+        display: block;
+        height: 1px;
+        clear: both;
+      }
+    }
+
+    .category-apps-row-end.three-in-row {
+      display: none;
+      clear: none;
+
+      @include mq($from: desktop) {
+        display: block;
+        height: 1px;
+        clear: both;
       }
     }
   }
@@ -183,8 +196,9 @@ h2 {
     @include clearfix;
 
     .more {
-      @include small-body-text;
+      @include body-text;
       float: right;
+      text-align: right;
     }
 
     span:before {
@@ -283,7 +297,7 @@ h2 {
     margin-left: $small-category-result-icon-dim + $cat-app-summary-sidebar-wrapper-margin-right;
 
     @include mq($from: desktop) {
-      margin-left: $large-category-result-icon-dim + $cat-app-summary-sidebar-wrapper-margin-right;
+      margin-left: $large-category-result-icon-dim + $cat-app-summary-sidebar-wrapper-margin-right + 3px;
     }
 
     h3 {

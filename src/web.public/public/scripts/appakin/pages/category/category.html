@@ -3,7 +3,7 @@
         <span class="icon"></span>There was a problem getting the category details. Please try again, or if the problem persists please try later.
     </p>
     <div class="no-error-wrapper" ng-if="!category.data.serverError">
-        <h1>{{category.data.name}} Chart</h1>
+        <h1>{{category.data.name}}</h1>
         <p class="description">{{category.data.description}}</p>
         <ul>
             <li ng-repeat="app in category.data.apps track by app.url"

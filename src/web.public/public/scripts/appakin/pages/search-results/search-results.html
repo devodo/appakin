@@ -38,11 +38,11 @@
                         <p class="category-description"
                            ng-if="category.isCategoryMatch"
                            ng-bind-html="'&hellip; ' + (category.highlight.desc[0] | removeRules) + '&hellip;'"></p>
-                        <ul class="category-apps"
-                            ng-repeat="apps in category.partitionedApps"
-                            ng-class="{ 'extra-apps': $index === 1 }">
-                            <li class="app-summary category-search-app-summary"
-                                ng-repeat="app in apps">
+
+                        <ul class="category-apps">
+                            <li ng-repeat-start="app in category.apps"
+                                class="app-summary category-search-app-summary"
+                                ng-class="{'extra-app': $index > 2}">
                                 <div class="app-summary-sidebar-wrapper">
                                     <a class="img-wrapper"
                                        href="{{ url.createAppUrl(app.platform, app.url) }}" >
@@ -57,11 +57,38 @@
                                     <p class="tight-lines description" ng-bind-html="(app.highlight.desc ? app.highlight.desc + '&hellip;' : '')  | removeRules"></p>
                                 </div>
                             </li>
+                            <div ng-repeat-end class="category-apps-row-end"
+                                 ng-if="($index % 2) === 1 || ($index % 3) === 2"
+                                 ng-class="{'two-in-row': ($index % 2) === 1, 'three-in-row': ($index % 3) === 2}">
+                            </div>
                         </ul>
+
+                        <!--<ul class="category-apps"-->
+                            <!--ng-repeat="apps in category.partitionedApps"-->
+                            <!--ng-class="{ 'extra-apps': $index === 1 }">-->
+                            <!--<li class="app-summary category-search-app-summary"-->
+                                <!--ng-repeat="app in apps">-->
+                                <!--<div class="app-summary-sidebar-wrapper">-->
+                                    <!--<a class="img-wrapper"-->
+                                       <!--href="{{ url.createAppUrl(app.platform, app.url) }}" >-->
+                                        <!--<img ng-src="{{app.imageUrl}}">-->
+                                    <!--</a>-->
+                                <!--</div>-->
+                                <!--<div class="app-summary-body-wrapper">-->
+                                    <!--<h3>-->
+                                        <!--<a class="underline-on-hover" href="{{ url.createAppUrl(app.platform, app.url) }}"-->
+                                           <!--ng-bind-html="app.highlight.name ? app.highlight.name : app.name"></a>-->
+                                    <!--</h3>-->
+                                    <!--<p class="tight-lines description" ng-bind-html="(app.highlight.desc ? app.highlight.desc + '&hellip;' : '')  | removeRules"></p>-->
+                                <!--</div>-->
+                            <!--</li>-->
+                        <!--</ul>-->
+
+
                         <div class="more-wrapper">
                             <a class="more underline-on-hover"
                                href="{{ url.createCategoryUrl(category.platform, category.url) }}">
-                                View <em>{{category.name}}</em> Chart<span class="icon"></span>
+                                {{category.name}} chart<span class="icon"></span>
                             </a>
                         </div>
                     </li>
