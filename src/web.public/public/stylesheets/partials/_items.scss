@@ -492,6 +492,8 @@ h2 {
 }
 
 #app {
+  min-height: 612px; // TODO: nasty hack
+
   h1 {
     margin-bottom: 12px;
   }
@@ -721,6 +723,7 @@ h2 {
   }
 
   .body-wrapper {
+
     @include mq($from: mobile-landscape) {
       margin-left: 140px;
     }
