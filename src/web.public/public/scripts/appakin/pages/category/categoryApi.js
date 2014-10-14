@@ -27,6 +27,7 @@
 
                 function handleResponse(data) {
                     data.platform = platform;
+                    console.log('here ' + data.apps.length);
                     deferred.resolve(data);
                     loading.reset();
                 }
@@ -42,6 +43,7 @@
                 categoryApi(
                     createUrl(platform, encodedId, slug, pageNumber),
                     function (data) {
+                        console.log(data.apps.length);
                         handleResponse(data);
                     },
                     function (data) {
@@ -50,7 +52,7 @@
                     });
 
                 function handleResponse(data) {
-                    data.serverError = false; // ignore errors
+                    data.serverError = false; // ignore errors. TODO change this.
                     data.platform = platform;
                     deferred.resolve(data);
                     loading.reset(loadingKey);

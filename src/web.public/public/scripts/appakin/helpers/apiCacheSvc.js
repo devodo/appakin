@@ -3,7 +3,7 @@
 
     angular.module('appAkin').factory('cache', function($sessionStorage, $interval) {
         var cacheTtlMinutes = 30;
-        var noCache = false;
+        var noCache = true;
         var cacheScanMinutes = 10;
 
         function addMinutes(date, minutes) {
@@ -33,7 +33,16 @@
                     data.added = new Date();
                 }
 
-                $sessionStorage[keyStr] = data;
+                try {
+                    $sessionStorage[keyStr] = data;
+                }
+                catch (err) {
+                    // writing can fail if storage is full; swallow the error in this case.
+                    console.log('failed to write data for key ' + keyStr + ' to sessionStorage');
+                    return false;
+                }
+
+                return true;
             },
             get: function(keyStr) {
                 var now = null;

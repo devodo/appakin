@@ -2,7 +2,7 @@
     'use strict';
 
     angular.module('appAkin').factory('category',
-        function($routeParams, search, platform, $route, categoryApi) {
+        function($routeParams, $route, search, platform, categoryApi) {
             var me = this;
             var getNextPagePromise = null;
 

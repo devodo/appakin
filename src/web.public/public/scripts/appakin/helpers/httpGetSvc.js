@@ -39,6 +39,8 @@
                     var cachedData = cache.get(createCacheKey(url));
                     if (cachedData) {
                         currentRequest.active = false;
+                        console.log('got data from cache');
+
                         if (success) {
                             success(cachedData);
                         }

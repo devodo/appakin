@@ -27,24 +27,13 @@
                 return !searchTypeRegex.test(value) ? undefined : value;
             }
 
-            function createResultsObject(isInitialState) {
-                return {
-                    items: [],
-                    totalItems: 0,
-                    serverError: false,
-                    searchType: defaultSearchType,
-                    suggestion: null,
-                    resultSearchTerm: null
-                };
-            }
-
             me.service = {
                 searchTerm: '',
                 platform: platform.getInitialPlatform(),
                 currentPage: defaultCurrentPage,
                 searchType: defaultSearchType,
                 searchInProgress: false,
-                results: createResultsObject(true),
+                //results: createResultsObject(true),
                 autoComplete: {
                     active: true,
                     terms: []
@@ -75,9 +64,6 @@
                     }
 
                     debouncedAutoCompleteApi(currentSearchTerm, currentPlatform);
-                },
-                resetSearchResults: function() {
-                    me.service.results = createResultsObject(true);
                 },
                 urlMatchesSearch: function(targetPage) {
                     var search = $location.search();

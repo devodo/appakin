@@ -1,22 +1,23 @@
 (function () {'use strict';
 
     angular.module('appAkin').controller('SearchResultsCtrl',
-        function($scope, $timeout, $location, pageTitle, search, url) {
+        function($scope, $timeout, $location, $route, pageTitle, search, url) {
             pageTitle.setPageTitle('appAkin Search Results');
+            var searchResults = $route.current.locals.searchData;
 
             $scope.search = search;
             $scope.url = url;
             $scope.numPages = 5;
 
-            $scope.searchType = search.results.searchType;
-            $scope.isCategorySearch = search.results.searchType == 'category';
-            $scope.isAppSearch = search.results.searchType == 'app';
-            $scope.serverError = search.results.serverError;
-            $scope.hasResults = search.results.items.length > 0;
-            $scope.suggestion = search.results.suggestion;
-            $scope.resultSearchTerm = search.results.resultSearchTerm;
-            $scope.resultTotalItems = search.results.totalItems;
-            $scope.resultItems = search.results.items;
+            $scope.searchType = searchResults.searchType;
+            $scope.isCategorySearch = searchResults.searchType == 'category';
+            $scope.isAppSearch = searchResults.searchType == 'app';
+            $scope.serverError = searchResults.serverError;
+            $scope.hasResults = searchResults.items.length > 0;
+            $scope.suggestion = searchResults.suggestion;
+            $scope.resultSearchTerm = searchResults.resultSearchTerm;
+            $scope.resultTotalItems = searchResults.totalItems;
+            $scope.resultItems = searchResults.items;
 
             $scope.setSearchType = function(searchType) {
                 search.searchType = searchType;
@@ -24,8 +25,8 @@
             };
 
             $scope.pageChanged = function() {
-                if (search.results.resultSearchTerm) {
-                    search.searchTerm = search.results.resultSearchTerm;
+                if (searchResults.resultSearchTerm) {
+                    search.searchTerm = searchResults.resultSearchTerm;
                 }
 
                 search.submitSearch(search.currentPage);

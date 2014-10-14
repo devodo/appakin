@@ -4,7 +4,7 @@
         var categoryData = $route.current.locals.categoryData;
 
         if (categoryData && !categoryData.serverError) {
-            pageTitle.setPageTitle(categoryData.name + ' on appAkin');
+            pageTitle.setPageTitle(categoryData.name + ' chart on appAkin');
         } else {
             pageTitle.setPageTitle('appAkin');
         }
@@ -19,7 +19,9 @@
         category.updateSearch();
 
         $scope.$on('$destroy', function() {
+            console.log('destroying');
             category.cancel();
+            category.data = {};
         });
     });
 

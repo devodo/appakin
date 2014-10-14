@@ -10,11 +10,14 @@
     "tests"
   ],
   "dependencies": {
-    "angular": "~1.3.0-rc.3",
-    "angular-cookies": "~1.3.0-rc.3",
-    "angular-resource": "~1.3.0-rc.3",
-    "angular-route": "~1.3.0-rc.3",
-    "angular-sanitize": "~1.3.0-rc.3",
-    "angular-touch": "~1.3.0-rc.3"
+    "angular": "~1.3.0",
+    "angular-cookies": "~1.3.0",
+    "angular-resource": "~1.3.0",
+    "angular-route": "~1.3.0",
+    "angular-sanitize": "~1.3.0",
+    "angular-touch": "~1.3.0"
+  },
+  "resolutions": {
+    "angular": "1.3.0"
   }
 }

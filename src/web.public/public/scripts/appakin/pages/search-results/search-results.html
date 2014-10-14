@@ -1,96 +1,92 @@
 <div id="search-results" class="main-wrapper" ng-cloak>
-    <h1 class="search-type category" ng-if="isCategorySearch">
-        Category Results&nbsp;&nbsp;
+    <h1 class="search-type category" ng-if="::isCategorySearch">
+        Category Results
         <a class="never-underline basic-button"
-           href="{{url.createSearchUrl(resultSearchTerm, 'app', search.platform)}}">App Results</a>
+           href="{{::url.createSearchUrl(resultSearchTerm, 'app', search.platform)}}">App Results</a>
     </h1>
-    <h1 class="search-type app" ng-if="isAppSearch">
-        App Results&nbsp;&nbsp;
+    <h1 class="search-type app" ng-if="::isAppSearch">
+        App Results
         <a class="never-underline basic-button"
-           href="{{url.createSearchUrl(resultSearchTerm, 'category', search.platform)}}">Category Results</a>
+           href="{{::url.createSearchUrl(resultSearchTerm, 'category', search.platform)}}">Category Results</a>
     </h1>
-    <p class="error" ng-if="serverError">
+    <p class="error" ng-if="::serverError">
         <span class="icon"></span>There was a problem getting your search result.
         Please try again, or if the problem persists please try later.
     </p>
-    <div class="no-error-wrapper" ng-if="!serverError">
-        <p class="info underline-on-hover" ng-if="!hasResults">
+    <div class="no-error-wrapper" ng-if="::!serverError">
+        <p class="info underline-on-hover" ng-if="::!hasResults">
             <span class="icon"></span>No results found.<br/>
-            <span ng-show="suggestion">Did you mean
-                <a href="{{url.createSearchUrl(suggestion, searchType, search.platform)}}">{{suggestion}}</a>?
+            <span ng-if="::suggestion">Did you mean
+                <a href="{{::url.createSearchUrl(suggestion, searchType, search.platform)}}">{{::suggestion}}</a>?
             </span>
         </p>
-        <!--<p class="hint" ng-if="isCategorySearch && hasResults">-->
-            <!--Click on a category to see all of its apps.-->
-        <!--</p>-->
-        <div class="valid-results-wrapper" ng-if="hasResults">
-            <div class="valid-results-list-wrapper" ng-class="search.searchInProgress ? 'disabled' : ''">
-                <ul ng-if="isCategorySearch">
-                    <li ng-repeat="category in resultItems"
+        <div class="valid-results-wrapper" ng-if="::hasResults">
+            <div class="valid-results-list-wrapper" ng-class="::search.searchInProgress ? 'disabled' : ''">
+                <ul ng-if="::isCategorySearch">
+                    <li ng-repeat="category in ::resultItems"
                         class="category-search-result"
                         ng-class="{ 'last': $last }">
                         <h2>
                             <a class="underline-on-hover"
-                               ng-bind-html="category.highlight && category.highlight.name ? category.highlight.name : category.name"
-                               href="{{ url.createCategoryUrl(category.platform, category.url) }}"></a>
+                               ng-bind-html="::category.highlight && category.highlight.name ? category.highlight.name : category.name"
+                               href="{{::url.createCategoryUrl(category.platform, category.url)}}"></a>
                         </h2>
                         <p class="category-description"
-                           ng-if="category.isCategoryMatch"
-                           ng-bind-html="'&hellip; ' + (category.highlight.desc[0] | removeRules) + '&hellip;'"></p>
-
+                           ng-if="::category.isCategoryMatch"
+                           ng-bind-html="::'&hellip; ' + (category.highlight.desc[0] | removeRules) + '&hellip;'"></p>
                         <ul class="category-apps">
-                            <li ng-repeat-start="app in category.apps"
+                            <li ng-repeat-start="app in ::category.apps"
                                 class="app-summary category-search-app-summary"
                                 ng-class="{'extra-app': $index > 2}">
                                 <div class="app-summary-sidebar-wrapper">
                                     <a class="img-wrapper"
-                                       href="{{ url.createAppUrl(app.platform, app.url) }}" >
-                                        <img ng-src="{{app.imageUrl}}">
+                                       href="{{::url.createAppUrl(app.platform, app.url)}}" >
+                                        <img ng-src="{{::app.imageUrl}}">
                                     </a>
                                 </div>
                                 <div class="app-summary-body-wrapper">
                                     <h3>
-                                        <a class="underline-on-hover" href="{{ url.createAppUrl(app.platform, app.url) }}"
-                                           ng-bind-html="app.highlight.name ? app.highlight.name : app.name"></a>
+                                        <a class="underline-on-hover" href="{{::url.createAppUrl(app.platform, app.url)}}"
+                                           ng-bind-html="::app.highlight.name ? app.highlight.name : app.name"></a>
                                     </h3>
-                                    <p class="tight-lines description" ng-bind-html="(app.highlight.desc ? app.highlight.desc + '&hellip;' : '')  | removeRules"></p>
+                                    <p class="tight-lines description" ng-bind-html="::(app.highlight.desc ? app.highlight.desc + '&hellip;' : '')  | removeRules"></p>
                                 </div>
                             </li>
                             <div ng-repeat-end class="category-apps-row-end"
-                                 ng-if="($index % 2) === 1 || ($index % 3) === 2"
+                                 ng-if="::($index % 2) === 1 || ($index % 3) === 2"
                                  ng-class="{'two-in-row': ($index % 2) === 1, 'three-in-row': ($index % 3) === 2}">
                             </div>
                         </ul>
                         <div class="more-wrapper">
                             <a class="more underline-on-hover"
-                               href="{{ url.createCategoryUrl(category.platform, category.url) }}">
-                                {{category.name}} chart<span class="icon"></span>
+                               href="{{::url.createCategoryUrl(category.platform, category.url)}}">
+                                {{::category.name}} chart<span class="icon"></span>
                             </a>
                         </div>
                     </li>
                 </ul>
-                <ul ng-if="isAppSearch">
-                    <li ng-repeat="app in resultItems track by app.url"
+                <ul ng-if="::isAppSearch">
+                    <li ng-repeat="app in ::resultItems track by app.url"
                         class="app-summary app-search-app-summary"
                         ng-class="{ last: $last }">
                         <div class="app-summary-sidebar-wrapper">
-                            <a href="{{ url.createAppUrl(app.platform, app.url) }}">
-                                <img ng-src="{{app.imageUrl}}">
+                            <a href="{{::url.createAppUrl(app.platform, app.url)}}">
+                                <img ng-src="{{::app.imageUrl}}">
                             </a>
                         </div>
                         <div class="app-summary-body-wrapper">
                             <h3>
                                 <a class="underline-on-hover"
-                                   href="{{ url.createAppUrl(app.platform, app.url) }}"
-                                   ng-bind-html="app.highlight.name ? app.highlight.name : app.name"></a>
+                                   href="{{::url.createAppUrl(app.platform, app.url)}}"
+                                   ng-bind-html="::app.highlight.name ? app.highlight.name : app.name"></a>
                             </h3>
                             <p class="tight-lines description"
-                               ng-bind-html="(app.highlight.desc ? app.highlight.desc + '&hellip;' : '')  | removeRules"></p>
+                               ng-bind-html="::(app.highlight.desc ? app.highlight.desc + '&hellip;' : '')  | removeRules"></p>
                         </div>
                     </li>
                 </ul>
             </div>
-            <div class="pagination-wrapper" ng-if="resultTotalItems > resultItems">
+            <div class="pagination-wrapper" ng-if="::resultTotalItems > resultItems">
                 <div class="centering-wrapper">
                     <div pagination
                          total-items="resultTotalItems"

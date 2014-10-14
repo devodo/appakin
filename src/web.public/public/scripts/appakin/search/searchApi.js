@@ -61,20 +61,14 @@
                             newResults.suggestion = data.suggestions[0];
                         }
 
-                        search.resetSearchResults();
-                        search.results = newResults;
                         search.searchInProgress = false;
                         search.currentPage = data.page;
-
-                        data.serverError = false;
-                        handleResponse(data);
+                        handleResponse(newResults);
                     },
                     function(data) {
-                        search.resetSearchResults();
-                        search.results.serverError = true;
+                        var newResults = { serverError: true };
                         search.searchInProgress = false;
-                        data.serverError = true;
-                        handleResponse(data);
+                        handleResponse(newResults);
                     }
                 );
 
