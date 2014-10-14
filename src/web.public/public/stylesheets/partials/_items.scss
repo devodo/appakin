@@ -55,6 +55,8 @@ p.info {
 
 .more-button {
   @include akin-basic-button;
+  padding-top: 0px;
+  padding-bottom: 0px;
   width: 100px;
   @include centred-margins;
   margin-top: 12px;
@@ -65,6 +67,10 @@ p.info {
     color: lighten($icon-colour, 20);
     @include icon($down-icon);
   }
+}
+
+.more-button:active span:before {
+  color: white;
 }
 
 // Page title
@@ -91,15 +97,17 @@ h1 {
   }
 }
 
-h1 .basic-button {
+h1 a.basic-button {
   position: absolute;
   bottom: 6px;
   right: 0px;
   border-color: $main-spot-colour;
   color: $main-spot-colour;
+  padding-left: 9px;
+  padding-right: 9px;
 }
 
-h1 .basic-button:active {
+h1 a.basic-button:active {
   background-color: $main-spot-colour;
   color: white;
 }
@@ -201,7 +209,7 @@ h2 {
       text-align: right;
     }
 
-    span:before {
+    .more span:before {
       @include small-icon;
       color: $light-drawing-colour; // lighten($main-spot-colour, 20);
       @include icon($category-icon);
@@ -755,20 +763,20 @@ h2 {
       word-break: break-word;
     }
 
-    .more {
-      @include akin-basic-button;
-      width: 100px;
-      @include centred-margins;
-      margin-top: 12px;
-      margin-bottom: 6px;
-    }
+//    .more {
+//      @include akin-basic-button;
+//      width: 100px;
+//      @include centred-margins;
+//      margin-top: 12px;
+//      margin-bottom: 6px;
+//    }
 
-    span:before {
-      @include large-icon;
-      color: lighten($icon-colour, 20);
-    }
+//    span:before {
+//      @include large-icon;
+//      color: lighten($icon-colour, 20);
+//    }
 
-    .more span:before { @include icon($down-icon); }
+//    .more span:before { @include icon($down-icon); }
   }
 
   h2 {

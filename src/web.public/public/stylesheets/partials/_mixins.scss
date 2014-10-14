@@ -152,7 +152,9 @@
   display: block;
 
   &:active {
-    background-color: $dark-background-colour;
+    background-color: lighten($dark-background-colour, 30);
+    border-color: lighten($dark-background-colour, 30);
+    color: white;
   }
 }
 
