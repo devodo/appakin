@@ -493,9 +493,18 @@ h2 {
     text-align: center;
     display: block;
     @include centred-margins;
-    margin-bottom: 18px;
-    font-size: 24px;
-    color: #999;
+    margin-bottom: 30px;
+    font-size: 19px;
+    line-height: 19px;
+    color: $main-spot-colour;
+    font-style: italic;
+    font-weight: bold;
+
+    @include mq($from: tablet) {
+      margin-bottom: 36px;
+      font-size: 23px;
+      line-height: 23px;
+    }
   }
 }
 

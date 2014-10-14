@@ -207,11 +207,11 @@ $searchbox-border-colour: $control-border-colour;
         @include border-right-radius(2px);
       }
 
-      button.submit-button:before {
+      .submit-button:before {
         @include icon($search-icon);
       }
 
-      button.clear-button {
+      .clear-button {
         @include akin-fancy-button;
         width: 28px;
         font-family: "icomoon";
@@ -222,7 +222,7 @@ $searchbox-border-colour: $control-border-colour;
         background-color: white;
       }
 
-      button.clear-button:before {
+      .clear-button:before {
         @include icon($cross-icon);
       }
     }

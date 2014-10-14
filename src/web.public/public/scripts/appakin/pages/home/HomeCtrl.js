@@ -24,7 +24,8 @@
                 }
 
                 focusTimer = $timeout(function() {
-                    $document.scrollTop(searchbox[0].offsetTop - 3);
+                    $document.scrollTop(offsetTop(searchbox) - 3);
+                            //searchbox[0].offsetTop - 3);
                 }, 0);
             });
 
@@ -48,6 +49,15 @@
             $timeout.cancel(focusTimer);
             $timeout.cancel(blurTimer);
         });
+
+        function offsetTop(elm) {
+            var rawDom = elm[0];
+            var _y = 0;
+            var body = document.documentElement || document.body;
+            var scrollY = window.pageYOffset || body.scrollTop;
+            _y = rawDom.getBoundingClientRect().top + scrollY;
+            return _y;
+        }
     });
 
 }()); // use strict
