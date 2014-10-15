@@ -6,6 +6,7 @@
         function($scope, $location, pageTitle, $rootScope, loading, $document, $timeout, url, search, cache) {
             $scope.pageTitle = pageTitle;
 
+            var scrollCache = cache('scrollCache', 10, true);
             var scrollCanBeCaptured = false;
             var viewContentLoadedTimeout = null;
 
@@ -26,15 +27,11 @@
                             // get the scroll position from the cache.
 
                             var key = createScrollCacheKey(urlKey);
-                            var scrollValue = cache.get(key);
-
-                            //console.log('Got scroll key: ' + key + ' - value ' + scrollValue);
+                            var scrollValue = scrollCache.get(key);
 
                             if (scrollValue > 0) {
-                                //console.log('Scrolling to ' + scrollValue);
                                 $document.scrollTop(scrollValue);
                             } else {
-                                //console.log('Scrolling to top');
                                 $document.scrollTop(0);
                             }
                         } else {
@@ -65,7 +62,7 @@
                 if (url.onSearchResultsPage(urlKey) || url.onCategoryPage(urlKey)) {
                     var key = createScrollCacheKey(urlKey);
                     var value = $document.scrollTop();
-                    cache.set(key, value, false);
+                    scrollCache.set(key, value, false);
                 }
             });
 

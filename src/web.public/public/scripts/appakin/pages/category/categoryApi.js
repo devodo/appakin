@@ -2,7 +2,7 @@
     'use strict';
 
     angular.module('appAkin').factory('categoryApi', function($q, $timeout, httpGet, loading) {
-        var categoryApi = httpGet();
+        var categoryApi = httpGet(true);
 
         function createUrl(platform, encodedId, slug, pageNumber) {
             return platform + '/category/' + encodedId + '/' + slug + '?p=' + pageNumber;

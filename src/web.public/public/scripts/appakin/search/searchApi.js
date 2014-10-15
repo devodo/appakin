@@ -2,7 +2,7 @@
     'use strict';
 
     angular.module('appAkin').factory('searchApi', function($q, $timeout, httpGet, loading, search, platform) {
-        var searchApi = httpGet();
+        var searchApi = httpGet(true);
 
         return {
             get: function() {

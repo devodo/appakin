@@ -2,7 +2,7 @@
     'use strict';
 
     angular.module('appAkin').factory('appApi', function($q, $timeout, httpGet, loading) {
-        var appApi = httpGet();
+        var appApi = httpGet(false);
 
         return {
             get: function(platform, encodedId, slug) {

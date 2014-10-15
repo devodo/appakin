@@ -2,14 +2,15 @@
     'use strict';
 
     angular.module('appAkin.http', [])
-        .service('httpGet', function($timeout, $http, $q, webApiUrl, cache) {
+        .service('httpGet', function($timeout, $http, $q, webApiUrl, cache, cacheApiRequests) {
             var defaultRequestTimeoutMs = 5000;
+            var apiCache = cache('apiCache', 10, cacheApiRequests);
 
             function createCacheKey(url) {
                 return 'data ' + url;
             }
 
-            return function(requestTimeoutMs) {
+            return function(isCacheable, requestTimeoutMs) {
                 requestTimeoutMs = requestTimeoutMs || defaultRequestTimeoutMs;
 
                 var currentRequest;
@@ -34,18 +35,20 @@
 
                     resetCurrentRequest();
                     var url = webApiUrl + relativeUrl;
-                    //console.log('invoked do request: url=' + url);
 
-                    var cachedData = cache.get(createCacheKey(url));
-                    if (cachedData) {
-                        currentRequest.active = false;
-                        console.log('got data from cache');
+                    if (isCacheable) {
+                        var cachedData = apiCache.get(createCacheKey(url));
 
-                        if (success) {
-                            success(cachedData);
+                        if (cachedData) {
+                            currentRequest.active = false;
+                            console.log('got data from cache');
+
+                            if (success) {
+                                success(cachedData);
+                            }
+
+                            return;
                         }
-
-                        return;
                     }
 
                     var localCurrentRequest = currentRequest;
@@ -76,10 +79,10 @@
                                 timeout: localCurrentRequest.requestCancelPromise.promise
                             })
                         .success(function(data) {
-                            console.log('Successful search: url=' + url);
+                            console.log('Successful api call: url=' + url);
 
-                            if (data) {
-                                cache.set(createCacheKey(url), data, true);
+                            if (data && isCacheable) {
+                                apiCache.set(createCacheKey(url), data, true);
                             }
 
                             if (success) {
@@ -90,7 +93,7 @@
                             localCurrentRequest.active = false;
                         })
                         .error(function(data, status) {
-                            console.log('Failed search: status=' + status +
+                            console.log('Failed api call: status=' + status +
                                 ' url=' + url +
                                 ' timedOut=' + localCurrentRequest.timedOut +
                                 ' cancelled=' + localCurrentRequest.cancelled +

@@ -8,7 +8,7 @@
             var debounceTimeoutMs = 200;
             var defaultSearchType = 'category';
             var searchTypeRegex = /(category|app)/;
-            var autoCompleteApi = httpGet();
+            var autoCompleteApi = httpGet(false);
 
             var debouncedAutoCompleteApi = debounce(
                 function(currentSearchTerm, currentPlatform) {
