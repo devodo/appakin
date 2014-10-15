@@ -29,7 +29,7 @@
 
             var indexOfNewline = trimmedInput.lastIndexOf('\n');
             if (indexOfNewline > lengthThreshold) {
-                return trimmedInput.substring(0, indexOfNewline);
+                return trimmedInput.substring(0, indexOfNewline).trim();
             }
 
             var indexOfLastPeriod = trimmedInput.lastIndexOf('.');
@@ -39,10 +39,10 @@
 
             var indexOfLastSpace = trimmedInput.lastIndexOf(' ');
             if (indexOfLastSpace > lengthThreshold) {
-                return trimmedInput.substring(0, indexOfLastSpace) + '...';
+                return trimmedInput.substring(0, indexOfLastSpace) + '&hellip;';
             }
 
-            return trimmedInput + '...';
+            return trimmedInput + '&hellip;';
         };
     });
 
