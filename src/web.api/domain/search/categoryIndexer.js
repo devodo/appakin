@@ -19,7 +19,8 @@ var addCategory = function(category, apps, numAppDescriptions, numChartApps, nex
             desc: app.description,
             url: app.extId.replace(/\-/g, ''),
             "image_url": app.imageUrl,
-            position: parseInt(app.position, 10) + 10,
+            position: app.position,
+            //position: parseInt(app.position, 10) + 10,
             popularity: app.popularity
         };
     });
@@ -38,7 +39,8 @@ var addCategory = function(category, apps, numAppDescriptions, numChartApps, nex
             name: app.name,
             url: app.extId.replace(/\-/g, ''),
             "image_url": app.imageUrl,
-            position: parseInt(app.position, 10) + 10
+            position: app.position
+            //position: parseInt(app.position, 10) + 10
         });
     }
 
@@ -47,12 +49,12 @@ var addCategory = function(category, apps, numAppDescriptions, numChartApps, nex
         type: CHILD_TYPE,
         "parent_id": category.id,
         name: category.name,
-        cat_desc: appDescriptions.join('\n\n'),
+        //cat_desc: appDescriptions.join('\n\n'),
         position: 1,
         popularity: category.popularity
     };
 
-    children.push(categoryChild);
+    //children.push(categoryChild);
 
     var solrCategory = {
         id : category.id,
@@ -60,7 +62,7 @@ var addCategory = function(category, apps, numAppDescriptions, numChartApps, nex
         type: PARENT_TYPE,
         cat_name: category.name,
         url: category.extId.replace(/\-/g, ''),
-        "cat_chart": JSON.stringify(chartApps),
+        //"cat_chart": JSON.stringify(chartApps),
         "_childDocuments_": children
     };
 

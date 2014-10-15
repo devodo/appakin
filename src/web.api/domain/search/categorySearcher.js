@@ -138,17 +138,18 @@ var search = function(queryStr, pageNum, next) {
 
         var categories = obj.response.docs.map(function(doc) {
             var isCatMatch = isCategoryMatch(expanded, doc.id);
+            var appResult = getApps(expanded, highlights, doc.id);
+            var catScore = parseFloat(doc.score);
+            var useChartApps = isCatMatch && appResult.maxScore / catScore < 0.09;
 
             var category = {
                 name: doc.cat_name,
                 url: urlUtil.makeUrl(doc.url, doc.cat_name),
-                isCategoryMatch: isCatMatch
+                isCategoryMatch: useChartApps
             };
 
             var highlight = getHighlight(highlights, doc.id + '-0');
-            var appResult = getApps(expanded, highlights, doc.id);
-            var catScore = parseFloat(doc.score);
-            var useChartApps = isCatMatch && appResult.maxScore / catScore < 0.05;
+
             var apps = useChartApps ? getChartApps(doc.cat_chart, appResult.appsMap) : appResult.apps.splice(0, 6);
 
             if (highlight) {
@@ -175,7 +176,56 @@ var search = function(queryStr, pageNum, next) {
     });
 };
 
+var searchApps = function(queryStr, pageNum, categoryId, next) {
+    var q = encodeURIComponent(solrCore.escapeSpecialChars(queryStr));
+    var solrQuery = 'rows=' + PAGE_SIZE + '&qq=' + q + '&fq={!cache=false}parent_id:' + categoryId;
+
+    if (pageNum && pageNum > 1) {
+        var start = (pageNum - 1) * PAGE_SIZE;
+        solrQuery += '&start=' + start;
+    }
+
+    solrCore.client.get('custom', solrQuery, function (err, obj) {
+        if (err) {
+            return next(err);
+        }
+
+        if (!obj || !obj.response) {
+            return next("Unexpected response from search server");
+        }
+
+        var highlights = obj.highlighting;
+
+
+        var apps = obj.response.docs.map(function(doc) {
+            var app = {
+                name: doc.name,
+                url: urlUtil.makeUrl(doc.url, doc.name),
+                imageUrl: doc.image_url,
+                position: doc.position
+            };
+
+            var highlight = getHighlight(highlights, doc.id);
+
+            if (highlight) {
+                app.highlight = highlight;
+            }
+
+            return apps;
+        });
+
+        var searhcResult = {
+            total: obj.response.numFound,
+            page: pageNum,
+            apps: apps
+        };
+
+        next(null, searhcResult);
+    });
+};
+
 exports.search = search;
+exports.searchApps = searchApps;
 
 
 
