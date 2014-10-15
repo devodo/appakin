@@ -45,7 +45,7 @@
                     me.service.searchType = defaultSearchType;
                 },
                 getPlaceholderText: function() {
-                    return 'Search ' +
+                    return 'Search for ' +
                         platform.getFriendlyName(me.service.platform) +
                         ' apps';
                 },

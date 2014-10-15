@@ -13,7 +13,8 @@
         'angularSpinner',
         'angular-carousel',
         'ngStorage',
-        'duScroll'
+        'duScroll',
+        'angular-data.DSCacheFactory'
     ]);
 
     appAkin.config(function ($routeProvider, $locationProvider) {
@@ -37,7 +38,6 @@
             .when('/search', {
                 templateUrl: '/public/templates/appakin/pages/search-results/search-results.html',
                 controller: 'SearchResultsCtrl',
-                //reloadOnSearch: false
                 resolve: {
                     searchData: ['$route', 'search', 'searchApi', function($route, search, searchApi) {
                         search.updateSearchFromUrl();
