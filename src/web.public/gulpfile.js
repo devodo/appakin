@@ -203,6 +203,11 @@ gulp.task('build:cdnify', ['build:index-html', 'build:stylesheets'], function() 
                         file: '/bower_components/angular-sanitize/angular-sanitize.js',
                         package: 'angular-sanitize',
                         cdn: '//ajax.googleapis.com/ajax/libs/angularjs/${ version }/angular-sanitize.min.js'
+                    },
+                    {
+                        file: '/bower_components/angular-cache/dist/angular-cache.js',
+                        package: 'angular-cache',
+                        cdn: '//cdn.jsdelivr.net/angular.angular-cache/${ version }/angular-cache.min.js'
                     }
                 ]
 			}))

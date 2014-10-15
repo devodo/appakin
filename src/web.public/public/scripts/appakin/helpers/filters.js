@@ -57,7 +57,7 @@
     angular.module('appAkin').filter('removeRules', function() {
         return function(value) {
             return value.replace(/-{3,}/g, '');
-        }
+        };
     });
 
     angular.module('appAkin').filter('formatDescription', function($sanitize) {

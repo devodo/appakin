@@ -40,7 +40,7 @@
 
                 blurTimer = $timeout(function() {
                     $scope.autocompleteFocused = false;
-                }, 500)
+                }, 500);
             });
 
         $scope.$on('$destroy', function() {

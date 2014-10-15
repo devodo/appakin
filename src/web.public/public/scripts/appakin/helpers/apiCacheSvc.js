@@ -5,7 +5,7 @@
         var cacheTtlMinutes = 10;
         var noCache = false;
 
-        var cache = DSCacheFactory(
+        var cache = new DSCacheFactory(
             'cache',
             {
                 maxAge: 1000 * 60 * cacheTtlMinutes,
@@ -29,7 +29,7 @@
                 var value = cache.get(keyStr);
                 return (!value || value.isExpired) ? null : value;
             }
-        }
+        };
     });
 
 }()); // use strict

@@ -279,7 +279,7 @@
                     scope.select(element.text());
                     autoCtrl.setIndex(-1);
                     scope.$apply();
-                })
+                });
             }
         };
     });
