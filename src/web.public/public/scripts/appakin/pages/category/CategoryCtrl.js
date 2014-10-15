@@ -1,6 +1,6 @@
 (function () {'use strict';
 
-    angular.module('appAkin').controller('CategoryCtrl', function($scope, $route, search, pageTitle, category, url,platform) {
+    angular.module('appAkin').controller('CategoryCtrl', function($scope, $document, $route, search, pageTitle, category, url,platform) {
         var categoryData = $route.current.locals.categoryData;
 
         if (categoryData && !categoryData.serverError) {
@@ -10,18 +10,15 @@
         }
 
         search.resetSearchTerm();
-        category.reset(categoryData);
+        category.updateSearch();
 
+        $scope.categoryData = categoryData;
         $scope.category = category;
         $scope.url = url;
         $scope.platform = platform;
 
-        category.updateSearch();
-
         $scope.$on('$destroy', function() {
-            console.log('destroying');
             category.cancel();
-            category.data = {};
         });
     });
 

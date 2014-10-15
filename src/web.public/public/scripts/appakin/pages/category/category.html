@@ -1,18 +1,18 @@
 <div id="category" class="main-wrapper">
-    <p class="error" ng-if="::category.data.serverError">
+    <p class="error" ng-if="::categoryData.serverError">
         <span class="icon"></span>There was a problem getting the category details. Please try again, or if the problem persists please try later.
     </p>
-    <div class="no-error-wrapper" ng-if="::!category.data.serverError">
-        <h1>{{::category.data.name}}</h1>
-        <p class="description">{{::category.data.description}}</p>
+    <div class="no-error-wrapper" ng-if="::!categoryData.serverError">
+        <h1>{{::categoryData.name}}</h1>
+        <p class="description">{{::categoryData.description}}</p>
         <ul>
-            <li ng-repeat="app in category.data.apps track by app.url"
+            <li ng-repeat="app in categoryData.apps track by app.url"
                 class="app-summary category-app-summary"
                 ng-class="{'last':$last}"
                 ng-cloak>
                 <div class="app-summary-sidebar-wrapper">
                     <p class="position" ng-bind="::app.position"></p>
-                    <a href="{{::url.createAppUrl(category.data.platform, app.url)}}">
+                    <a href="{{::url.createAppUrl(categoryData.platform, app.url)}}">
                         <img ng-src="{{::app.artworkSmallUrl}}">
                     </a>
                     <p class="price highlighted" ng-bind="::app.price | formatPrice"></p>
@@ -20,7 +20,7 @@
                 <div class="app-summary-body-wrapper">
                     <h3>
                         <a class="underline-on-hover"
-                           href="{{::url.createAppUrl(category.data.platform, app.url)}}"
+                           href="{{::url.createAppUrl(categoryData.platform, app.url)}}"
                            ng-bind="::app.name"></a>
                     </h3>
                     <p class="tight-lines description"

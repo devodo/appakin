@@ -15,7 +15,7 @@
                     <div ng-if="::app.data.ratingCountCurrent >= 5"
                          akin-score
                          score="app.data.userRatingCurrent"
-                         votes="formatVoteCount(app.data.ratingCountCurrent)"></div>
+                         votes="app.data.ratingCountCurrent | formatVoteCount"></div>
                     <p ng-if="::app.data.ratingCountCurrent < 5">&nbsp;&mdash;</p>
                 </div>
                 <div class="rating sidebar-section"
@@ -23,7 +23,7 @@
                     <h6>OVERALL RATING</h6>
                     <div akin-score
                          score="app.data.userRating"
-                         votes="formatVoteCount(app.data.ratingCount)"></div>
+                         votes="app.data.ratingCount | formatVoteCount"></div>
                 </div>
                 <div class="age-rating single-line-sidebar-section">
                     <h6>AGE RATING</h6>
@@ -35,7 +35,7 @@
                 </div>
                 <div class="supported-devices sidebar-section">
                     <span class="device tag-border"
-                          ng-repeat="device in ::getSupportedDevices(app.data.supportedDevices)">{{device}}</span>
+                          ng-repeat="device in ::supportedDevices">{{::device}}</span>
                 </div>
                 <a class="download-button" href="{{::app.data.storeUrl}}" target="{{::getLinkTarget()}}">
                     <img src="/images/app-store-badge.svg">
@@ -90,15 +90,15 @@
                 <h2>CATEGORY CHARTS</h2>
                 <ul>
                     <li ng-repeat="category in ::app.data.categories">
-                        <h4>#{{category.position}} in <a class="body-link underline-on-hover" href="{{::url.createCategoryUrl(app.data.platform, category.url)}}">{{::category.name}}</a></h4>
+                        <h4>#{{::category.position}} in <a class="body-link underline-on-hover" href="{{::url.createCategoryUrl(app.data.platform, category.url)}}">{{::category.name}}</a></h4>
                     </li>
                 </ul>
             </div>
             <div class="technical-info">
                 <h2>DETAILS</h2>
                 <p class="seller"><span class="label">By</span>&nbsp;{{::app.data.sellerName}}</p>
-                <p class="language"><span class="label">Size</span>&nbsp;{{::formatSize(app.data.fileSizeBytes)}}</p>
-                <p class="last-updated"><span class="label">First Released</span>&nbsp;{{::formatDate(app.data.releaseDate)}}</p>
+                <p class="language"><span class="label">Size</span>&nbsp;{{::app.data.fileSizeBytes | formatBytes}}</p>
+                <p class="last-updated"><span class="label">First Released</span>&nbsp;{{::app.data.releaseDate | formatDate}}</p>
             </div>
         </div>
     </div>

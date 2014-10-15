@@ -42,6 +42,71 @@
         };
     });
 
+    angular.module('appAkin').filter('formatVoteCount', function() {
+        return function(voteCount) {
+            if (voteCount > 1000000) {
+                return (Math.round(voteCount / 10000) / 100) + ' m';
+            }
+
+            if (voteCount >= 1000) {
+                return Math.floor(voteCount / 1000) + ',' + ('000' + voteCount % 1000).slice(-3);
+            }
+
+            return voteCount;
+        };
+    });
+
+    angular.module('appAkin').filter('formatBytes', function() {
+        return function(fileSizeBytes) {
+            if (fileSizeBytes < 1024) {
+                return fileSizeBytes + ' B';
+            } else if (fileSizeBytes < 1048576) {
+                return Math.round(fileSizeBytes / 1024.0) + ' kB';
+            } else {
+                return Math.round(fileSizeBytes / 1048576.0) + ' MB';
+            }
+        };
+    });
+
+    angular.module('appAkin').filter('createSupportedDevicesArray', function() {
+        return function(supportedDevices) {
+            var result = [];
+            var device = null;
+            var iPhone = false;
+            var iPad = false;
+            var iPodTouch = false;
+
+            for (var i = 0; i < supportedDevices.length; i++) {
+                device = supportedDevices[i];
+
+                if (!iPhone && device.indexOf('iPhone') === 0) {
+                    iPhone = true;
+                } else if (!iPad && device.indexOf('iPad') === 0) {
+                    iPad = true;
+                } else if (!iPodTouch && device.indexOf('iPodTouch') === 0) {
+                    iPodTouch = true;
+                }
+            }
+
+            if (iPhone) { result.push('iPHONE'); }
+            if (iPad) { result.push('iPAD'); }
+            if (iPodTouch) { result.push('iPOD'); }
+
+            return result;
+        };
+    });
+
+    angular.module('appAkin').filter('formatDate', function() {
+        var monthNames = [
+            "Jan", "Feb", "Mar", "Apr", "May", "Jun",
+            "Jul", "Aug", "Sept", "Oct", "Nov", "Dec"];
+
+        return function(dateString) {
+            var date = new Date(dateString);
+            return monthNames[date.getMonth()] + ' ' + date.getFullYear();
+        };
+    });
+
     angular.module('appAkin').filter('formatPrice', function() {
         return function(price) {
             if (price === 0) {

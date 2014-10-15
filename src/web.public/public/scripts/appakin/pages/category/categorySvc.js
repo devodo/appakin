@@ -7,15 +7,8 @@
             var getNextPagePromise = null;
 
             me.service = {
-                data: {},
-                hasMorePages: true,
-                reset: function(data) {
-                    me.service.data = data;
-                    me.service.hasMorePages = true;
-                },
                 cancel: function() {
                     if (getNextPagePromise) {
-                        //getNextPagePromise.reject('cancelled');
                         getNextPagePromise = null;
                     }
                 },
@@ -26,7 +19,7 @@
                         search.platform = urlPlatform;
                     }
                 },
-                appendNextPage: function() {
+                appendNextPage: function(currentData) {
                     var i;
 
                     me.service.cancel();
@@ -35,7 +28,7 @@
                         $route.current.params.platform,
                         $route.current.params.encodedId,
                         $route.current.params.slug,
-                        me.service.data.page + 1
+                        currentData.page + 1
                     );
 
                     getNextPagePromise.then(function(data) {
@@ -43,12 +36,12 @@
                             if (data.apps && data.apps.length > 0) {
 
                                 for (i = 0; i < data.apps.length; ++i) {
-                                    me.service.data.apps.push(data.apps[i]);
+                                    currentData.apps.push(data.apps[i]);
                                 }
 
-                                me.service.data.page = data.page;
+                                currentData.page = data.page;
                             } else {
-                                me.service.hasMorePages = false;
+                                currentData.hasMorePages = false;
                             }
                         }
                     });
