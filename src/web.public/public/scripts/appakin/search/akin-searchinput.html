@@ -1,5 +1,7 @@
 <div class="search-input-wrapper">
     <div class="input-wrapper">
+        <!--onfocus="setTimeout(function(){window.scrollTo(0, 150);document.body.scrollTop = 150;}, 1);"-->
+
         <input
             type="text"
             ng-model="searchParam"
@@ -9,7 +11,8 @@
             ng-blur="setFocus(false)"
             spellcheck=false
             autocomplete="off"
-            autocorrect="off"/>
+            autocorrect="off"
+            autocapitalize="off"/>
     </div>
     <div class="button-wrapper" ng-show="hasFocus && searchParam">
         <!--<div class="clear-button" ng-mousedown="clear($event)">-->

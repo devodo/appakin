@@ -14,7 +14,7 @@
                 isActive: '=isActive',
                 placeholder: '=placeholder'
             },
-            controller: ['$scope', '$timeout', function($scope, $timeout) {
+            controller: ['$scope', '$timeout', '$document', function($scope, $timeout, $document) {
                 // the index of the suggestions that's currently selected
                 $scope.selectedIndex = -1;
 
@@ -36,6 +36,10 @@
                 $scope.hasFocus = false;
 
                 $scope.setFocus = function(value) {
+                    if (value) {
+                        $document.scrollTop(0);
+                    }
+
                     $scope.hasFocus = value;
                 };
 

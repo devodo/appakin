@@ -24,7 +24,7 @@
                            ng-bind="::app.name"></a>
                     </h3>
                     <p class="tight-lines description"
-                       ng-bind="::app.shortDescription | firstSection: 120"></p>
+                       ng-bind-html="::app.shortDescription | firstSection: 120"></p>
                 </div>
             </li>
         </ul>

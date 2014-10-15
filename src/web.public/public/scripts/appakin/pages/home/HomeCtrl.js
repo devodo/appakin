@@ -6,15 +6,12 @@
 
         $scope.autocompleteFocused = false;
 
-        var focusTimer;
-        var blurTimer;
+        var focusTimer = null;
+        var blurTimer = null;
 
         var deregisterAutocompleteFocused = $scope.$on(
             'autocomplete.focused',
             function() {
-                // probably a problem here with offsetTop not taking scrolling into account,
-                // and probably not cross-browser.
-
                 var searchbox = angular.element(document.querySelector('#searchbox-home'));
 
                 $scope.autocompleteFocused = true;
@@ -24,9 +21,11 @@
                 }
 
                 focusTimer = $timeout(function() {
-                    $document.scrollTop(offsetTop(searchbox) - 20);
+                    var offset = offsetTop(searchbox) - 3;
+                    $document.scrollTop(offset);
+                    document.body.scrollTop = offset;
                             //searchbox[0].offsetTop - 3);
-                }, 0);
+                }, 1);
             });
 
         var deregisterAutocompleteBlurred = $scope.$on(

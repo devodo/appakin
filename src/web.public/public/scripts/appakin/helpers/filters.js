@@ -25,7 +25,7 @@
             }
 
             var trimmedInput = input.substring(0, maxLength).trim();
-            var lengthThreshold = maxLength / 2;
+            var lengthThreshold = maxLength / 1.5;
 
             var indexOfNewline = trimmedInput.lastIndexOf('\n');
             if (indexOfNewline > lengthThreshold) {
