@@ -1,4 +1,4 @@
 <div class="akin-score">
-    <span ng-repeat="i in [0,1,2,3,4]" class="icon" ng-class="getIconClass(i, score) + ' ' + getIndexClass(i)"></span>
-    <span ng-hide="voteCount === null" class="vote-count">({{voteCount}})</span>
+    <span ng-repeat="i in [0,1,2,3,4]" class="icon" ng-class="::getIconClass(i, score) + ' ' + getIndexClass(i)"></span>
+    <span ng-hide="::voteCount === null" class="vote-count">({{::voteCount}})</span>
 </div>

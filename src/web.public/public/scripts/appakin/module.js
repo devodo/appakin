@@ -12,7 +12,6 @@
         'debounce',
         'angularSpinner',
         'angular-carousel',
-        'ngStorage',
         'duScroll',
         'angular-data.DSCacheFactory'
     ]);
