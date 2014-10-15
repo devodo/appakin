@@ -11,7 +11,7 @@
     });
 
     angular.module('appAkin').filter('firstSection', function($window) {
-        var maxSectionLength = 400;
+        var maxSectionLength = 450;
 
         return function(input, maxLength) {
             maxLength = maxLength || maxSectionLength;
@@ -25,20 +25,24 @@
             }
 
             var trimmedInput = input.substring(0, maxLength).trim();
+            var lengthThreshold = maxLength / 2;
 
             var indexOfNewline = trimmedInput.lastIndexOf('\n');
+            if (indexOfNewline > lengthThreshold) {
+                return trimmedInput.substring(0, indexOfNewline);
+            }
 
-            if (indexOfNewline > 0) {
-                return input.substring(0, indexOfNewline);
+            var indexOfLastPeriod = trimmedInput.lastIndexOf('.');
+            if (indexOfLastPeriod > lengthThreshold) {
+                return trimmedInput.substring(0, indexOfLastPeriod + 1);
             }
 
             var indexOfLastSpace = trimmedInput.lastIndexOf(' ');
-
-            if (indexOfLastSpace > (maxLength / 2)) {
-                return trimmedInput.substring(0, indexOfLastSpace) + ' ...';
+            if (indexOfLastSpace > lengthThreshold) {
+                return trimmedInput.substring(0, indexOfLastSpace) + '...';
             }
 
-            return trimmedInput + ' ...';
+            return trimmedInput + '...';
         };
     });
 
