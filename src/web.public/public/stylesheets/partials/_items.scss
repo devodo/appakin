@@ -433,6 +433,12 @@ h2 {
   }
 
   .app-summary-body-wrapper {
+    margin-left: $large-category-result-icon-dim + 6px;
+
+    @include mq($from: mobile-landscape) {
+      margin-left: (($large-category-result-icon-dim + 6px) * 2) + 3px;
+    }
+
     p {
       @include small-body-text;
     }
