@@ -22,10 +22,10 @@
                 templateUrl: '/public/templates/appakin/pages/home/home.html',
                 controller: 'HomeCtrl'
             })
-            .when('/raters', {
-                templateUrl: '/public/templates/appakin/pages/raters/raters.html',
-                controller: 'RatersCtrl'
-            })
+//            .when('/raters', {
+//                templateUrl: '/public/templates/appakin/pages/raters/raters.html',
+//                controller: 'RatersCtrl'
+//            })
             .when('/about', {
                 templateUrl: '/public/templates/appakin/pages/about/about.html',
                 controller: 'AboutCtrl'

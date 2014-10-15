@@ -1,8 +1,8 @@
 // STICKY FOOTER
 
-$small-footer-height: 78px;
-$medium-footer-height: 90px;
-$large-footer-height: 135px;
+$small-footer-height: 50px;
+$medium-footer-height: 62px;
+$large-footer-height: 107px;
 
 html {
   position: relative;
@@ -40,7 +40,7 @@ footer {
 
 // Sticky footer adjustment
 #home-page {
-  padding-top: 15px;
+  padding-top: 50px;
   padding-bottom: 150px;
 }
 

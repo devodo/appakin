@@ -31,9 +31,9 @@
                                ng-bind-html="::category.highlight && category.highlight.name ? category.highlight.name : category.name"
                                href="{{::url.createCategoryUrl(category.platform, category.url)}}"></a>
                         </h2>
-                        <p class="category-description"
-                           ng-if="::category.isCategoryMatch"
-                           ng-bind-html="::'&hellip; ' + (category.highlight.desc[0] | removeRules) + '&hellip;'"></p>
+                        <!--<p class="category-description"-->
+                           <!--ng-if="::category.isCategoryMatch"-->
+                           <!--ng-bind-html="::'&hellip; ' + (category.highlight.desc[0] | removeRules) + '&hellip;'"></p>-->
                         <ul class="category-apps">
                             <li ng-repeat-start="app in ::category.apps"
                                 class="app-summary category-search-app-summary"
@@ -86,14 +86,15 @@
                     </li>
                 </ul>
             </div>
-            <div class="pagination-wrapper" ng-if="::resultTotalItems > resultItems">
+            <div class="pagination-wrapper" ng-if="::resultTotalItems > resultItems.length">
                 <div class="centering-wrapper">
                     <div pagination
                          total-items="resultTotalItems"
                          max-size="numPages"
                          ng-model="search.currentPage"
                          ng-change="pageChanged()"
-                         previous-text="" next-text=""></div>
+                         previous-text=""
+                         next-text=""></div>
                 </div>
             </div>
         </div>
