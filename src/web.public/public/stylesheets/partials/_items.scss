@@ -778,21 +778,6 @@ h2 {
       word-wrap: break-word;
       word-break: break-word;
     }
-
-//    .more {
-//      @include akin-basic-button;
-//      width: 100px;
-//      @include centred-margins;
-//      margin-top: 12px;
-//      margin-bottom: 6px;
-//    }
-
-//    span:before {
-//      @include large-icon;
-//      color: lighten($icon-colour, 20);
-//    }
-
-//    .more span:before { @include icon($down-icon); }
   }
 
   h2 {
@@ -1035,5 +1020,11 @@ h2 {
 
   p:after {
     display: none;
+  }
+}
+
+#category {
+  .loading-more-categories-spinner-wrapper {
+    max-width: 550px;
   }
 }

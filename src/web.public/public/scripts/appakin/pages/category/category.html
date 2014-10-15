@@ -30,8 +30,8 @@
         </ul>
         <div class="loading-more-categories-spinner-wrapper" us-spinner="{radius:7, width:3, length: 6}" spinner-key="loading-more-categories">
             <a class="more-button never-underline" href
-               ng-click="::category.appendNextPage()"
-               ng-show="category.hasMorePages"><span></span></a>
+               ng-click="category.appendNextPage(categoryData)"
+               ng-show="categoryData.hasMorePages"><span></span></a>
         </div>
 </div>
 <footer data-akin-footer></footer>

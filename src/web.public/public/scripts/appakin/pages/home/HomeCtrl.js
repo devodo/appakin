@@ -24,7 +24,6 @@
                     var offset = offsetTop(searchbox) - 3;
                     $document.scrollTop(offset);
                     document.body.scrollTop = offset;
-                            //searchbox[0].offsetTop - 3);
                 }, 1);
             });
 
