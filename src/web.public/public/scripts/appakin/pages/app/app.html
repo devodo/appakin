@@ -1,71 +1,73 @@
 <div id="app" class="main-wrapper" ng-cloak>
-    <p class="error" ng-if="::app.data.serverError">
-        <span class="icon"></span>There was a problem getting the app details. Please try again, or if the problem persists please try later.
+    <p class="error" ng-if="::appData.serverError">
+        <span class="icon"></span>There was a problem getting the app details.
+        Please try again, or if the problem persists please try later.
     </p>
-    <div class="no-error-wrapper" ng-if="::!app.data.serverError">
-        <h1>{{::app.data.censoredName}}</h1>
+    <div class="no-error-wrapper" ng-if="::!appData.serverError">
+        <h1>{{::appData.censoredName}}</h1>
         <div class="sidebar">
-            <a class="app-icon-wrapper" href="{{::app.data.storeUrl}}" target="{{::getLinkTarget()}}">
-                <img class="app-icon" ng-src="{{::url.createAppleAppStoreImageUrl(app.data.artworkMediumUrl, 175)}}">
+            <a class="app-icon-wrapper" href="{{::appData.storeUrl}}" target="{{::getLinkTarget()}}">
+                <img class="app-icon"
+                     ng-src="{{::url.createAppleAppStoreImageUrl(appData.artworkMediumUrl, 175)}}">
             </a>
             <div class="basic-info">
-                <p class="price highlighted">{{::app.data.price | formatPrice}}</p>
-                <div class="rating sidebar-section" ng-if="::app.data.userRatingCurrent">
+                <p class="price highlighted">{{::appData.price | formatPrice}}</p>
+                <div class="rating sidebar-section" ng-if="::appData.userRatingCurrent">
                     <h6>CURRENT RATING</h6>
-                    <div ng-if="::app.data.ratingCountCurrent >= 5"
+                    <div ng-if="::appData.ratingCountCurrent >= 5"
                          akin-score
-                         score="app.data.userRatingCurrent"
-                         votes="app.data.ratingCountCurrent | formatVoteCount"></div>
-                    <p ng-if="::app.data.ratingCountCurrent < 5">&nbsp;&mdash;</p>
+                         score="appData.userRatingCurrent"
+                         votes="appData.ratingCountCurrent | formatVoteCount"></div>
+                    <p ng-if="::appData.ratingCountCurrent < 5">&nbsp;&mdash;</p>
                 </div>
                 <div class="rating sidebar-section"
-                     ng-if="::app.data.userRating && app.data.ratingCount >= 5">
+                     ng-if="::appData.userRating && appData.ratingCount >= 5">
                     <h6>OVERALL RATING</h6>
                     <div akin-score
-                         score="app.data.userRating"
-                         votes="app.data.ratingCount | formatVoteCount"></div>
+                         score="appData.userRating"
+                         votes="appData.ratingCount | formatVoteCount"></div>
                 </div>
                 <div class="age-rating single-line-sidebar-section">
                     <h6>AGE RATING</h6>
-                    <p>{{::app.data.advisoryRating}}</p>
+                    <p>{{::appData.advisoryRating}}</p>
                 </div>
                 <div class="ios-version single-line-sidebar-section">
                     <h6>iOS VERSION</h6>
-                    <p>{{::app.data.minOsVersion}}+</p>
+                    <p>{{::appData.minOsVersion}}+</p>
                 </div>
                 <div class="supported-devices sidebar-section">
                     <span class="device tag-border"
-                          ng-repeat="device in ::supportedDevices">{{::device}}</span>
+                          ng-repeat="device in ::appData.supportedDevicesArray">{{::device}}</span>
                 </div>
-                <a class="download-button" href="{{::app.data.storeUrl}}" target="{{::getLinkTarget()}}">
+                <a class="download-button" href="{{::appData.storeUrl}}" target="{{::getLinkTarget()}}">
                     <img src="/images/app-store-badge.svg">
                 </a>
             </div>
         </div>
         <div class="body-wrapper">
             <div class="mobile-download-button">
-                <a class="download-button" href="{{::app.data.storeUrl}}" target="{{::getLinkTarget()}}">
+                <a class="download-button" href="{{::appData.storeUrl}}" target="{{::getLinkTarget()}}">
                     <img src="/images/app-store-badge.svg">
                 </a>
             </div>
             <div class="screen-shots-positioning-wrapper">
                 <div class="description">
                     <div ng-if="display.fullDescription">
-                        <p class="body-text" ng-bind-html="::app.data.description | formatDescription"></p>
+                        <p class="body-text" ng-bind-html="::appData.description | formatDescription"></p>
                     </div>
                     <div ng-if="!display.fullDescription">
-                        <p class="body-text" ng-bind-html="app.data.firstSection | formatDescription"></p>
+                        <p class="body-text" ng-bind-html="appData.firstSection | formatDescription"></p>
                         <a class="more-button never-underline" href ng-click="toggleFullDescription()"
-                           ng-if="!(app.data.firstSection === app.data.description)"><span></span></a>
+                           ng-if="!(appData.firstSection === appData.description)"><span></span></a>
                     </div>
                 </div>
                 <div class="screen-shots">
                     <div class="iphone-screen-shots"
-                         ng-if="::app.data.screenShotUrls.length > 0">
+                         ng-if="::appData.screenShotUrls.length > 0">
                         <h2>SCREENSHOTS</h2>
                         <div class="screen-shot-wrapper img-border">
                             <ul rn-carousel rn-carousel-buffered rn-carousel-indicator rn-carousel-control>
-                                <li ng-repeat="screenShotUrl in ::app.data.screenShotUrls">
+                                <li ng-repeat="screenShotUrl in ::appData.screenShotUrls">
                                     <img ng-src="{{::screenShotUrl}}" nopin="nopin">
                                 </li>
                             </ul>
@@ -73,11 +75,11 @@
                         <p class="label">iPhone Screenshots</p>
                     </div>
                     <div class="ipad-screen-shots"
-                         ng-if="::app.data.screenShotUrls.length == 0 && app.data.ipadScreenShotUrls.length > 0">
+                         ng-if="::appData.screenShotUrls.length == 0 && appData.ipadScreenShotUrls.length > 0">
                         <h2>iPAD SCREENSHOTS</h2>
                         <div class="screen-shot-wrapper img-border">
                             <ul rn-carousel rn-carousel-buffered rn-carousel-indicator rn-carousel-control>
-                                <li ng-repeat="screenShotUrl in ::app.data.ipadScreenShotUrls">
+                                <li ng-repeat="screenShotUrl in ::appData.ipadScreenShotUrls">
                                     <img ng-src="{{::screenShotUrl}}" nopin="nopin">
                                 </li>
                             </ul>
@@ -86,19 +88,19 @@
                     </div>
                 </div>
             </div>
-            <div class="app-categories" ng-if="::app.data.categories.length > 0">
+            <div class="app-categories" ng-if="::appData.categories.length > 0">
                 <h2>CATEGORY CHARTS</h2>
                 <ul>
-                    <li ng-repeat="category in ::app.data.categories">
-                        <h4>#{{::category.position}} in <a class="body-link underline-on-hover" href="{{::url.createCategoryUrl(app.data.platform, category.url)}}">{{::category.name}}</a></h4>
+                    <li ng-repeat="category in ::appData.categories">
+                        <h4>#{{::category.position}} in <a class="body-link underline-on-hover" href="{{::url.createCategoryUrl(appData.platform, category.url)}}">{{::category.name}}</a></h4>
                     </li>
                 </ul>
             </div>
             <div class="technical-info">
                 <h2>DETAILS</h2>
-                <p class="seller"><span class="label">By</span>&nbsp;{{::app.data.sellerName}}</p>
-                <p class="language"><span class="label">Size</span>&nbsp;{{::app.data.fileSizeBytes | formatBytes}}</p>
-                <p class="last-updated"><span class="label">First Released</span>&nbsp;{{::app.data.releaseDate | formatDate}}</p>
+                <p class="seller"><span class="label">By</span>&nbsp;{{::appData.sellerName}}</p>
+                <p class="language"><span class="label">Size</span>&nbsp;{{::appData.fileSizeBytes | formatBytes}}</p>
+                <p class="last-updated"><span class="label">First Released</span>&nbsp;{{::appData.releaseDate | formatDate}}</p>
             </div>
         </div>
     </div>

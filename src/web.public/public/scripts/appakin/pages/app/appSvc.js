@@ -5,7 +5,6 @@
         var me = this;
 
         me.service = {
-            data: {},
             updateSearch: function() {
                 var urlPlatform = platform.normalisePlatform($routeParams.platform);
 
