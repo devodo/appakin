@@ -26,7 +26,7 @@ var getHighlight = function(highlights, docId) {
 };
 
 var search = function(queryStr, pageNum, next) {
-    var q = encodeURIComponent(solrCore.escapeSpecialChars(queryStr));
+    var q = encodeURIComponent(solrCore.escapeSpecialCharsAllowQuotes(queryStr));
     var solrQuery = 'rows=' + PAGE_SIZE + '&qq=' + q + '&spellcheck.q=' + q;
 
     if (pageNum && pageNum > 1) {

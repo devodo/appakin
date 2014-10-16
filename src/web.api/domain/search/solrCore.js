@@ -31,6 +31,12 @@ SolrCore.prototype.optimise = function (next) {
     });
 };
 
+SolrCore.prototype.escapeSpecialCharsAllowQuotes = function(s){
+    return s.replace(/([\+\-&\|!\(\)\{\}\[\]\^~\*\?:\\])/g, function(match) {
+        return '\\' + match;
+    });
+};
+
 SolrCore.prototype.escapeSpecialChars = function(s){
     return s.replace(/([\+\-&\|!\(\)\{\}\[\]\^"~\*\?:\\])/g, function(match) {
         return '\\' + match;
@@ -116,6 +122,26 @@ SolrCore.prototype.stopwords_en =
     "-": true,
     "—": true,
     ":": true
+};
+
+SolrCore.prototype.getTopWords = function(text, maxChars) {
+    if (!text) {
+        return null;
+    }
+
+    if (text.length <= maxChars) {
+        return text;
+    }
+
+    var indexStart = Math.min(text.length - 1, maxChars);
+
+    for (var i = indexStart; i > 0; i--) {
+        if (text[i].match(/\s/)) {
+            return text.substr(0, i);
+        }
+    }
+
+    return '';
 };
 
 var createSolrCore = function(coreName) {

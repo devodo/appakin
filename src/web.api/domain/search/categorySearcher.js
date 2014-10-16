@@ -116,7 +116,7 @@ var getChartApps = function(catChart, appsMap) {
 };
 
 var search = function(queryStr, pageNum, next) {
-    var q = encodeURIComponent(solrCore.escapeSpecialChars(queryStr));
+    var q = encodeURIComponent(solrCore.escapeSpecialCharsAllowQuotes(queryStr));
     var solrQuery = 'rows=' + PAGE_SIZE + '&qq=' + q + '&spellcheck.q=' + q;
 
     if (pageNum && pageNum > 1) {

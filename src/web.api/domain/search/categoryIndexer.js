@@ -9,25 +9,6 @@ var fs = require('fs');
 var PARENT_TYPE = 1;
 var CHILD_TYPE = 2;
 
-var getTopWords = function(text, maxChars) {
-    if (!text) {
-        return null;
-    }
-
-    if (text.length <= maxChars) {
-        return text;
-    }
-
-    var indexStart = Math.min(text.length - 1, maxChars);
-
-    for (var i = indexStart; i > 0; i--) {
-        if (text[i].match(/\s/)) {
-            return text.substr(0, i);
-        }
-    }
-
-    return '';
-};
 
 var addCategory = function(category, apps, numAppDescriptions, numChartApps, next) {
     var children = apps.map(function(app) {
@@ -37,7 +18,7 @@ var addCategory = function(category, apps, numAppDescriptions, numChartApps, nex
             "parent_id": category.id,
             name: app.name,
             desc: app.description,
-            "desc_top": getTopWords(app.description, 200),
+            "desc_top": solrCore.getTopWords(app.description, 200),
             url: app.extId.replace(/\-/g, ''),
             "image_url": app.imageUrl,
             position: app.position,
@@ -191,6 +172,5 @@ var getCategoryKeywords = function(categoryId, next) {
 exports.saveCorpusTermFrequency = saveCorpusTermFrequency;
 exports.rebuild = rebuild;
 exports.getCategoryKeywords = getCategoryKeywords;
-exports.getTopWords = getTopWords;
 
 

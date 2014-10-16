@@ -9,6 +9,7 @@ var createSolrApp = function(app) {
         id : app.id,
         name: app.name,
         desc: app.description,
+        "desc_top": solrCore.getTopWords(app.description, 200),
         url: app.extId.replace(/\-/g, ''),
         "img_url" : app.imageUrl,
         price: app.price,
