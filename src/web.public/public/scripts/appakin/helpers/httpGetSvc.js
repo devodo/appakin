@@ -102,7 +102,7 @@
                             var cancelled = localCurrentRequest.cancelled && !localCurrentRequest.timedOut;
 
                             if (error) {
-                                if (status > 0 || (status === 0 && !cancelled)) {
+                                if (status > 0 || ((status === 0 || status === undefined) && !cancelled)) {
                                     //console.log('Invoking error callback.');
                                     error(data || {});
                                 }

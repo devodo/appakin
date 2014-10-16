@@ -77,7 +77,10 @@ gulp.task('build:config', ['build:clean'], function() {
         .pipe(plugins.ngConstant({
             name: 'appAkin.config',
             deps: [],
-            constants: { webApiUrl: 'http://127.0.0.1:3002/' },
+            constants: {
+                webApiUrl: 'http://127.0.0.1:3002/',
+                cacheApiRequests: true
+            },
             wrap: ''
         }))
         .pipe(gulp.dest(buildTempRoot))

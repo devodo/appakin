@@ -80,6 +80,10 @@
             var iPad = false;
             var iPodTouch = false;
 
+            if (!supportedDevices) {
+                return result;
+            }
+
             for (var i = 0; i < supportedDevices.length; i++) {
                 device = supportedDevices[i];
 
