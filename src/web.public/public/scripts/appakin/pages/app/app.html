@@ -92,7 +92,7 @@
                 <h2>CATEGORY CHARTS</h2>
                 <ul>
                     <li ng-repeat="category in ::appData.categories">
-                        <h4>#{{::category.position}} in <a class="body-link underline-on-hover" href="{{::url.createCategoryUrl(appData.platform, category.url)}}">{{::category.name}}</a></h4>
+                        <h4>{{::category.position | ordinalNumber}} in <a class="body-link underline-on-hover" href="{{::url.createCategoryUrl(appData.platform, category.url)}}">{{::category.name}}</a></h4>
                     </li>
                 </ul>
             </div>

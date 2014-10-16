@@ -2,7 +2,6 @@
 
 var express = require('express');
 var path = require('path');
-//var favicon = require('serve-favicon');
 var logger = require('express-bunyan-logger');
 var cookieParser = require('cookie-parser');
 var bodyParser = require('body-parser');
@@ -23,6 +22,7 @@ app.use(notFoundHandler);
 app.use(logger.errorLogger({logger: log}));
 app.use(notFoundErrorHandler);
 app.use(serverErrorHandler);
+
 log.info("Started web.public site");
 
 // ================================

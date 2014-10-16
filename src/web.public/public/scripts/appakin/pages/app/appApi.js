@@ -1,17 +1,23 @@
 (function () {
     'use strict';
 
-    angular.module('appAkin').factory('appApi', function($q, $timeout, httpGet, loading) {
+    angular.module('appAkin').factory('appApi', function($q, $timeout, $location, httpGet, loading, url) {
         var appApi = httpGet(false);
 
         return {
             get: function(platform, encodedId, slug) {
+                var urlName = encodedId + '/' + slug;
                 var deferred = $q.defer();
+
                 loading.started();
 
                 appApi(
-                    platform + '/app/' + encodedId + '/' + slug,
+                    platform + '/app/' + urlName,
                     function (data) {
+                        if (data.url !== urlName) {
+                            $location.path(url.createAppUrl(platform, data.url)).replace();
+                        }
+
                         data.serverError = false;
 
                         if (data.screenShotUrls && data.screenShotUrls.length > 0) {

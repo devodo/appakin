@@ -1,7 +1,7 @@
 (function () {
     'use strict';
 
-    angular.module('appAkin').factory('categoryApi', function($q, $timeout, httpGet, loading) {
+    angular.module('appAkin').factory('categoryApi', function($q, $timeout, $location, httpGet, loading, url) {
         var categoryApi = httpGet(true);
 
         function createUrl(platform, encodedId, slug, pageNumber) {
@@ -10,12 +10,18 @@
 
         return {
             get: function(platform, encodedId, slug) {
+                var urlName = encodedId + '/' + slug;
                 var deferred = $q.defer();
+
                 loading.started();
 
                 categoryApi(
                     createUrl(platform, encodedId, slug, 1),
                     function (data) {
+                        if (data.url !== urlName) {
+                            $location.path(url.createCategoryUrl(platform, data.url)).replace();
+                        }
+
                         data.serverError = false;
                         data.hasMorePages = true;
                         handleResponse(data);

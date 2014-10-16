@@ -161,11 +161,6 @@
                         (currentSearch.page === search.page || (!currentSearch.page && !search.page)) &&
                         (currentSearch.type === search.type || (!currentSearch.type && search.type === defaultSearchType));
 
-                    // console.log('locationPath=' + $location.path() +
-                    // '  q=' + currentSearch.q + ' p=' + currentSearch.p +
-                    // ' page=' + currentSearch.page + ' type=' + currentSearch.type);
-
-                    //console.log('redirecting to search: q=' + me.service.searchTerm + ' p=' + me.service.platform + ' page=' + page);
                     $location.path(url.searchResultsPagePath).search(search);
 
                     if (locationNotChanging) {
