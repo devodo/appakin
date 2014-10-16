@@ -11,16 +11,11 @@ var getHighlight = function(highlights, docId) {
     var hDoc = highlights[docId];
     if (!hDoc) { return null; }
 
-    if (!hDoc.desc_split && !hDoc.cat_desc_split && !hDoc.name_split) { return null; }
+    if (!hDoc.desc_split && !hDoc.name_split) { return null; }
 
     if (hDoc.name_split) {
         hDoc.name = hDoc.name_split;
         delete hDoc.name_split;
-    }
-
-    if (hDoc.cat_desc_split) {
-        hDoc.desc = hDoc.cat_desc_split;
-        delete hDoc.cat_desc_split;
     }
 
     if (hDoc.desc_split) {
@@ -31,88 +26,33 @@ var getHighlight = function(highlights, docId) {
     return hDoc;
 };
 
-var catChildRegex = /\-0$/;
-
-var isCategoryMatch = function(expanded, docId) {
-    if (!expanded) {
-        return false;
-    }
-
-    var appSection = expanded[docId];
-    if (!appSection) {
-        return false;
-    }
-
-    if (!appSection.docs || appSection.docs.length === 0) {
-        return false;
-    }
-
-    return docId + '-0' === appSection.docs[0].id;
-};
-
 var getApps = function(expanded, highlights, docId) {
     if (!expanded) { return []; }
 
     var appSection = expanded[docId];
     if (!appSection) { return []; }
 
-    var appDocs = appSection.docs.filter(function(appDoc) {
-        return !catChildRegex.test(appDoc.id);
-    });
-
+    var appDocs = appSection.docs;
     if (!appDocs) { return []; }
 
-    var appArray = [];
-    var appsMap = {};
-    var maxScore = 0;
-    if (appDocs.length > 0) {
-        maxScore = parseFloat(appDocs[0].score);
-    }
-
-    for (var i = 0; i < appDocs.length; i++) {
-        var appDoc = appDocs[i];
-
-        var appResult = {
+    var apps = appDocs.map(function(appDoc) {
+        var app = {
             name: appDoc.name,
             url: urlUtil.makeUrl(appDoc.url, appDoc.name),
-            imageUrl: appDoc.image_url
+            imageUrl: appDoc.image_url,
+            position: appDoc.position
         };
 
         var highlight = getHighlight(highlights, appDoc.id);
 
         if (highlight) {
-            appResult.highlight = highlight;
+            app.highlight = highlight;
         }
 
-        appArray.push(appResult);
-        appsMap[appDoc.position] = appResult;
-    }
-
-    return {
-        apps: appArray,
-        appsMap: appsMap,
-        maxScore: maxScore
-    };
-};
-
-var getChartApps = function(catChart, appsMap) {
-    if (!catChart) { return []; }
-
-    var chartApps = JSON.parse(catChart);
-
-    return chartApps.map(function(chartApp) {
-        var appResult = appsMap[chartApp.position];
-
-        if (!appResult) {
-            appResult = {
-                name: chartApp.name,
-                url: urlUtil.makeUrl(chartApp.url, chartApp.name),
-                imageUrl: chartApp.image_url
-            };
-        }
-
-        return appResult;
+        return app;
     });
+
+    return apps;
 };
 
 var search = function(queryStr, pageNum, next) {
@@ -137,26 +77,13 @@ var search = function(queryStr, pageNum, next) {
         var expanded = obj.expanded;
 
         var categories = obj.response.docs.map(function(doc) {
-            var isCatMatch = isCategoryMatch(expanded, doc.id);
-            var appResult = getApps(expanded, highlights, doc.id);
-            var catScore = parseFloat(doc.score);
-            var useChartApps = isCatMatch && appResult.maxScore / catScore < 0.09;
-
             var category = {
                 name: doc.cat_name,
-                url: urlUtil.makeUrl(doc.url, doc.cat_name),
-                isCategoryMatch: useChartApps
+                url: urlUtil.makeUrl(doc.url, doc.cat_name)
             };
 
-            var highlight = getHighlight(highlights, doc.id + '-0');
-
-            var apps = useChartApps ? getChartApps(doc.cat_chart, appResult.appsMap) : appResult.apps.splice(0, 6);
-
-            if (highlight) {
-                category.highlight = highlight;
-            }
-
-            if (apps && apps.length > 0) {
+            var apps = getApps(expanded, highlights, doc.id);
+            if (apps.length > 0) {
                 category.apps = apps;
             }
 
