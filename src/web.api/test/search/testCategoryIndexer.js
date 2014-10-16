@@ -42,5 +42,25 @@ exports.group = {
             test.ok(!err, err);
             test.done();
         });
+    },
+
+    testGetTopText: function (test) {
+        var text = "The quick brown fox jumps over the lazy dog";
+        var posi = "1234567890123456789012345678901234567890123";
+
+        var r1 = categoryIndexer.getTopWords(text, 10);
+        var r2 = categoryIndexer.getTopWords(text, 0);
+        var r3 = categoryIndexer.getTopWords(text, 1000);
+        var r4 = categoryIndexer.getTopWords(posi, 10);
+        var r5 = categoryIndexer.getTopWords(text, 23);
+        var r6 = categoryIndexer.getTopWords(text, 9);
+        test.expect(6);
+        test.equals(r1, "The quick");
+        test.equals(r2, "");
+        test.equals(r3, text);
+        test.equals(r4, "");
+        test.equals(r5, "The quick brown fox");
+        test.equals(r6, "The quick");
+        test.done();
     }
 };

@@ -42,3 +42,6 @@ node_modules
 
 #Local configs
 config-local.json
+
+# Generated file
+src/web.api/domain/search/docfreq.json

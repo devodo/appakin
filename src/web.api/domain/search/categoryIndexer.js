@@ -9,6 +9,26 @@ var fs = require('fs');
 var PARENT_TYPE = 1;
 var CHILD_TYPE = 2;
 
+var getTopWords = function(text, maxChars) {
+    if (!text) {
+        return null;
+    }
+
+    if (text.length <= maxChars) {
+        return text;
+    }
+
+    var indexStart = Math.min(text.length - 1, maxChars);
+
+    for (var i = indexStart; i > 0; i--) {
+        if (text[i].match(/\s/)) {
+            return text.substr(0, i);
+        }
+    }
+
+    return '';
+};
+
 var addCategory = function(category, apps, numAppDescriptions, numChartApps, next) {
     var children = apps.map(function(app) {
         return {
@@ -17,44 +37,13 @@ var addCategory = function(category, apps, numAppDescriptions, numChartApps, nex
             "parent_id": category.id,
             name: app.name,
             desc: app.description,
+            "desc_top": getTopWords(app.description, 200),
             url: app.extId.replace(/\-/g, ''),
             "image_url": app.imageUrl,
             position: app.position,
-            //position: parseInt(app.position, 10) + 10,
             popularity: app.popularity
         };
     });
-
-    var appDescriptions = [];
-
-    for (var i = 0; i < numAppDescriptions && i < apps.length; i++) {
-        appDescriptions.push(apps[i].description);
-    }
-
-    var chartApps = [];
-
-    for (i = 0; i < numChartApps && i < apps.length; i++) {
-        var app = apps[i];
-        chartApps.push({
-            name: app.name,
-            url: app.extId.replace(/\-/g, ''),
-            "image_url": app.imageUrl,
-            position: app.position
-            //position: parseInt(app.position, 10) + 10
-        });
-    }
-
-    var categoryChild = {
-        id : category.id + '-0',
-        type: CHILD_TYPE,
-        "parent_id": category.id,
-        name: category.name,
-        //cat_desc: appDescriptions.join('\n\n'),
-        position: 1,
-        popularity: category.popularity
-    };
-
-    //children.push(categoryChild);
 
     var solrCategory = {
         id : category.id,
@@ -62,7 +51,6 @@ var addCategory = function(category, apps, numAppDescriptions, numChartApps, nex
         type: PARENT_TYPE,
         cat_name: category.name,
         url: category.extId.replace(/\-/g, ''),
-        //"cat_chart": JSON.stringify(chartApps),
         "_childDocuments_": children
     };
 
@@ -203,5 +191,6 @@ var getCategoryKeywords = function(categoryId, next) {
 exports.saveCorpusTermFrequency = saveCorpusTermFrequency;
 exports.rebuild = rebuild;
 exports.getCategoryKeywords = getCategoryKeywords;
+exports.getTopWords = getTopWords;
 
 
