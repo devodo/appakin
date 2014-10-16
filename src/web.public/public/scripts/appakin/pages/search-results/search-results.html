@@ -35,7 +35,7 @@
                            <!--ng-if="::category.isCategoryMatch"-->
                            <!--ng-bind-html="::'&hellip; ' + (category.highlight.desc[0] | removeRules) + '&hellip;'"></p>-->
                         <ul class="category-apps">
-                            <li ng-repeat-start="app in ::category.apps"
+                            <li ng-repeat-start="app in ::category.apps | limitTo: 6"
                                 class="app-summary category-search-app-summary"
                                 ng-class="{'extra-app': $index > 2}">
                                 <div class="app-summary-sidebar-wrapper">
