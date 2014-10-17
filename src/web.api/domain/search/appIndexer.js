@@ -6,11 +6,10 @@ var log = require('../../logger');
 
 var createSolrApp = function(app) {
     var appIndex = {
-        id : app.id,
+        id : app.extId.replace(/\-/g, ''),
         name: app.name,
         desc: app.description,
         "desc_top": solrCore.getTopWords(app.description, 200),
-        url: app.extId.replace(/\-/g, ''),
         "img_url" : app.imageUrl,
         price: app.price,
         popularity: app.popularity

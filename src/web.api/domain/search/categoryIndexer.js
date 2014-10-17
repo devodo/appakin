@@ -11,15 +11,16 @@ var CHILD_TYPE = 2;
 
 
 var addCategory = function(category, apps, numAppDescriptions, numChartApps, next) {
+    var catId = category.extId.replace(/\-/g, '');
+
     var children = apps.map(function(app) {
         return {
-            id : category.id + '-' + app.id,
+            id : app.extId.replace(/\-/g, ''),
             type: CHILD_TYPE,
-            "parent_id": category.id,
+            "parent_id": catId,
             name: app.name,
             desc: app.description,
             "desc_top": solrCore.getTopWords(app.description, 200),
-            url: app.extId.replace(/\-/g, ''),
             "image_url": app.imageUrl,
             position: app.position,
             popularity: app.popularity
@@ -27,11 +28,10 @@ var addCategory = function(category, apps, numAppDescriptions, numChartApps, nex
     });
 
     var solrCategory = {
-        id : category.id,
-        "parent_id": category.id,
+        id: catId,
+        "parent_id": catId,
         type: PARENT_TYPE,
         cat_name: category.name,
-        url: category.extId.replace(/\-/g, ''),
         "_childDocuments_": children
     };
 

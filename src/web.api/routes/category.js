@@ -4,6 +4,7 @@ var urlUtil = require('../domain/urlUtil');
 var appStoreRepo = require('../repos/appStoreRepo');
 
 var PAGE_SIZE = 20;
+var MAX_CAT_PAGES = 5;
 
 exports.init = function init(app) {
 
@@ -22,7 +23,7 @@ exports.init = function init(app) {
 
         var pageNum = (req.query && req.query.p) ? parseInt(req.query.p, 10) : 1;
 
-        if (isNaN(pageNum) || pageNum < 1) {
+        if (isNaN(pageNum) || pageNum < 1 || pageNum > MAX_CAT_PAGES) {
             return res.status(400).send('Bad page number');
         }
 

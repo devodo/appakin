@@ -50,8 +50,9 @@ var search = function(queryStr, pageNum, next) {
             var highlight = getHighlight(highlights, doc.id);
 
             var app = {
+                id: doc.id,
                 name: doc.name,
-                url: urlUtil.makeUrl(doc.url, doc.name),
+                url: urlUtil.makeUrl(doc.id, doc.name),
                 imageUrl: doc.img_url,
                 popularity: doc.popularity
             };
