@@ -13,7 +13,7 @@
             $scope.isCategorySearch = searchResults.searchType == 'category';
             $scope.isAppSearch = searchResults.searchType == 'app';
             $scope.serverError = searchResults.serverError;
-            $scope.hasResults = searchResults.items.length > 0;
+            $scope.hasResults = searchResults.items && searchResults.items.length > 0;
             $scope.suggestion = searchResults.suggestion;
             $scope.resultSearchTerm = searchResults.resultSearchTerm;
             $scope.resultTotalItems = searchResults.totalItems;
