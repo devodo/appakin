@@ -12,6 +12,10 @@
                         getNextPagePromise = null;
                     }
                 },
+                excludeFromCategory: function(categoryExtId, appExtId) {
+                    console.log('excluding ' + appExtId + ' from ' + categoryExtId);
+                    categoryApi.excludeFromCategory(categoryExtId, appExtId);
+                },
                 updateSearch: function() {
                     var urlPlatform = platform.normalisePlatform($routeParams.platform);
 

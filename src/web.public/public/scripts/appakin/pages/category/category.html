@@ -25,6 +25,7 @@
                     </h3>
                     <p class="tight-lines description"
                        ng-bind-html="::app.shortDescription | firstSection: 120"></p>
+                    <button ng-click="category.excludeFromCategory(categoryData.extId, app.extId)">Exclude</button>
                 </div>
             </li>
         </ul>
