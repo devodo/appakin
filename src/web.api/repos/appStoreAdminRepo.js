@@ -808,7 +808,43 @@ exports.resetAppPopularities = function(appStoreBatchId, next) {
     });
 };
 
+var insertCategoryAppExclude = function(client, categoryExtId, appExtId, next) {
+    var insertStr =
+        "INSERT INTO category_app_exclude(category_id, app_id, date_created)\n" +
+        "VALUES (\n" +
+        "  (select id from category where ext_id = $1),\n" +
+        "  (select id from app where ext_id = $2),\n" +
+        "  NOW() at time zone 'utc')\n" +
+        "RETURNING id;";
+
+    var insertParams = [
+        categoryExtId,
+        appExtId
+    ];
+
+    client.query(insertStr, insertParams, function (err, result) {
+        if (err) {
+            return next(err);
+        }
+
+        next(null, result.rows[0].id);
+    });
+};
+
 exports.getMissingXyoCategories = getMissingXyoCategories;
 exports.insertCategory = insertCategory;
 exports.insertXyoCategoryMap = insertXyoCategoryMap;
 
+exports.insertCategoryAppExclude = function(categoryExtId, appExtId, next) {
+    connection.open(function(err, conn) {
+        if (err) {
+            return next(err);
+        }
+
+        insertCategoryAppExclude(conn.client, categoryExtId, appExtId, function(err, results) {
+            conn.close(err, function(err) {
+                next(err, results);
+            });
+        });
+    });
+};

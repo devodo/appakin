@@ -77,4 +77,11 @@ exports.init = function init(app) {
             res.json({ "result": "success"});
         });
     });
+
+    app.post('/admin/search/cat/exclude_app', function (req, res) {
+        var categoryExtId = req.body.categoryExtId;
+        var appExtId = req.body.appExtId;
+
+        log.debug("Excluding app " + appExtId + " from category " + categoryExtId);
+    });
 };
