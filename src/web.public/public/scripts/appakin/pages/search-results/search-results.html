@@ -1,43 +1,40 @@
 <div id="search-results" class="main-wrapper" ng-cloak>
-    <h1 class="search-type category" ng-if="::isCategorySearch">
+    <h1 class="search-type category" ng-if="::searchResults.searchType == 'category'">
         Category Results
         <a class="never-underline basic-button"
-           href="{{::url.createSearchUrl(resultSearchTerm, 'app', search.platform)}}">App Results</a>
+           href="{{::url.createSearchUrl(searchResults.resultSearchTerm, 'app', search.platform)}}">App Results</a>
     </h1>
-    <h1 class="search-type app" ng-if="::isAppSearch">
+    <h1 class="search-type app" ng-if="::searchResults.searchType == 'app'">
         App Results
         <a class="never-underline basic-button"
-           href="{{::url.createSearchUrl(resultSearchTerm, 'category', search.platform)}}">Category Results</a>
+           href="{{::url.createSearchUrl(searchResults.resultSearchTerm, 'category', search.platform)}}">Category Results</a>
     </h1>
-    <p class="error" ng-if="::serverError">
+    <p class="error" ng-if="::searchResults.serverError">
         <span class="icon"></span>There was a problem getting your search result.
         Please try again, or if the problem persists please try later.
     </p>
-    <div class="no-error-wrapper" ng-if="::!serverError">
-        <p class="info underline-on-hover" ng-if="::!hasResults">
+    <div class="no-error-wrapper" ng-if="::!searchResults.serverError">
+        <p class="info underline-on-hover" ng-if="::!(searchResults.items && searchResults.items.length > 0)">
             <span class="icon"></span>No results found.<br/>
-            <span ng-if="::suggestion">Did you mean
-                <a href="{{::url.createSearchUrl(suggestion, searchType, search.platform)}}">{{::suggestion}}</a>?
+            <span ng-if="::searchResults.suggestion">Did you mean
+                <a href="{{::url.createSearchUrl(searchResults.suggestion, searchResults.searchType, search.platform)}}">{{::searchResults.suggestion}}</a>?
             </span>
         </p>
-        <div class="valid-results-wrapper" ng-if="::hasResults">
+        <div class="valid-results-wrapper" ng-if="::searchResults.items && searchResults.items.length > 0">
             <div class="valid-results-list-wrapper" ng-class="::search.searchInProgress ? 'disabled' : ''">
-                <ul ng-if="::isCategorySearch">
-                    <li ng-repeat="category in ::resultItems"
+                <ul ng-if="::searchResults.searchType == 'category'">
+                    <li ng-repeat="category in ::searchResults.items"
                         class="category-search-result"
-                        ng-class="{ 'last': $last }">
+                        ng-class="::{ 'last': $last }">
                         <h2>
                             <a class="underline-on-hover"
                                ng-bind-html="::category.highlight && category.highlight.name ? category.highlight.name : category.name"
                                href="{{::url.createCategoryUrl(category.platform, category.url)}}"></a>
                         </h2>
-                        <!--<p class="category-description"-->
-                           <!--ng-if="::category.isCategoryMatch"-->
-                           <!--ng-bind-html="::'&hellip; ' + (category.highlight.desc[0] | removeRules) + '&hellip;'"></p>-->
                         <ul class="category-apps">
                             <li ng-repeat-start="app in ::category.apps | limitTo: 6"
                                 class="app-summary category-search-app-summary"
-                                ng-class="{'extra-app': $index > 2}">
+                                ng-class="::{'extra-app': $index > 2}">
                                 <div class="app-summary-sidebar-wrapper">
                                     <a class="img-wrapper"
                                        href="{{::url.createAppUrl(app.platform, app.url)}}" >
@@ -54,7 +51,7 @@
                             </li>
                             <div ng-repeat-end class="category-apps-row-end"
                                  ng-if="::($index % 2) === 1 || ($index % 3) === 2"
-                                 ng-class="{'two-in-row': ($index % 2) === 1, 'three-in-row': ($index % 3) === 2}">
+                                 ng-class="::{'two-in-row': ($index % 2) === 1, 'three-in-row': ($index % 3) === 2}">
                             </div>
                         </ul>
                         <div class="more-wrapper">
@@ -65,10 +62,10 @@
                         </div>
                     </li>
                 </ul>
-                <ul ng-if="::isAppSearch">
-                    <li ng-repeat="app in ::resultItems track by app.url"
+                <ul ng-if="::searchResults.searchType == 'app'">
+                    <li ng-repeat="app in ::searchResults.items track by app.url"
                         class="app-summary app-search-app-summary"
-                        ng-class="{ last: $last }">
+                        ng-class="::{ last: $last }">
                         <div class="app-summary-sidebar-wrapper">
                             <a href="{{::url.createAppUrl(app.platform, app.url)}}">
                                 <img ng-src="{{::app.imageUrl}}">
@@ -86,10 +83,10 @@
                     </li>
                 </ul>
             </div>
-            <div class="pagination-wrapper" ng-if="::resultTotalItems > resultItems.length">
+            <div class="pagination-wrapper" ng-if="::searchResults.totalItems > searchResults.items.length">
                 <div class="centering-wrapper">
                     <div pagination
-                         total-items="resultTotalItems"
+                         total-items="searchResults.totalItems"
                          max-size="numPages"
                          ng-model="search.currentPage"
                          ng-change="pageChanged()"
@@ -100,4 +97,3 @@
         </div>
     </div>
 </div>
-<footer data-akin-footer></footer>

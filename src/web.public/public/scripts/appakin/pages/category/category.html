@@ -8,8 +8,8 @@
         <ul>
             <li ng-repeat="app in categoryData.apps track by app.url"
                 class="app-summary category-app-summary"
-                ng-class="{'last':$last}"
-                ng-cloak>
+                >
+                <!--ng-class="{'last':$last}">-->
                 <div class="app-summary-sidebar-wrapper">
                     <p class="position" ng-bind="::app.position"></p>
                     <a href="{{::url.createAppUrl(categoryData.platform, app.url)}}">
@@ -23,9 +23,9 @@
                            href="{{::url.createAppUrl(categoryData.platform, app.url)}}"
                            ng-bind="::app.name"></a>
                     </h3>
-                    <p class="tight-lines description"
-                       ng-bind-html="::app.shortDescription | firstSection: 120"></p>
                     <button ng-click="category.excludeFromCategory(categoryData.extId, app.extId)">Exclude</button>
+                    <p class="tight-lines description"
+                       ng-bind-html="::app.shortDescription | removeRules | firstSection: 120"></p>
                 </div>
             </li>
         </ul>
@@ -35,4 +35,3 @@
                ng-show="categoryData.hasMorePages"><span></span></a>
         </div>
 </div>
-<footer data-akin-footer></footer>

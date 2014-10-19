@@ -137,7 +137,11 @@
 
     angular.module('appAkin').filter('removeRules', function() {
         return function(value) {
-            return value.replace(/-{3,}/g, '');
+            if (!value) {
+                return value;
+            }
+
+            return value.replace(/-{3,}|\*{3,}/g, '');
         };
     });
 

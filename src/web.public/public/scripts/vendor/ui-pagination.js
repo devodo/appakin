@@ -177,6 +177,10 @@ angular.module('ui.bootstrap.pagination', [])
                         scope.pages = getPages(scope.page, scope.totalPages);
                     }
                 };
+
+                scope.$on('$destroy', function() {
+                    element.remove();
+                });
             }
         };
     }]);

@@ -3,21 +3,11 @@
     angular.module('appAkin').controller('SearchResultsCtrl',
         function($scope, $timeout, $location, $route, pageTitle, search, url) {
             pageTitle.setPageTitle('appAkin Search Results');
-            var searchResults = $route.current.locals.searchData;
 
             $scope.search = search;
             $scope.url = url;
             $scope.numPages = 5;
-
-            $scope.searchType = searchResults.searchType;
-            $scope.isCategorySearch = searchResults.searchType == 'category';
-            $scope.isAppSearch = searchResults.searchType == 'app';
-            $scope.serverError = searchResults.serverError;
-            $scope.hasResults = searchResults.items && searchResults.items.length > 0;
-            $scope.suggestion = searchResults.suggestion;
-            $scope.resultSearchTerm = searchResults.resultSearchTerm;
-            $scope.resultTotalItems = searchResults.totalItems;
-            $scope.resultItems = searchResults.items;
+            $scope.searchResults = $route.current.locals.searchData;
 
             $scope.setSearchType = function(searchType) {
                 search.searchType = searchType;
@@ -25,12 +15,32 @@
             };
 
             $scope.pageChanged = function() {
-                if (searchResults.resultSearchTerm) {
-                    search.searchTerm = searchResults.resultSearchTerm;
+                if ($scope.searchResults.resultSearchTerm) {
+                    search.searchTerm = $scope.searchResults.resultSearchTerm;
                 }
 
                 search.submitSearch(search.currentPage);
             };
+
+            $scope.$on('$destroy', function() {
+                console.log('destroy on search result close');
+
+
+                var i, j;
+                if ($scope.searchResults.items) {
+                    for (i = 0; i < $scope.searchResults.items.length; ++i) {
+                        if ($scope.searchResults.items[i].apps) {
+                            for (j = 0; j < $scope.searchResults.items[i].apps.length; ++j) {
+                                delete $scope.searchResults.items[i].apps[j];
+                            }
+                        }
+
+                        delete $scope.searchResults.items[i];
+                    }
+                }
+
+                delete $scope.searchResults;
+            })
         });
 
 }()); // use strict

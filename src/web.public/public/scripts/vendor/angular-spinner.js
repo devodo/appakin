@@ -78,8 +78,10 @@
                         });
 
                         scope.$on('$destroy', function () {
+                            console.log('category spinner destroyed');
                             scope.stop();
                             scope.spinner = null;
+                            element.remove();
                         });
                     }
                 };
