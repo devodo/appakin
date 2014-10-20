@@ -1,10 +1,11 @@
 (function () {'use strict';
 
     angular.module('appAkin').controller('SearchResultsCtrl',
-        function($scope, $timeout, $location, $route, pageTitle, search, url) {
+        function($scope, $window, $timeout, $location, $route, pageTitle, search, searchApi, url) {
             pageTitle.setPageTitle('appAkin Search Results');
 
             $scope.search = search;
+            $scope.searchApi = searchApi;
             $scope.url = url;
             $scope.numPages = 5;
             $scope.searchResults = $route.current.locals.searchData;
@@ -22,9 +23,25 @@
                 search.submitSearch(search.currentPage);
             };
 
+//            var w = angular.element($window);
+//
+//            $scope.$watch(
+//                function() {
+//                    console.log($window.innerWidth);
+//                    return $window.innerWidth;
+//                },
+//                function(value) {
+//                    console.log('screen width: ' + value);
+//
+//                },
+//                false);
+//            w.bind('resize', function () {
+//                $scope.$apply();
+//            });
+
+
             $scope.$on('$destroy', function() {
                 console.log('destroy on search result close');
-
 
                 var i, j;
                 if ($scope.searchResults.items) {

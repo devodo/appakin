@@ -106,7 +106,7 @@ var getCategoryByExtId = function (client, extId, next) {
 var getCategoryApps = function(client, categoryId, skip, take, next) {
     var queryStr =
         "SELECT a.ext_id, a.name, a.artwork_small_url, a.price,\n" +
-        "substring(a.description from 0 for 150) as short_description, ca.position\n" +
+        "substring(a.description from 0 for 200) as short_description, ca.position\n" +
         "FROM appstore_app a\n" +
         "JOIN category_app ca ON a.app_id = ca.app_id\n" +
         "LEFT JOIN category_app_exclude ca_e on ca.category_id = ca_e.category_id AND ca.app_id = ca_e.app_id\n" +

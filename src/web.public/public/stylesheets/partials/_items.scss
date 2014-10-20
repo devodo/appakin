@@ -216,24 +216,107 @@ h2 {
     }
   }
 
-  .more-wrapper {
+  .category-search-actions-wrapper {
     clear: both;
     @include clearfix;
+    display: table;
 
-    .more {
-      @include body-text;
-      float: right;
-      text-align: right;
+    .more-results-wrapper {
+      display: table-cell;
+      min-width: 80px;
     }
 
-    .more span:before {
+    .more-results-wrapper:before {
       @include small-icon;
-      color: $light-drawing-colour; // lighten($main-spot-colour, 20);
-      @include icon($category-icon);
-      margin-left: 6px;
-      vertical-align: middle;
-      text-decoration: none !important;
+      color: $main-spot-colour;
+      @include icon($add-icon);
+      line-height: 22px;
+      margin-right: 0px;
     }
+
+    .category-chart-wrapper {
+      display: table-cell;
+      width: 100%;
+      text-align: right;
+
+      .category-chart-link {
+        display: inline-block;
+        margin-right: 5px;
+        //text-align: right;
+        @include h3-title-small-narrow;
+      }
+
+      .category-chart-icon {
+        float: right;
+        width: 18px;
+      }
+
+      .category-chart-icon:after {
+        @include small-icon;
+        color: $light-drawing-colour; // lighten($main-spot-colour, 20);
+        @include icon($category-icon);
+        //margin-top: 3px;
+      }
+    }
+
+//    .category-chart-wrapper:after {
+//      @include small-icon;
+//      color: $light-drawing-colour; // lighten($main-spot-colour, 20);
+//      @include icon($category-icon);
+//      //margin-top: 3px;
+//    }
+
+//    .category-chart-icon {
+//      display: table-cell;
+//      min-width: 18px;
+//    }
+
+//
+//
+//    position: relative;
+//
+//    .more-results-link {
+//      position: absolute;
+//      left: 16px;
+//      top: 2px;
+//      line-height: 22px;
+//      @include small-body-text;
+//    }
+//
+//    .more-results-icon:before {
+//      @include small-icon;
+//      color: $main-spot-colour; // lighten($main-spot-colour, 20);
+//      @include icon($add-icon);
+//      //padding-top: 5px;
+//      line-height: 22px;
+//      margin-right: 0px;
+//      //vertical-align: middle;
+//      text-decoration: none !important;
+//    }
+//
+//    .category-chart-link {
+//      @include body-text;
+//      line-height: 22px;
+//      float: right;
+//      text-align: right;
+//      margin-left: 50px;
+//      margin-right: 5px;
+//    }
+//
+//    .category-chart-icon {
+//      float: right;
+//      width: 18px;
+//      padding-top: 1px;
+//      //height: 18px;
+//    }
+//
+//    .category-chart-icon:after {
+//      @include small-icon;
+//      color: $light-drawing-colour; // lighten($main-spot-colour, 20);
+//      @include icon($category-icon);
+//      //margin-top: 3px;
+//      text-decoration: none !important;
+//    }
   }
 }
 
@@ -243,17 +326,28 @@ h2 {
   $app-summary-sidebar-wrapper-margin-right: 9px;
 
   @include clearfix;
-  margin-bottom: 12px;
+  margin-bottom: 15px;
 
   @include mq($from: desktop) {
-    margin-bottom: 12px;
+    margin-bottom: 18px;
   }
 
   .app-summary-sidebar-wrapper {
     float: left;
-    margin-right: $app-summary-sidebar-wrapper-margin-right; // + 3px;
+    margin-right: $app-summary-sidebar-wrapper-margin-right;
+
+    .position {
+      margin-bottom: 2px;
+
+      @include mq($from: desktop) {
+        margin-bottom: 3px;
+      }
+    }
 
     a {
+      width: $large-category-result-icon-dim;
+      height: $large-category-result-icon-dim;
+      display: block;
 
       img {
         width: $large-category-result-icon-dim;
@@ -261,8 +355,11 @@ h2 {
         @include border-top-radius(12px);
         @include border-bottom-radius(12px);
         @include app-icon-shadow;
-        margin-top: 2px;
       }
+    }
+
+    .price {
+      margin-top: 4px;
     }
   }
 
@@ -274,7 +371,7 @@ h2 {
     }
 
     h3 {
-      @include h3-title-medium;
+      @include h3-title-small-narrow;
       margin-bottom: 3px;
     }
 
@@ -293,6 +390,42 @@ h2 {
   border-bottom: none;
 }
 
+.category-search-app-summary,
+.app-search-app-summary {
+  .app-summary-sidebar-wrapper {
+    .position {
+      border: 1px solid $main-spot-colour;
+      @include border-top-radius(3px);
+      @include border-bottom-radius(3px);
+      font-size: 14px;
+      line-height: 20px;
+      text-align: center;
+      font-weight: bold;
+      color: $main-spot-colour;
+
+      @include mq($to: desktop) {
+        font-size: 11px;
+        line-height: 18px;
+      }
+    }
+
+    .price {
+      display: block;
+      width: 100%;
+      margin-left: 0px;
+      font-size: 14px;
+      line-height: 20px;
+      font-weight: bold;
+      text-align: center;
+
+      @include mq($to: desktop) {
+        font-size: 11px;
+        line-height: 18px;
+      }
+    }
+  }
+}
+
 .category-search-app-summary {
   $cat-app-summary-sidebar-wrapper-margin-right: 6px;
 
@@ -304,13 +437,20 @@ h2 {
     }
 
     a {
+      width: $small-category-result-icon-dim;
+      height: $small-category-result-icon-dim;
+
+      @include mq($from: desktop) {
+        width: $large-category-result-icon-dim;
+        height: $large-category-result-icon-dim;
+      }
+
       img {
         width: $small-category-result-icon-dim;
         height: $small-category-result-icon-dim;
         @include border-top-radius(9px);
         @include border-bottom-radius(9px);
         @include app-icon-shadow;
-        margin-top: 2px;
 
         @include mq($from: desktop) {
           width: $large-category-result-icon-dim;
@@ -330,7 +470,7 @@ h2 {
     }
 
     h3 {
-      @include h3-title-small-wide;
+      //@include h3-title-small-wide;
     }
 
     p {

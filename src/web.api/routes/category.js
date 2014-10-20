@@ -58,7 +58,7 @@ exports.init = function init(app) {
                 apps.forEach(function(app) {
                     app.url = urlUtil.makeUrl(app.extId, app.name);
                     app.position = pIndex++;
-                    //delete app.extId;  // TODO: TEMPORARY OMISSION!!
+                    delete app.extId;  // TODO: TEMPORARY OMISSION!!
                 });
 
                 category.url = categoryUrl;
@@ -66,7 +66,7 @@ exports.init = function init(app) {
                 category.apps = apps;
 
                 delete category.id;
-                //delete category.extId; // TODO: TEMPORARY OMISSION!!
+                delete category.extId; // TODO: TEMPORARY OMISSION!!
 
                 res.json(category);
             });

@@ -40,9 +40,13 @@
 
 @mixin h3-title-medium {
   font-size: 18px;
-  line-height: 22px;
+  line-height: 20px;
 }
 
+@mixin h3-title-small-narrow {
+  font-size: 16px;
+  line-height: 20px;
+}
 
 @mixin h2-text {
   font-size: 22px;
