@@ -5,7 +5,7 @@ var urlUtil = require('../urlUtil');
 
 var CAT_PAGE_SIZE = 10;
 var APP_PAGE_SIZE = 12;
-var MAX_CAT_APPS = 60;
+var MAX_CAT_APPS = 96;
 
 var getAppHighlight = function(highlights, docId) {
     if (!highlights) { return null; }
@@ -15,17 +15,10 @@ var getAppHighlight = function(highlights, docId) {
 
     if (!hDoc.desc_split && !hDoc.name_split) { return null; }
 
-    if (hDoc.name_split) {
-        hDoc.name = hDoc.name_split;
-        delete hDoc.name_split;
-    }
-
-    if (hDoc.desc_split) {
-        hDoc.desc = hDoc.desc_split;
-        delete hDoc.desc_split;
-    }
-
-    return hDoc;
+    return {
+        name: hDoc.name_split,
+        desc: hDoc.desc_split
+    };
 };
 
 var getCatHighlight = function(highlights, docId) {
@@ -59,6 +52,7 @@ var getApps = function(expanded, highlights, docId) {
             name: appDoc.name,
             url: urlUtil.makeUrl(appDoc.id, appDoc.name),
             imageUrl: appDoc.image_url,
+            price: appDoc.price,
             position: appDoc.position
         };
 
@@ -158,6 +152,7 @@ var searchApps = function(queryStr, pageNum, categoryId, next) {
                 name: doc.name,
                 url: urlUtil.makeUrl(doc.id, doc.name),
                 imageUrl: doc.image_url,
+                price: doc.price,
                 position: doc.position
             };
 

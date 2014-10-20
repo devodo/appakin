@@ -23,6 +23,7 @@ var addCategory = function(category, apps, numAppDescriptions, numChartApps, nex
             "desc_top": solrCore.getTopWords(app.description, 200),
             "image_url": app.imageUrl,
             position: app.position,
+            price: app.price,
             popularity: app.popularity
         };
     });

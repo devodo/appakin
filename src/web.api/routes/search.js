@@ -4,7 +4,7 @@ var autoSearcher = require('../domain/search/autoSearcher');
 var catSearcher = require('../domain/search/categorySearcher');
 var appSearcher = require('../domain/search/appSearcher');
 
-var MAX_CAT_APP_PAGES = 5;
+var MAX_CAT_APP_PAGES = 8;
 
 exports.init = function init(app) {
 
