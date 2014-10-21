@@ -254,17 +254,25 @@ h2 {
         @include h3-title-small-narrow;
       }
 
-      .category-chart-icon {
-        float: right;
-        width: 18px;
-      }
+//      .category-chart-icon {
+//        float: right;
+//        width: 18px;
+//      }
+//
+//      .category-chart-icon:after {
+//        @include small-icon;
+//        color: $light-drawing-colour; // lighten($main-spot-colour, 20);
+//        @include icon($category-icon);
+//        //margin-top: 3px;
+//      }
+    }
 
-      .category-chart-icon:after {
-        @include small-icon;
-        color: $light-drawing-colour; // lighten($main-spot-colour, 20);
-        @include icon($category-icon);
-        //margin-top: 3px;
-      }
+    .category-chart-wrapper:after {
+      @include small-icon;
+      color: $light-drawing-colour;
+      @include icon($category-icon);
+      line-height: 22px;
+      margin-left: 0px;
     }
 
 //    .category-chart-wrapper:after {
