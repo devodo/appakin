@@ -54,6 +54,7 @@ var search = function(queryStr, pageNum, next) {
                 name: doc.name,
                 url: urlUtil.makeUrl(doc.id, doc.name),
                 imageUrl: doc.img_url,
+                price: doc.price,
                 popularity: doc.popularity
             };
 
