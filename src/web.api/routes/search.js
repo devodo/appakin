@@ -24,7 +24,7 @@ exports.init = function init(app) {
         });
     });
 
-    app.get('/ios/search/cat', function (req, res) {
+    app.get('/ios/search/cat', function (req, res, next) {
         var query = req.query.q;
         var pageNum = req.query.p ? parseInt(req.query.p, 10) : 1;
 
@@ -38,7 +38,7 @@ exports.init = function init(app) {
 
         catSearcher.search(query, pageNum, function (err, result) {
             if (err) {
-                return res.status(500).send(err);
+                return next(err);
             }
 
             res.json(result);

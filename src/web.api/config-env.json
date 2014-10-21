@@ -1,7 +1,17 @@
 {
     "common": {
+        "server": {
+            "port": 3002,
+            "cluster": {
+                "enabled": true,
+                "workers": 1
+            }
+        },
         "connectionString": {
             "appakin": "postgres://appakin:appakin@appakin-dev/appakin"
+        },
+        "log": {
+            "level": "info"
         },
         "search": {
             "solr": {
@@ -16,9 +26,18 @@
         }
     },
     "development": {
-        "test": "test dev"
+        "test": "test dev",
+        "log": {
+            "level": "debug"
+        }
     },
     "production": {
-        "test": "test production"
+        "test": "test production",
+        "server": {
+            "cluster": {
+                "enabled": true,
+                "workers": "cpu_count"
+            }
+        }
     }
 }

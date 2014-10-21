@@ -15,7 +15,11 @@ var S = require('string');
 
 var app = module.exports = express();
 configureApp(app);
-config.environment !== 'production' && app.use(logger({logger: log}));
+
+if (config.environment !== 'production') {
+    app.use(logger({logger: log}));
+}
+
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded());
 app.use(cookieParser());
