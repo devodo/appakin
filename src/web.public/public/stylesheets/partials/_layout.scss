@@ -1,6 +1,6 @@
 // STICKY FOOTER
 
-$small-footer-height: 50px;
+$small-footer-height: 53px;
 $medium-footer-height: 62px;
 $large-footer-height: 107px;
 
@@ -242,20 +242,20 @@ footer .footer-background-wrapper {
 
 footer .footer-centering-wrapper {
   @include clearfix;
-  height: 48px;
+  height: $small-footer-height - 2px;
   padding-bottom: 2px;
   position: relative;
   max-width: $website-max-width;
   margin-left:auto;
   margin-right: auto;
-  padding-top: 6px;
+  padding-top: 3px;
 
   @include mq($from: mobile-landscape) {
-    height: 60px;
+    height: $medium-footer-height - 2px;
   }
 
   @include mq($from: tablet) {
-    height: 105px;
+    height: $large-footer-height - 2px;
   }
 }
 
@@ -266,6 +266,7 @@ footer .footer-centering-wrapper {
   position: relative;
   left: -50%;
   text-align: left;
+  margin-bottom: 2px;
 
   @include mq($from: mobile-landscape) {
     float: none;
