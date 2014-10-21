@@ -32,7 +32,7 @@
                                href="{{::url.createCategoryUrl(category.platform, category.url)}}"></a>
                         </h2>
                         <ul class="category-apps">
-                            <li ng-repeat-start="app in category.displayApps track by app.id"
+                            <li ng-repeat-start="app in category.displayApps track by $index"
                                 class="app-summary category-search-app-summary"
                                 ng-class="{'extra-app': $index > 2 && !category.moreAdded}">
                                 <div class="app-summary-sidebar-wrapper">
@@ -74,9 +74,7 @@
                             <div class="category-chart-wrapper">
                                 <div class="category-chart-icon icon"></div>
                                 <a class="category-chart-link underline-on-hover"
-                                   href="{{::url.createCategoryUrl(category.platform, category.url)}}">
-                                    Full chart</a>
-                                    <!--{{::category.name}} chart</a>-->
+                                   href="{{::url.createCategoryUrl(category.platform, category.url)}}">View chart</a>
                             </div>
                         </div>
                     </li>
