@@ -343,21 +343,6 @@ h2 {
       }
     }
 
-//    .price {
-//      display: block;
-//      width: 100%;
-//      margin-left: 0px;
-//      font-size: 14px;
-//      line-height: 20px;
-//      font-weight: bold;
-//      text-align: center;
-//
-//      @include mq($to: desktop) {
-//        font-size: 11px;
-//        line-height: 18px;
-//      }
-//    }
-
     .price {
       color: $deemphasized-text-colour;
       font-weight: bold;
@@ -376,33 +361,19 @@ h2 {
   .app-summary-sidebar-wrapper {
     margin-right: $cat-app-summary-sidebar-wrapper-margin-right;
 
-    @include mq($from: desktop) {
+    @include mq($from: tablet) {
       margin-right: $cat-app-summary-sidebar-wrapper-margin-right + 3px;
     }
 
-//    .price {
-//      color: $deemphasized-text-colour;
-//
-//      @include mq($to: desktop) {
-//        font-size: 10px;
-//        line-height: 11px;
-//      }
-//
-//      @include mq($from: desktop) {
-//        font-size: 13px;
-//        line-height: 15px;
-//      }
-//    }
-
     .price {
-      @include mq($to: desktop) {
+      @include mq($to: tablet) {
         font-size: 10px;
         line-height: 11px;
       }
     }
 
     .position {
-      @include mq($to: desktop) {
+      @include mq($to: tablet) {
         font-size: 11px;
         line-height: 16px;
       }
@@ -412,7 +383,7 @@ h2 {
       width: $small-category-result-icon-dim;
       height: $small-category-result-icon-dim;
 
-      @include mq($from: desktop) {
+      @include mq($from: tablet) {
         width: $large-category-result-icon-dim;
         height: $large-category-result-icon-dim;
       }
@@ -424,7 +395,7 @@ h2 {
         @include border-bottom-radius(9px);
         @include app-icon-shadow;
 
-        @include mq($from: desktop) {
+        @include mq($from: tablet) {
           width: $large-category-result-icon-dim;
           height: $large-category-result-icon-dim;
           @include border-top-radius(12px);
@@ -437,12 +408,8 @@ h2 {
   .app-summary-body-wrapper {
     margin-left: $small-category-result-icon-dim + $cat-app-summary-sidebar-wrapper-margin-right;
 
-    @include mq($from: desktop) {
+    @include mq($from: tablet) {
       margin-left: $large-category-result-icon-dim + $cat-app-summary-sidebar-wrapper-margin-right + 3px;
-    }
-
-    h3 {
-      //@include h3-title-small-wide;
     }
 
     p {
@@ -465,15 +432,6 @@ h2 {
   @include mq($from: mobile-landscape) {
     margin-bottom: 18px;
   }
-
-//  .app-summary-sidebar-wrapper {
-//    .price {
-//      @include mq($to: desktop) {
-//        font-size: 13px;
-//        line-height: 15px;
-//      }
-//    }
-//  }
 }
 
 .category-app-summary {
@@ -532,13 +490,7 @@ h2 {
     }
 
     .price {
-      //display: block;
-      //width: 100%;
       margin-left: 0px;
-      //font-size: 14px;
-      //line-height: 20px;
-      //font-weight: bold;
-      //text-align: center;
 
       @include mq($from: mobile-landscape) {
         margin-left: $large-category-result-icon-dim + 6px;

@@ -17,13 +17,13 @@ header .akin-logo {
   margin: 7px 6px 0px 6px;
 
   @include mq($from: mobile-landscape) {
-    width: 120px;
-    height: 32px;
-    margin: 0px 6px 0px 6px;
+    width: 90px;
+    height: 25px;
+    margin: 0px 24px 0px 26px;
   }
 
   @include mq($from: wide) {
-    margin: 0px 16px 0px 15px;
+    margin: 0px 30px 0px 30px;
   }
 }
 

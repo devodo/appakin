@@ -90,19 +90,17 @@ header {
       @include mq($from: mobile-landscape) {
         display: table;
         width: 100%;
-        padding-top: 20px;
+        padding-top: 6px;
       }
 
       .akin-logo {
-
         @include mq($from: mobile-landscape) {
           display: table-cell;
-          vertical-align: middle;
+          vertical-align: bottom;
         }
       }
 
       .searchbox-wrapper {
-
         @include mq($from: mobile-landscape) {
           display: table-cell;
           width: 100%;
