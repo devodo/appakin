@@ -29,7 +29,6 @@ app.use(notFoundHandler);
 app.use(logger.errorLogger({logger: log}));
 app.use(notFoundErrorHandler);
 app.use(serverErrorHandler);
-log.info("Started Web site");
 
 // ================================
 

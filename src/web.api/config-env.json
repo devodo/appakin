@@ -1,11 +1,12 @@
 {
     "common": {
         "server": {
-            "port": 3002,
-            "cluster": {
-                "enabled": true,
-                "workers": 1
-            }
+            "port": 3002
+        },
+        "cluster": {
+            "enabled": true,
+            "workers": "cpu_count",
+            "watchFile": "./system/restart"
         },
         "connectionString": {
             "appakin": "postgres://appakin:appakin@appakin-dev/appakin"
@@ -33,11 +34,9 @@
     },
     "production": {
         "test": "test production",
-        "server": {
-            "cluster": {
-                "enabled": true,
-                "workers": "cpu_count"
-            }
+        "cluster": {
+            "enabled": true,
+            "workers": "cpu_count"
         }
     }
 }
