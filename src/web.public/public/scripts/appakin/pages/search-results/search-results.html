@@ -63,14 +63,6 @@
                                 <a class="more-results-link underline-on-hover" href
                                    ng-click="searchApi.getMoreCategoryApps(category)">More</a>
                             </div>
-                            <!--<div ng-show="category.displayApps.length < category.totalApps || (windowIsNarrow && !category.moreAdded && category.totalApps > 3)">-->
-                                <!--<span class="more-results-icon icon"></span>-->
-                                <!--<a class="more-results-link underline-on-hover" href>More&hellip;</a>-->
-                                <!--&lt;!&ndash;<a class="more-button never-underline" href><span></span></a>&ndash;&gt;-->
-                                   <!--&lt;!&ndash;ng-click="category.appendNextPage(categoryData)"&ndash;&gt;-->
-                                   <!--&lt;!&ndash;ng-show="categoryData.hasMorePages"><span></span></a>&ndash;&gt;-->
-                            <!--</div>-->
-                            <!--<span class="category-chart-icon icon"></span>-->
                             <div class="category-chart-wrapper">
                                 <!--<div class="category-chart-icon icon"></div>-->
                                 <a class="category-chart-link underline-on-hover"
@@ -87,7 +79,7 @@
                             <a href="{{::url.createAppUrl(app.platform, app.url)}}">
                                 <img ng-src="{{::app.imageUrl}}">
                             </a>
-                            <p class="price highlighted" ng-bind="::app.price | formatPrice"></p>
+                            <p class="price" ng-bind="::app.price | formatPrice"></p>
                         </div>
                         <div class="app-summary-body-wrapper">
                             <h3>

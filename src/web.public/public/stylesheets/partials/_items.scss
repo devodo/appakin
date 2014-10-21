@@ -326,6 +326,7 @@ h2 {
 .app-search-app-summary,
 .category-app-summary {
   .app-summary-sidebar-wrapper {
+
     .position {
       border: 1px solid $main-spot-colour;
       @include border-top-radius(3px);
@@ -342,19 +343,29 @@ h2 {
       }
     }
 
+//    .price {
+//      display: block;
+//      width: 100%;
+//      margin-left: 0px;
+//      font-size: 14px;
+//      line-height: 20px;
+//      font-weight: bold;
+//      text-align: center;
+//
+//      @include mq($to: desktop) {
+//        font-size: 11px;
+//        line-height: 18px;
+//      }
+//    }
+
     .price {
-      display: block;
-      width: 100%;
-      margin-left: 0px;
-      font-size: 14px;
-      line-height: 20px;
+      color: $deemphasized-text-colour;
       font-weight: bold;
       text-align: center;
-
-      @include mq($to: desktop) {
-        font-size: 11px;
-        line-height: 18px;
-      }
+      display: block;
+      width: 100%;
+      font-size: 13px;
+      line-height: 15px;
     }
   }
 }
@@ -369,17 +380,24 @@ h2 {
       margin-right: $cat-app-summary-sidebar-wrapper-margin-right + 3px;
     }
 
-    .price {
-      color: $deemphasized-text-colour;
+//    .price {
+//      color: $deemphasized-text-colour;
+//
+//      @include mq($to: desktop) {
+//        font-size: 10px;
+//        line-height: 11px;
+//      }
+//
+//      @include mq($from: desktop) {
+//        font-size: 13px;
+//        line-height: 15px;
+//      }
+//    }
 
+    .price {
       @include mq($to: desktop) {
         font-size: 10px;
         line-height: 11px;
-      }
-
-      @include mq($from: desktop) {
-        font-size: 13px;
-        line-height: 15px;
       }
     }
 
@@ -447,6 +465,15 @@ h2 {
   @include mq($from: mobile-landscape) {
     margin-bottom: 18px;
   }
+
+//  .app-summary-sidebar-wrapper {
+//    .price {
+//      @include mq($to: desktop) {
+//        font-size: 13px;
+//        line-height: 15px;
+//      }
+//    }
+//  }
 }
 
 .category-app-summary {
@@ -490,7 +517,7 @@ h2 {
     a {
       display: block;
       height: $large-category-result-icon-dim;
-      margin-bottom: 7px;
+      margin-bottom: 2px;
 
       @include mq($from: mobile-landscape) {
         margin-left: $large-category-result-icon-dim + 6px;
@@ -505,13 +532,13 @@ h2 {
     }
 
     .price {
-      display: block;
-      width: 100%;
+      //display: block;
+      //width: 100%;
       margin-left: 0px;
-      font-size: 14px;
-      line-height: 20px;
-      font-weight: bold;
-      text-align: center;
+      //font-size: 14px;
+      //line-height: 20px;
+      //font-weight: bold;
+      //text-align: center;
 
       @include mq($from: mobile-landscape) {
         margin-left: $large-category-result-icon-dim + 6px;
