@@ -23,7 +23,7 @@
                            href="{{::url.createAppUrl(categoryData.platform, app.url)}}"
                            ng-bind="::app.name"></a>
                     </h3>
-                    <button ng-click="category.excludeFromCategory(categoryData.extId, app.extId)">Exclude</button>
+                    <!--<button ng-click="category.excludeFromCategory(categoryData.extId, app.extId)">Exclude</button>-->
                     <p class="tight-lines description"
                        ng-bind-html="::app.shortDescription | removeRules | firstSection: 120"></p>
                 </div>
