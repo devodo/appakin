@@ -330,8 +330,8 @@ h2 {
       border: 1px solid $main-spot-colour;
       @include border-top-radius(3px);
       @include border-bottom-radius(3px);
-      font-size: 14px;
-      line-height: 20px;
+      font-size: 13px;
+      line-height: 19px;
       text-align: center;
       font-weight: bold;
       color: $main-spot-colour;
@@ -367,6 +367,27 @@ h2 {
 
     @include mq($from: desktop) {
       margin-right: $cat-app-summary-sidebar-wrapper-margin-right + 3px;
+    }
+
+    .price {
+      color: $deemphasized-text-colour;
+
+      @include mq($to: desktop) {
+        font-size: 10px;
+        line-height: 11px;
+      }
+
+      @include mq($from: desktop) {
+        font-size: 13px;
+        line-height: 15px;
+      }
+    }
+
+    .position {
+      @include mq($to: desktop) {
+        font-size: 11px;
+        line-height: 16px;
+      }
     }
 
     a {

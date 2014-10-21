@@ -141,7 +141,7 @@
                 return value;
             }
 
-            return value.replace(/(.)\1{5,}/g, ' ');
+            return value.replace(/(.)\1{3,}/g, ' ');
         };
     });
 
