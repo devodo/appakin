@@ -7,7 +7,7 @@
             $scope.pageTitle = pageTitle;
 
             var scrollCache = cache('scrollCache', 10, true);
-            var scrollCanBeCaptured = false;
+            var scrollUrlKey = $location.url();
             var viewContentLoadedTimeout = null;
 
             // Perform actions that crosscut the controllers.
@@ -47,27 +47,21 @@
                         // Ensure the global spinner disappears if it is visible.
                         loading.reset();
 
-                        scrollCanBeCaptured = true;
+                        scrollUrlKey = $location.url();
                     },
                     0);
             });
 
             $document.on('scroll', function() {
-                if (!scrollCanBeCaptured) {
-                    return;
-                }
-
-                var urlKey = $location.url();
-
-                if (url.onSearchResultsPage(urlKey) || url.onCategoryPage(urlKey)) {
-                    var key = createScrollCacheKey(urlKey);
-                    var value = $document.scrollTop();
-                    scrollCache.set(key, value, false);
-                }
+                scrollUrlKey = $location.url();
             });
 
             $rootScope.$on('$locationChangeStart', function(event, nextLocation, currentLocation) {
-                scrollCanBeCaptured = false;
+                if (url.onSearchResultsPage(scrollUrlKey) || url.onCategoryPage(scrollUrlKey)) {
+                    var key = createScrollCacheKey(scrollUrlKey);
+                    var value = $document.scrollTop();
+                    scrollCache.set(key, value, false);
+                }
             });
 
             function createScrollCacheKey(urlKey) {
