@@ -1168,9 +1168,20 @@ h2 {
 
 #privacy,
 #terms {
-  p {
+
+  ol li {
+    list-style-type: decimal;
+    list-style-position: inside;
+    margin-bottom: 6px;
+  }
+
+  p, dl {
     @include body-text;
     margin-bottom: 6px;
+  }
+
+  dd {
+    margin-left: 12px;
   }
 
   p.credits {
