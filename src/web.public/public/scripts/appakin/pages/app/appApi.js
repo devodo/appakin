@@ -2,7 +2,7 @@
     'use strict';
 
     angular.module('appAkin').factory('appApi', function($q, $timeout, $location, httpGet, loading, url) {
-        var appApi = httpGet(false);
+        var appApi = httpGet();
 
         return {
             get: function(platform, encodedId, slug) {
@@ -32,7 +32,8 @@
                         data = {data: data};
                         data.serverError = true;
                         handleResponse(data);
-                    });
+                    },
+                    false);
 
                 function handleResponse(data) {
                     data.platform = platform;

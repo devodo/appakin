@@ -3,7 +3,7 @@
 
     angular.module('appAkin').factory('categoryApi', function(
         $q, $timeout, $location, $http, httpGet, loading, url, webApiUrl) {
-            var categoryApi = httpGet(true);
+            var categoryApi = httpGet();
 
             function createUrl(platform, encodedId, slug, pageNumber) {
                 return platform + '/category/' + encodedId + '/' + slug + '?p=' + pageNumber;
@@ -31,7 +31,8 @@
                             data = {data: data};
                             data.serverError = true;
                             handleResponse(data);
-                        });
+                        },
+                        true);
 
                     function handleResponse(data) {
                         data.platform = platform;
@@ -55,7 +56,8 @@
                         function (data) {
                             data = {data: data};
                             handleResponse(data);
-                        });
+                        },
+                        false);
 
                     function handleResponse(data) {
                         data.serverError = false; // ignore errors for now.
@@ -65,25 +67,26 @@
                     }
 
                     return deferred.promise;
-                },
-                excludeFromCategory: function(categoryExtId, appExtId) {
-                    var url = webApiUrl + 'admin/search/cat/exclude_app';
-                    console.log(url);
-
-                    $http.post(
-                        url,
-                        {
-                            categoryExtId: categoryExtId,
-                            appExtId: appExtId
-                        }
-                    )
-                    .success(function(data) {
-                        console.log('successfully excluded');
-                    })
-                    .error(function(data, status) {
-                        console.log('failed to exclude');
-                    });
                 }
+//                ,
+//                excludeFromCategory: function(categoryExtId, appExtId) {
+//                    var url = webApiUrl + 'admin/search/cat/exclude_app';
+//                    console.log(url);
+//
+//                    $http.post(
+//                        url,
+//                        {
+//                            categoryExtId: categoryExtId,
+//                            appExtId: appExtId
+//                        }
+//                    )
+//                    .success(function(data) {
+//                        console.log('successfully excluded');
+//                    })
+//                    .error(function(data, status) {
+//                        console.log('failed to exclude');
+//                    });
+//                }
             };
     });
 

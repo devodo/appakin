@@ -26,18 +26,18 @@
             $scope.$on('$destroy', function() {
                 console.log('destroy on search result close');
 
-                var i, j;
-                if ($scope.searchResults.items) {
-                    for (i = 0; i < $scope.searchResults.items.length; ++i) {
-                        if ($scope.searchResults.items[i].apps) {
-                            for (j = 0; j < $scope.searchResults.items[i].apps.length; ++j) {
-                                delete $scope.searchResults.items[i].apps[j];
-                            }
-                        }
-
-                        delete $scope.searchResults.items[i];
-                    }
-                }
+//                var i, j;
+//                if ($scope.searchResults.items) {
+//                    for (i = 0; i < $scope.searchResults.items.length; ++i) {
+//                        if ($scope.searchResults.items[i].apps) {
+//                            for (j = 0; j < $scope.searchResults.items[i].apps.length; ++j) {
+//                                delete $scope.searchResults.items[i].apps[j];
+//                            }
+//                        }
+//
+//                        delete $scope.searchResults.items[i];
+//                    }
+//                }
 
                 delete $scope.searchResults;
             });

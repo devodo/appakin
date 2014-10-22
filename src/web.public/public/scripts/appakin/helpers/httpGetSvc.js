@@ -10,7 +10,7 @@
                 return 'data ' + url;
             }
 
-            return function(isCacheable, requestTimeoutMs) {
+            return function(requestTimeoutMs) {
                 requestTimeoutMs = requestTimeoutMs || defaultRequestTimeoutMs;
 
                 var currentRequest;
@@ -31,8 +31,7 @@
                     };
                 }
 
-                function doRequest(relativeUrl, success, error) {
-
+                function doRequest(relativeUrl, success, error, isCacheable) {
                     resetCurrentRequest();
                     var url = webApiUrl + relativeUrl;
 
@@ -83,6 +82,7 @@
 
                             if (data && isCacheable) {
                                 apiCache.set(createCacheKey(url), data, true);
+                                console.log('added data to cache for url ' + url);
                             }
 
                             if (success) {

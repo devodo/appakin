@@ -2,7 +2,7 @@
     'use strict';
 
     angular.module('appAkin').factory('searchApi', function($q, $timeout, httpGet, loading, search, platform) {
-        var searchApi = httpGet(true);
+        var searchApi = httpGet();
 
         function addPlatform(arr, platform) {
             if (!arr) { return; }
@@ -70,7 +70,8 @@
                         //var newResults = { serverError: true };
                         //search.searchInProgress = false;
                         handleResponse(data);
-                    }
+                    },
+                    false
                 );
 
                 function handleResponse(data) {
@@ -107,11 +108,13 @@
 
                         if (data.categories) {
                             for (var i = 0; i < data.categories.length; ++i) {
-                                addPlatform(data.categories[i].apps, localPlatform);
-                                data.categories[i].moreAdded = false;
-                                data.categories[i].page = 1;
-                                data.categories[i].searchTerm = localSearchTerm;
-                                data.categories[i].displayApps = data.categories[i].apps.slice(0, 6);
+                                if (!data.categories[i].moreAdded) {
+                                    addPlatform(data.categories[i].apps, localPlatform);
+                                    data.categories[i].moreAdded = false;
+                                    data.categories[i].page = 1;
+                                    data.categories[i].searchTerm = localSearchTerm;
+                                    data.categories[i].displayApps = data.categories[i].apps.slice(0, 6);
+                                }
                             }
                         }
 
@@ -138,7 +141,8 @@
                         var newResults = { serverError: true };
                         search.searchInProgress = false;
                         handleResponse(newResults);
-                    }
+                    },
+                    true
                 );
 
                 function handleResponse(data) {
