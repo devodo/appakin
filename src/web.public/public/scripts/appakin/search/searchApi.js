@@ -113,7 +113,12 @@
                                     data.categories[i].moreAdded = false;
                                     data.categories[i].page = 1;
                                     data.categories[i].searchTerm = localSearchTerm;
-                                    data.categories[i].displayApps = data.categories[i].apps.slice(0, 6);
+
+                                    if (data.categories[i].apps) {
+                                        data.categories[i].displayApps = data.categories[i].apps.slice(0, 6);
+                                    } else {
+                                        data.categories[i].displayApps = [];
+                                    }
                                 }
                             }
                         }
