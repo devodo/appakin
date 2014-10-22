@@ -34,6 +34,9 @@
     },
     "production": {
         "test": "test production",
+        "connectionString": {
+            "appakin": "postgres://appakin:allawedapap@appakin-db.czfejgbveylk.us-east-1.rds.amazonaws.com:/appakin"
+        },
         "cluster": {
             "enabled": true,
             "workers": "cpu_count"
