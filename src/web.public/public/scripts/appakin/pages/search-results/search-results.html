@@ -57,10 +57,10 @@
                             </div>
                         </ul>
                         <div class="category-search-actions-wrapper">
-                            <div class="more-results-wrapper"
-                                 ng-show="category.displayApps.length < category.totalApps || (windowIsNarrow && !category.moreAdded && category.totalApps > 3)">
+                            <div class="more-results-wrapper">
                                 <a class="more-results-link underline-on-hover" href
-                                   ng-click="searchApi.getMoreCategoryApps(category)">More</a>
+                                   ng-click="searchApi.getMoreCategoryApps(category)"
+                                   ng-show="category.displayApps.length < category.totalApps || (windowIsNarrow && !category.moreAdded && category.totalApps > 3)">More</a>
                             </div>
                             <div class="category-chart-wrapper">
                                 <a class="category-chart-link underline-on-hover"
