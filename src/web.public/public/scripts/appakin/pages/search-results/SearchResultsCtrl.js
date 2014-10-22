@@ -23,23 +23,6 @@
                 search.submitSearch(search.currentPage);
             };
 
-//            var w = angular.element($window);
-//
-//            $scope.$watch(
-//                function() {
-//                    console.log($window.innerWidth);
-//                    return $window.innerWidth;
-//                },
-//                function(value) {
-//                    console.log('screen width: ' + value);
-//
-//                },
-//                false);
-//            w.bind('resize', function () {
-//                $scope.$apply();
-//            });
-
-
             $scope.$on('$destroy', function() {
                 console.log('destroy on search result close');
 
@@ -57,7 +40,7 @@
                 }
 
                 delete $scope.searchResults;
-            })
+            });
         });
 
 }()); // use strict

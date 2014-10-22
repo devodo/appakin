@@ -54,7 +54,7 @@ function initStaticRoutes(app) {
     app.use('/stylesheets',express.static(path.join(__dirname, 'public-generated/public/stylesheets')));
     app.use('/stylesheets', express.static(path.join(__dirname, 'public/stylesheets')));
 
-    app.use('/public/templates', express.static(path.join(__dirname, 'public/scripts')));
+    app.use('/templates', express.static(path.join(__dirname, 'public/templates')));
     app.use('/templates', express.static(path.join(__dirname, 'public/scripts')));
     app.use('/bower_components', express.static(path.join(__dirname, 'bower_components')));
 	app.use('*', routes);

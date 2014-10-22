@@ -11,7 +11,6 @@
 
             w.bind('resize', function() {
                 scope.windowIsNarrow = getWindowWidth() < isNarrowBreakpoint;
-                //console.log('resized to: ' + getWindowWidth() + ' isNarrow: ' + scope.windowIsNarrow);
 
                 if (timeoutHandle) {
                     $timeout.cancel(timeoutHandle);
@@ -21,11 +20,11 @@
                 timeoutHandle = $timeout(function() {scope.$apply();}, 0);
                 //scope.$apply();
                 // TODO: remove this timeout?
-            })
+            });
 
             function getWindowWidth() {
                 return $window.innerWidth;
             }
-        }
-    })
+        };
+    });
 }()); // use strict

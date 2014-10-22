@@ -65,11 +65,6 @@
 
                     debouncedAutoCompleteApi(currentSearchTerm, currentPlatform);
                 },
-                appendMoreCategoryApps: function(category) {
-                    console.log('appending more apps');
-
-
-                },
                 urlMatchesSearch: function(targetPage) {
                     var search = $location.search();
                     var pageInt = null;
