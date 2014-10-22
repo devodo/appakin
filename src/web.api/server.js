@@ -9,6 +9,5 @@ var port = config.server.port;
 app.set('port', port);
 
 var server = app.listen(app.get('port'), function() {
-    log.info('Worker ' + process.pid + ' started.');
-    log.debug('Express server listening on port ' + server.address().port);
+    log.info('Express server listening on port ' + server.address().port);
 });

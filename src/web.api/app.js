@@ -6,6 +6,7 @@ var logger = require('express-bunyan-logger');
 var cookieParser = require('cookie-parser');
 var bodyParser = require('body-parser');
 var cors = require('cors');
+var http = require('http');
 var fs = require('fs');
 var log = require('./logger');
 var config = require('./config');
@@ -46,6 +47,8 @@ function configureApp(app) {
         }
     };
     Object.defineProperty(Error.prototype, 'toJSON', config);
+
+    http.globalAgent.maxSockets = 500; // set this high, if you use httpClient or request anywhere (defaults to 5)
 
     // TODO: test this on linux.
     process.on('SIGTERM', function() {
