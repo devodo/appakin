@@ -23,6 +23,7 @@ var opts = {
     workers: numWorkers
 };
 
+
 var cluster = recluster(path.join(__dirname, 'server.js'), opts);
 
 var sighupSent = false;

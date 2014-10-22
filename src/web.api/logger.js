@@ -14,11 +14,7 @@ var log = bunyan.createLogger({
     streams: [
         {
             level: config.log.level,
-            stream: process.stdout  // log DEBUG and above to stdout
-        },
-        {
-            level: 'error',
-            stream: process.stderr  // log ERROR and above to stderr
+            stream: process.stdout  // log level and above to stdout
         }
     ]
 });
