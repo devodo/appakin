@@ -1,0 +1,22 @@
+
+make resize event less processor intensive         
+
+check perf with api caching activated.
+
+perf - images? memory doesn't drop with F5
+
+* check in ie, safari and firefox
+
+window width timeout
+
+------------
+
+turn scroll caching into a directive.
+
+appearing header on scroll up
+
+404 and 500 static pages
+
+more button spinners on category results page
+
+
