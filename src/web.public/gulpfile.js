@@ -79,7 +79,7 @@ gulp.task('build:config', ['build:clean'], function() {
             deps: [],
             constants: {
                 webApiUrl: 'http://127.0.0.1:3002/',
-                cacheApiRequests: true
+                cacheApiRequests: false
             },
             wrap: ''
         }))
@@ -114,7 +114,7 @@ gulp.task('build:scripts', ['build:clean', 'build:config', 'build:templates'], f
         .pipe(plugins.ngAnnotate())
         .pipe(plugins.uglify())
         .pipe(plugins.rev())
-        .pipe(gulp.dest(buildRoot + '/public/scripts/'))
+        .pipe(gulp.dest(buildRoot + '/scripts/'))
         .on('error', handleError);
 });
 
@@ -129,16 +129,15 @@ gulp.task('build:stylesheets', ['build:clean', 'build:config'], function () {
         .pipe(plugins.minifyCss({noAdvanced:true}))
         .pipe(plugins.size({ showFiles: true }))
         .pipe(plugins.rev())
-        .pipe(gulp.dest(buildRoot + '/public/stylesheets/'))
+        .pipe(gulp.dest(buildRoot + '/stylesheets/'))
         .on('error', handleError);
 });
 
 gulp.task('build:index-html', ['build:scripts', 'build:stylesheets', 'build:templates'], function() {
     return gulp
 	    .src(indexHtmlPath)
-        .pipe(inject('./stylesheets/app-styles*.css', buildRoot + '/public', 'appakin-styles'))
-        .pipe(inject('./scripts/app-scripts*.js', buildRoot + '/public', 'appakin-scripts'))
-        //.pipe(inject('./public/templates/app-templates*.js', buildRoot, 'appakin-templates'))
+        .pipe(inject('./stylesheets/app-styles*.css', buildRoot, 'appakin-styles'))
+        .pipe(inject('./scripts/app-scripts*.js', buildRoot, 'appakin-scripts'))
         .pipe(gulp.dest(buildRoot))
 		.on('error', handleError);
 });
@@ -148,30 +147,30 @@ gulp.task('build:minify-images', ['build:clean'], function() {
 	    .src('./public/images/**/*.*')
         .pipe(plugins.imagemin())
         .pipe(plugins.size({ showFiles: true }))
-        .pipe(gulp.dest(buildRoot + '/public/images'))
+        .pipe(gulp.dest(buildRoot + '/images'))
 		.on('error', handleError);
 });
 
 gulp.task('build:copy', ['build:clean'], function() {
 	var filesToCopy =
 	    [
-            './node_modules/**/*.*',
-            './routes/**/*.*',
-            './views/**/*.*',
+            //'./node_modules/**/*.*',
+            //'./routes/**/*.*',
+            //'./views/**/*.*',
             './public/fonts/*.*',
             './public/stylesheets/vendor/*.css',
-            './*.*',
+            //'./*.*',
             '!./bower.json', '!./gulpfile.js', '!./index.html'
 		];
 
     fsSync.copy('./public/scripts/appakin/pages/terms/terms.html',
-        buildRoot + '/public/templates/appakin/pages/terms/terms.html');
+        buildRoot + '/templates/appakin/pages/terms/terms.html');
 
     fsSync.copy('./public/scripts/appakin/pages/privacy/privacy.html',
-            buildRoot + '/public/templates/appakin/pages/privacy/privacy.html');
+            buildRoot + '/templates/appakin/pages/privacy/privacy.html');
 
 	return gulp
-	    .src(filesToCopy, {base: './'})
+	    .src(filesToCopy, {base: './public'})
 	    .pipe(gulp.dest(buildRoot))
 		.on('error', handleError);
 });
