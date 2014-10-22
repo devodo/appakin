@@ -154,12 +154,8 @@ gulp.task('build:minify-images', ['build:clean'], function() {
 gulp.task('build:copy', ['build:clean'], function() {
 	var filesToCopy =
 	    [
-            //'./node_modules/**/*.*',
-            //'./routes/**/*.*',
-            //'./views/**/*.*',
             './public/fonts/*.*',
             './public/stylesheets/vendor/*.css',
-            //'./*.*',
             '!./bower.json', '!./gulpfile.js', '!./index.html'
 		];
 

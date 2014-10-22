@@ -1,6 +1,6 @@
 // STICKY FOOTER
 
-$small-footer-height: 53px;
+$small-footer-height: 84px;
 $medium-footer-height: 62px;
 $large-footer-height: 107px;
 
@@ -298,8 +298,12 @@ footer .footer-centering-wrapper {
     float: none;
     position: absolute;
     left: 0px;
-    bottom: 6px;
+    bottom: 21px;
     margin-left: 30px;
+  }
+
+  @include mq($from: tablet) {
+    bottom: 51px;
   }
 
   ul {
@@ -338,8 +342,12 @@ footer .footer-centering-wrapper {
   @include mq($from: mobile-landscape) {
     position: absolute;
     right: 0px;
-    bottom: 14px;
+    bottom: 30px;
     margin-right: 30px;
+  }
+
+  @include mq($from: tablet) {
+    bottom: 14px;
   }
 }
 
