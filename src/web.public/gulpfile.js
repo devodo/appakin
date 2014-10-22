@@ -78,7 +78,7 @@ gulp.task('build:config', ['build:clean'], function() {
             name: 'appAkin.config',
             deps: [],
             constants: {
-                webApiUrl: 'http://127.0.0.1:3002/',
+                webApiUrl: 'http://api.appakin.com/',
                 cacheApiRequests: false
             },
             wrap: ''
