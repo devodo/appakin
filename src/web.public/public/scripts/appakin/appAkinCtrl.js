@@ -32,11 +32,11 @@
                             if (scrollValue > 0) {
                                 $document.scrollTop(scrollValue);
                             } else {
-                                $document.scrollTop(0);
+                                $document.scrollTop(1); // 1 instead of 0 is chrome hack
                             }
                         } else {
                             // scroll to the top of the page
-                            $document.scrollTop(0);
+                            $document.scrollTop(1); // 1 instead of 0 is chrome hack
                         }
 
                         // reset the search term on all pages except the search results page.
