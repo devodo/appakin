@@ -21,12 +21,12 @@
 
             //$route.current.locals.categoryData = null;
 
-            var i;
-            if ($scope.categoryData.apps) {
-                for (i = 0; i < $scope.categoryData.apps.length; ++i) {
-                    delete $scope.categoryData.apps[i];
-                }
-            }
+//            var i;
+//            if ($scope.categoryData.apps) {
+//                for (i = 0; i < $scope.categoryData.apps.length; ++i) {
+//                    delete $scope.categoryData.apps[i];
+//                }
+//            }
 
             delete $scope.categoryData;
         });
