@@ -145,7 +145,7 @@
 }
 
 @mixin control-border {
-  border: 1px solid $light-drawing-colour;
+  border: 1px solid $deemphasized-text-colour; // $light-drawing-colour;
   @include border-top-radius(6px);
   @include border-bottom-radius(6px);
   padding: 3px;

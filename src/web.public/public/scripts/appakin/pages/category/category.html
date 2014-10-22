@@ -4,7 +4,6 @@
     </p>
     <div class="no-error-wrapper" ng-if="::!categoryData.serverError">
         <h1>{{::categoryData.name}}</h1>
-        <p class="description">{{::categoryData.description}}</p>
         <ul>
             <li ng-repeat="app in categoryData.apps track by $index"
                 class="app-summary category-app-summary"

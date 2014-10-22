@@ -64,7 +64,7 @@ p.info {
 
   span:before {
     @include large-icon;
-    color: lighten($icon-colour, 20);
+    color: $deemphasized-text-colour;
     @include icon($down-icon);
   }
 }
@@ -217,17 +217,21 @@ h2 {
     @include clearfix;
     display: table;
 
-    .more-results-wrapper {
-      display: table-cell;
-      min-width: 80px;
+    .more-results-wrapper a:before,
+    .category-chart-wrapper a:after{
+      @include small-icon;
     }
 
-    .more-results-wrapper:before {
-      @include small-icon;
+    .more-results-wrapper {
+      display: table-cell;
+      min-width: 1px;
+    }
+
+    .more-results-wrapper a:before {
       color: $main-spot-colour;
       @include icon($add-icon);
-      line-height: 22px;
-      margin-right: 0px;
+      margin-right: 3px;
+      vertical-align: middle;
     }
 
     .category-chart-wrapper {
@@ -242,12 +246,11 @@ h2 {
       }
     }
 
-    .category-chart-wrapper:after {
-      @include small-icon;
+    .category-chart-wrapper a:after {
       color: $light-drawing-colour;
       @include icon($category-icon);
-      line-height: 22px;
-      margin-left: 0px;
+      margin-left: 6px;
+      vertical-align: bottom;
     }
   }
 }
@@ -271,7 +274,7 @@ h2 {
     .position {
       margin-bottom: 2px;
 
-      @include mq($from: desktop) {
+      @include mq($from: tablet) {
         margin-bottom: 3px;
       }
     }
@@ -358,6 +361,9 @@ h2 {
 .category-search-app-summary {
   $cat-app-summary-sidebar-wrapper-margin-right: 6px;
 
+  margin-top: 10px;
+  margin-bottom: 5px;
+
   .app-summary-sidebar-wrapper {
     margin-right: $cat-app-summary-sidebar-wrapper-margin-right;
 
@@ -365,17 +371,12 @@ h2 {
       margin-right: $cat-app-summary-sidebar-wrapper-margin-right + 3px;
     }
 
-    .price {
-      @include mq($to: tablet) {
-        font-size: 10px;
-        line-height: 11px;
-      }
-    }
-
     .position {
       @include mq($to: tablet) {
         font-size: 11px;
         line-height: 16px;
+        margin-top: 2px;
+        margin-bottom: 3px;
       }
     }
 
@@ -401,6 +402,13 @@ h2 {
           @include border-top-radius(12px);
           @include border-bottom-radius(12px);
         }
+      }
+    }
+
+    .price {
+      @include mq($to: tablet) {
+        font-size: 10px;
+        line-height: 11px;
       }
     }
   }
@@ -877,6 +885,32 @@ h2 {
     }
   }
 
+  .app-categories {
+    li {
+      //clear: both;
+
+      .position {
+        float: left;
+        display: inline-block;
+        width: 60px;
+        @include small-body-text;
+        border: 1px solid $deemphasized-text-colour;
+        @include border-top-radius(3px);
+        @include border-bottom-radius(3px);
+        font-size: 13px;
+        line-height: 19px;
+        text-align: center;
+        font-weight: bold;
+        color: $deemphasized-text-colour;
+        margin-top: 4px;
+      }
+
+      h4 {
+        margin-left: 66px;
+      }
+    }
+  }
+
   .screen-shot-wrapper {
     margin-bottom: 3px;
 
@@ -1099,5 +1133,29 @@ h2 {
 #category {
   .loading-more-categories-spinner-wrapper {
     max-width: 550px;
+  }
+}
+
+#privacy,
+#terms {
+  p {
+    @include body-text;
+    margin-bottom: 6px;
+  }
+
+  p.credits {
+    margin-top: 24px;
+    @include very-small-body-text;
+    color: $light-drawing-colour;
+  }
+
+  h2 {
+    margin-top: 24px;
+  }
+
+  h4 {
+    @include h3-title-medium;
+    margin-top: 12px;
+    margin-bottom: 6px;
   }
 }

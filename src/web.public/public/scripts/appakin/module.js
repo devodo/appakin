@@ -31,7 +31,7 @@
                 controller: 'AboutCtrl'
             })
             .when('/terms', {
-                templateUrl: '/public/templates/appakin/pages/terms/terms.html',
+                templateUrl: '/templates/appakin/pages/terms/terms.html',
                 controller: 'TermsCtrl'
             })
             .when('/search', {
@@ -77,7 +77,7 @@
                 }
             })
             .when('/privacy', {
-                templateUrl: '/public/templates/appakin/pages/privacy/privacy.html',
+                templateUrl: '/templates/appakin/pages/privacy/privacy.html',
                 controller: 'PrivacyCtrl'
             })
             .otherwise({

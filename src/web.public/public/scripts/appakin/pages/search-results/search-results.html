@@ -59,12 +59,10 @@
                         <div class="category-search-actions-wrapper">
                             <div class="more-results-wrapper"
                                  ng-show="category.displayApps.length < category.totalApps || (windowIsNarrow && !category.moreAdded && category.totalApps > 3)">
-                                <!--<span class="more-results-icon icon"></span>-->
                                 <a class="more-results-link underline-on-hover" href
                                    ng-click="searchApi.getMoreCategoryApps(category)">More</a>
                             </div>
                             <div class="category-chart-wrapper">
-                                <!--<div class="category-chart-icon icon"></div>-->
                                 <a class="category-chart-link underline-on-hover"
                                    href="{{::url.createCategoryUrl(category.platform, category.url)}}">View chart</a>
                             </div>
