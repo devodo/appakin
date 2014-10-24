@@ -1,6 +1,6 @@
 -- Populate category_app table from xyo data
 -- Precondition: category_app table must be empty
-INSERT INTO category_app(category_id, app_id, "position", date_created)
+INSERT INTO category_app(category_id, app_id, "position", old_position, date_created)
   select c.id, a.id, xca.position, NOW()
   from app a
     join xyo_category_app xca on a.name = xca.name
