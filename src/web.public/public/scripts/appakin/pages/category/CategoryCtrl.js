@@ -4,9 +4,9 @@
         $scope.categoryData = $route.current.locals.categoryData;
 
         if ($scope.categoryData && !$scope.categoryData.serverError) {
-            pageTitle.setPageTitle($scope.categoryData.name + ' chart on appAkin');
+            pageTitle.setPageTitle($scope.categoryData.name + ' chart on AppAkin');
         } else {
-            pageTitle.setPageTitle('appAkin');
+            pageTitle.setPageTitle('AppAkin');
         }
 
         search.resetSearchTerm();

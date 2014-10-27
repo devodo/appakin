@@ -3,7 +3,7 @@
 
     angular.module('appAkin').factory('pageTitle', function() {
         var me = this;
-        var initialPageTitle = 'appAkin';
+        var initialPageTitle = 'AppAkin';
 
         me.service = {
             pageTitle: initialPageTitle,

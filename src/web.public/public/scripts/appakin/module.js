@@ -16,7 +16,7 @@
         'angular-data.DSCacheFactory'
     ]);
 
-    appAkin.config(function ($routeProvider, $locationProvider) {
+    appAkin.config(function ($routeProvider, $locationProvider, $compileProvider, angularDebugInfo) {
         $routeProvider
             .when('/', {
                 templateUrl: '/public/templates/appakin/pages/home/home.html',
@@ -85,6 +85,7 @@
             });
 
         $locationProvider.html5Mode(true);
+        $compileProvider.debugInfoEnabled(angularDebugInfo);
     });
 
 }()); // use strict

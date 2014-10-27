@@ -10,9 +10,9 @@
                 appData.supportedDevicesArray = createSupportedDevicesArrayFilter(appData.supportedDevices);
 
                 if (appData && !appData.serverError) {
-                    pageTitle.setPageTitle(appData.name + ' on appAkin');
+                    pageTitle.setPageTitle(appData.name + ' on AppAkin');
                 } else {
-                    pageTitle.setPageTitle('appAkin');
+                    pageTitle.setPageTitle('AppAkin');
                 }
 
                 $document.scrollTo(0);

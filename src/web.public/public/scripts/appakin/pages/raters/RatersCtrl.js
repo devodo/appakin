@@ -1,7 +1,7 @@
 (function () {'use strict';
 
     angular.module('appAkin').controller('RatersCtrl', function($scope, $document, search, pageTitle) {
-        pageTitle.setPageTitle('appAkin Raters');
+        pageTitle.setPageTitle('AppAkin Raters');
         search.resetSearchTerm();
         $document.scrollTo(0);
     });

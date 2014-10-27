@@ -1,7 +1,7 @@
 (function () {'use strict';
 
     angular.module('appAkin').controller('HomeCtrl', function($scope, $timeout, $document, pageTitle, search) {
-        pageTitle.setPageTitle('appAkin - Search for iPhone and iPad apps');
+        pageTitle.setPageTitle('AppAkin - Search for iPhone and iPad apps');
         search.resetSearchTerm();
 
         $scope.autocompleteFocused = false;
