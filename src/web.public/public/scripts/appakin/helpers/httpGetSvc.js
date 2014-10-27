@@ -3,7 +3,7 @@
 
     angular.module('appAkin.http', [])
         .service('httpGet', function($timeout, $http, $q, webApiUrl, cache, cacheApiRequests) {
-            var defaultRequestTimeoutMs = 5000;
+            var defaultRequestTimeoutMs = 10000;
             var apiCache = cache('apiCache', 10, cacheApiRequests);
 
             function createCacheKey(url) {
