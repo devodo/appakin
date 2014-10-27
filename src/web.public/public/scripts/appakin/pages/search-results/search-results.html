@@ -19,6 +19,12 @@
             <span ng-if="::searchResults.suggestion">Did you mean
                 <a href="{{::url.createSearchUrl(searchResults.suggestion, searchResults.searchType, search.platform)}}">{{::searchResults.suggestion}}</a>?
             </span>
+            <span ng-if="::!searchResults.suggestion && searchResults.searchType == 'category'">
+                Try the
+                <a class="underline-on-hover"
+                   href="{{::url.createSearchUrl(searchResults.resultSearchTerm, 'app', search.platform)}}">App Results</a>
+                page.
+            </span>
         </p>
         <div class="valid-results-wrapper" ng-if="::searchResults.items && searchResults.items.length > 0">
             <div class="valid-results-list-wrapper" ng-class="::search.searchInProgress ? 'disabled' : ''">
