@@ -17,6 +17,8 @@
     ]);
 
     appAkin.config(function ($routeProvider, $locationProvider, $compileProvider, angularDebugInfo) {
+        $compileProvider.debugInfoEnabled(angularDebugInfo);
+
         $routeProvider
             .when('/', {
                 templateUrl: '/public/templates/appakin/pages/home/home.html',
@@ -85,7 +87,6 @@
             });
 
         $locationProvider.html5Mode(true);
-        $compileProvider.debugInfoEnabled(angularDebugInfo);
     });
 
 }()); // use strict

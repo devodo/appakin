@@ -917,12 +917,10 @@ h2 {
 
   .app-categories {
     li {
-      //clear: both;
-
       .position {
         float: left;
         display: inline-block;
-        width: 60px;
+        width: 50px;
         @include small-body-text;
         border: 1px solid $deemphasized-text-colour;
         @include border-top-radius(3px);
@@ -932,11 +930,13 @@ h2 {
         text-align: center;
         font-weight: bold;
         color: $deemphasized-text-colour;
-        margin-top: 4px;
+        margin-top: 2px;
       }
 
       h4 {
-        margin-left: 66px;
+        margin-left: 56px;
+        font-size: 16px;
+        line-height: 22px;
       }
     }
   }
