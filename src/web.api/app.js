@@ -61,6 +61,15 @@ function configureApp(app) {
         res.contentType("application/json; charset=UTF-8");
         next();
     });
+
+    app.set('trust proxy', function (ip) {
+        // trusted IPs
+        if (ip === '127.0.0.1') {
+            return true;
+        }
+
+        return false;
+    });
 }
 
 function configureCors(app) {
@@ -126,5 +135,6 @@ function notFoundErrorHandler(err, req, res, next) {
 }
 
 function serverErrorHandler(err, req, res, next) {
+    log.error(err);
     res.send(err.status || 500, {error: err.message});
 }

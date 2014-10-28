@@ -51,9 +51,16 @@ exports.init = function init(app) {
                 app.categories = cats;
 
                 delete app.id;
-                delete app.extId;
+                delete app.storeAppId;
+                delete app.censoredName;
+                delete app.storeUrl;
+                delete app.devId;
+                delete app.devUrl;
                 delete app.dateCreated;
-
+                delete app.primaryGenre;
+                delete app.genres;
+                delete app.bundleId;
+                delete app.sellerName;
                 res.json(app);
             });
         });

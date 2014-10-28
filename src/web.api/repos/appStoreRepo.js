@@ -71,6 +71,41 @@ var getAppByExtId = function (client, extId, next) {
     });
 };
 
+var getAppStoreLink = function (client, extAppId, extCatId, next) {
+    var queryStr =
+        "select a.app_id, a.store_url, c.id as cat_id, ca.id as cat_app_id\n" +
+        "from appstore_app a\n" +
+        "left join category c on c.ext_id = $1\n" +
+        "left join category_app ca on c.id = ca.category_id and a.app_id = ca.app_id\n" +
+        "where a.ext_id = $2";
+
+    var queryParams = [
+        extCatId,
+        extAppId
+    ];
+
+    client.query(queryStr, queryParams, function (err, result) {
+        if (err) {
+            return next(err);
+        }
+
+        if (result.rows.length !== 1) {
+            return next(null, null);
+        }
+
+        var item = result.rows[0];
+
+        var appLink = {
+            appId: item.app_id,
+            storeUrl: item.store_url,
+            catId: item.cat_id,
+            catAppId: item.cat_app_id
+        };
+
+        next(null, appLink);
+    });
+};
+
 var getCategoryByExtId = function (client, extId, next) {
     var queryStr =
         "SELECT id, ext_id, name, description, date_created, date_modified,\n" +
@@ -381,6 +416,20 @@ exports.getAppByExtId = function(extId, next) {
         getAppByExtId(conn.client, extId, function(err, app) {
             conn.close(err, function(err) {
                 next(err, app);
+            });
+        });
+    });
+};
+
+exports.getAppStoreLink = function(extAppId, extCatId, next) {
+    connection.open(function(err, conn) {
+        if (err) {
+            return next(err);
+        }
+
+        getAppStoreLink(conn.client, extAppId, extCatId, function(err, appLink) {
+            conn.close(err, function(err) {
+                next(err, appLink);
             });
         });
     });

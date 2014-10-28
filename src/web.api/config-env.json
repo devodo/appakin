@@ -24,6 +24,9 @@
                     "app": "appakin_app"
                 }
             }
+        },
+        "itunes": {
+            "affiliateId": "10lNjB"
         }
     },
     "development": {

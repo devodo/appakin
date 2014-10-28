@@ -28,7 +28,8 @@
     "slugid": "^1.0.2",
     "solr-client": "^0.3.0",
     "string": "^1.9.1",
-    "unidecode": "^0.1.3"
+    "unidecode": "^0.1.3",
+    "validator": "^3.22.0"
   },
   "devDependencies": {},
   "engines": {
