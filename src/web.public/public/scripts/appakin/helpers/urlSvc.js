@@ -1,7 +1,7 @@
 (function () {
     'use strict';
 
-    angular.module('appAkin').factory('url', function($rootScope, $location) {
+    angular.module('appAkin').factory('url', function($rootScope, $location, webApiUrl) {
         var appleAppStoreImageUrlRegex = /jpg$|png$|tif$/;
         var searchResultsPagePath = '/search';
         var categoryPagePathRegex = /^\/(?:ios|android|winphone)\/category\//;
@@ -12,6 +12,15 @@
             },
             createAppUrl: function(platform, urlName) {
                 return '/' + platform + '/app/' + urlName;
+            },
+            createAppStoreOutUrl: function(platform, appExtId, categoryExtId) {
+                var outUrl = webApiUrl + platform + '/out/' + appExtId;
+
+                if (categoryExtId) {
+                    outUrl += '?cat_id=' + categoryExtId;
+                }
+
+                return outUrl
             },
             createSearchUrl: function(query, searchType, platform) {
                 return '/search?q='+encodeURIComponent(query) +

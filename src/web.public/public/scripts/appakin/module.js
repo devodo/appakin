@@ -71,12 +71,11 @@
                 templateUrl: '/public/templates/appakin/pages/app/app.html',
                 controller: 'AppCtrl',
                 resolve: {
-                    appData: ['$route', 'appApi', 'app', function($route, appApi, app) {
+                    appData: ['$route', 'appApi', 'app', function($route, appApi) {
                         return appApi.get(
                             $route.current.params.platform,
                             $route.current.params.encodedId,
-                            $route.current.params.slug,
-                            app.fromCategoryExtId
+                            $route.current.params.slug
                         );
                     }]
                 }

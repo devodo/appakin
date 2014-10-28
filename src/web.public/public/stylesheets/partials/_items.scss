@@ -231,7 +231,7 @@ h2 {
       color: $main-spot-colour;
       @include icon($add-icon);
       margin-right: 3px;
-      vertical-align: middle;
+      //vertical-align: top;
     }
 
     .category-chart-wrapper {
@@ -250,7 +250,7 @@ h2 {
       color: $light-drawing-colour;
       @include icon($category-icon);
       margin-left: 6px;
-      vertical-align: bottom;
+      //vertical-align: bottom;
     }
   }
 }
@@ -640,6 +640,7 @@ h2 {
   .mobile-download-button {
     clear: both;
     border-top: 1px solid $light-drawing-colour;
+    border-bottom: 1px solid $light-drawing-colour;
     padding-top: 6px;
 
     @include mq($from: mobile-landscape) {
@@ -874,20 +875,18 @@ h2 {
 
   .description {
     clear: both;
-    padding: 18px 6px 0px 6px;
-    border-top: 1px solid $light-drawing-colour;
+    padding: 0px 6px 0px 6px;
     margin-bottom: 12px;
-    max-width: 500px;
+    //max-width: 500px;
 
     @include mq($from: mobile-landscape) {
       clear: none;
-      border-top: none;
-      padding-top: 0px;
     }
 
     p {
       word-wrap: break-word;
       word-break: break-word;
+      max-width: 800px;
     }
   }
 
@@ -916,8 +915,11 @@ h2 {
   }
 
   .app-categories {
+    h2 {
+      padding-top: 0px;
+    }
+
     li {
-      @include clearfix;
       margin-bottom: 5px;
 
       .position {

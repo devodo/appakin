@@ -42,7 +42,7 @@
                                 class="app-summary category-search-app-summary"
                                 ng-class="{'extra-app': $index > 2 && !category.moreAdded}">
                                 <div class="app-summary-sidebar-wrapper">
-                                    <p class="position" ng-bind="::app.position | ordinalNumber"></p>
+                                    <!--<p class="position" ng-bind="::app.position | ordinalNumber"></p>-->
                                     <a class="img-wrapper"
                                        href ng-click="::appsvc.loadAppPage(app.platform, app.url, category.id)">
                                         <img ng-src="{{::app.imageUrl}}">

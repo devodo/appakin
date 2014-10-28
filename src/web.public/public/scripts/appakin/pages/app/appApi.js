@@ -5,14 +5,10 @@
         var appApi = httpGet();
 
         return {
-            get: function(platform, encodedId, slug, fromCategoryExtId) {
+            get: function(platform, encodedId, slug) {
                 var urlName = encodedId + '/' + slug;
                 var deferred = $q.defer();
-
                 var appUrl = platform + '/app/' + urlName;
-                if (fromCategoryExtId) {
-                    appUrl += '?cat_id=' + fromCategoryExtId;
-                }
 
                 loading.started();
 

@@ -4,10 +4,10 @@
         Please try again, or if the problem persists please try later.
     </p>
     <div class="no-error-wrapper" ng-if="::!appData.serverError">
-        <h1>{{::appData.censoredName}}</h1>
+        <h1>{{::appData.name}}</h1>
         <div class="sidebar">
             <a class="app-icon-wrapper"
-               href="{{::appData.storeUrl}}"
+               href="{{::url.createAppStoreOutUrl('ios', appData.extId, app.fromCategoryExtId)}}"
                rel="nofollow"
                target="{{::getLinkTarget()}}"
                analytics-on="click" analytics-event="{{::analyticsEvent}}" analytics-category="{{::analyticsCategory}}" analytics-label="{{::analyticsLabel}}">
@@ -44,7 +44,7 @@
                           ng-repeat="device in ::appData.supportedDevicesArray">{{::device}}</span>
                 </div>
                 <a class="download-button"
-                   href="{{::appData.storeUrl}}"
+                   href="{{::url.createAppStoreOutUrl('ios', appData.extId, app.fromCategoryExtId)}}"
                    rel="nofollow"
                    target="{{::getLinkTarget()}}"
                    analytics-on="click" analytics-event="{{::analyticsEvent}}" analytics-category="{{::analyticsCategory}}" analytics-label="{{::analyticsLabel}}">
@@ -55,7 +55,7 @@
         <div class="body-wrapper">
             <div class="mobile-download-button">
                 <a class="download-button"
-                   href="{{::appData.storeUrl}}"
+                   href="{{::url.createAppStoreOutUrl('ios', appData.extId, app.fromCategoryExtId)}}"
                    rel="nofollow"
                    target="{{::getLinkTarget()}}"
                    analytics-on="click" analytics-event="{{::analyticsEvent}}" analytics-category="{{::analyticsCategory}}" analytics-label="{{::analyticsLabel}}">
@@ -63,7 +63,17 @@
                 </a>
             </div>
             <div class="screen-shots-positioning-wrapper">
+                <div class="app-categories" ng-if="::appData.categories.length > 0">
+                    <h2>CATEGORY CHARTS</h2>
+                    <ul>
+                        <li ng-repeat="category in ::appData.categories">
+                            <p class="position" ng-bind="::category.position | ordinalNumber"></p>
+                            <h4><a class="body-link underline-on-hover" href="{{::url.createCategoryUrl(appData.platform, category.url)}}">{{::category.name}}</a></h4>
+                        </li>
+                    </ul>
+                </div>
                 <div class="description">
+                    <h2>DESCRIPTION</h2>
                     <div ng-if="display.fullDescription">
                         <p class="body-text" ng-bind-html="::appData.description | formatDescription"></p>
                     </div>
@@ -100,18 +110,9 @@
                     </div>
                 </div>
             </div>
-            <div class="app-categories" ng-if="::appData.categories.length > 0">
-                <h2>CATEGORY CHARTS</h2>
-                <ul>
-                    <li ng-repeat="category in ::appData.categories">
-                        <p class="position" ng-bind="::category.position | ordinalNumber"></p>
-                        <h4><a class="body-link underline-on-hover" href="{{::url.createCategoryUrl(appData.platform, category.url)}}">{{::category.name}}</a></h4>
-                    </li>
-                </ul>
-            </div>
             <div class="technical-info">
                 <h2>DETAILS</h2>
-                <p class="seller"><span class="label">By</span>&nbsp;{{::appData.sellerName}}</p>
+                <p class="seller"><span class="label">By</span>&nbsp;{{::appData.devName}}</p>
                 <p class="language"><span class="label">Size</span>&nbsp;{{::appData.fileSizeBytes | formatBytes}}</p>
                 <p class="last-updated"><span class="label">First Released</span>&nbsp;{{::appData.releaseDate | formatDate}}</p>
             </div>
