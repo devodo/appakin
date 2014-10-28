@@ -25,17 +25,19 @@ a.basic-button {
 // SOCIAL MEDIA
 
 .social-media-links {
+  width: 70px;
+
   a {
     display: block;
-    width: 32px;
-    height: 32px;
+    width: 28px;
+    height: 28px;
     font-size: 28px;
     text-align: center;
     color: $main-spot-colour;
   }
 
   a.facebook {
-    margin-right: 2px;
+    margin-right: 6px;
   }
 
   a.facebook:after { @include icon($facebook-icon); }
@@ -43,6 +45,16 @@ a.basic-button {
 
   a.facebook:active, a.facebook:hover { color: $facebook-colour; }
   a.twitter:active, a.twitter:hover { color: $twitter-colour; }
+}
+
+.platform-menu .social-media-links {
+  position: absolute;
+  right: 0px;
+  top: -8px;
+
+  @include mq($to: mobile-landscape) {
+    display: none;
+  }
 }
 
 // AKIN LOGO
