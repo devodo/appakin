@@ -639,9 +639,10 @@ h2 {
 
   .mobile-download-button {
     clear: both;
-    border-top: 1px solid $light-drawing-colour;
-    border-bottom: 1px solid $light-drawing-colour;
-    padding-top: 6px;
+    //border-top: 1px solid $light-drawing-colour;
+    //border-bottom: 1px solid $light-drawing-colour;
+    //padding-top: 6px;
+    margin-bottom: 9px;
 
     @include mq($from: mobile-landscape) {
       display: none;
@@ -687,9 +688,12 @@ h2 {
 
   .app-icon-wrapper {
     display: block;
-    margin-bottom: 9px;
     float: left;
     position: relative;
+
+    @include mq($from: mobile-landscape) {
+      margin-bottom: 9px;
+    }
 
     img.app-icon {
       width: 175px;
@@ -765,8 +769,11 @@ h2 {
   .basic-info {
     @include clearfix;
     width: 126px;
-    margin-bottom: 9px;
     float: right;
+
+    @include mq($from: mobile-landscape) {
+      margin-bottom: 9px;
+    }
 
     @include mq($from: tablet) {
       width: 175px;
