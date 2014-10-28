@@ -28,6 +28,13 @@ TODO
 
 ## web.api
 
+### npm install
+
+crawler, slug and pg have build issues on Windows. I got around this with the following cmd, running it from the Visual Studio command line:
+npm install --msvs_version=2013 crawler
+
+Note that you need to have VS2013 installed for this to work. (I have the full version of VS2013 installed.)
+
 ### JSHint 
 
 Cd to the /src/web.api directory and run 'gulp jshint'.
@@ -40,3 +47,14 @@ You can check the build by cding to /build.output/web.api and running 'npm start
 ### Running locally while developing
 
 If you're not wanting to run the API Web site in an IDE, just cd to the /src/web.api directory and run 'npm start'. Browse to http://localhost:3002/api/test/ping
+
+## Deployment
+
+on build:
+pscp -i d:\work\appakin-key.ppk -r d:\work\appakin\build-output\web-public ubuntu@appakin.com:v0.0.3
+
+on live machine:
+gunzip < file.tar.gz | tar xvf -
+sudo cp -r v0.0.3 /var/www/appakin/releases/
+
+sudo ln -sfn v0.0.3 current

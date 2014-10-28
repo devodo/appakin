@@ -41,7 +41,9 @@ gulp.task('build:copy', ['build:clean'], function() {
         './repos/**/*.*',
         './domain/**/*.*',
 		'./*.*',
-		'!./gulpfile.js'
+		'!./gulpfile.js',
+        '!./config-local.json',
+        '!./domain/search/docfreq.json'
 	];
 		
 	return gulp

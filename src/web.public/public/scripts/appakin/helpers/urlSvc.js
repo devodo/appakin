@@ -20,7 +20,7 @@
                     outUrl += '?cat_id=' + categoryExtId;
                 }
 
-                return outUrl
+                return outUrl;
             },
             createSearchUrl: function(query, searchType, platform) {
                 return '/search?q='+encodeURIComponent(query) +
