@@ -7,15 +7,7 @@ window width timeout
 
 lowercase logo version
 
-canonical url in app page - only different to url on app page but need to set canonical url on
-every angular page.
-
-link from category search result or category chart page to app needs to contain ext cat id as query string
-param.
-
 context query string param in search request urls to api.
-
-google analytics
 
 autocomplete selection - no indication that search is underway ?!?
 
@@ -23,9 +15,9 @@ twitter background on mobile
 
 problem of category charts on app page - chheam pi damnor
 
-unbind in google analytics plugin
-
 test category to app api urls when david commits his changes.
+
+nick's changes
 
 ------------
 
@@ -36,6 +28,9 @@ appearing header on scroll up - park this.
 404 and 500 static pages
 
 more button spinners on category results page
+
+canonical url in app page - only different to url on app page but need to set canonical url on
+every angular page.
 
 -------------
 

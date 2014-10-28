@@ -8,6 +8,6 @@
         .constant('webApiUrl', 'http://127.0.0.1:3002/')
         .constant('cacheApiRequests', true)
         .constant('angularDebugInfo', false)
-        .constant('googleAnalyticsTracking', true);
+        .constant('googleAnalyticsTracking', false);
 
 }()); // use strict

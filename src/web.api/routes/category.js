@@ -66,7 +66,6 @@ exports.init = function init(app) {
                 category.apps = apps;
 
                 delete category.id;
-                delete category.extId;
 
                 res.json(category);
             });

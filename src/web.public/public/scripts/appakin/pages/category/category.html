@@ -11,7 +11,7 @@
                 <!--ng-class="{'last':$last}">-->
                 <div class="app-summary-sidebar-wrapper">
                     <p class="position" ng-bind="::app.position | ordinalNumber"></p>
-                    <a href ng-click="::appsvc.loadAppPage(categoryData.platform, app.url, categoryData.id)">
+                    <a href ng-click="::appsvc.loadAppPage(categoryData.platform, app.url, categoryData.extId)">
                         <img ng-src="{{::app.artworkSmallUrl}}">
                     </a>
                     <p class="price" ng-bind="::app.price | formatPrice"></p>
@@ -19,7 +19,7 @@
                 <div class="app-summary-body-wrapper">
                     <h3>
                         <a class="underline-on-hover"
-                           href ng-click="::appsvc.loadAppPage(categoryData.platform, app.url, categoryData.id)"
+                           href ng-click="::appsvc.loadAppPage(categoryData.platform, app.url, categoryData.extId)"
                            ng-bind="::app.name"></a>
                     </h3>
                     <!--<button ng-click="category.excludeFromCategory(categoryData.extId, app.extId)">Exclude</button>-->
