@@ -13,11 +13,13 @@
         'angularSpinner',
         'angular-carousel',
         'duScroll',
-        'angular-data.DSCacheFactory'
+        'angular-data.DSCacheFactory',
+        'angulartics', 'angulartics.google.analytics'
     ]);
 
-    appAkin.config(function ($routeProvider, $locationProvider, $compileProvider, angularDebugInfo) {
+    appAkin.config(function ($routeProvider, $locationProvider, $compileProvider, angularDebugInfo, googleAnalyticsTracking, $analyticsProvider) {
         $compileProvider.debugInfoEnabled(angularDebugInfo);
+        $analyticsProvider.virtualPageviews(googleAnalyticsTracking);
 
         $routeProvider
             .when('/', {
@@ -69,11 +71,12 @@
                 templateUrl: '/public/templates/appakin/pages/app/app.html',
                 controller: 'AppCtrl',
                 resolve: {
-                    appData: ['$route', 'appApi', function($route, appApi) {
+                    appData: ['$route', 'appApi', 'app', function($route, appApi, app) {
                         return appApi.get(
                             $route.current.params.platform,
                             $route.current.params.encodedId,
-                            $route.current.params.slug
+                            $route.current.params.slug,
+                            app.fromCategoryExtId
                         );
                     }]
                 }

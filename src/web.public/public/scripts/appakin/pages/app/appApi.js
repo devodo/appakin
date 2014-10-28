@@ -5,14 +5,19 @@
         var appApi = httpGet();
 
         return {
-            get: function(platform, encodedId, slug) {
+            get: function(platform, encodedId, slug, fromCategoryExtId) {
                 var urlName = encodedId + '/' + slug;
                 var deferred = $q.defer();
+
+                var appUrl = platform + '/app/' + urlName;
+                if (fromCategoryExtId) {
+                    appUrl += '?cat_id=' + fromCategoryExtId;
+                }
 
                 loading.started();
 
                 appApi(
-                    platform + '/app/' + urlName,
+                    appUrl,
                     function (data) {
                         if (data.url !== urlName) {
                             $location.path(url.createAppUrl(platform, data.url)).replace();

@@ -80,7 +80,8 @@ gulp.task('build:config', ['build:clean'], function() {
             constants: {
                 webApiUrl: 'http://api.appakin.com/',
                 cacheApiRequests: true,
-                angularDebugInfo: false
+                angularDebugInfo: false,
+                googleAnalyticsTracking: true
             },
             wrap: ''
         }))
@@ -155,7 +156,6 @@ gulp.task('build:minify-images', ['build:clean'], function() {
 gulp.task('build:copy', ['build:clean'], function() {
 	var filesToCopy =
 	    [
-            './sitemap.txt',
             './public/fonts/*.*',
             './public/stylesheets/vendor/*.css',
             '!./bower.json', '!./gulpfile.js', '!./index.html'
@@ -166,6 +166,8 @@ gulp.task('build:copy', ['build:clean'], function() {
 
     fsSync.copy('./public/scripts/appakin/pages/privacy/privacy.html',
             buildRoot + '/templates/appakin/pages/privacy/privacy.html');
+
+    fsSync.copy('./sitemap.txt', buildRoot + '/sitemap.txt');
 
 	return gulp
 	    .src(filesToCopy, {base: './public'})

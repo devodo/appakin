@@ -917,6 +917,9 @@ h2 {
 
   .app-categories {
     li {
+      @include clearfix;
+      margin-bottom: 5px;
+
       .position {
         float: left;
         display: inline-block;

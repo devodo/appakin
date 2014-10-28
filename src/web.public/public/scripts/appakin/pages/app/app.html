@@ -6,7 +6,11 @@
     <div class="no-error-wrapper" ng-if="::!appData.serverError">
         <h1>{{::appData.censoredName}}</h1>
         <div class="sidebar">
-            <a class="app-icon-wrapper" href="{{::appData.storeUrl}}" rel="nofollow" target="{{::getLinkTarget()}}">
+            <a class="app-icon-wrapper"
+               href="{{::appData.storeUrl}}"
+               rel="nofollow"
+               target="{{::getLinkTarget()}}"
+               analytics-on="click" analytics-event="{{::analyticsEvent}}" analytics-category="{{::analyticsCategory}}" analytics-label="{{::analyticsLabel}}">
                 <img class="app-icon"
                      ng-src="{{::url.createAppleAppStoreImageUrl(appData.artworkMediumUrl, 175)}}">
             </a>
@@ -39,14 +43,22 @@
                     <span class="device tag-border"
                           ng-repeat="device in ::appData.supportedDevicesArray">{{::device}}</span>
                 </div>
-                <a class="download-button" href="{{::appData.storeUrl}}" rel="nofollow" target="{{::getLinkTarget()}}">
+                <a class="download-button"
+                   href="{{::appData.storeUrl}}"
+                   rel="nofollow"
+                   target="{{::getLinkTarget()}}"
+                   analytics-on="click" analytics-event="{{::analyticsEvent}}" analytics-category="{{::analyticsCategory}}" analytics-label="{{::analyticsLabel}}">
                     <img src="/images/app-store-badge.svg">
                 </a>
             </div>
         </div>
         <div class="body-wrapper">
             <div class="mobile-download-button">
-                <a class="download-button" href="{{::appData.storeUrl}}" rel="nofollow" target="{{::getLinkTarget()}}">
+                <a class="download-button"
+                   href="{{::appData.storeUrl}}"
+                   rel="nofollow"
+                   target="{{::getLinkTarget()}}"
+                   analytics-on="click" analytics-event="{{::analyticsEvent}}" analytics-category="{{::analyticsCategory}}" analytics-label="{{::analyticsLabel}}">
                     <img src="/images/app-store-badge.svg">
                 </a>
             </div>

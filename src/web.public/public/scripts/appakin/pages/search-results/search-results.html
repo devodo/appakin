@@ -44,14 +44,14 @@
                                 <div class="app-summary-sidebar-wrapper">
                                     <p class="position" ng-bind="::app.position | ordinalNumber"></p>
                                     <a class="img-wrapper"
-                                       href="{{::url.createAppUrl(app.platform, app.url)}}" >
+                                       href ng-click="::appsvc.loadAppPage(app.platform, app.url, category.id)">
                                         <img ng-src="{{::app.imageUrl}}">
                                     </a>
                                     <p class="price" ng-bind="::app.price | formatPrice"></p>
                                 </div>
                                 <div class="app-summary-body-wrapper">
                                     <h3>
-                                        <a class="underline-on-hover" href="{{::url.createAppUrl(app.platform, app.url)}}"
+                                        <a class="underline-on-hover" href ng-click="::appsvc.loadAppPage(app.platform, app.url, category.id)"
                                            ng-bind-html="::app.highlight.name ? app.highlight.name : app.name"></a>
                                     </h3>
                                     <p class="tight-lines description" ng-bind-html="::(app.highlight.desc ? app.highlight.desc + '&hellip;' : '')  | removeRules"></p>
@@ -80,7 +80,7 @@
                         class="app-summary app-search-app-summary"
                         ng-class="::{ last: $last }">
                         <div class="app-summary-sidebar-wrapper">
-                            <a href="{{::url.createAppUrl(app.platform, app.url)}}">
+                            <a href ng-click="::appsvc.loadAppPage(app.platform, app.url, null)">
                                 <img ng-src="{{::app.imageUrl}}">
                             </a>
                             <p class="price" ng-bind="::app.price | formatPrice"></p>
@@ -88,7 +88,7 @@
                         <div class="app-summary-body-wrapper">
                             <h3>
                                 <a class="underline-on-hover"
-                                   href="{{::url.createAppUrl(app.platform, app.url)}}"
+                                   href ng-click="::appsvc.loadAppPage(app.platform, app.url, null)"
                                    ng-bind-html="::app.highlight.name ? app.highlight.name : app.name"></a>
                             </h3>
                             <p class="tight-lines description"

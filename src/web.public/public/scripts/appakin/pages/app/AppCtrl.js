@@ -20,6 +20,10 @@
                 search.resetSearchTerm();
                 app.updateSearch();
 
+                $scope.analyticsEvent = 'AppStoreLinkClicked';
+                $scope.analyticsCategory = 'Affiliation';
+                $scope.analyticsLabel = ''; // TODO: make this the ios/out url
+
                 $scope.appData = appData;
                 $scope.app = app;
                 $scope.url = url;

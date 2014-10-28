@@ -1,6 +1,6 @@
 (function () {'use strict';
 
-    angular.module('appAkin').controller('CategoryCtrl', function($scope, $document, $route, search, pageTitle, category, url,platform) {
+    angular.module('appAkin').controller('CategoryCtrl', function($scope, $document, $route, search, pageTitle, category, url, platform, app) {
         $scope.categoryData = $route.current.locals.categoryData;
 
         if ($scope.categoryData && !$scope.categoryData.serverError) {
@@ -15,6 +15,7 @@
         $scope.category = category;
         $scope.url = url;
         $scope.platform = platform;
+        $scope.appsvc = app;
 
         $scope.$on('$destroy', function() {
             category.cancel();

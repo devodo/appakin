@@ -1,11 +1,12 @@
 (function () {'use strict';
 
     angular.module('appAkin').controller('SearchResultsCtrl',
-        function($scope, $window, $timeout, $location, $route, pageTitle, search, searchApi, url) {
+        function($scope, $window, $timeout, $location, $route, pageTitle, search, searchApi, url, app) {
             pageTitle.setPageTitle('AppAkin Search Results');
 
             $scope.search = search;
             $scope.searchApi = searchApi;
+            $scope.appsvc = app;
             $scope.url = url;
             $scope.numPages = 5;
             $scope.searchResults = $route.current.locals.searchData;
