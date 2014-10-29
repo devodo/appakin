@@ -42,15 +42,10 @@
                 templateUrl: '/public/templates/appakin/pages/search-results/search-results.html',
                 controller: 'SearchResultsCtrl',
                 resolve: {
-                    searchData: ['$route', 'search', 'searchApi', function($route, search, searchApi) {
+                    searchData: ['search', 'searchApi', function(search, searchApi) {
                         search.updateSearchFromUrl();
 
-                        return searchApi.get(
-                            $route.current.params.p,
-                            $route.current.params.q,
-                            $route.current.params.type,
-                            $route.current.params.page
-                        );
+                        return searchApi.get(search.searchContext);
                     }]
                 }
             })

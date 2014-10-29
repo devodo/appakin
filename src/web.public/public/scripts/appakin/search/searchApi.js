@@ -81,7 +81,7 @@
 
                 return deferred.promise;
             },
-            get: function() {
+            get: function(searchContext) {
                 var deferred = $q.defer();
 
                 if (search.searchTerm === '') {
@@ -99,10 +99,18 @@
                 var typeApiName = search.searchType === 'category' ? 'cat' : 'app';
                 var page = search.currentPage;
 
+                var searchUrl = platformApiName + '/search/' + typeApiName +
+                    '?q='+encodeURIComponent(localSearchTerm) +
+                    '&p='+encodeURIComponent(page);
+
+                var cacheSearchUrl = searchUrl;
+
+                if (searchContext) {
+                    searchUrl += '&cxt=' + searchContext;
+                }
+
                 searchApi(
-                    platformApiName + '/search/' + typeApiName +
-                        '?q='+encodeURIComponent(localSearchTerm) +
-                        '&p='+encodeURIComponent(page),
+                    searchUrl,
                     function(data) {
                         addPlatform(data.categories, localPlatform);
 
@@ -147,7 +155,8 @@
                         search.searchInProgress = false;
                         handleResponse(newResults);
                     },
-                    true
+                    true,
+                    cacheSearchUrl
                 );
 
                 function handleResponse(data) {

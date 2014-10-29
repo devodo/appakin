@@ -73,13 +73,12 @@
                         $scope.searchFilter = suggestion;
 
                         if($scope.onSelect) {
-                            $scope.onSelect(suggestion);
+                            $scope.onSelect(suggestion, true);
                         }
                     }
 
                     $scope.completing = false;
                     $scope.setIndex(-1);
-                    //$scope.inputElement[0].blur();
                 };
 
                 $scope.clear = function(e) {
@@ -232,6 +231,7 @@
 
                             if(index !== -1) {
                                 scope.select(angular.element(angular.element(this).find('li')[index]).text());
+                                e.preventDefault();
                             }
 
                             scope.setIndex(-1);

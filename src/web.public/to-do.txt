@@ -17,10 +17,6 @@ twitter background on mobile
 nick's changes
  - home page additions
  - header - rethink it.
- 
-google analytics bug?
-
-Add out url to tracking
 
 ------------
 
@@ -40,3 +36,8 @@ every angular page.
 appannie
 
 scores
+
+
+----------------
+
+goo matches goo.gl - prob shouldn't

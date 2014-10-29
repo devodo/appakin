@@ -10,13 +10,13 @@
                 $scope.platform = platform;
                 var submitSearchTimeout = null;
 
-                $scope.submitSearch = function(value) {
+                $scope.submitSearch = function(value, isAutocompleteSearch) {
                     if (submitSearchTimeout) {
                         $timeout.cancel(submitSearchTimeout);
                     }
 
                     submitSearchTimeout = $timeout(function() {
-                        search.submitSearch(1);
+                        search.submitSearch(1, isAutocompleteSearch);
                     }, 0);
                 };
 

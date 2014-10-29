@@ -11,7 +11,9 @@
                 $scope.status = { isOpen: false };
                 var submitSearchTimeout = null;
 
-                $scope.submitSearch = function(value) {
+                $scope.submitSearch = function(value, isAutocompleteSearch) {
+                    console.log('submitted ' + isAutocompleteSearch);
+
                     if (submitSearchTimeout) {
                         $timeout.cancel(submitSearchTimeout);
                     }
@@ -22,7 +24,7 @@
                             document.activeElement.blur();
                         }
 
-                        search.submitSearch(1);
+                        search.submitSearch(1, isAutocompleteSearch);
                     }, 0);
                 };
 

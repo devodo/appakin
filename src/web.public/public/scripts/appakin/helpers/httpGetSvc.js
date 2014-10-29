@@ -31,12 +31,13 @@
                     };
                 }
 
-                function doRequest(relativeUrl, success, error, isCacheable) {
+                function doRequest(relativeUrl, success, error, isCacheable, cacheRelativeUrl) {
                     resetCurrentRequest();
                     var url = webApiUrl + relativeUrl;
+                    var cacheUrl = webApiUrl + (cacheRelativeUrl || relativeUrl);
 
                     if (isCacheable) {
-                        var cachedData = apiCache.get(createCacheKey(url));
+                        var cachedData = apiCache.get(createCacheKey(cacheUrl));
 
                         if (cachedData) {
                             currentRequest.active = false;
@@ -81,8 +82,8 @@
                             console.log('Successful api call: url=' + url);
 
                             if (data && isCacheable) {
-                                apiCache.set(createCacheKey(url), data, true);
-                                console.log('added data to cache for url ' + url);
+                                apiCache.set(createCacheKey(cacheUrl), data, true);
+                                console.log('added data to cache for cache url ' + cacheUrl);
                             }
 
                             if (success) {

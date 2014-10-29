@@ -32,8 +32,8 @@
                 platform: platform.getInitialPlatform(),
                 currentPage: defaultCurrentPage,
                 searchType: defaultSearchType,
+                searchContext: null,
                 searchInProgress: false,
-                //results: createResultsObject(true),
                 autoComplete: {
                     active: true,
                     terms: []
@@ -126,12 +126,13 @@
                         me.service.currentPage = defaultCurrentPage;
                     }
                 },
-                submitSearch: function(page) {
+                submitSearch: function(page, isAutocompleteSearch) {
                     if (me.service.searchTerm === '') {
                         return;
                     }
 
                     me.service.cancelAutoComplete();
+                    me.service.searchContext = isAutocompleteSearch ? 'auto' : 'manual';
 
                     var search = {
                         q: me.service.searchTerm,
