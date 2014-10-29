@@ -18,8 +18,6 @@
                 }
 
                 timeoutHandle = $timeout(function() {scope.$apply();}, 0);
-                //scope.$apply();
-                // TODO: remove this timeout?
             });
 
             function getWindowWidth() {

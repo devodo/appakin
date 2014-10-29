@@ -12,6 +12,10 @@
         var deregisterAutocompleteFocused = $scope.$on(
             'autocomplete.focused',
             function() {
+                if (!$scope.windowIsNarrow) {
+                    return;
+                }
+
                 var searchbox = angular.element(document.querySelector('#searchbox-home'));
 
                 $scope.autocompleteFocused = true;
@@ -30,6 +34,10 @@
         var deregisterAutocompleteBlurred = $scope.$on(
             'autocomplete.blurred',
             function() {
+                if (!$scope.windowIsNarrow) {
+                    return;
+                }
+
                 $document.scrollTop(0, 500);
 
                 if (blurTimer) {

@@ -7,12 +7,12 @@ window width timeout
 
 lowercase logo version
 
-context query string param in search request urls to api.
-      - whether clicked on autocomplete or entered search term
-
-autocomplete selection - no indication that search is underway ?!?
-
 twitter background on mobile
+
+stop search box move on home page if screen is tallish.
+- maybe do better solution
+
+lower search box on home page on mobile.
 
 nick's changes
  - home page additions
