@@ -7,10 +7,14 @@
         <h1>{{::appData.name}}</h1>
         <div class="sidebar">
             <a class="app-icon-wrapper"
-               href="{{::url.createAppStoreOutUrl('ios', appData.extId, app.fromCategoryExtId)}}"
+               href="{{::outUrl}}"
                rel="nofollow"
                target="{{::getLinkTarget()}}"
-               analytics-on="click" analytics-event="{{::analyticsEvent}}" analytics-category="{{::analyticsCategory}}" analytics-label="{{::analyticsLabel}}">
+               analytics-on="click"
+               analytics-if="::googleAnalyticsTracking"
+               analytics-event="{{::analyticsEvent}}"
+               analytics-category="{{::analyticsCategory}}"
+               analytics-label="{{::analyticsLabel}}">
                 <img class="app-icon"
                      ng-src="{{::url.createAppleAppStoreImageUrl(appData.artworkMediumUrl, 175)}}">
             </a>
@@ -44,10 +48,14 @@
                           ng-repeat="device in ::appData.supportedDevicesArray">{{::device}}</span>
                 </div>
                 <a class="download-button"
-                   href="{{::url.createAppStoreOutUrl('ios', appData.extId, app.fromCategoryExtId)}}"
+                   href="{{::outUrl}}"
                    rel="nofollow"
                    target="{{::getLinkTarget()}}"
-                   analytics-on="click" analytics-event="{{::analyticsEvent}}" analytics-category="{{::analyticsCategory}}" analytics-label="{{::analyticsLabel}}">
+                   analytics-on="click"
+                   analytics-if="::googleAnalyticsTracking"
+                   analytics-event="{{::analyticsEvent}}"
+                   analytics-category="{{::analyticsCategory}}"
+                   analytics-label="{{::analyticsLabel}}">
                     <img src="/images/app-store-badge.svg">
                 </a>
             </div>
@@ -55,10 +63,14 @@
         <div class="body-wrapper">
             <div class="mobile-download-button">
                 <a class="download-button"
-                   href="{{::url.createAppStoreOutUrl('ios', appData.extId, app.fromCategoryExtId)}}"
+                   href="{{::outUrl}}"
                    rel="nofollow"
                    target="{{::getLinkTarget()}}"
-                   analytics-on="click" analytics-event="{{::analyticsEvent}}" analytics-category="{{::analyticsCategory}}" analytics-label="{{::analyticsLabel}}">
+                   analytics-on="click"
+                   analytics-if="::googleAnalyticsTracking"
+                   analytics-event="{{::analyticsEvent}}"
+                   analytics-category="{{::analyticsCategory}}"
+                   analytics-label="{{::analyticsLabel}}">
                     <img src="/images/app-store-badge.svg">
                 </a>
             </div>

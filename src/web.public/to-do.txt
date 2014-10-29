@@ -8,16 +8,19 @@ window width timeout
 lowercase logo version
 
 context query string param in search request urls to api.
+      - whether clicked on autocomplete or entered search term
 
 autocomplete selection - no indication that search is underway ?!?
 
 twitter background on mobile
 
-problem of category charts on app page - chheam pi damnor
-
-test category to app api urls when david commits his changes.
-
 nick's changes
+ - home page additions
+ - header - rethink it.
+ 
+google analytics bug?
+
+Add out url to tracking
 
 ------------
 

@@ -3,7 +3,7 @@
 
     angular.module('appAkin').controller(
         'AppAkin',
-        function($scope, $location, pageTitle, $rootScope, loading, $document, $timeout, url, search, cache) {
+        function($scope, $location, $analytics, pageTitle, $rootScope, loading, $document, $timeout, url, search, cache, googleAnalyticsTracking) {
             $scope.pageTitle = pageTitle;
 
             var scrollCache = cache('scrollCache', 10, true);
@@ -48,6 +48,10 @@
                         loading.reset();
 
                         scrollUrlKey = $location.url();
+
+                        if (googleAnalyticsTracking) {
+                            $analytics.pageTrack($location.url());
+                        }
                     },
                     0);
             });

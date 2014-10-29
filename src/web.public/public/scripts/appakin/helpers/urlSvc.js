@@ -13,14 +13,17 @@
             createAppUrl: function(platform, urlName) {
                 return '/' + platform + '/app/' + urlName;
             },
-            createAppStoreOutUrl: function(platform, appExtId, categoryExtId) {
-                var outUrl = webApiUrl + platform + '/out/' + appExtId;
+            createAppStoreOutRelativeUrl: function(platform, appExtId, categoryExtId) {
+                var outUrl = platform + '/out/' + appExtId;
 
                 if (categoryExtId) {
                     outUrl += '?cat_id=' + categoryExtId;
                 }
 
                 return outUrl;
+            },
+            createAppStoreOutUrl: function(relativeOutUrl) {
+                return webApiUrl + relativeOutUrl;
             },
             createSearchUrl: function(query, searchType, platform) {
                 return '/search?q='+encodeURIComponent(query) +

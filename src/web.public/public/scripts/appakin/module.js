@@ -17,9 +17,9 @@
         'angulartics', 'angulartics.google.analytics'
     ]);
 
-    appAkin.config(function ($routeProvider, $locationProvider, $compileProvider, angularDebugInfo, googleAnalyticsTracking, $analyticsProvider) {
+    appAkin.config(function ($routeProvider, $locationProvider, $compileProvider, angularDebugInfo, $analyticsProvider) {
         $compileProvider.debugInfoEnabled(angularDebugInfo);
-        $analyticsProvider.virtualPageviews(googleAnalyticsTracking);
+        $analyticsProvider.virtualPageviews(false);
 
         $routeProvider
             .when('/', {
