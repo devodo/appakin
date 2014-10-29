@@ -21,7 +21,8 @@
                 "cores": {
                     "auto": "appakin_auto",
                     "category": "appakin_cat",
-                    "app": "appakin_app"
+                    "app": "appakin_app",
+                    "cluster": "appakin_cluster"
                 }
             }
         },

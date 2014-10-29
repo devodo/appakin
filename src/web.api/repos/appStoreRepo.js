@@ -273,6 +273,44 @@ var getAppIndexBatch = function(client, lastId, limit, next) {
     });
 };
 
+var getClusterIndexBatch = function(client, lastId, limit, next) {
+    var queryStr =
+        "SELECT a.app_id, a.ext_id, a.name, a.description, t.is_cat_app\n" +
+        "FROM appstore_app a\n" +
+        "JOIN (\n" +
+        "  SELECT a.app_id, bool_or(ca.id is not null) as is_cat_app\n" +
+        "  FROM appstore_app a\n" +
+        "  LEFT JOIN category_app ca on a.app_id = ca.app_id\n" +
+        "  WHERE a.app_id > $1\n" +
+        "  GROUP BY a.app_id\n" +
+        "  ORDER BY a.app_id\n" +
+        "  LIMIT $2\n" +
+        ") t ON a.app_id = t.app_id;";
+
+    var queryParams = [
+        lastId,
+        limit
+    ];
+
+    client.query(queryStr, queryParams, function (err, result) {
+        if (err) {
+            return next(err);
+        }
+
+        var items = result.rows.map(function(item) {
+            return {
+                id: item.app_id,
+                extId: item.ext_id,
+                name: item.name,
+                description: item.description,
+                isCategoryApp: item.is_cat_app
+            };
+        });
+
+        next(null, items);
+    });
+};
+
 var getCategoryAppsIndexBatch = function(client, lastId, limit, next) {
     var queryStr =
         "SELECT a.app_id, a.ext_id, a.name, a.description, a.store_url, a.supported_devices,\n" +
@@ -498,6 +536,20 @@ exports.getAppIndexBatch = function(lastId, limit, next) {
         }
 
         getAppIndexBatch(conn.client, lastId, limit, function(err, results) {
+            conn.close(err, function(err) {
+                next(err, results);
+            });
+        });
+    });
+};
+
+exports.getClusterIndexBatch = function(lastId, limit, next) {
+    connection.open(function(err, conn) {
+        if (err) {
+            return next(err);
+        }
+
+        getClusterIndexBatch(conn.client, lastId, limit, function(err, results) {
             conn.close(err, function(err) {
                 next(err, results);
             });

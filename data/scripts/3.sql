@@ -17,4 +17,4 @@ CREATE TABLE referral_audit
   CONSTRAINT referral_audit_store_id_fkey FOREIGN KEY (store_id)
   REFERENCES store (id) MATCH SIMPLE
   ON UPDATE NO ACTION ON DELETE NO ACTION
-)
+);

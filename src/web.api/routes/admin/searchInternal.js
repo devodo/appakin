@@ -4,6 +4,8 @@ var log = require('../../logger');
 var autoIndexer = require('../../domain/search/autoIndexer');
 var catIndexer = require('../../domain/search/categoryIndexer');
 var appIndexer = require('../../domain/search/appIndexer');
+var clusterIndexer = require('../../domain/search/clusterIndexer');
+var clusterSearcher = require('../../domain/search/clusterSearcher');
 
 exports.init = function init(app) {
     app.post('/admin/search/auto/rebuild', function (req, res) {
@@ -43,6 +45,20 @@ exports.init = function init(app) {
         log.debug("Starting rebuild of app index");
 
         appIndexer.rebuild(batchSize, function(err) {
+            if (err) {
+                log.error(err);
+                return res.status(500).json(err);
+            }
+
+            res.json({status: 'success'});
+        });
+    });
+
+    app.post('/admin/search/cluster/rebuild', function (req, res) {
+        var batchSize = 10000;
+        log.debug("Starting rebuild of cluster index");
+
+        clusterIndexer.rebuild(batchSize, function(err) {
             if (err) {
                 log.error(err);
                 return res.status(500).json(err);

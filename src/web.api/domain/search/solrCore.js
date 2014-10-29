@@ -171,6 +171,12 @@ exports.getAutoSolrCore = function() {
     return solrCore;
 };
 
+exports.getClusterCore = function() {
+    var coreName = config.search.solr.cores.cluster;
+    var solrCore = createSolrCore(coreName);
+    return solrCore;
+};
+
 
 
 
