@@ -47,9 +47,14 @@ a.basic-button {
   a.twitter:active, a.twitter:hover { color: #999; }
 }
 
-.home-header-wrapper .social-media-links {
+.home-header-wrapper .social-media-links,
+#about .social-media-links {
   a.facebook:active, a.facebook:hover { color: $facebook-colour !important; }
   a.twitter:active, a.twitter:hover { color: $twitter-colour !important; }
+}
+
+#about .social-media-links {
+  width: 100px;
 }
 
 .platform-menu .social-media-links {
