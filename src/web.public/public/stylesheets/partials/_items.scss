@@ -1225,6 +1225,10 @@ h2 {
       padding-bottom: 24px;
     }
 
+    @include mq($to: tablet) {
+      margin-top: 75px;
+    }
+
     .instruction {
       float: left;
       width: 33%;
@@ -1275,10 +1279,16 @@ h2 {
 
         .img.one {
           background-image: url(/images/category-search-results-@2x.jpg);
+          background-position: -20px 0px;
         }
 
         .img.two {
           background-image: url(/images/category-@2x.jpg);
+          background-position: 0px -20px;
+
+          @include mq($from: mobile-landscape, $to: tablet) {
+            background-position: 0px -33px;
+          }
         }
 
         .img.three {
