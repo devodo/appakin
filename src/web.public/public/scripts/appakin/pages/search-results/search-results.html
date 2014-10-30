@@ -11,7 +11,7 @@
     </h1>
     <p class="error" ng-if="::searchResults.serverError">
         <span class="icon"></span>There was a problem getting your search result.
-        Please try again, or if the problem persists please try later.
+        Please try refreshing the page, or if the problem persists please try later.
     </p>
     <div class="no-error-wrapper" ng-if="::!searchResults.serverError">
         <p class="info underline-on-hover" ng-if="::!(searchResults.items && searchResults.items.length > 0)">

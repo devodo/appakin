@@ -1,6 +1,7 @@
 <div id="category" class="main-wrapper">
     <p class="error" ng-if="::categoryData.serverError">
-        <span class="icon"></span>There was a problem getting the category details. Please try again, or if the problem persists please try later.
+        <span class="icon"></span>There was a problem getting the category details.
+        Please try refreshing the page, or if the problem persists please try later.
     </p>
     <div class="no-error-wrapper" ng-if="::!categoryData.serverError">
         <h1>{{::categoryData.name}}</h1>
