@@ -1251,6 +1251,10 @@ h2 {
           margin-bottom: 24px;
         }
 
+        @include mq($from: mobile-landscape, $to: tablet) {
+          width: 130px;
+        }
+
         .img {
           width: 160px;
           height: 160px;
@@ -1260,6 +1264,13 @@ h2 {
           -webkit-box-shadow: inset 0 0 10px #555;
           -moz-box-shadow: inset 0 0 10px #555;
           box-shadow: inset 0 0 10px #555;
+
+          @include mq($from: mobile-landscape, $to: tablet) {
+            width: 130px;
+            height: 130px;
+            @include border-top-radius(64.9px);
+            @include border-bottom-radius(64.9px);
+          }
         }
 
         .img.one {

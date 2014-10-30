@@ -43,8 +43,13 @@ a.basic-button {
   a.facebook:after { @include icon($facebook-icon); }
   a.twitter:after { @include icon($twitter-icon); }
 
-  a.facebook:active, a.facebook:hover { color: $facebook-colour; }
-  a.twitter:active, a.twitter:hover { color: $twitter-colour; }
+  a.facebook:active, a.facebook:hover { color: #999; }
+  a.twitter:active, a.twitter:hover { color: #999; }
+}
+
+.home-header-wrapper .social-media-links {
+  a.facebook:active, a.facebook:hover { color: $facebook-colour !important; }
+  a.twitter:active, a.twitter:hover { color: $twitter-colour !important; }
 }
 
 .platform-menu .social-media-links {
