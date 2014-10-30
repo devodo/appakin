@@ -1,14 +1,19 @@
 'use strict';
+
+var lineReader = require('line-reader');
+var async = require('async');
+
 var solrClusterCore = require('./solrCore').getClusterCore();
 var solrCategoryCore = require('./solrCore').getCategoryCore();
 var config = require('../../config');
-var lineReader = require('line-reader');
+var adminRepo = require('../../repos/appStoreAdminRepo');
 
-var MAX_TERMS = 25;
+
+var MAX_TERMS = 40;
 var USE_BOOST = true;
-var BOOST_SMOOTH = 0.2;
-var TITLE_POSITION_DECAY = 0.1;
-var DESC_POSITION_DECAY = 0.3;
+var BOOST_SMOOTH = 0.85;
+var TITLE_POSITION_DECAY = 0.2;
+var DESC_POSITION_DECAY = 0.4;
 var TERM_FREQ_BOOST = 0.2;
 var TITLE_BOOST = 1.2;
 
@@ -268,9 +273,65 @@ var search = function(appId, next) {
     });
 };
 
+var runTrainingTest = function(next) {
+    adminRepo.getClusterTrainingData(function(err, trainingItems) {
+        if (err) { return next(err); }
+
+        var hits = [];
+        var misses = [];
+
+        var processItem = function(trainingItem, callback) {
+            search(trainingItem.appId, function(err, searchResults) {
+                if (err) { return callback(err); }
+                var topResult = {
+                    expected: trainingItem
+                };
+
+                if (searchResults.categories.length > 0) {
+                    topResult.result = searchResults.categories[0];
+
+                    var catId = trainingItem.categoryId.replace(/\-/g, '');
+                    var isMatch = catId === topResult.result.id;
+
+                    if (isMatch) {
+                        hits.push(topResult);
+                    } else {
+                        misses.push(topResult);
+                    }
+                }
+                else {
+                    misses.push(topResult);
+                }
+
+                callback();
+            });
+        };
+
+        async.eachSeries(trainingItems, processItem, function(err) {
+            if (err) { return next(err); }
+
+            var testResult = {
+                misses: misses,
+                hits: hits
+            };
+
+            next(null, testResult);
+        });
+    });
+};
+
 exports.searchSimilarByName = searchSimilarByName;
-exports.getKeywords = getKeywords;
+
+exports.getKeywords = function(appId, num, next) {
+    getKeywords(appId, function(err, keywords) {
+        if (err) { return next(err); }
+
+        next(null, keywords.slice(0, num));
+    });
+};
+
 exports.search = search;
+exports.runTrainingTest = runTrainingTest;
 
 
 

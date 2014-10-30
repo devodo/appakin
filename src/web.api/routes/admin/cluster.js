@@ -27,12 +27,17 @@ exports.init = function init(app) {
 
     app.get('/admin/cluster/keywords/:appId', function (req, res, next) {
         var appId = req.params.appId;
+        var rows = req.query.rows ? parseInt(req.query.rows, 10) : 1000;
 
         if (!appId || appId.trim() === '') {
             return res.status(400).send('Bad app id string');
         }
 
-        clusterSearcher.getKeywords(appId, function (err, result) {
+        if (isNaN(rows)) {
+            return res.status(400).send("Bad rows request parameter");
+        }
+
+        clusterSearcher.getKeywords(appId, rows, function (err, result) {
             if (err) {
                 return next(err);
             }
@@ -49,6 +54,16 @@ exports.init = function init(app) {
         }
 
         clusterSearcher.search(appId, function (err, result) {
+            if (err) {
+                return next(err);
+            }
+
+            res.json(result);
+        });
+    });
+
+    app.get('/admin/cluster/test', function (req, res, next) {
+        clusterSearcher.runTrainingTest(function (err, result) {
             if (err) {
                 return next(err);
             }

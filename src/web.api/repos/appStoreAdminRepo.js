@@ -636,6 +636,33 @@ var insertXyoCategoryMap = function(client, categoryId, xyoCategoryId, next) {
     });
 };
 
+var getClusterTrainingData = function(client, next) {
+    var queryStr =
+        "SELECT ct.id, ct.app_ext_id, ct.category_ext_id, c.name as cat_name, a.name as app_name\n" +
+        "FROM category_cluster_training ct\n" +
+        "JOIN category c on ct.category_ext_id = c.ext_id\n" +
+        "JOIN appstore_app a on ct.app_ext_id = a.ext_id\n" +
+        "ORDER BY id";
+
+    client.query(queryStr, function (err, result) {
+        if (err) {
+            return next(err);
+        }
+
+        var results = result.rows.map(function(row) {
+            return {
+                id: row.id,
+                appId: row.app_ext_id,
+                categoryId: row.category_ext_id,
+                appName: row.app_name,
+                categoryName: row.cat_name
+            };
+        });
+
+        next(null, results);
+    });
+};
+
 exports.insertAppStoreApp = function(app, next) {
     connection.open(function(err, conn) {
         if (err) {
@@ -842,6 +869,20 @@ exports.insertCategoryAppExclude = function(categoryExtId, appExtId, next) {
         }
 
         insertCategoryAppExclude(conn.client, categoryExtId, appExtId, function(err, results) {
+            conn.close(err, function(err) {
+                next(err, results);
+            });
+        });
+    });
+};
+
+exports.getClusterTrainingData = function(next) {
+    connection.open(function(err, conn) {
+        if (err) {
+            return next(err);
+        }
+
+        getClusterTrainingData(conn.client, function(err, results) {
             conn.close(err, function(err) {
                 next(err, results);
             });
