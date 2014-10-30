@@ -16,6 +16,7 @@
     "debug": "~0.7.4",
     "express": "~4.2.0",
     "express-bunyan-logger": "^1.0.0",
+    "languagedetect": "^1.1.1",
     "line-reader": "^0.2.4",
     "morgan": "~1.0.0",
     "natural": "^0.1.28",

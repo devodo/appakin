@@ -58,3 +58,9 @@ gunzip < file.tar.gz | tar xvf -
 sudo cp -r v0.0.3 /var/www/appakin/releases/
 
 sudo ln -sfn v0.0.3 current
+readlink -f current
+
+sudo rm -rf node_modules
+sudo npm install
+
+sudo restart appakin

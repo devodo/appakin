@@ -663,6 +663,108 @@ var getClusterTrainingData = function(client, next) {
     });
 };
 
+var getAppAnalysisBatch = function(client, lastId, limit, next) {
+    var queryStr =
+        "SELECT a.app_id, a.name, a.description\n" +
+        "FROM appstore_app a\n" +
+        "WHERE a.app_id > $1\n" +
+        "ORDER BY a.app_id\n" +
+        "limit $2;";
+
+    var queryParams = [
+        lastId,
+        limit
+    ];
+
+    client.query(queryStr, queryParams, function (err, result) {
+        if (err) {
+            return next(err);
+        }
+
+        var items = result.rows.map(function(item) {
+            return {
+                app_id: item.app_id,
+                name: item.name,
+                description: item.description
+            };
+        });
+
+        next(null, items);
+    });
+};
+
+var insertCategoryAppExclude = function(client, categoryExtId, appExtId, next) {
+    var insertStr =
+        "INSERT INTO category_app_exclude(category_id, app_id, date_created)\n" +
+        "VALUES (\n" +
+        "  (select id from category where ext_id = $1),\n" +
+        "  (select id from app where ext_id = $2),\n" +
+        "  NOW() at time zone 'utc')\n" +
+        "RETURNING id;";
+
+    var insertParams = [
+        categoryExtId,
+        appExtId
+    ];
+
+    client.query(insertStr, insertParams, function (err, result) {
+        if (err) {
+            return next(err);
+        }
+
+        next(null, result.rows[0].id);
+    });
+};
+
+var upsertAppAnalysis = function(client, appAnalysis, next) {
+    var queryStr =
+        "WITH new_values (app_id, english_description, description_length, name_length) AS (\n" +
+        "    values ($1::integer, $2::double precision, $3::integer, $4::integer)\n" +
+        "),\n" +
+        "upsert AS\n" +
+        "( \n" +
+        "    UPDATE app_analysis aa \n" +
+        "    SET english_description = nv.english_description,\n" +
+        "        description_length = nv.description_length,\n" +
+        "        name_length = nv.name_length,\n" +
+        "        date_modified = NOW() at time zone 'utc'\n" +
+        "    FROM new_values nv\n" +
+        "    WHERE aa.app_id = nv.app_id\n" +
+        "    RETURNING aa.*\n" +
+        ")\n" +
+        "INSERT INTO app_analysis (\n" +
+        "    app_id,\n" +
+        "    english_description,\n" +
+        "    description_length,\n" +
+        "    name_length,\n" +
+        "    date_created,\n" +
+        "    date_modified)\n" +
+        "SELECT\n" +
+        "    app_id,\n" +
+        "    english_description,\n" +
+        "    description_length,\n" +
+        "    name_length,\n" +
+        "    NOW() at time zone 'utc',\n" +
+        "    NOW() at time zone 'utc'\n" +
+        "FROM new_values\n" +
+        "WHERE NOT EXISTS (SELECT 1 FROM upsert up WHERE up.app_id = new_values.app_id);"
+
+    var queryParams = [
+        appAnalysis.app_id,
+        appAnalysis.english_description,
+        appAnalysis.description_length,
+        appAnalysis.name_length
+    ];
+
+    client.query(queryStr, queryParams, function (err, result) {
+        if (err) {
+            return next(err);
+        }
+
+        next(null, appAnalysis.app_id);
+    });
+};
+
 exports.insertAppStoreApp = function(app, next) {
     connection.open(function(err, conn) {
         if (err) {
@@ -885,6 +987,34 @@ exports.getClusterTrainingData = function(next) {
         getClusterTrainingData(conn.client, function(err, results) {
             conn.close(err, function(err) {
                 next(err, results);
+            });
+        });
+    });
+};
+
+exports.getAppAnalysisBatch = function(lastId, limit, next) {
+    connection.open(function(err, conn) {
+        if (err) {
+            return next(err);
+        }
+
+        getAppAnalysisBatch(conn.client, lastId, limit, function(err, results) {
+            conn.close(err, function(err) {
+                next(err, results);
+            });
+        });
+    });
+};
+
+exports.upsertAppAnalysis = function(appAnalysis, next) {
+    connection.open(function(err, conn) {
+        if (err) {
+            return next(err);
+        }
+
+        upsertAppAnalysis(conn.client, appAnalysis, function(err, appId) {
+            conn.close(err, function(err) {
+                next(err, appId);
             });
         });
     });
