@@ -210,8 +210,11 @@ var getAppCategories = function(client, appId, skip, take, next) {
         "FROM category c\n" +
         "JOIN category_app ca ON c.id = ca.category_id\n" +
         "LEFT JOIN category_popularity cp ON c.id = cp.category_id\n" +
+        "LEFT JOIN category_app_exclude ca_e on ca.category_id = ca_e.category_id\n" +
+        "AND ca.app_id = ca_e.app_id\n" +
         "WHERE ca.app_id = $1\n" +
         "AND c.date_deleted is null\n" +
+        "AND ca_e.id is null\n" +
         "ORDER BY ca.position, ca.id\n" +
         "LIMIT $2 OFFSET $3";
 
