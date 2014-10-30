@@ -24,7 +24,8 @@
                     "app": "appakin_app",
                     "cluster": "appakin_cluster"
                 }
-            }
+            },
+            "stopwordFile": "domain/search/stopwords_en.txt"
         },
         "itunes": {
             "affiliateId": "10lNjB"

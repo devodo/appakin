@@ -1,6 +1,30 @@
 'use strict';
 var solrClusterCore = require('./solrCore').getClusterCore();
 var solrCategoryCore = require('./solrCore').getCategoryCore();
+var config = require('../../config');
+var lineReader = require('line-reader');
+
+var MAX_TERMS = 25;
+var USE_BOOST = true;
+var BOOST_SMOOTH = 0.2;
+var TITLE_POSITION_DECAY = 0.1;
+var DESC_POSITION_DECAY = 0.3;
+var TERM_FREQ_BOOST = 0.2;
+var TITLE_BOOST = 1.2;
+
+var stopwords = null;
+
+var isStopWord = function(word) {
+    if (!stopwords) {
+        stopwords = {};
+        lineReader.eachLine(config.search.stopwordFile, function(line) {
+            if (line.match(/'^\s*#'/)) { return; } // ignore commented lines
+            stopwords[line] = true;
+        });
+    }
+
+    return stopwords[word];
+};
 
 var searchSimilarByName = function(appId, rows, next) {
     var options = {
@@ -79,16 +103,20 @@ var parseTermStats = function(fieldArray, minDocFreq, minTermLength) {
 
     for (var i = 0; i < numStems; i++) {
         var indexBase = i * 2;
+        var term = fieldArray[indexBase];
+
+        if (term.length < minTermLength) {
+            continue;
+        }
+
+        if (isStopWord(term)) {
+            continue;
+        }
+
         var stats = fieldArray[indexBase + 1];
         var docFreq = stats[7];
 
         if (docFreq < minDocFreq) {
-            continue;
-        }
-
-        var term = fieldArray[indexBase];
-
-        if (term.length < minTermLength) {
             continue;
         }
 
@@ -105,7 +133,7 @@ var parseTermStats = function(fieldArray, minDocFreq, minTermLength) {
 };
 
 var getTermStats = function(appId, minDocFreq, minTermLength, next) {
-    var solrQuery = 'q=' + appId;
+    var solrQuery = 'q=' + appId.replace(/\-/g, '');
 
     solrClusterCore.client.get('keyword', solrQuery, function (err, obj) {
         if (err) { return next(err); }
@@ -141,7 +169,8 @@ var getKeywords = function(appId, next) {
 
         termStats.name.forEach(function(term) {
             var tfIdfExp = Math.pow(10, term.tfIdf);
-            var score = log(10, (1.0 * tfIdfExp) / term.termFreq);
+            var positionFactor = 1 / (Math.pow(term.positions[0] + 1, TITLE_POSITION_DECAY));
+            var score = log(10, (tfIdfExp * TITLE_BOOST) / term.termFreq) * positionFactor;
 
             keywordMap[term.term] = {
                 keyword: term.term,
@@ -160,7 +189,8 @@ var getKeywords = function(appId, next) {
             }
 
             var tfIdfExp = Math.pow(10, term.tfIdf);
-            var score = log(10, tfIdfExp * Math.pow(term.termFreq, 0.2));
+            var positionFactor = 1 / (Math.pow(term.positions[0] + 1, DESC_POSITION_DECAY));
+            var score = log(10, tfIdfExp * Math.pow(term.termFreq, TERM_FREQ_BOOST)) * positionFactor;
 
             keyword.score += score;
         });
@@ -173,22 +203,33 @@ var getKeywords = function(appId, next) {
             return b.score - a.score;
         });
 
+        keywords.forEach(function(keyword) {
+            var diff = keywords[0].score - keyword.score;
+            var smooth = keywords[0].score - (diff * BOOST_SMOOTH);
+            keyword.boost = (keyword.score / smooth);
+        });
+
         next(null, keywords);
     });
 };
 
-var buildSearchQuery = function(keywords, maxTerms) {
+var buildSearchQuery = function(keywords, useBoost, maxTerms) {
     var queryTerms = [];
     for (var i = 0; i < keywords.length && i < maxTerms; i++) {
-        var boost = keywords[i].score / keywords[0].score;
-        queryTerms.push(solrClusterCore.escapeSpecialCharsAllowQuotes(keywords[i].keyword) + '^' + boost);
+        var queryTerm = solrClusterCore.escapeSpecialChars(keywords[i].keyword);
+
+        if (useBoost) {
+            queryTerm += '^' + keywords[i].boost;
+        }
+
+        queryTerms.push(queryTerm);
     }
 
     return encodeURIComponent(queryTerms.join(' '));
 };
 
 var searchKeywords = function(appId, keywords, next) {
-    var q = buildSearchQuery(keywords, 25);
+    var q = buildSearchQuery(keywords, USE_BOOST, MAX_TERMS);
     var solrQuery = 'rows=' + 20 + '&qq=' + q + '&app_id=' + appId;
 
     solrCategoryCore.client.get('cluster', solrQuery, function (err, obj) {
