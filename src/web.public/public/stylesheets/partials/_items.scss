@@ -1244,6 +1244,7 @@ h2 {
 
       @include mq($to: mobile-landscape) {
         width: 300px;
+        margin-bottom: 60px;
       }
 
       .img-wrapper {
@@ -1314,6 +1315,12 @@ h2 {
         width: 120px;
         border-top: 1px solid $main-spot-colour;
         @include centred-margins;
+      }
+    }
+
+    .instruction.last {
+      @include mq($to: mobile-landscape) {
+        margin-bottom: 30px;
       }
     }
   }
