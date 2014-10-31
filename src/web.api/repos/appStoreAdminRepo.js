@@ -765,6 +765,27 @@ var upsertAppAnalysis = function(client, appAnalysis, next) {
     });
 };
 
+var insertCategoryClusterTest = function(client, appId, result, next) {
+    var queryStr =
+        "INSERT INTO category_cluster_test(app_ext_id, category_ext_id, score, date_created)\n" +
+        "VALUES ($1, $2, $3, NOW() at time zone 'utc')\n" +
+        "RETURNING id;";
+
+    var queryParams = [
+        appId,
+        result.id,
+        result.score
+    ];
+
+    client.query(queryStr, queryParams, function (err, result) {
+        if (err) {
+            return next(err);
+        }
+
+        next(null, result.rows[0].id);
+    });
+};
+
 exports.insertAppStoreApp = function(app, next) {
     connection.open(function(err, conn) {
         if (err) {
@@ -937,6 +958,29 @@ exports.resetAppPopularities = function(appStoreBatchId, next) {
     });
 };
 
+var insertCategoryAppExclude = function(client, categoryExtId, appExtId, next) {
+    var insertStr =
+        "INSERT INTO category_app_exclude(category_id, app_id, date_created)\n" +
+        "VALUES (\n" +
+        "  (select id from category where ext_id = $1),\n" +
+        "  (select id from app where ext_id = $2),\n" +
+        "  NOW() at time zone 'utc')\n" +
+        "RETURNING id;";
+
+    var insertParams = [
+        categoryExtId,
+        appExtId
+    ];
+
+    client.query(insertStr, insertParams, function (err, result) {
+        if (err) {
+            return next(err);
+        }
+
+        next(null, result.rows[0].id);
+    });
+};
+
 exports.getMissingXyoCategories = getMissingXyoCategories;
 exports.insertCategory = insertCategory;
 exports.insertXyoCategoryMap = insertXyoCategoryMap;
@@ -964,34 +1008,6 @@ exports.getClusterTrainingData = function(next) {
         getClusterTrainingData(conn.client, function(err, results) {
             conn.close(err, function(err) {
                 next(err, results);
-            });
-        });
-    });
-};
-
-exports.getAppAnalysisBatch = function(lastId, limit, next) {
-    connection.open(function(err, conn) {
-        if (err) {
-            return next(err);
-        }
-
-        getAppAnalysisBatch(conn.client, lastId, limit, function(err, results) {
-            conn.close(err, function(err) {
-                next(err, results);
-            });
-        });
-    });
-};
-
-exports.upsertAppAnalysis = function(appAnalysis, next) {
-    connection.open(function(err, conn) {
-        if (err) {
-            return next(err);
-        }
-
-        upsertAppAnalysis(conn.client, appAnalysis, function(err, appId) {
-            conn.close(err, function(err) {
-                next(err, appId);
             });
         });
     });

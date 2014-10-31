@@ -62,8 +62,18 @@ exports.init = function init(app) {
         });
     });
 
-    app.get('/admin/cluster/test', function (req, res, next) {
+    app.get('/admin/cluster/training_test', function (req, res, next) {
         clusterSearcher.runTrainingTest(function (err, result) {
+            if (err) {
+                return next(err);
+            }
+
+            res.json(result);
+        });
+    });
+
+    app.post('/admin/cluster/cluster_test', function (req, res, next) {
+        clusterSearcher.runClusterTest(1000, function (err, result) {
             if (err) {
                 return next(err);
             }

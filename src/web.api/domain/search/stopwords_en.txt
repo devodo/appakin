@@ -16,7 +16,6 @@ also
 an
 and
 any
-app
 are
 as
 at
@@ -34,20 +33,16 @@ fun
 get
 has
 have
-hd
 how
 if
 in
 into
-ipad
-iphone
 is
 it
 just
 many
 more
 most
-new
 no
 not
 now
@@ -84,3 +79,5 @@ which
 with
 you
 your
+www
+com
