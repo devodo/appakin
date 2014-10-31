@@ -5,7 +5,6 @@ var autoIndexer = require('../../domain/search/autoIndexer');
 var catIndexer = require('../../domain/search/categoryIndexer');
 var appIndexer = require('../../domain/search/appIndexer');
 var clusterIndexer = require('../../domain/search/clusterIndexer');
-var clusterSearcher = require('../../domain/search/clusterSearcher');
 
 exports.init = function init(app) {
     app.post('/admin/search/auto/rebuild', function (req, res) {
@@ -25,12 +24,28 @@ exports.init = function init(app) {
     });
 
     app.post('/admin/search/cat/rebuild', function (req, res) {
-        var numAppDescriptions = 10;
-        var numChartApps = 6;
-
         log.debug("Starting rebuild of category index");
 
-        catIndexer.rebuild(numAppDescriptions, numChartApps, function(err) {
+        catIndexer.rebuild(function(err) {
+            if (err) {
+                log.error(err);
+                return res.status(500).json(err);
+            }
+
+            res.json({status: 'success'});
+        });
+    });
+
+    app.get('/admin/search/cat/index/:categoryId', function (req, res) {
+        var categoryId = parseInt(req.params.categoryId, 10);
+
+        if (isNaN(categoryId)) {
+            return res.status(400).send('Bad category id in query string');
+        }
+
+        log.debug("Starting index of category: " + categoryId);
+
+        catIndexer.rebuildCategory(categoryId, function(err) {
             if (err) {
                 log.error(err);
                 return res.status(500).json(err);

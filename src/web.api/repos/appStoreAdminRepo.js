@@ -1012,3 +1012,31 @@ exports.getClusterTrainingData = function(next) {
         });
     });
 };
+
+exports.getAppAnalysisBatch = function(lastId, limit, next) {
+    connection.open(function(err, conn) {
+        if (err) {
+            return next(err);
+        }
+
+        getAppAnalysisBatch(conn.client, lastId, limit, function(err, results) {
+            conn.close(err, function(err) {
+                next(err, results);
+            });
+        });
+    });
+};
+
+exports.upsertAppAnalysis = function(appAnalysis, next) {
+    connection.open(function(err, conn) {
+        if (err) {
+            return next(err);
+        }
+
+        upsertAppAnalysis(conn.client, appAnalysis, function(err, appId) {
+            conn.close(err, function(err) {
+                next(err, appId);
+            });
+        });
+    });
+};

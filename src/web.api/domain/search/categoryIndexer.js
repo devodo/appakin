@@ -10,7 +10,7 @@ var PARENT_TYPE = 1;
 var CHILD_TYPE = 2;
 
 
-var addCategory = function(category, apps, numAppDescriptions, numChartApps, next) {
+var addCategory = function(category, apps, next) {
     var catId = category.extId.replace(/\-/g, '');
 
     var children = apps.map(function(app) {
@@ -45,7 +45,7 @@ var addCategory = function(category, apps, numAppDescriptions, numChartApps, nex
     });
 };
 
-var rebuild = function(numAppDescriptions, numChartApps, next) {
+var rebuild = function(next) {
     appStoreRepo.getCategories(function (err, categories) {
         if (err) {
             return next(err);
@@ -58,7 +58,7 @@ var rebuild = function(numAppDescriptions, numChartApps, next) {
                     return callback(err);
                 }
 
-                addCategory(category, apps, numAppDescriptions, numChartApps, function (err) {
+                addCategory(category, apps, function (err) {
                     callback(err);
                 });
             });
@@ -78,6 +78,29 @@ var rebuild = function(numAppDescriptions, numChartApps, next) {
                 log.debug("Solr optimising");
                 solrCore.optimise(function (err) {
                     next(err);
+                });
+            });
+        });
+    });
+};
+
+var rebuildCategory = function(categoryId, next) {
+    appStoreRepo.getCategory(categoryId, function (err, category) {
+        if (err) { return next(err); }
+        if (!category) { return next("No category found for id: " + categoryId); }
+
+        log.debug("Adding category: " + category.name);
+        appStoreRepo.getCategoryAppsForIndex(category.id, function (err, apps) {
+            if (err) { return next(err); }
+
+            addCategory(category, apps, function (err) {
+                if (err) { return next(err); }
+
+                log.debug("Solr committing changes");
+                solrCore.commit(function (err) {
+                    if (err) { return next(err); }
+
+                    next();
                 });
             });
         });
@@ -172,6 +195,7 @@ var getCategoryKeywords = function(categoryId, next) {
 
 exports.saveCorpusTermFrequency = saveCorpusTermFrequency;
 exports.rebuild = rebuild;
+exports.rebuildCategory = rebuildCategory;
 exports.getCategoryKeywords = getCategoryKeywords;
 
 

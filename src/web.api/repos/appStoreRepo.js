@@ -203,6 +203,40 @@ var getCategories = function(client, next) {
     });
 };
 
+var getCategory = function(client, categoryId, next) {
+    var queryStr =
+        "SELECT c.id, c.ext_id, c.name, c.description,\n" +
+        "c.date_created, c.date_modified, c.date_deleted, cp.popularity\n" +
+        "FROM category c\n" +
+        "LEFT JOIN category_popularity cp\n" +
+        "ON c.id = cp.category_id\n" +
+        "WHERE c.id = $1;";
+
+    client.query(queryStr, [categoryId], function (err, result) {
+        if (err) {
+            return next(err);
+        }
+
+        var category = null;
+
+        if (result.rows.length > 0) {
+            var item = result.rows[0];
+            category = {
+                    id: item.id,
+                    extId: item.ext_id,
+                    name: item.name,
+                    description: item.description,
+                    dateCreated: item.date_created,
+                    dateModified: item.date_modified,
+                    dateDeleted: item.date_deleted,
+                    popularity: item.popularity
+            };
+        }
+
+        next(null, category);
+    });
+};
+
 var getAppCategories = function(client, appId, skip, take, next) {
     var queryStr =
         "SELECT c.id, c.ext_id, c.name,\n" +
@@ -513,6 +547,20 @@ exports.getCategories = function(next) {
         getCategories(conn.client, function(err, results) {
             conn.close(err, function(err) {
                 next(err, results);
+            });
+        });
+    });
+};
+
+exports.getCategory = function(categoryId, next) {
+    connection.open(function(err, conn) {
+        if (err) {
+            return next(err);
+        }
+
+        getCategory(conn.client, categoryId, function(err, result) {
+            conn.close(err, function(err) {
+                next(err, result);
             });
         });
     });

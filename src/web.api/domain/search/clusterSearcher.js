@@ -11,14 +11,15 @@ var appStoreRepo = require('../../repos/appStoreRepo');
 var log = require('../../logger');
 
 
-var MAX_TERMS = 40;
+var MAX_TERMS = 50;
 var USE_BOOST = true;
 var BOOST_SMOOTH = 0.95;
 var TITLE_POSITION_DECAY = 0.1;
 var DESC_POSITION_DECAY = 0.1;
 var TERM_FREQ_BOOST = 1.5;
 var TITLE_BOOST = 1.1;
-var IDF_DECAY = 0.5;
+var TITLE_IDF_FACTOR = 0.5;
+var DESC_IDF_FACTOR = 0.35;
 
 var stopwords = null;
 
@@ -178,7 +179,7 @@ var getKeywords = function(appId, next) {
         var keywordMap = {};
 
         termStats.name.forEach(function(term) {
-            var tfIdf = 1 / Math.pow(term.docFreq, IDF_DECAY);
+            var tfIdf = 1 / Math.pow(term.docFreq, TITLE_IDF_FACTOR);
             var positionFactor = 1 / (Math.pow(term.positions[0] + 1, TITLE_POSITION_DECAY));
             var score = TITLE_BOOST * tfIdf * positionFactor;
 
@@ -199,11 +200,12 @@ var getKeywords = function(appId, next) {
             }
 
             var tfBoost = Math.pow(term.termFreq, TERM_FREQ_BOOST);
-            var tfIdf = term.termFreq / Math.pow(term.docFreq / tfBoost, IDF_DECAY);
+            var tfIdf = tfBoost / Math.pow(term.docFreq, DESC_IDF_FACTOR);
             var positionFactor = 1 / (Math.pow(term.positions[0] + 1, DESC_POSITION_DECAY));
             var score = tfIdf * positionFactor;
 
             keyword.score += score;
+            keyword.score = logBase(10, keyword.score + 1);
             keyword.tfIdf = tfIdf;
             keyword.pos = positionFactor;
             keyword.termFreq = term.termFreq;
