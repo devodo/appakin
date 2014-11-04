@@ -665,7 +665,7 @@ var getClusterTrainingData = function(client, next) {
 
 var getAppAnalysisBatch = function(client, lastId, limit, next) {
     var queryStr =
-        "SELECT a.app_id, a.name, a.description\n" +
+        "SELECT a.app_id, a.ext_id, a.name, a.description\n" +
         "FROM appstore_app a\n" +
         "WHERE a.app_id > $1\n" +
         "ORDER BY a.app_id\n" +
@@ -684,6 +684,7 @@ var getAppAnalysisBatch = function(client, lastId, limit, next) {
         var items = result.rows.map(function(item) {
             return {
                 app_id: item.app_id,
+                ext_id: item.ext_id,
                 name: item.name,
                 description: item.description
             };
@@ -718,15 +719,19 @@ var insertCategoryAppExclude = function(client, categoryExtId, appExtId, next) {
 
 var upsertAppAnalysis = function(client, appAnalysis, next) {
     var queryStr =
-        "WITH new_values (app_id, english_description, description_length, name_length) AS (\n" +
-        "    values ($1::integer, $2::double precision, $3::integer, $4::integer)\n" +
+        "WITH new_values (app_id, desc_english_score, desc_length, name_length, desc_valid_term_count, desc_english_term_count, desc_english_position, desc_is_english) AS (\n" +
+        "    values ($1::integer, $2::double precision, $3::integer, $4::integer, $5::integer, $6::integer, $7::integer, $8::boolean)\n" +
         "),\n" +
         "upsert AS\n" +
         "( \n" +
         "    UPDATE app_analysis aa \n" +
-        "    SET english_description = nv.english_description,\n" +
-        "        description_length = nv.description_length,\n" +
+        "    SET desc_english_score = nv.desc_english_score,\n" +
+        "        desc_english_position = nv.desc_english_position,\n" +
+        "        desc_is_english = nv.desc_is_english,\n" +
+        "        desc_length = nv.desc_length,\n" +
         "        name_length = nv.name_length,\n" +
+        "        desc_valid_term_count = nv.desc_valid_term_count,\n" +
+        "        desc_english_term_count = nv.desc_english_term_count,\n" +
         "        date_modified = NOW() at time zone 'utc'\n" +
         "    FROM new_values nv\n" +
         "    WHERE aa.app_id = nv.app_id\n" +
@@ -734,26 +739,38 @@ var upsertAppAnalysis = function(client, appAnalysis, next) {
         ")\n" +
         "INSERT INTO app_analysis (\n" +
         "    app_id,\n" +
-        "    english_description,\n" +
-        "    description_length,\n" +
+        "    desc_english_score,\n" +
+        "    desc_english_position,\n" +
+        "    desc_is_english,\n" +
+        "    desc_length,\n" +
         "    name_length,\n" +
+        "    desc_valid_term_count,\n" +
+        "    desc_english_term_count,\n" +
         "    date_created,\n" +
         "    date_modified)\n" +
         "SELECT\n" +
         "    app_id,\n" +
-        "    english_description,\n" +
-        "    description_length,\n" +
+        "    desc_english_score,\n" +
+        "    desc_english_position,\n" +
+        "    desc_is_english,\n" +
+        "    desc_length,\n" +
         "    name_length,\n" +
+        "    desc_valid_term_count,\n" +
+        "    desc_english_term_count,\n" +
         "    NOW() at time zone 'utc',\n" +
         "    NOW() at time zone 'utc'\n" +
         "FROM new_values\n" +
-        "WHERE NOT EXISTS (SELECT 1 FROM upsert up WHERE up.app_id = new_values.app_id);"
+        "WHERE NOT EXISTS (SELECT 1 FROM upsert up WHERE up.app_id = new_values.app_id);";
 
     var queryParams = [
         appAnalysis.app_id,
-        appAnalysis.english_description,
-        appAnalysis.description_length,
-        appAnalysis.name_length
+        appAnalysis.desc_english_score,
+        appAnalysis.desc_length,
+        appAnalysis.name_length,
+        appAnalysis.desc_valid_term_count,
+        appAnalysis.desc_english_term_count,
+        appAnalysis.desc_english_position,
+        appAnalysis.desc_is_english
     ];
 
     client.query(queryStr, queryParams, function (err, result) {
