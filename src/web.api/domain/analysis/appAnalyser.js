@@ -58,7 +58,7 @@ var processApp = function(app, callback) {
             } else {
                 appAnalysis.desc_is_english =
                     appAnalysis.desc_english_score >= 0.1 && (
-                        appAnalysis.desc_english_position = 1 ||
+                        appAnalysis.desc_english_position === 1 ||
                         appAnalysis.desc_english_score >= 0.3 ||
                         (appAnalysis.desc_valid_term_count > 0 && (appAnalysis.desc_english_term_count / appAnalysis.desc_valid_term_count) > 0.6) ||
                         (appAnalysis.desc_english_term_count > (appAnalysis.desc_valid_term_count * 0.2) && appAnalysis.desc_english_position <= 2)
