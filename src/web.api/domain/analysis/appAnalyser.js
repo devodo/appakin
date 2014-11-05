@@ -102,7 +102,7 @@ var analyse = function(batchSize, next) {
         });
     };
 
-    processBatch(970000); // TODO: revert this!
+    processBatch(0);
 };
 
 exports.analyse = analyse;
