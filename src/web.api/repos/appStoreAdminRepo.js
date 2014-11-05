@@ -1057,3 +1057,17 @@ exports.upsertAppAnalysis = function(appAnalysis, next) {
         });
     });
 };
+
+exports.insertCategoryClusterTest = function(appId, result, next) {
+    connection.open(function(err, conn) {
+        if (err) {
+            return next(err);
+        }
+
+        insertCategoryClusterTest(conn.client, appId, result, function(err, id) {
+            conn.close(err, function(err) {
+                next(err, id);
+            });
+        });
+    });
+};

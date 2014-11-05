@@ -46,7 +46,7 @@ exports.init = function init(app) {
         });
     });
 
-    app.get('/admin/cluster/category/:appId', function (req, res, next) {
+    app.get('/admin/cluster/:appId', function (req, res, next) {
         var appId = req.params.appId;
 
         if (!appId || appId.trim() === '') {
@@ -54,6 +54,28 @@ exports.init = function init(app) {
         }
 
         clusterSearcher.search(appId, function (err, result) {
+            if (err) {
+                return next(err);
+            }
+
+            res.json(result);
+        });
+    });
+
+    app.get('/admin/cluster/category/:categoryId/:appId', function (req, res, next) {
+        var categoryId = req.params.categoryId;
+
+        if (!categoryId || categoryId.trim() === '') {
+            return res.status(400).send('Bad category id string');
+        }
+
+        var appId = req.params.appId;
+
+        if (!appId || appId.trim() === '') {
+            return res.status(400).send('Bad app id string');
+        }
+
+        clusterSearcher.searchCategory(appId, categoryId, function (err, result) {
             if (err) {
                 return next(err);
             }
@@ -74,6 +96,22 @@ exports.init = function init(app) {
 
     app.post('/admin/cluster/cluster_test', function (req, res, next) {
         clusterSearcher.runClusterTest(1000, function (err, result) {
+            if (err) {
+                return next(err);
+            }
+
+            res.json(result);
+        });
+    });
+
+    app.get('/admin/cluster/cluster_category_test/:categoryId', function (req, res, next) {
+        var categoryId = req.params.categoryId;
+
+        if (!categoryId || categoryId.trim() === '') {
+            return res.status(400).send('Bad category id string');
+        }
+
+        clusterSearcher.runClusterCategoryTest(categoryId, '8c7007d88a024096b00b68f92b68dfcd', function (err, result) {
             if (err) {
                 return next(err);
             }

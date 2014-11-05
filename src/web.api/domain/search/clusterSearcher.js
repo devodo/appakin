@@ -13,13 +13,13 @@ var log = require('../../logger');
 
 var MAX_TERMS = 50;
 var USE_BOOST = true;
-var BOOST_SMOOTH = 0.95;
+var BOOST_SMOOTH = 0.8;
 var TITLE_POSITION_DECAY = 0.1;
-var DESC_POSITION_DECAY = 0.1;
-var TERM_FREQ_BOOST = 1.5;
-var TITLE_BOOST = 1.1;
+var DESC_POSITION_DECAY = 0.3;
+var TERM_FREQ_BOOST = 1.2;
+var TITLE_BOOST = 1.5;
 var TITLE_IDF_FACTOR = 0.5;
-var DESC_IDF_FACTOR = 0.35;
+var DESC_IDF_FACTOR = 0.3;
 
 var stopwords = null;
 
@@ -123,6 +123,10 @@ var parseTermStats = function(fieldArray, minDocFreq, minTermLength) {
         if (isStopWord(term)) {
             continue;
         }
+
+        //if (term !== 'marbl' && term !== 'game') {
+        //    continue;
+        //}
 
         var stats = fieldArray[indexBase + 1];
         var docFreq = stats[7];
@@ -249,9 +253,13 @@ var buildSearchQuery = function(keywords, useBoost, maxTerms) {
     return encodeURIComponent(queryTerms.join(' '));
 };
 
-var searchKeywords = function(appId, keywords, next) {
+var searchKeywords = function(appId, keywords, categoryId, next) {
     var q = buildSearchQuery(keywords, USE_BOOST, MAX_TERMS);
     var solrQuery = 'rows=' + 20 + '&qq=' + q + '&app_id=' + appId;
+
+    if (categoryId) {
+        solrQuery += '&fq=id:' + categoryId;
+    }
 
     solrCategoryCore.client.get('cluster', solrQuery, function (err, obj) {
         if (err) {
@@ -285,7 +293,15 @@ var search = function(appId, next) {
     getKeywords(appId, function(err, keywords) {
         if (err) { return next(err); }
 
-        searchKeywords(appId, keywords, next);
+        searchKeywords(appId, keywords, null, next);
+    });
+};
+
+var searchCategory = function(appId, categoryId, next) {
+    getKeywords(appId, function(err, keywords) {
+        if (err) { return next(err); }
+
+        searchKeywords(appId, keywords, categoryId, next);
     });
 };
 
@@ -378,6 +394,46 @@ var runClusterTest = function(batchSize, next) {
     processBatch(0);
 };
 
+var runClusterCategoryTest = function(categoryId, extCategoryId, next) {
+    var processItem = function(app, callback) {
+        getKeywords(app.extId, function(err, keywords) {
+            if (err) { return next(err); }
+
+            if (keywords.length === 0) {
+                return callback();
+            }
+
+            var score = 0;
+            keywords.forEach(function(k) {
+                score += k.score;
+            });
+
+            var keywordResult = {
+                id: extCategoryId,
+                score: score
+            };
+
+            adminRepo.insertCategoryClusterTest(app.extId, keywordResult, function (err) {
+                callback(err);
+            });
+        });
+    };
+
+
+    appStoreRepo.getCategoryAppsForIndex(categoryId, function(err, apps) {
+        if (err) {
+            return next(err);
+        }
+
+        async.eachSeries(apps, processItem, function(err) {
+            if (err) { return next(err); }
+
+            log.debug("Completed clustering.");
+            return next();
+        });
+    });
+};
+
 exports.searchSimilarByName = searchSimilarByName;
 
 exports.getKeywords = function(appId, num, next) {
@@ -389,8 +445,10 @@ exports.getKeywords = function(appId, num, next) {
 };
 
 exports.search = search;
+exports.searchCategory = searchCategory;
 exports.runTrainingTest = runTrainingTest;
 exports.runClusterTest = runClusterTest;
+exports.runClusterCategoryTest = runClusterCategoryTest;
 
 
 
