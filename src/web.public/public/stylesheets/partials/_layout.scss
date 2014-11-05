@@ -129,10 +129,14 @@ header {
 
         @include mq($from: mobile-landscape) {
           display: table-cell;
-          min-width: 140px;
+          min-width: 90px;
           position: relative;
           top: 0px;
           vertical-align: middle;
+        }
+
+        @include mq($from: wide) {
+          min-width: 140px;
         }
       }
     }
