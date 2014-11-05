@@ -8,7 +8,9 @@ var createSolrDoc = function(app) {
     var doc = {
         id : app.extId.replace(/\-/g, ''),
         name: app.name,
-        desc: app.description
+        desc: app.description,
+        "primary_genre": app.genres[0],
+        genres: app.genres
     };
 
     return doc;
