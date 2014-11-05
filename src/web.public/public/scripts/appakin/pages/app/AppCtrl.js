@@ -32,6 +32,7 @@
                 $scope.app = app;
                 $scope.url = url;
                 $scope.platform = platform;
+                $scope.route = $route;
                 $scope.display = { fullDescription: false };
                 $scope.googleAnalyticsTracking = googleAnalyticsTracking;
 

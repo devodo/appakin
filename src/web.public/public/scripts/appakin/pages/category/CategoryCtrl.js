@@ -14,6 +14,7 @@
 
         $scope.category = category;
         $scope.url = url;
+        $scope.route = $route;
         $scope.platform = platform;
         $scope.appsvc = app;
 

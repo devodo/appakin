@@ -8,6 +8,7 @@
             $scope.searchApi = searchApi;
             $scope.appsvc = app;
             $scope.url = url;
+            $scope.route = $route;
             $scope.numPages = 5;
             $scope.searchResults = $route.current.locals.searchData;
 

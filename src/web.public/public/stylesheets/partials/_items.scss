@@ -34,6 +34,10 @@ p.error {
   .icon:before {
     @include icon($cross-icon);
   }
+
+  a {
+    color: $error-colour;
+  }
 }
 
 p.info {
