@@ -49,7 +49,18 @@ var getDescriptionStats = function(appId, next) {
             return next("Unexpected response from search server");
         }
 
-        var stats = parseTermStats(obj.termVectors[3][3]);
+        var stats = null;
+
+        if (!obj.termVectors || !obj.termVectors[3]) {
+            log.debug('Failed to get term vectors for app ' + appId);
+
+            stats = {
+                totalValidTerms: 0,
+                terms: []
+            };
+        } else {
+            stats = parseTermStats(obj.termVectors[3][3]);
+        }
 
         next(null, stats);
     });

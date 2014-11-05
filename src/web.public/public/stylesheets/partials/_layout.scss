@@ -47,20 +47,6 @@ footer {
   }
 }
 
-//#home-page.extended {
-//  padding-bottom: 225px;
-//}
-//
-//#home-page.extended-add {
-//  -webkit-transition: 1s linear all; /* Chrome */
-//  transition: 5s linear all;
-//  padding-bottom: 150px;
-//}
-//
-//#home-page.extended-add-active {
-//  padding-bottom: 225px;
-//}
-
 // HEADER LAYOUT
 
 ul.social-media-links {
@@ -183,7 +169,7 @@ main .main-wrapper {
   @include clearfix;
   max-width: $website-max-width;
   @include centred-margins;
-  padding: 6px 6px 20px 6px;
+  padding: 6px 12px 20px 12px;
 
   @include mq($from: mobile-landscape) {
     padding-left: 50px;

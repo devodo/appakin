@@ -159,7 +159,7 @@ $searchbox-button-colour: lighten($main-spot-colour, 25);
 $searchbox-border-colour: $control-border-colour;
 
 .searchbox {
-  padding: 0px 3px;
+  padding: 0px 6px;
 
   @include mq($from: mobile-landscape) {
     padding: 0px;

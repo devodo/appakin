@@ -646,7 +646,7 @@ h2 {
     }
 
     .download-button {
-      width: 308px;
+      width: 296px;
       padding: 6px 0px;
       display: block;
       clear: both;
@@ -693,8 +693,8 @@ h2 {
     }
 
     img.app-icon {
-      width: 175px;
-      height: 175px;
+      width: 162px;
+      height: 162px;
 
       @include mq($from: mobile-landscape) {
         width: 126px;
@@ -767,9 +767,11 @@ h2 {
     @include clearfix;
     width: 126px;
     float: right;
+    margin-right: 12px;
 
     @include mq($from: mobile-landscape) {
       margin-bottom: 9px;
+      margin-right: 0px;
     }
 
     @include mq($from: tablet) {
@@ -879,9 +881,8 @@ h2 {
 
   .description {
     clear: both;
-    padding: 0px 6px 0px 6px;
+    padding: 0px;
     margin-bottom: 12px;
-    //max-width: 500px;
 
     @include mq($from: mobile-landscape) {
       clear: none;
@@ -910,7 +911,7 @@ h2 {
   .app-categories,
   .screen-shots,
   .technical-info {
-    padding: 0px 6px;
+    padding: 0px;
     margin-bottom: 12px;
 
     h4 {
