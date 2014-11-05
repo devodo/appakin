@@ -314,7 +314,9 @@ var getClusterIndexBatch = function(client, lastId, limit, next) {
     var queryStr =
         "SELECT a.app_id, a.ext_id, a.name, a.description\n" +
         "FROM appstore_app a\n" +
-        "ORDER BY a.app_id;";
+        "WHERE a.app_id > $1\n" +
+        "ORDER BY a.app_id\n" +
+        "limit $2;";
 
     var queryParams = [
         lastId,
