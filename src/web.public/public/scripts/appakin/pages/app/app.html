@@ -4,7 +4,7 @@
         Please try refreshing the page, or if the problem persists please try later.
     </p>
     <div class="no-error-wrapper" ng-if="::!appData.serverError">
-        <h1>{{::appData.name}}</h1>
+        <h1 ng-bind="::appData.name"></h1>
         <div class="sidebar">
             <a class="app-icon-wrapper"
                href="{{::outUrl}}"
@@ -19,7 +19,7 @@
                      ng-src="{{::url.createAppleAppStoreImageUrl(appData.artworkMediumUrl, 175)}}">
             </a>
             <div class="basic-info">
-                <p class="price highlighted">{{::appData.price | formatPrice}}</p>
+                <p class="price highlighted" ng-bind="::appData.price | formatPrice"></p>
                 <div class="rating sidebar-section" ng-if="::appData.userRatingCurrent">
                     <h6>CURRENT RATING</h6>
                     <div ng-if="::appData.ratingCountCurrent >= 5"
@@ -37,15 +37,16 @@
                 </div>
                 <div class="age-rating single-line-sidebar-section">
                     <h6>AGE RATING</h6>
-                    <p>{{::appData.advisoryRating}}</p>
+                    <p ng-bind="::appData.advisoryRating"></p>
                 </div>
                 <div class="ios-version single-line-sidebar-section">
                     <h6>iOS VERSION</h6>
-                    <p>{{::appData.minOsVersion}}+</p>
+                    <p ng-bind="::appData.minOsVersion + '+'"></p>
                 </div>
                 <div class="supported-devices sidebar-section">
                     <span class="device tag-border"
-                          ng-repeat="device in ::appData.supportedDevicesArray">{{::device}}</span>
+                          ng-repeat="device in ::appData.supportedDevicesArray"
+                          ng-bind="::device"></span>
                 </div>
                 <a class="download-button"
                    href="{{::outUrl}}"
@@ -80,7 +81,8 @@
                     <ul>
                         <li ng-repeat="category in ::appData.categories">
                             <p class="position" ng-bind="::category.position | ordinalNumber"></p>
-                            <h4><a class="body-link underline-on-hover" href="{{::url.createCategoryUrl(appData.platform, category.url)}}">{{::category.name}}</a></h4>
+                            <h4><a class="body-link underline-on-hover" href="{{::url.createCategoryUrl(appData.platform, category.url)}}"
+                                    ng-bind="::category.name"></a></h4>
                         </li>
                     </ul>
                 </div>
