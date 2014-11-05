@@ -119,4 +119,20 @@ exports.init = function init(app) {
             res.json(result);
         });
     });
+
+    app.get('/admin/cluster/search_seed_app/:seedId', function (req, res, next) {
+        var seedId = req.params.seedId;
+
+        if (!seedId || isNaN(seedId)) {
+            return res.status(400).send('Bad seed Id query parameter');
+        }
+
+        clusterSearcher.getSeedApps(seedId, function (err, result) {
+            if (err) {
+                return next(err);
+            }
+
+            res.json(result);
+        });
+    });
 };

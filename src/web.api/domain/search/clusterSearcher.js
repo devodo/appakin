@@ -289,6 +289,85 @@ var searchKeywords = function(appId, keywords, categoryId, next) {
     });
 };
 
+var buildSeedQuery = function(seedSearch, includeDetails) {
+    var queryLines = seedSearch.query.
+        replace(/\r/g,'').
+        split(/\n/g).
+        filter(function(line) { //remove blank lines and comments
+            return line.trim() === '' || !line.match(/^\s*#/);
+        });
+
+    var queryTerms = encodeURIComponent(queryLines.join(' '));
+    var qq = 'q=' + queryTerms;
+    var rows = 'rows=' + seedSearch.maxTake;
+    var fl = includeDetails ? 'fl=id,name,desc,genres,score' : 'fl=id';
+
+    return qq + '&' + rows + '&' + fl;
+};
+
+var searchSeedApps = function(seedSearch, includeDetails, next) {
+    var solrQuery = buildSeedQuery(seedSearch, includeDetails);
+    log.debug("Get seed apps: " + solrQuery);
+
+    solrClusterCore.client.get('select', solrQuery, function (err, obj) {
+        if (err) { return next(err); }
+
+        if (!obj || !obj.response) {
+            return next("Unexpected response from search server");
+        }
+
+        var apps = obj.response.docs.map(function(doc, index) {
+            var app = {
+                position: index + 1,
+                name: doc.name,
+                desc: doc.desc,
+                genres: doc.genres,
+                extId: doc.id,
+                score: doc.score
+            };
+
+            return app;
+        });
+
+        var searchResult = {
+            total: obj.response.numFound,
+            apps: apps
+        };
+
+        next(null, searchResult);
+    });
+};
+
+var getSeedApps = function(seedSearchId, next) {
+    adminRepo.getSeedSearch(seedSearchId, function(err, seedSearch) {
+        if (err) { return next(err); }
+
+        searchSeedApps(seedSearch, true, function(err, searchResult) {
+            if (err) { return next(err); }
+
+            next(null, searchResult);
+        });
+    });
+};
+
+var addSeedApps = function(seedCategoryId, next) {
+    adminRepo.getSeedSearches(seedCategoryId, function(err, seedSearches) {
+        if (err) { return next(err); }
+
+        var processSeedSearch = function(seedSearch, callback) {
+
+        };
+
+        async.eachSeries(seedSearches, processSeedSearch, function(err) {
+            if (err) { return next(err); }
+
+
+        });
+
+    });
+
+};
+
 var search = function(appId, next) {
     getKeywords(appId, function(err, keywords) {
         if (err) { return next(err); }
@@ -449,6 +528,7 @@ exports.searchCategory = searchCategory;
 exports.runTrainingTest = runTrainingTest;
 exports.runClusterTest = runClusterTest;
 exports.runClusterCategoryTest = runClusterCategoryTest;
+exports.getSeedApps = getSeedApps;
 
 
 
