@@ -312,17 +312,9 @@ var getAppIndexBatch = function(client, lastId, limit, next) {
 
 var getClusterIndexBatch = function(client, lastId, limit, next) {
     var queryStr =
-        "SELECT a.app_id, a.ext_id, a.name, a.description, t.is_cat_app\n" +
+        "SELECT a.app_id, a.ext_id, a.name, a.description\n" +
         "FROM appstore_app a\n" +
-        "JOIN (\n" +
-        "  SELECT a.app_id, bool_or(ca.id is not null) as is_cat_app\n" +
-        "  FROM appstore_app a\n" +
-        "  LEFT JOIN category_app ca on a.app_id = ca.app_id\n" +
-        "  WHERE a.app_id > $1\n" +
-        "  GROUP BY a.app_id\n" +
-        "  ORDER BY a.app_id\n" +
-        "  LIMIT $2\n" +
-        ") t ON a.app_id = t.app_id;";
+        "ORDER BY a.app_id;";
 
     var queryParams = [
         lastId,

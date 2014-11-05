@@ -8,9 +8,7 @@ var createSolrDoc = function(app) {
     var doc = {
         id : app.extId.replace(/\-/g, ''),
         name: app.name,
-        desc: app.description,
-        "desc_top": solrCore.getTopWords(app.description, 200),
-        "is_cat_app": app.isCategoryApp
+        desc: app.description
     };
 
     return doc;
