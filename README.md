@@ -51,7 +51,9 @@ If you're not wanting to run the API Web site in an IDE, just cd to the /src/web
 ## Deployment
 
 on build:
-pscp -i d:\work\appakin-key.ppk -r d:\work\appakin\build-output\web-public ubuntu@appakin.com:v0.0.3
+pscp -i d:\work\appakin-key.ppk -r d:\work\appakin\build-output\web.public ubuntu@appakin.com:temp/
+<-- copies to temp/web.public
+
 
 on live machine:
 gunzip < file.tar.gz | tar xvf -
@@ -60,7 +62,9 @@ sudo cp -r v0.0.3 /var/www/appakin/releases/
 sudo ln -sfn v0.0.3 current
 readlink -f current
 
+sudo restart appakin
+
+------------------
+
 sudo rm -rf node_modules
 sudo npm install
-
-sudo restart appakin
