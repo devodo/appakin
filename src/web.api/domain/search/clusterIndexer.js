@@ -11,7 +11,8 @@ var createSolrDoc = function(app) {
         desc: app.description,
         "desc_top": solrCore.getTopWords(app.description, 200),
         "primary_genre": app.genres[0],
-        genres: app.genres
+        genres: app.genres,
+        popularity: app.popularity
     };
 
     return doc;

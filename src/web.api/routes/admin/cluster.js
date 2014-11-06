@@ -122,12 +122,13 @@ exports.init = function init(app) {
 
     app.get('/admin/cluster/search_seed_app/:seedId', function (req, res, next) {
         var seedId = req.params.seedId;
+        var boost = req.query.boost && !isNaN(req.query.boost) ? parseFloat(req.query.boost) : 1;
 
         if (!seedId || isNaN(seedId)) {
             return res.status(400).send('Bad seed Id query parameter');
         }
 
-        clusterSearcher.getSeedApps(seedId, function (err, result) {
+        clusterSearcher.getSeedApps(seedId, boost, function (err, result) {
             if (err) {
                 return next(err);
             }

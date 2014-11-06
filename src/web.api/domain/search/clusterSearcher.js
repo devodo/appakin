@@ -289,7 +289,7 @@ var searchKeywords = function(appId, keywords, categoryId, next) {
     });
 };
 
-var buildSeedQuery = function(seedSearch, includeDetails) {
+var buildSeedQuery = function(seedSearch, boostFactor, includeDetails) {
     var queryLines = seedSearch.query.
         replace(/\r/g,'').
         split(/\n/g).
@@ -298,18 +298,19 @@ var buildSeedQuery = function(seedSearch, includeDetails) {
         });
 
     var queryTerms = encodeURIComponent(queryLines.join(' '));
-    var qq = 'q=' + queryTerms;
+    var qq = 'qq=' + queryTerms;
     var rows = 'rows=' + seedSearch.maxTake;
-    var fl = includeDetails ? 'fl=id,name,desc,genres,score' : 'fl=id';
+    var fl = includeDetails ? 'fl=id,name,desc,genres,popularity,score' : 'fl=id';
+    var boost = 'b=' + (boostFactor ? boostFactor : 1);
 
-    return qq + '&' + rows + '&' + fl;
+    return qq + '&' + rows + '&' + fl + '&' + boost;
 };
 
-var searchSeedApps = function(seedSearch, includeDetails, next) {
-    var solrQuery = buildSeedQuery(seedSearch, includeDetails);
+var searchSeedApps = function(seedSearch, boostFactor, includeDetails, next) {
+    var solrQuery = buildSeedQuery(seedSearch, boostFactor, includeDetails);
     log.debug("Get seed apps: " + solrQuery);
 
-    solrClusterCore.client.get('select', solrQuery, function (err, obj) {
+    solrClusterCore.client.get('seed_search', solrQuery, function (err, obj) {
         if (err) { return next(err); }
 
         if (!obj || !obj.response) {
@@ -322,6 +323,7 @@ var searchSeedApps = function(seedSearch, includeDetails, next) {
                 name: doc.name,
                 desc: doc.desc,
                 genres: doc.genres,
+                popularity: doc.popularity,
                 extId: doc.id,
                 score: doc.score
             };
@@ -338,11 +340,11 @@ var searchSeedApps = function(seedSearch, includeDetails, next) {
     });
 };
 
-var getSeedApps = function(seedSearchId, next) {
+var getSeedApps = function(seedSearchId, boostFactor, next) {
     adminRepo.getSeedSearch(seedSearchId, function(err, seedSearch) {
         if (err) { return next(err); }
 
-        searchSeedApps(seedSearch, true, function(err, searchResult) {
+        searchSeedApps(seedSearch, boostFactor, true, function(err, searchResult) {
             if (err) { return next(err); }
 
             next(null, searchResult);

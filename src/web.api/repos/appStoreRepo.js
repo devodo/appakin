@@ -312,10 +312,12 @@ var getAppIndexBatch = function(client, lastId, limit, next) {
 
 var getClusterIndexBatch = function(client, lastId, limit, next) {
     var queryStr =
-        "SELECT a.app_id, a.ext_id, a.name, a.description, a.genres\n" +
+        "SELECT a.app_id, a.ext_id, a.name, a.description, a.genres, ap.popularity\n" +
         "FROM appstore_app a\n" +
         "INNER JOIN app_analysis aa\n" +
         "ON a.app_id = aa.app_id\n" +
+        "LEFT JOIN app_popularity ap\n" +
+        "ON a.app_id = ap.app_id\n" +
         "WHERE a.app_id > $1\n" +
         "AND aa.desc_is_english\n" +
         "ORDER BY a.app_id\n" +
@@ -337,7 +339,8 @@ var getClusterIndexBatch = function(client, lastId, limit, next) {
                 extId: item.ext_id,
                 name: item.name,
                 description: item.description,
-                genres: item.genres
+                genres: item.genres,
+                popularity: item.popularity
             };
         });
 
