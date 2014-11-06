@@ -1,7 +1,5 @@
 ﻿http://www.appakin.com/
 http://www.appakin.com/about
-http://www.appakin.com/terms
-http://www.appakin.com/privacy
 http://www.appakin.com/ios/category/eCVsMAz8SwWDEWnNt3mlQg/magazines
 http://www.appakin.com/ios/category/qkNMIL_MRA6xaHLPmOTkCQ/racing-games
 http://www.appakin.com/ios/category/u-IXjKXoRoeZ2r_ttglDjw/platform-games
