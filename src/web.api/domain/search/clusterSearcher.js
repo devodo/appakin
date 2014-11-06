@@ -301,7 +301,7 @@ var buildSeedQuery = function(seedSearch, boostFactor, includeDetails) {
     var qq = 'qq=' + queryTerms;
     var rows = 'rows=' + seedSearch.maxTake;
     var fl = includeDetails ? 'fl=id,name,desc,genres,popularity,score' : 'fl=id';
-    var boost = 'b=' + (boostFactor ? boostFactor : 1);
+    var boost = 'b=' + (boostFactor || boostFactor === 0 ? boostFactor : 1);
 
     return qq + '&' + rows + '&' + fl + '&' + boost;
 };
