@@ -220,6 +220,7 @@ h2 {
     clear: both;
     @include clearfix;
     display: table;
+    margin-top: 15px;
 
     .more-results-wrapper a:before,
     .category-chart-wrapper a:after{
@@ -363,16 +364,16 @@ h2 {
 }
 
 .category-search-app-summary {
-  $cat-app-summary-sidebar-wrapper-margin-right: 6px;
+  $cat-app-summary-sidebar-wrapper-margin-right: 9px;
 
   margin-top: 10px;
-  margin-bottom: 5px;
+  //margin-bottom: 5px;
 
   .app-summary-sidebar-wrapper {
     margin-right: $cat-app-summary-sidebar-wrapper-margin-right;
 
     @include mq($from: tablet) {
-      margin-right: $cat-app-summary-sidebar-wrapper-margin-right + 3px;
+      margin-right: $cat-app-summary-sidebar-wrapper-margin-right + 0px;
     }
 
     .position {
@@ -421,7 +422,7 @@ h2 {
     margin-left: $small-category-result-icon-dim + $cat-app-summary-sidebar-wrapper-margin-right;
 
     @include mq($from: tablet) {
-      margin-left: $large-category-result-icon-dim + $cat-app-summary-sidebar-wrapper-margin-right + 3px;
+      margin-left: $large-category-result-icon-dim + $cat-app-summary-sidebar-wrapper-margin-right + 0px;
     }
 
     p {
