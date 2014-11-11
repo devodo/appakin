@@ -66,4 +66,25 @@ exports.init = function init(app) {
         });
     });
 
+    app.get('/ios/app/:extId', function (req, res) {
+        var extId = req.params.extId;
+        if (!extId)
+        {
+            return res.status(400).send('Bad query string');
+        }
+
+        appStoreRepo.getAppByExtId(extId, function(err, app) {
+            if (err) {
+                log.error(err);
+                return res.status(500).send('Error retrieving app data');
+            }
+
+            if (!app) {
+                return res.status(404).send('App not found');
+            }
+
+            res.json(app);
+        });
+    });
+
 };
