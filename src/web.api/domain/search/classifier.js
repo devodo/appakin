@@ -35,8 +35,29 @@ Classifier.prototype.predict = function(matrix) {
 };
 
 var ClassifierAnalyser = function() {
-    this.titleTermMatrix = new TermMatrix(20, 3, 1, 0, 0.1, 0.5, 0.1);
-    this.descTermMatrix = new TermMatrix(50, 3, 1, 1.2, 0.3, 0.5, 0.1);
+    var resultSettings = {
+        maxTerms: 50,
+        smoothFactor: 0.1
+    };
+
+    var titleSettings = {
+        minDocFreq: 5,
+        minTermLength: 1,
+        tfBoost: 0,
+        positionDecay: 0.1,
+        dfWeight: 2.0,
+        titleBoost: 0.5
+    };
+
+    var descSettings = {
+        minDocFreq: 5,
+        minTermLength: 1,
+        tfBoost: 1.0,
+        positionDecay: 0.1,
+        dfWeight: 2.0
+    };
+
+    this.termMatrix = new TermMatrix(resultSettings, titleSettings, descSettings);
     this.docMap = {};
     this.docIndex = [];
 };
@@ -47,8 +68,7 @@ ClassifierAnalyser.prototype.totalDocs = function() {
 
 ClassifierAnalyser.prototype.addDoc = function(doc) {
     var self = this;
-    self.titleTermMatrix.addTermVector(doc.name);
-    self.descTermMatrix.addTermVector(doc.desc);
+    self.termMatrix.addDoc(doc);
     self.docMap[doc.id] = self.docIndex.length;
     self.docIndex.push(doc.id);
 };
@@ -61,9 +81,7 @@ ClassifierAnalyser.prototype.buildVectorMatrix = function() {
         vectorMatrix[i] = [];
     }
 
-    self.titleTermMatrix.buildTermMatrix(vectorMatrix, 0);
-    var indexOffset = self.titleTermMatrix.termIndex;
-    self.descTermMatrix.buildTermMatrix(vectorMatrix, indexOffset);
+    self.termMatrix.buildTermMatrix(vectorMatrix, 0);
 
     return {
         vectorMatrix: vectorMatrix,
@@ -74,44 +92,25 @@ ClassifierAnalyser.prototype.buildVectorMatrix = function() {
 
 ClassifierAnalyser.prototype.getDocTopTerms = function(doc) {
     var self = this;
-    var titleTerms = self.titleTermMatrix.getTopScoringTerms(doc.name);
-    var descTerms = self.descTermMatrix.getTopScoringTerms(doc.desc);
+    var result = self.termMatrix.getTopScoringTerms(doc);
 
-    return {
-        title: titleTerms,
-        desc: descTerms
-    };
+    return result;
 };
 
-ClassifierAnalyser.prototype.getTopTerms = function(titleLimit, descLimit) {
-    var self = this;
-    var titleTerms = self.titleTermMatrix.getTopTerms(titleLimit);
-    var descTerms = self.descTermMatrix.getTopTerms(descLimit);
-
-    return {
-        title: titleTerms,
-        desc: descTerms
-    };
-};
-
-var TermMatrix = function(maxTerms, minDocFreq, minTermLength, tfBoost, positionDecay, idfBoost, smoothFactor) {
-    this.maxTerms = maxTerms;
-    this.minDocFreq = minDocFreq;
-    this.minTermLength = minTermLength;
-    this.tfBoost = tfBoost;
-    this.positionDecay = positionDecay;
-    this.idfBoost = idfBoost;
-    this.smoothFactor = smoothFactor;
+var TermMatrix = function(resultSettings, titleSettings, descSettings) {
+    this.resultSettings = resultSettings;
+    this.titleSettings = titleSettings;
+    this.descSettings = descSettings;
 
     this.termDictionary = {};
     this.termIndex = 0;
     this.indexedTermMatrix = [];
 };
 
-TermMatrix.prototype.addTermVector = function(termVector) {
+TermMatrix.prototype.addDoc = function(doc) {
     var self = this;
 
-    var termScores = self.getTopScoringTerms(termVector);
+    var termScores = self.getTopScoringTerms(doc);
 
     var indexedTermVector = [];
 
@@ -134,13 +133,22 @@ TermMatrix.prototype.addTermVector = function(termVector) {
     self.indexedTermMatrix.push(indexedTermVector);
 };
 
-TermMatrix.prototype.getTopScoringTerms = function(termVector) {
+TermMatrix.prototype.getTitleTermScoresMap = function(titleTermVector) {
     var self = this;
 
-    var results = [];
+    var results = {};
 
-    termVector.forEach(function(termInfo) {
-        if (termInfo.term.length < self.minTermLength) {
+    var lastPosition = 0;
+
+    titleTermVector.forEach(function(termInfo) {
+        var pos = termInfo.positions[termInfo.positions.length - 1];
+        if (pos > lastPosition) {
+            lastPosition = pos;
+        }
+    });
+
+    titleTermVector.forEach(function(termInfo) {
+        if (termInfo.term.length < self.titleSettings.minTermLength) {
             return;
         }
 
@@ -148,39 +156,128 @@ TermMatrix.prototype.getTopScoringTerms = function(termVector) {
             return;
         }
 
-        if (termInfo.docFreq < self.minDocFreq) {
+        if (termInfo.docFreq < self.titleSettings.minDocFreq) {
             return;
         }
 
-        var decayFactor = Math.pow(termInfo.positions[0] + 1, self.positionDecay);
-        var tf = Math.pow(termInfo.termFreq, self.tfBoost) / decayFactor;
+        var posVal = 1 - (logBase(termInfo.positions[0] + 1, 10) / logBase(lastPosition + 1, 10));
+        var decayFactor = Math.pow(posVal, self.titleSettings.positionDecay);
+        var tf = Math.pow(termInfo.termFreq * decayFactor, self.titleSettings.tfBoost);
 
-        //var idfRaw = Math.log(882439 / termInfo.docFreq) / Math.log(10);
-        //var idf = Math.pow(idfRaw, self.idfBoost);
-        var df = Math.pow(termInfo.docFreq, self.idfBoost);
-        var tfIdf = tf / df;
+        //var df = Math.pow(termInfo.docFreq, self.titleSettings.dfWeight);
+        var numDocs = 800000;
+        //var df = Math.pow(termInfo.docFreq, self.descSettings.dfWeight);
+        //var df = 1 - (logBase(termInfo.docFreq, 10) / logBase(numDocs, 10));
+        var idfRaw = 1 + logBase(numDocs / (termInfo.docFreq + 1), 10);
+        var idf = Math.pow(idfRaw, self.titleSettings.dfWeight);
+        var tfIdf = tf * idf;
 
-        if (tfIdf <= 0) {
+        results[termInfo.term] = {
+            term: termInfo.term,
+            title: {
+                tf: tf,
+                idf: idf,
+                tfIdf: tfIdf
+            }
+        };
+    });
+
+    return results;
+};
+
+var logBase = function(x,b) {
+    return Math.log(x) / Math.log(b);
+};
+
+TermMatrix.prototype.getDescTermScores = function(descTermVector) {
+    var self = this;
+
+    var results = [];
+
+    var lastPosition = 0;
+
+    descTermVector.forEach(function(termInfo) {
+        var pos = termInfo.positions[termInfo.positions.length - 1];
+        if (pos > lastPosition) {
+            lastPosition = pos;
+        }
+    });
+
+    descTermVector.forEach(function(termInfo) {
+        if (termInfo.term.length < self.descSettings.minTermLength) {
             return;
         }
+
+        if (isStopWord(termInfo.term)) {
+            return;
+        }
+
+        if (termInfo.docFreq < self.descSettings.minDocFreq) {
+            return;
+        }
+
+        var posVal = 1 - (logBase(termInfo.positions[0] + 1, 10) / logBase(lastPosition + 1, 10));
+        var posDecay = Math.pow(posVal, self.descSettings.positionDecay);
+        var tf = Math.pow(termInfo.termFreq * posDecay, self.descSettings.tfBoost);
+
+        var numDocs = 800000;
+        //var df = Math.pow(termInfo.docFreq, self.descSettings.dfWeight);
+        //var df = 1 - (logBase(termInfo.docFreq, 10) / logBase(numDocs, 10));
+        var idfRaw = 1 + logBase(numDocs / (termInfo.docFreq + 1), 10);
+        var idf = Math.pow(idfRaw, self.descSettings.dfWeight);
+        var tfIdf = tf * idf;
 
         results.push({
             term: termInfo.term,
-            tf: tf,
-            df: df,
-            tfIdf: tfIdf
+            desc: {
+                tf: tf,
+                idf: idf,
+                tfIdf: tfIdf
+            }
         });
+    });
+
+    return results;
+};
+
+TermMatrix.prototype.getTopScoringTerms = function(doc) {
+    var self = this;
+
+    var results = [];
+
+    var titleTermScoresMap = self.getTitleTermScoresMap(doc.name);
+    var descTermScores = self.getDescTermScores(doc.desc);
+
+    descTermScores.forEach(function(termScore) {
+        var termScoreEntry = titleTermScoresMap[termScore.term];
+
+        if (!termScoreEntry) {
+            termScoreEntry = termScore;
+            termScoreEntry.tfIdf = termScore.desc.tfIdf;
+        } else {
+            termScoreEntry.desc = termScore.desc;
+            termScoreEntry.tfIdf = (termScoreEntry.title.tfIdf * self.titleSettings.titleBoost) + termScore.desc.tfIdf;
+            delete titleTermScoresMap[termScore.term];
+        }
+
+        results.push(termScoreEntry);
+    });
+
+    Object.keys(titleTermScoresMap).forEach(function(key) {
+        var termScoreEntry = titleTermScoresMap[key];
+        termScoreEntry.tfIdf = termScoreEntry.title.tfIdf;
+        results.push(termScoreEntry);
     });
 
     results.sort(function(a, b) {
         return b.tfIdf - a.tfIdf;
     });
 
-    results = results.splice(0, self.maxTerms);
+    results = results.splice(0, self.resultSettings.maxTerms);
 
     results.forEach(function(result) {
         var diff = results[0].tfIdf - result.tfIdf;
-        var smooth = results[0].tfIdf - (diff * self.smoothFactor);
+        var smooth = results[0].tfIdf - (diff * self.resultSettings.smoothFactor);
         result.score = (result.tfIdf / smooth);
     });
 
