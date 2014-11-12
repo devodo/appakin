@@ -68,3 +68,58 @@ sudo restart appakin
 
 sudo rm -rf node_modules
 sudo npm install
+
+# Mac Installation
+
+installing appakin
+
+download and install xcode
+download and install git
+download and install latest java sdk
+download and install se6 java (needed by webstorm). Apple have file for this.
+download and install webstorm
+download and install tunnelblick
+
+configure tunnelblick - david creates new openvpn settings for me and gives me configuration file
+
+git clone git@10.10.4.1:appakin-docs.git
+
+download and install solr - untar the file somewhere, then copy the example dir to where you want to have your solr install. Rename the directory to solr. Checkout the appakin-solr repo to some location, then copy it into the solr directory that's within the solr directory. Make sure the git files get copied over too.
+
+install:
+mvim
+homebrew
+pgadmin
+
+brew update
+brew doctor
+brew install postgresql
+initdb `brew --prefix`/var/postgres/data -E utf8
+in pgadmin, change user to login to db to be your short mac username, and create a user called postgres with password postgres and all role privileges.
+to run postgres on startup: ln -sfv /usr/local/opt/postgresql/*.plist ~/Library/LaunchAgents
+to run postgres now: launchctl load ~/Library/LaunchAgents/homebrew.mxcl.postgresql.plist
+
+brew install ant
+brew install node
+sudo gem install sass
+sudo npm install -g express nodemon bower gulp nodeunit
+cd to root of appakin repo: npm install
+cd to web.api directory: npm install
+cd to web.public directory: npm install
+
+to update only npm:
+npm install -g npm@latest
+
+postgres -D /usr/local/var/postgres/data
+or pg_ctl -D /usr/local/var/postgres/data -l logfile start
+
+Then:
+In web.api dir: npm start
+In web.public dir: gulp dev
+In web.public dir: npm start
+
+check on name of database backup file: ssh dev@appakin-dev
+copy database backup over: scp dev@appakin-dev:./appakin-2014-11-12.sql.bz2 ~/appakin-2014-11-12.sql.bz2
+double click on it to expand it.
+
+add a config-local.json file to web.api with connectionString override for your local postgres instance.
