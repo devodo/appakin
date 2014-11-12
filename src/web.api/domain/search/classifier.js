@@ -2,20 +2,24 @@
 
 var fs = require('fs');
 var config = require('../../config');
+var log = require('../../logger');
 
 var Classifier = function() {
     var nodesvm = require('node-svm');
     this.svm = new nodesvm.CSVC({ // classification
         kernelType: nodesvm.KernelTypes.RBF,
-        //C: 1.0,
-        //gamma: 0.5,
+        //gamma: [0.01],
+        //C: [0.5, 1, 2, 4, 8],
         reduce: false,
         normalize: false
     });
 };
 
 Classifier.prototype.train = function(trainingData, next) {
-    this.svm.train(trainingData, next);
+    this.svm.train(trainingData, function(report) {
+        log.info('SVM trained. report :\n%s', JSON.stringify(report, null, '\t'));
+        next();
+    });
 };
 
 Classifier.prototype.predict = function(matrix) {
@@ -31,16 +35,20 @@ Classifier.prototype.predict = function(matrix) {
 };
 
 var ClassifierAnalyser = function() {
-    this.titleTermMatrix = new TermMatrix(20, 5, 1, 0, 0.1, 0.5);
-    this.descTermMatrix = new TermMatrix(50, 5, 1, 1.0, 0.1, 1.0);
+    this.titleTermMatrix = new TermMatrix(20, 3, 1, 0, 0.1, 0.5, 0.1);
+    this.descTermMatrix = new TermMatrix(50, 3, 1, 1.2, 0.3, 0.5, 0.1);
     this.docMap = {};
     this.docIndex = [];
 };
 
+ClassifierAnalyser.prototype.totalDocs = function() {
+    return this.docIndex.length;
+};
+
 ClassifierAnalyser.prototype.addDoc = function(doc) {
     var self = this;
-    self.titleTermMatrix.addDocTermVector(doc.name);
-    self.descTermMatrix.addDocTermVector(doc.desc);
+    self.titleTermMatrix.addTermVector(doc.name);
+    self.descTermMatrix.addTermVector(doc.desc);
     self.docMap[doc.id] = self.docIndex.length;
     self.docIndex.push(doc.id);
 };
@@ -53,24 +61,9 @@ ClassifierAnalyser.prototype.buildVectorMatrix = function() {
         vectorMatrix[i] = [];
     }
 
-    var indexOffset = self.titleTermMatrix.buildKeywordMatrix(vectorMatrix, 0);
-    self.descTermMatrix.buildKeywordMatrix(vectorMatrix, indexOffset);
-
-    var rowLength = 0;
-
-    vectorMatrix.forEach(function(row) {
-        if (rowLength < row.length) {
-            rowLength = row.length;
-        }
-    });
-
-    vectorMatrix.forEach(function(row) {
-        for (var j = 0; j < rowLength; j++) {
-            if (!row[j]) {
-                row[j] = 0;
-            }
-        }
-    });
+    self.titleTermMatrix.buildTermMatrix(vectorMatrix, 0);
+    var indexOffset = self.titleTermMatrix.termIndex;
+    self.descTermMatrix.buildTermMatrix(vectorMatrix, indexOffset);
 
     return {
         vectorMatrix: vectorMatrix,
@@ -79,81 +72,72 @@ ClassifierAnalyser.prototype.buildVectorMatrix = function() {
     };
 };
 
-ClassifierAnalyser.prototype.getKeywords = function(docId) {
+ClassifierAnalyser.prototype.getDocTopTerms = function(doc) {
     var self = this;
-    var docIndex = self.docMap[docId];
-    var titleKeywords = self.titleTermMatrix.getDocKeywords(docIndex);
-    var descKeywords = self.descTermMatrix.getDocKeywords(docIndex);
+    var titleTerms = self.titleTermMatrix.getTopScoringTerms(doc.name);
+    var descTerms = self.descTermMatrix.getTopScoringTerms(doc.desc);
 
     return {
-        title: titleKeywords,
-        desc: descKeywords
+        title: titleTerms,
+        desc: descTerms
     };
 };
 
-ClassifierAnalyser.prototype.getTopKeywords = function(titleLimit, descLimit) {
+ClassifierAnalyser.prototype.getTopTerms = function(titleLimit, descLimit) {
     var self = this;
-    var titleKeywords = self.titleTermMatrix.getTopKeywords(titleLimit);
-    var descKeywords = self.descTermMatrix.getTopKeywords(descLimit);
+    var titleTerms = self.titleTermMatrix.getTopTerms(titleLimit);
+    var descTerms = self.descTermMatrix.getTopTerms(descLimit);
 
     return {
-        title: titleKeywords,
-        desc: descKeywords
+        title: titleTerms,
+        desc: descTerms
     };
 };
 
-var TermMatrix = function(maxKeywords, minDocFreq, minTermLength, tfBoost, positionDecay, dfBoost) {
-    this.maxKeywords = maxKeywords;
+var TermMatrix = function(maxTerms, minDocFreq, minTermLength, tfBoost, positionDecay, idfBoost, smoothFactor) {
+    this.maxTerms = maxTerms;
     this.minDocFreq = minDocFreq;
     this.minTermLength = minTermLength;
     this.tfBoost = tfBoost;
     this.positionDecay = positionDecay;
-    this.dfBoost = dfBoost;
+    this.idfBoost = idfBoost;
+    this.smoothFactor = smoothFactor;
 
-    this.termDictionary = { count: 0 };
-    this.docs = [];
+    this.termDictionary = {};
+    this.termIndex = 0;
+    this.indexedTermMatrix = [];
 };
 
-
-TermMatrix.prototype.addDocTermVector = function(termVector) {
+TermMatrix.prototype.addTermVector = function(termVector) {
     var self = this;
 
-    termVector.forEach(function(termInfo) {
-        if (termInfo.term.length < self.minTermLength) {
-            return;
-        }
+    var termScores = self.getTopScoringTerms(termVector);
 
-        if (isStopWord(termInfo.term)) {
-            return;
-        }
+    var indexedTermVector = [];
 
-        var dictionaryEntry = self.termDictionary[termInfo.term];
-
-        if (!dictionaryEntry) {
-            dictionaryEntry = {
+    termScores.forEach(function(termScore) {
+        var termEntry = self.termDictionary[termScore.term];
+        if (!termEntry && termEntry !== 0) {
+            termEntry = {
+                score: 0,
                 docFreq: 0,
-                id: self.termDictionary.count
+                index: self.termIndex++
             };
-            self.termDictionary[termInfo.term] = dictionaryEntry;
-            self.termDictionary.count++;
+            self.termDictionary[termScore.term] = termEntry;
         }
 
-        dictionaryEntry.docFreq++;
+        termEntry.score += termScore.score;
+        termEntry.docFreq++;
+        indexedTermVector[termEntry.index] = termScore.score;
     });
 
-    this.docs.push(termVector);
+    self.indexedTermMatrix.push(indexedTermVector);
 };
 
-TermMatrix.prototype.getDocKeywords = function(docIndex) {
-    var self = this;
-    var termVector = self.docs[docIndex];
-    return self.getKeywords(termVector);
-};
-
-TermMatrix.prototype.getKeywords = function(termVector) {
+TermMatrix.prototype.getTopScoringTerms = function(termVector) {
     var self = this;
 
-    var keywords = [];
+    var results = [];
 
     termVector.forEach(function(termInfo) {
         if (termInfo.term.length < self.minTermLength) {
@@ -164,94 +148,76 @@ TermMatrix.prototype.getKeywords = function(termVector) {
             return;
         }
 
-        var dictionaryEntry = self.termDictionary[termInfo.term];
-
-        if (!dictionaryEntry) {
-            throw "Invalid term dictionary";
-        }
-
-        if (dictionaryEntry.docFreq < self.minDocFreq) {
+        if (termInfo.docFreq < self.minDocFreq) {
             return;
         }
 
-        var decayFactor = 1 / (Math.pow(termInfo.positions[0] + 1, self.positionDecay));
-        var tf = Math.pow(termInfo.termFreq, self.tfBoost) * decayFactor;
+        var decayFactor = Math.pow(termInfo.positions[0] + 1, self.positionDecay);
+        var tf = Math.pow(termInfo.termFreq, self.tfBoost) / decayFactor;
 
-        var idfRaw = Math.log(self.docs.length / dictionaryEntry.docFreq) / Math.log(10);
-        var idf = Math.pow(idfRaw, self.dfBoost);
-        var tfIdf = tf * idf;
+        //var idfRaw = Math.log(882439 / termInfo.docFreq) / Math.log(10);
+        //var idf = Math.pow(idfRaw, self.idfBoost);
+        var df = Math.pow(termInfo.docFreq, self.idfBoost);
+        var tfIdf = tf / df;
 
         if (tfIdf <= 0) {
             return;
         }
 
-        keywords.push({
+        results.push({
             term: termInfo.term,
-            score: tfIdf
+            tf: tf,
+            df: df,
+            tfIdf: tfIdf
         });
     });
 
-    keywords.sort(function(a, b) {
-        return b.score - a.score;
+    results.sort(function(a, b) {
+        return b.tfIdf - a.tfIdf;
     });
 
-    return keywords.splice(0, self.maxKeywords);
+    results = results.splice(0, self.maxTerms);
+
+    results.forEach(function(result) {
+        var diff = results[0].tfIdf - result.tfIdf;
+        var smooth = results[0].tfIdf - (diff * self.smoothFactor);
+        result.score = (result.tfIdf / smooth);
+    });
+
+    return results;
 };
 
-TermMatrix.prototype.buildKeywordMatrix = function(matrix, indexOffset) {
+TermMatrix.prototype.buildTermMatrix = function(matrix, indexOffset) {
     var self = this;
-    var keywordDictionary = {};
 
-    self.docs.forEach(function(termVector, docIndex) {
-        self.getKeywords(termVector).forEach(function(keyword) {
-            var dictionaryEntry = keywordDictionary[keyword.term];
-
-            if (!dictionaryEntry) {
-                dictionaryEntry = { index: indexOffset++ };
-                keywordDictionary[keyword.term] = dictionaryEntry;
-            }
-
-            matrix[docIndex][dictionaryEntry.index] = keyword.score;
-        });
+    self.indexedTermMatrix.forEach(function(indexedTermVector, row) {
+        for (var i = 0; i < self.termIndex; i++) {
+            matrix[row][i + indexOffset] = indexedTermVector[i] ? indexedTermVector[i] : 0;
+        }
     });
-
-    return indexOffset;
 };
 
-TermMatrix.prototype.getTopKeywords = function(limit) {
+TermMatrix.prototype.getTopTerms = function(limit) {
     var self = this;
-    var keywordDictionary = {};
 
-    self.docs.forEach(function(termVector, docIndex) {
-        self.getKeywords(termVector).forEach(function(keyword) {
-            var dictionaryEntry = keywordDictionary[keyword.term];
+    var termInfos = [];
 
-            if (!dictionaryEntry) {
-                dictionaryEntry = {
-                    term: keyword.term,
-                    score: 0.0,
-                    freq: 0
-                };
-                keywordDictionary[keyword.term] = dictionaryEntry;
-            }
+    Object.keys(self.termDictionary).forEach(function(key) {
+        var termEntry = self.termDictionary[key];
 
-            dictionaryEntry.freq++;
-            dictionaryEntry.score += keyword.score;
-        });
+        var termInfo = {
+            term: key,
+            stats: termEntry
+        };
+
+        termInfos.push(termInfo);
     });
 
-    var keys = Object.keys(keywordDictionary);
-    var keywords = [keys.length];
-
-    keys.forEach(function(key) {
-        keywords.push(keywordDictionary[key]);
+    termInfos.sort(function(a, b) {
+        return b.stats.score - a.stats.score;
     });
 
-    keywords.sort(function(a, b) {
-        return b.score - a.score;
-    });
-
-    return keywords.splice(0, limit);
+    return termInfos.splice(0, limit);
 };
 
 var stopwords = null;

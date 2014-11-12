@@ -51,7 +51,7 @@ var getDescriptionStats = function(appId, next) {
 
         var stats = null;
 
-        if (!obj.termVectors || !obj.termVectors[3]) {
+        if (!obj.docs || !obj.docs[3]) {
             log.debug('Failed to get term vectors for app ' + appId);
 
             stats = {
@@ -59,7 +59,7 @@ var getDescriptionStats = function(appId, next) {
                 terms: []
             };
         } else {
-            stats = parseTermStats(obj.termVectors[3][3]);
+            stats = parseTermStats(obj.docs[3][3]);
         }
 
         next(null, stats);

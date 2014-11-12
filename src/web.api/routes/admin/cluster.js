@@ -37,7 +37,7 @@ exports.init = function init(app) {
             return res.status(400).send("Bad rows request parameter");
         }
 
-        clusterSearcher.getKeywords(appId, rows, function (err, result) {
+        clusterSearcher.getTopTerms(appId, rows, function (err, result) {
             if (err) {
                 return next(err);
             }
@@ -145,6 +145,22 @@ exports.init = function init(app) {
         }
 
         clusterSearcher.getSeedCategoryKeywords(seedCategoryId, function (err, result) {
+            if (err) {
+                return next(err);
+            }
+
+            res.json(result);
+        });
+    });
+
+    app.get('/admin/cluster/app_keywords/:appExtId', function (req, res, next) {
+        var appExtId = req.params.appExtId;
+
+        if (!appExtId || appExtId.trim() === '') {
+            return res.status(400).send('Bad seed category Id query parameter');
+        }
+
+        clusterSearcher.getAppTopKeywords(appExtId, function (err, result) {
             if (err) {
                 return next(err);
             }

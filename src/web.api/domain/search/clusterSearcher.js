@@ -109,7 +109,7 @@ var parsePositions = function(positionsArray) {
     return positions;
 };
 
-var parseTermVectors = function(fieldArray) {
+var parseTermVector = function(fieldArray) {
     var termStats = [];
 
     var numStems = fieldArray.length / 2;
@@ -143,8 +143,8 @@ var getTermVectors = function(appId, next) {
             return next("Unexpected response from search server");
         }
 
-        var nameStats = parseTermVectors(obj.termVectors[3][3]);
-        var descStats = parseTermVectors(obj.termVectors[3][5]);
+        var nameStats = parseTermVector(obj.termVectors[3][3]);
+        var descStats = parseTermVector(obj.termVectors[3][5]);
 
         var stats = {
             name: nameStats,
@@ -244,24 +244,29 @@ var searchTermVectors = function(query, skip, take, next) {
 
         var total = (obj.termVectors.length - 2) / 2;
 
-        var results = [];
+        var docs = [];
 
-        for (var i = 1; i < total; i++) {
+        for (var i = 1; i <= total; i++) {
             var index = i * 2;
             var id = obj.termVectors[index];
-            var nameStats = parseTermVectors(obj.termVectors[index+1][3]);
-            var descStats = parseTermVectors(obj.termVectors[index+1][5]);
+            var nameTermVector = parseTermVector(obj.termVectors[index+1][3]);
+            var descTermVector = parseTermVector(obj.termVectors[index+1][5]);
 
-            var stats = {
+            var doc = {
                 id: id,
-                name: nameStats,
-                desc: descStats
+                name: nameTermVector,
+                desc: descTermVector
             };
 
-            results.push(stats);
+            docs.push(doc);
         }
 
-        next(null, results);
+        var searchResult = {
+            total: obj.response.numFound,
+            docs: docs
+        };
+
+        next(null, searchResult);
     });
 };
 
@@ -279,14 +284,18 @@ var getClassifierAnalyser = function(seedSearches, next) {
         var query = buildSeedTermVectorQuery(seedSearch);
 
         var processBatch = function(batchIndex) {
-            searchTermVectors(query, batchSize * batchIndex, batchSize, function(err, results) {
+            searchTermVectors(query, batchSize * batchIndex, batchSize, function(err, searchResult) {
                 if (err) { return callback(err); }
 
-                results.forEach(function(result) {
-                    classifierAnalyser.addDoc(result);
+                searchResult.docs.forEach(function(doc) {
+                    classifierAnalyser.addDoc(doc);
                 });
 
-                if (results.length < batchSize) {
+                if (searchResult.docs.length < batchSize) {
+                    if (classifierAnalyser.totalDocs() !== searchResult.total) {
+                        return callback("Expected " + searchResult.total + " docs but was " + classifierAnalyser.totalDocs());
+                    }
+
                     return callback();
                 }
 
@@ -446,8 +455,18 @@ var getSeedCategoryKeywords = function(seedCategoryId, next) {
     getSeedCategoryAnalyser(seedCategoryId, function(err, analyser) {
         if (err) { return next(err); }
 
-        var keywords = analyser.getTopKeywords(20, 50);
+        var keywords = analyser.getTopTerms(20, 50);
         next(null, keywords);
+    });
+};
+
+var getAppTopKeywords = function(appExtId, next) {
+    getTermVectors(appExtId, function(err, result) {
+        if (err) { return next(err); }
+
+        var classifierAnalyser = classifier.createClassifierAnalyser();
+        var topTerms = classifierAnalyser.getDocTopTerms(result);
+        return next(null, topTerms);
     });
 };
 
@@ -458,8 +477,8 @@ var buildTrainingData = function(matrixData, trainingSet) {
         var appId = trainingItem.appExtId.replace(/\-/g, '');
         var rowIndex = matrixData.docMap[appId];
 
-        if (!rowIndex) {
-            log.warn("Training app not found in seed vector matrix:" + trainingItem.appExtId);
+        if (!rowIndex && rowIndex !== 0) {
+            log.warn("Training app not found in seed vector matrix:" + appId);
             return;
         }
 
@@ -487,7 +506,7 @@ var classifySeedCategory = function(seedCategoryId, next) {
                 log.debug("SVM training complete");
                 var predictions = svm.predict(matrixData.vectorMatrix);
 
-                var results = []
+                var results = [];
                 predictions.forEach(function(prediction, index) {
                     results.push({
                         id: matrixData.docIndex[index],
@@ -666,7 +685,7 @@ var runClusterCategoryTest = function(categoryId, extCategoryId, next) {
 
 exports.searchSimilarByName = searchSimilarByName;
 
-exports.getKeywords = function(appId, num, next) {
+exports.getTopTerms = function(appId, num, next) {
     getKeywords(appId, function(err, keywords) {
         if (err) { return next(err); }
 
@@ -681,6 +700,7 @@ exports.runClusterTest = runClusterTest;
 exports.runClusterCategoryTest = runClusterCategoryTest;
 exports.getSeedApps = getSeedApps;
 exports.getSeedCategoryKeywords = getSeedCategoryKeywords;
+exports.getAppTopKeywords = getAppTopKeywords;
 exports.classifySeedCategory = classifySeedCategory;
 
 
