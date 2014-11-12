@@ -1,5 +1,8 @@
 'use strict';
 
+var fs = require('fs');
+var config = require('../../config');
+
 var Classifier = function() {
     var nodesvm = require('node-svm');
     this.svm = new nodesvm.CSVC({ // classification
@@ -28,8 +31,8 @@ Classifier.prototype.predict = function(matrix) {
 };
 
 var ClassifierAnalyser = function() {
-    this.titleTermMatrix = new TermMatrix(20, 3, 1, 0, 0.1);
-    this.descTermMatrix = new TermMatrix(50, 3, 1, 1.0, 0.1);
+    this.titleTermMatrix = new TermMatrix(20, 5, 1, 0, 0.1, 0.5);
+    this.descTermMatrix = new TermMatrix(50, 5, 1, 1.0, 0.1, 1.0);
     this.docMap = {};
     this.docIndex = [];
 };
@@ -99,12 +102,13 @@ ClassifierAnalyser.prototype.getTopKeywords = function(titleLimit, descLimit) {
     };
 };
 
-var TermMatrix = function(maxKeywords, minDocFreq, minTermLength, tfBoost, positionDecay) {
+var TermMatrix = function(maxKeywords, minDocFreq, minTermLength, tfBoost, positionDecay, dfBoost) {
     this.maxKeywords = maxKeywords;
     this.minDocFreq = minDocFreq;
     this.minTermLength = minTermLength;
     this.tfBoost = tfBoost;
     this.positionDecay = positionDecay;
+    this.dfBoost = dfBoost;
 
     this.termDictionary = { count: 0 };
     this.docs = [];
@@ -115,6 +119,14 @@ TermMatrix.prototype.addDocTermVector = function(termVector) {
     var self = this;
 
     termVector.forEach(function(termInfo) {
+        if (termInfo.term.length < self.minTermLength) {
+            return;
+        }
+
+        if (isStopWord(termInfo.term)) {
+            return;
+        }
+
         var dictionaryEntry = self.termDictionary[termInfo.term];
 
         if (!dictionaryEntry) {
@@ -148,6 +160,10 @@ TermMatrix.prototype.getKeywords = function(termVector) {
             return;
         }
 
+        if (isStopWord(termInfo.term)) {
+            return;
+        }
+
         var dictionaryEntry = self.termDictionary[termInfo.term];
 
         if (!dictionaryEntry) {
@@ -161,7 +177,8 @@ TermMatrix.prototype.getKeywords = function(termVector) {
         var decayFactor = 1 / (Math.pow(termInfo.positions[0] + 1, self.positionDecay));
         var tf = Math.pow(termInfo.termFreq, self.tfBoost) * decayFactor;
 
-        var idf = Math.log(self.docs.length / dictionaryEntry.docFreq) / Math.log(10);
+        var idfRaw = Math.log(self.docs.length / dictionaryEntry.docFreq) / Math.log(10);
+        var idf = Math.pow(idfRaw, self.dfBoost);
         var tfIdf = tf * idf;
 
         if (tfIdf <= 0) {
@@ -235,6 +252,22 @@ TermMatrix.prototype.getTopKeywords = function(limit) {
     });
 
     return keywords.splice(0, limit);
+};
+
+var stopwords = null;
+
+var isStopWord = function(word) {
+    if (!stopwords) {
+        stopwords = {};
+        var contents = fs.readFileSync(config.search.stopwordFile).toString();
+        var lines = contents.replace(/\r/g, '').split(/\n/g);
+        lines.forEach(function(line) {
+            if (line.match(/^\s*#/)) { return; } // ignore commented lines
+            stopwords[line] = true;
+        });
+    }
+
+    return stopwords[word];
 };
 
 exports.createClassifierAnalyser = function() {
