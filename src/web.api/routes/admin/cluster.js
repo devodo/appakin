@@ -176,7 +176,47 @@ exports.init = function init(app) {
             return res.status(400).send('Bad seed category Id query parameter');
         }
 
-        clusterSearcher.classifySeedCategory(seedCategoryId, function (err, result) {
+        var saveResults = req.query.save === 'true';
+
+        clusterSearcher.classifySeedCategory(seedCategoryId, saveResults, function (err, result) {
+            if (err) {
+                return next(err);
+            }
+
+            res.json(result);
+        });
+    });
+
+    app.get('/admin/cluster/classified_apps/:seedCategoryId', function (req, res, next) {
+        var seedCategoryId = req.params.seedCategoryId;
+
+        if (!seedCategoryId || isNaN(seedCategoryId)) {
+            return res.status(400).send('Bad seed category Id query parameter');
+        }
+
+        var skip = parseInt(req.query.skip, 10);
+
+        if (req.query.skip && isNaN(skip)) {
+            return res.status(400).send('Bad skip parameter');
+        }
+
+        skip = isNaN(skip) ? 0 : skip;
+
+        var take = parseInt(req.query.take, 10);
+
+        if (req.query.take && isNaN(take)) {
+            return res.status(400).send('Bad take parameter');
+        }
+
+        take = isNaN(take) ? 100 : take;
+
+        var isInclude = req.query.include !== 'false';
+
+        if (isInclude && req.query.include && req.query.include !== 'true') {
+            return res.status(400).send('Bad include parameter');
+        }
+
+        clusterSearcher.getClassificationApps(seedCategoryId, isInclude, skip, take, function (err, result) {
             if (err) {
                 return next(err);
             }

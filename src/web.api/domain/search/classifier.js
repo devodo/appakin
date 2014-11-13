@@ -37,24 +37,28 @@ Classifier.prototype.predict = function(matrix) {
 var ClassifierAnalyser = function() {
     var resultSettings = {
         maxTerms: 50,
-        smoothFactor: 0.1
+        smoothFactor: 1.0,
+        tieBreak: 0.1,
+        maxDocFreq: 800000
     };
 
     var titleSettings = {
         minDocFreq: 5,
         minTermLength: 1,
         tfBoost: 0,
-        positionDecay: 0.1,
-        dfWeight: 2.0,
-        titleBoost: 0.5
+        posDecayTail: 2,
+        posDecayWeight: 2.5,
+        dfWeight: 2.5,
+        titleBoost: 1.0
     };
 
     var descSettings = {
         minDocFreq: 5,
         minTermLength: 1,
-        tfBoost: 1.0,
-        positionDecay: 0.1,
-        dfWeight: 2.0
+        tfBoost: 0.5,
+        posDecayTail: 2,
+        posDecayWeight: 2.5,
+        dfWeight: 2.5
     };
 
     this.termMatrix = new TermMatrix(resultSettings, titleSettings, descSettings);
@@ -160,22 +164,26 @@ TermMatrix.prototype.getTitleTermScoresMap = function(titleTermVector) {
             return;
         }
 
-        var posVal = 1 - (logBase(termInfo.positions[0] + 1, 10) / logBase(lastPosition + 1, 10));
-        var decayFactor = Math.pow(posVal, self.titleSettings.positionDecay);
-        var tf = Math.pow(termInfo.termFreq * decayFactor, self.titleSettings.tfBoost);
+        var inversePosVal = logBase(termInfo.positions[0] + 1, (lastPosition + 2) * self.titleSettings.posDecayTail);
+        var posDecay = 1 - Math.pow(inversePosVal, self.titleSettings.posDecayWeight);
+        var tf = Math.pow(termInfo.termFreq, self.titleSettings.tfBoost)  * posDecay;
 
-        //var df = Math.pow(termInfo.docFreq, self.titleSettings.dfWeight);
-        var numDocs = 800000;
-        //var df = Math.pow(termInfo.docFreq, self.descSettings.dfWeight);
-        //var df = 1 - (logBase(termInfo.docFreq, 10) / logBase(numDocs, 10));
-        var idfRaw = 1 + logBase(numDocs / (termInfo.docFreq + 1), 10);
-        var idf = Math.pow(idfRaw, self.titleSettings.dfWeight);
-        var tfIdf = tf * idf;
+        var idf = 0;
+        if (termInfo.docFreq < self.resultSettings.maxDocFreq) {
+            var df = logBase(termInfo.docFreq, self.resultSettings.maxDocFreq);
+            idf = 1 - Math.pow(df, self.titleSettings.dfWeight);
+        }
+
+        var tfIdf = Math.pow(tf * idf, self.titleSettings.titleBoost);
 
         results[termInfo.term] = {
             term: termInfo.term,
             title: {
+                termFreq: termInfo.termFreq,
+                position: termInfo.positions[0],
+                posDecay: posDecay,
                 tf: tf,
+                docFreq: termInfo.docFreq,
                 idf: idf,
                 tfIdf: tfIdf
             }
@@ -216,21 +224,26 @@ TermMatrix.prototype.getDescTermScores = function(descTermVector) {
             return;
         }
 
-        var posVal = 1 - (logBase(termInfo.positions[0] + 1, 10) / logBase(lastPosition + 1, 10));
-        var posDecay = Math.pow(posVal, self.descSettings.positionDecay);
-        var tf = Math.pow(termInfo.termFreq * posDecay, self.descSettings.tfBoost);
+        var inversePosVal = logBase(termInfo.positions[0] + 1, (lastPosition + 2) * self.descSettings.posDecayTail);
+        var posDecay = 1 - Math.pow(inversePosVal, self.descSettings.posDecayWeight);
+        var tf = Math.pow(termInfo.termFreq, self.descSettings.tfBoost) * posDecay;
 
-        var numDocs = 800000;
-        //var df = Math.pow(termInfo.docFreq, self.descSettings.dfWeight);
-        //var df = 1 - (logBase(termInfo.docFreq, 10) / logBase(numDocs, 10));
-        var idfRaw = 1 + logBase(numDocs / (termInfo.docFreq + 1), 10);
-        var idf = Math.pow(idfRaw, self.descSettings.dfWeight);
+        var idf = 0;
+        if (termInfo.docFreq < self.resultSettings.maxDocFreq) {
+            var df = logBase(termInfo.docFreq, self.resultSettings.maxDocFreq);
+            idf = 1 - Math.pow(df, self.descSettings.dfWeight);
+        }
+
         var tfIdf = tf * idf;
 
         results.push({
             term: termInfo.term,
             desc: {
+                termFreq: termInfo.termFreq,
+                position: termInfo.positions[0],
+                posDecay: posDecay,
                 tf: tf,
+                docFreq: termInfo.docFreq,
                 idf: idf,
                 tfIdf: tfIdf
             }
@@ -256,7 +269,9 @@ TermMatrix.prototype.getTopScoringTerms = function(doc) {
             termScoreEntry.tfIdf = termScore.desc.tfIdf;
         } else {
             termScoreEntry.desc = termScore.desc;
-            termScoreEntry.tfIdf = (termScoreEntry.title.tfIdf * self.titleSettings.titleBoost) + termScore.desc.tfIdf;
+            var maxTfIdf = Math.max(termScoreEntry.title.tfIdf, termScore.desc.tfIdf);
+            var minTfIdf = Math.min(termScoreEntry.title.tfIdf, termScore.desc.tfIdf);
+            termScoreEntry.tfIdf = maxTfIdf + (minTfIdf * self.resultSettings.tieBreak);
             delete titleTermScoresMap[termScore.term];
         }
 
@@ -269,16 +284,20 @@ TermMatrix.prototype.getTopScoringTerms = function(doc) {
         results.push(termScoreEntry);
     });
 
+    if (results.length === 0) {
+        return results;
+    }
+
     results.sort(function(a, b) {
         return b.tfIdf - a.tfIdf;
     });
 
     results = results.splice(0, self.resultSettings.maxTerms);
 
+    var topScore = Math.pow(results[0].tfIdf, self.resultSettings.smoothFactor);
+
     results.forEach(function(result) {
-        var diff = results[0].tfIdf - result.tfIdf;
-        var smooth = results[0].tfIdf - (diff * self.resultSettings.smoothFactor);
-        result.score = (result.tfIdf / smooth);
+        result.score = Math.pow(result.tfIdf, self.resultSettings.smoothFactor) / topScore;
     });
 
     return results;

@@ -426,8 +426,8 @@ var getSeedApps = function(seedSearchId, boostFactor, next) {
     });
 };
 
-var getSeedCategoryAnalyser = function(seedCategoryId, next) {
-    adminRepo.getSeedSearches(seedCategoryId, function(err, seedSearches) {
+var getClassificationSearchesAnalyser = function(seedCategoryId, next) {
+    adminRepo.getClassificationSearches(seedCategoryId, function(err, seedSearches) {
         if (err) { return next(err); }
 
         getClassifierAnalyser(seedSearches, function(err, analyser) {
@@ -439,7 +439,7 @@ var getSeedCategoryAnalyser = function(seedCategoryId, next) {
 };
 
 var getSeedCategoryMatrix = function(seedCategoryId, next) {
-    adminRepo.getSeedSearches(seedCategoryId, function(err, seedSearches) {
+    adminRepo.getClassificationSearches(seedCategoryId, function(err, seedSearches) {
         if (err) { return next(err); }
 
         getClassifierAnalyser(seedSearches, function(err, analyser) {
@@ -452,7 +452,7 @@ var getSeedCategoryMatrix = function(seedCategoryId, next) {
 };
 
 var getSeedCategoryKeywords = function(seedCategoryId, next) {
-    getSeedCategoryAnalyser(seedCategoryId, function(err, analyser) {
+    getClassificationSearchesAnalyser(seedCategoryId, function(err, analyser) {
         if (err) { return next(err); }
 
         var keywords = analyser.getTopTerms(20, 50);
@@ -491,7 +491,7 @@ var buildTrainingData = function(matrixData, trainingSet) {
     return trainingData;
 };
 
-var classifySeedCategory = function(seedCategoryId, next) {
+var classifySeedCategory = function(seedCategoryId, saveResults, next) {
     getSeedCategoryMatrix(seedCategoryId, function(err, matrixData) {
         if (err) { return next(err); }
 
@@ -514,9 +514,25 @@ var classifySeedCategory = function(seedCategoryId, next) {
                     });
                 });
 
-                next(null, results);
+                if (!saveResults) {
+                    return next(null, results);
+                }
+
+                classifierRepo.setClassificationApps(results, seedCategoryId, function(err) {
+                    if (err) { return next(err); }
+
+                    return next(null, results);
+                });
             });
         });
+    });
+};
+
+var getClassificationApps = function(seedCategoryId, isInclude, skip, take, next) {
+    classifierRepo.getClassificationApps(seedCategoryId, isInclude, skip, take, function(err, results) {
+        if (err) { return next(err); }
+
+        return next(null, results);
     });
 };
 
@@ -702,6 +718,7 @@ exports.getSeedApps = getSeedApps;
 exports.getSeedCategoryKeywords = getSeedCategoryKeywords;
 exports.getAppTopKeywords = getAppTopKeywords;
 exports.classifySeedCategory = classifySeedCategory;
+exports.getClassificationApps = getClassificationApps;
 
 
 
