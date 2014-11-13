@@ -99,7 +99,9 @@ var getClassificationApps = function(client, seedCategoryId, isInclude, skip, ta
         "from appstore_app a\n" +
         "join seed_classification_app sca on a.ext_id = sca.app_ext_id\n" +
         "left join app_popularity ap on a.app_id = ap.app_id\n" +
+        "left join seed_training st on sca.seed_category_id = st.seed_category_id and a.ext_id = st.app_ext_id\n" +
         "where sca.seed_category_id = $1\n" +
+        "and st.id is null\n" +
         "and sca.include = $2\n" +
         "order by coalesce(ap.popularity,0) desc\n" +
         "offset $3 limit $4;";

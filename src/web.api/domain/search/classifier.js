@@ -80,12 +80,7 @@ ClassifierAnalyser.prototype.addDoc = function(doc) {
 ClassifierAnalyser.prototype.buildVectorMatrix = function() {
     var self = this;
 
-    var vectorMatrix = [];
-    for (var i = 0; i < self.docIndex.length; i++) {
-        vectorMatrix[i] = [];
-    }
-
-    self.termMatrix.buildTermMatrix(vectorMatrix, 0);
+    var vectorMatrix = self.termMatrix.buildTermMatrix();
 
     return {
         vectorMatrix: vectorMatrix,
@@ -303,14 +298,20 @@ TermMatrix.prototype.getTopScoringTerms = function(doc) {
     return results;
 };
 
-TermMatrix.prototype.buildTermMatrix = function(matrix, indexOffset) {
+TermMatrix.prototype.buildTermMatrix = function() {
     var self = this;
 
-    self.indexedTermMatrix.forEach(function(indexedTermVector, row) {
+    log.debug("Term matrix size: " + self.indexedTermMatrix.length + " x " + self.termIndex);
+
+    self.indexedTermMatrix.forEach(function(indexedTermVector) {
         for (var i = 0; i < self.termIndex; i++) {
-            matrix[row][i + indexOffset] = indexedTermVector[i] ? indexedTermVector[i] : 0;
+            if (!indexedTermVector[i]) {
+                indexedTermVector[i] = 0;
+            }
         }
     });
+
+    return self.indexedTermMatrix;
 };
 
 TermMatrix.prototype.getTopTerms = function(limit) {

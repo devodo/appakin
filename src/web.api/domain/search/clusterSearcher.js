@@ -284,6 +284,7 @@ var getClassifierAnalyser = function(seedSearches, next) {
         var query = buildSeedTermVectorQuery(seedSearch);
 
         var processBatch = function(batchIndex) {
+            log.debug("Retrieving solr term vectors (batch:" + batchIndex +")");
             searchTermVectors(query, batchSize * batchIndex, batchSize, function(err, searchResult) {
                 if (err) { return callback(err); }
 
@@ -373,7 +374,7 @@ var buildSeedQuery = function(seedSearch, boostFactor, includeDetails) {
 
     var queryTerms = encodeURIComponent(queryLines.join(' '));
     var qq = 'qq=' + queryTerms;
-    var rows = 'rows=' + seedSearch.maxTake;
+    var rows = 'rows=' + (seedSearch.maxTake ? seedSearch.maxTake : 1000);
     var fl = includeDetails ? 'fl=id,name,desc,genres,popularity,score' : 'fl=id';
     var boost = 'b=' + (boostFactor || boostFactor === 0 ? boostFactor : 1);
 
@@ -426,6 +427,18 @@ var getSeedApps = function(seedSearchId, boostFactor, next) {
     });
 };
 
+var getClassificationSearchApps = function(searchId, boostFactor, next) {
+    adminRepo.getClassificationSearch(searchId, function(err, seedSearch) {
+        if (err) { return next(err); }
+
+        searchSeedApps(seedSearch, boostFactor, true, function(err, searchResult) {
+            if (err) { return next(err); }
+
+            next(null, searchResult);
+        });
+    });
+};
+
 var getClassificationSearchesAnalyser = function(seedCategoryId, next) {
     adminRepo.getClassificationSearches(seedCategoryId, function(err, seedSearches) {
         if (err) { return next(err); }
@@ -439,12 +452,14 @@ var getClassificationSearchesAnalyser = function(seedCategoryId, next) {
 };
 
 var getSeedCategoryMatrix = function(seedCategoryId, next) {
+    log.debug("Retrieving classification searches");
     adminRepo.getClassificationSearches(seedCategoryId, function(err, seedSearches) {
         if (err) { return next(err); }
 
         getClassifierAnalyser(seedSearches, function(err, analyser) {
             if (err) { return next(err); }
 
+            log.debug("Building vector matrix");
             var matrixData = analyser.buildVectorMatrix();
             next(null, matrixData);
         });
@@ -495,6 +510,7 @@ var classifySeedCategory = function(seedCategoryId, saveResults, next) {
     getSeedCategoryMatrix(seedCategoryId, function(err, matrixData) {
         if (err) { return next(err); }
 
+        log.debug("Retrieving training data");
         classifierRepo.getTrainingSet(seedCategoryId, function(err, trainingSet) {
             if (err) { return next(err); }
 
@@ -715,6 +731,7 @@ exports.runTrainingTest = runTrainingTest;
 exports.runClusterTest = runClusterTest;
 exports.runClusterCategoryTest = runClusterCategoryTest;
 exports.getSeedApps = getSeedApps;
+exports.getClassificationSearchApps = getClassificationSearchApps;
 exports.getSeedCategoryKeywords = getSeedCategoryKeywords;
 exports.getAppTopKeywords = getAppTopKeywords;
 exports.classifySeedCategory = classifySeedCategory;

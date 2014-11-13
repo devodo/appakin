@@ -137,6 +137,23 @@ exports.init = function init(app) {
         });
     });
 
+    app.get('/admin/cluster/classification_search_apps/:seedId', function (req, res, next) {
+        var seedId = req.params.seedId;
+        var boost = req.query.boost && !isNaN(req.query.boost) ? parseFloat(req.query.boost) : 1;
+
+        if (!seedId || isNaN(seedId)) {
+            return res.status(400).send('Bad seed Id query parameter');
+        }
+
+        clusterSearcher.getClassificationSearchApps(seedId, boost, function (err, result) {
+            if (err) {
+                return next(err);
+            }
+
+            res.json(result);
+        });
+    });
+
     app.get('/admin/cluster/seed_keywords/:seedCategoryId', function (req, res, next) {
         var seedCategoryId = req.params.seedCategoryId;
 
