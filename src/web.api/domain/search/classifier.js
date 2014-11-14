@@ -37,7 +37,7 @@ Classifier.prototype.predict = function(matrix) {
 var ClassifierAnalyser = function() {
     var resultSettings = {
         maxTerms: 50,
-        smoothFactor: 0.1,
+        smoothFactor: 1.0,
         tieBreak: 0.1,
         maxDocFreq: 800000
     };
