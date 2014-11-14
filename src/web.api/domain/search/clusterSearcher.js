@@ -453,7 +453,7 @@ var getClassificationSearchesAnalyser = function(seedCategoryId, next) {
 
 var getSeedCategoryMatrix = function(seedCategoryId, next) {
     log.debug("Retrieving classification searches");
-    adminRepo.getClassificationSearches(seedCategoryId, function(err, seedSearches) {
+    adminRepo.getSeedSearches(seedCategoryId, function(err, seedSearches) {
         if (err) { return next(err); }
 
         getClassifierAnalyser(seedSearches, function(err, analyser) {
