@@ -1,0 +1,22 @@
+<div id="classified-apps" class="main-wrapper" ng-cloak>
+    <form ng-submit="submitForm()">
+        <input type="number" ng-model="classifiedApps.seedCategoryId" name="seedCategoryId" min="1" max="99999999">
+        <input type="checkbox" ng-model="classifiedApps.include" name="include" value="true">Include
+        <input type="submit" value="Submit">
+    </form>
+    <div class="classified-apps-list-wrapper">
+        <ul class="classified-apps-list">
+            <li ng-repeat="classifiedApp in classifiedAppsData track by classifiedApp.extId" class="classified-app">
+                <h2>{{::classifiedApp.name}}</h2>
+                <p class="id">{{::classifiedApp.extId}}</p>
+                <p class="description">{{::classifiedApp.description}}</p>
+                <p class="store-url"><a href="{{::classifiedApp.storeUrl}}" target="_blank"></a></p>
+                <p class="genres"><em>Genres:</em> <span ng-repeat="genre in classifiedApp.genres track by $index">{{genre}}, </span></p>
+                <p class="actions">
+                    <button ng-if="::!classifiedApps.include" ng-click="::updateTrainingData(classifiedApp.extId, classifiedApps.seedCategoryId, classifiedApps.include)">Include</button>
+                    <button ng-if="::classifiedApps.include" ng-click="::updateTrainingData(classifiedApp.extId, classifiedApps.seedCategoryId, classifiedApps.include)">Exclude</button>
+                </p>
+            </li>
+        </ul>
+    </div>
+<div>

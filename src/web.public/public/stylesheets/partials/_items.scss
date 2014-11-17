@@ -1328,3 +1328,22 @@ h2 {
     }
   }
 }
+
+#classified-apps {
+  input[type="checkbox"] {
+    -webkit-appearance: checkbox;
+    -moz-appearance: checkbox;
+    -ms-appearance: checkbox;
+    -o-appearance: checkbox;
+    appearance: checkbox;
+  }
+
+  .classified-app {
+    margin-bottom: 18px;
+  }
+
+  p {
+    @include small-body-text;
+    margin-bottom: 6px;
+  }
+}

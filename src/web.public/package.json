@@ -3,7 +3,7 @@
   "version": "0.0.5",
   "private": true,
   "scripts": {
-    "start": "nodemon --debug server.js"
+    "start": "nodemon server.js"
   },
   "dependencies": {
     "body-parser": "~1.0.0",

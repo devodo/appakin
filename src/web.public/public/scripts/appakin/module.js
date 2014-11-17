@@ -30,6 +30,10 @@
 //                templateUrl: '/public/templates/appakin/pages/raters/raters.html',
 //                controller: 'RatersCtrl'
 //            })
+            .when('/classified-apps', {
+                templateUrl: '/public/templates/appakin/pages/admin/classified-apps.html',
+                controller: 'ClassifiedAppsCtrl'
+            })
             .when('/about', {
                 templateUrl: '/public/templates/appakin/pages/about/about.html',
                 controller: 'AboutCtrl'
