@@ -375,7 +375,7 @@ var buildSeedQuery = function(seedSearch, boostFactor, includeDetails) {
     var queryTerms = encodeURIComponent(queryLines.join(' '));
     var qq = 'qq=' + queryTerms;
     var rows = 'rows=' + (seedSearch.maxTake ? seedSearch.maxTake : 1000);
-    var fl = includeDetails ? 'fl=id,name,desc,genres,popularity,score' : 'fl=id';
+    var fl = includeDetails ? 'fl=id,name,desc,genres,popularity,score,screenshot_urls,ipad_screenshot_urls' : 'fl=id';
     var boost = 'b=' + (boostFactor || boostFactor === 0 ? boostFactor : 1);
 
     return qq + '&' + rows + '&' + fl + '&' + boost;
@@ -395,11 +395,13 @@ var searchSeedApps = function(seedSearch, boostFactor, includeDetails, next) {
         var apps = obj.response.docs.map(function(doc, index) {
             var app = {
                 position: index + 1,
+                extId: doc.id,
                 name: doc.name,
                 desc: doc.desc,
                 genres: doc.genres,
+                screenShots: doc.screenshot_urls,
+                ipadScreenShots: doc.ipad_screenshot_urls,
                 popularity: doc.popularity,
-                extId: doc.id,
                 score: doc.score
             };
 
