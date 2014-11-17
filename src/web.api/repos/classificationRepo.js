@@ -142,6 +142,27 @@ var getClassificationApps = function(client, seedCategoryId, isInclude, skip, ta
     });
 };
 
+var insertSeedTraining = function(client, seedCategoryId, appExtId, isIncluded, next) {
+    var queryStr =
+        "INSERT INTO seed_training(seed_category_id, app_ext_id, include, date_created)\n" +
+        "VALUES ($1, $2, $3, NOW() at time zone 'utc')\n" +
+        "RETURNING id;";
+
+    var queryParams = [
+        seedCategoryId,
+        appExtId,
+        isIncluded
+    ];
+
+    client.query(queryStr, queryParams, function (err, result) {
+        if (err) {
+            return next(err);
+        }
+
+        next(null, result.rows[0].id);
+    });
+};
+
 exports.getTrainingSet = function(seedCategoryId, next) {
     connection.open(function(err, conn) {
         if (err) {
@@ -173,6 +194,18 @@ exports.getClassificationApps = function(seedCategoryId, isInclude, skip, take, 
         if (err) { return next(err); }
 
         getClassificationApps(conn.client, seedCategoryId, isInclude, skip, take, function(err, id) {
+            conn.close(err, function(err) {
+                next(err, id);
+            });
+        });
+    });
+};
+
+exports.insertSeedTraining = function(seedCategoryId, appExtId, isIncluded, next)  {
+    connection.open(function(err, conn) {
+        if (err) { return next(err); }
+
+        insertSeedTraining(conn.client, seedCategoryId, appExtId, isIncluded, function(err, id) {
             conn.close(err, function(err) {
                 next(err, id);
             });

@@ -2,6 +2,7 @@
 
 var log = require('../../logger');
 var clusterSearcher = require('../../domain/search/clusterSearcher');
+var uuidUtil = require('../../domain/uuidUtil');
 
 exports.init = function init(app) {
     app.get('/admin/search/cluster_name', function (req, res, next) {
@@ -237,6 +238,32 @@ exports.init = function init(app) {
             if (err) {
                 return next(err);
             }
+
+            res.json(result);
+        });
+    });
+
+    app.post('/admin/classification/train', function (req, res, next) {
+        var seedCategoryId = req.body.seedCategoryId;
+
+        if (!seedCategoryId || isNaN(seedCategoryId)) {
+            return res.status(400).send('Bad seedCategoryId parameter');
+        }
+
+        var appExtId = req.body.appExtId;
+
+        if (!uuidUtil.isValid(appExtId)) {
+            return res.status(400).send('Bad appExtId parameter');
+        }
+
+        if (typeof req.body.include !== 'boolean') {
+            return res.status(400).send('Bad include parameter');
+        }
+
+        var isIncluded =  req.body.include;
+
+        clusterSearcher.insertSeedTraining(seedCategoryId, appExtId, isIncluded, function (err, result) {
+            if (err) { return next(err); }
 
             res.json(result);
         });

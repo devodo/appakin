@@ -519,9 +519,8 @@ var classifySeedCategory = function(seedCategoryId, saveResults, next) {
 
             log.debug("Starting SVM training");
             svm.train(trainingData, function() {
-                log.debug("SVM training complete");
+                log.debug("Generating classification results");
                 var predictions = svm.predict(matrixData.vectorMatrix);
-
                 var results = [];
                 predictions.forEach(function(prediction, index) {
                     results.push({
@@ -534,6 +533,7 @@ var classifySeedCategory = function(seedCategoryId, saveResults, next) {
                     return next(null, results);
                 }
 
+                log.debug("Saving classififcation results to db");
                 classifierRepo.setClassificationApps(results, seedCategoryId, function(err) {
                     if (err) { return next(err); }
 
@@ -552,22 +552,12 @@ var getClassificationApps = function(seedCategoryId, isInclude, skip, take, next
     });
 };
 
-var addSeedApps = function(seedCategoryId, next) {
-    adminRepo.getSeedSearches(seedCategoryId, function(err, seedSearches) {
+var insertSeedTraining = function(seedCategoryId, appExtId, isIncluded, next) {
+    classifierRepo.insertSeedTraining(seedCategoryId, appExtId, isIncluded, function(err, id) {
         if (err) { return next(err); }
 
-        var processSeedSearch = function(seedSearch, callback) {
-
-        };
-
-        async.eachSeries(seedSearches, processSeedSearch, function(err) {
-            if (err) { return next(err); }
-
-
-        });
-
+        return next(null, id);
     });
-
 };
 
 var search = function(appId, next) {
@@ -736,6 +726,7 @@ exports.getSeedCategoryKeywords = getSeedCategoryKeywords;
 exports.getAppTopKeywords = getAppTopKeywords;
 exports.classifySeedCategory = classifySeedCategory;
 exports.getClassificationApps = getClassificationApps;
+exports.insertSeedTraining = insertSeedTraining;
 
 
 

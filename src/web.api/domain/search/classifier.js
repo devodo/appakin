@@ -34,6 +34,8 @@ Classifier.prototype.predict = function(matrix) {
     return results;
 };
 
+// Maths
+//http://fooplot.com/#W3sidHlwZSI6MCwiZXEiOiIxLShsb2coeCkvbG9nKDIyMCkpXjIqMC45IiwiY29sb3IiOiIjRTYyNTI1In0seyJ0eXBlIjowLCJlcSI6IjEtKGxvZyh4KS9sb2coMzAwKSleMjAiLCJjb2xvciI6IiMxNDVBRDEifSx7InR5cGUiOjAsImVxIjoiKGxuKHgpL2xuKDI4NDIxMDgpKSIsImNvbG9yIjoiIzI1RTMwQyJ9LHsidHlwZSI6MCwiZXEiOiJ4XjAuNSIsImNvbG9yIjoiIzAwMDAwMCJ9LHsidHlwZSI6MTAwMCwid2luZG93IjpbIi0zMDkuNzg5NTUwNzgxMjQ5ODMiLCI2MDguNzg5NTUwNzgxMjQ5OCIsIi03LjE1NTI3MzQzNzQ5OTk5NjQiLCIxMS4xNTUyNzM0Mzc0OTk5OTYiXX1d
 var ClassifierAnalyser = function() {
     var resultSettings = {
         maxTerms: 50,
@@ -293,13 +295,15 @@ TermMatrix.prototype.buildTermMatrix = function() {
 
     log.debug("Term matrix size: " + self.indexedTermMatrix.length + " x " + self.termIndex);
 
-    self.indexedTermMatrix.forEach(function(indexedTermVector) {
+    for (var j = 0; j < self.indexedTermMatrix.length; j++) {
         for (var i = 0; i < self.termIndex; i++) {
-            if (!indexedTermVector[i]) {
-                indexedTermVector[i] = 0;
+            if (!self.indexedTermMatrix[j][i]) {
+                self.indexedTermMatrix[j][i] = 0;
             }
         }
-    });
+    }
+
+    log.debug("Vector matrix filling complete");
 
     return self.indexedTermMatrix;
 };
