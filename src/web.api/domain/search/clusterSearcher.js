@@ -436,30 +436,6 @@ var getSeedApps = function(seedSearchId, boostFactor, skip, take, next) {
     });
 };
 
-var getClassificationSearchApps = function(searchId, boostFactor, skip, take, next) {
-    adminRepo.getClassificationSearch(searchId, function(err, seedSearch) {
-        if (err) { return next(err); }
-
-        searchSeedApps(seedSearch, boostFactor, true, skip, take, function(err, searchResult) {
-            if (err) { return next(err); }
-
-            next(null, searchResult);
-        });
-    });
-};
-
-var getClassificationSearchesAnalyser = function(seedCategoryId, next) {
-    adminRepo.getClassificationSearches(seedCategoryId, function(err, seedSearches) {
-        if (err) { return next(err); }
-
-        getClassifierAnalyser(seedSearches, function(err, analyser) {
-            if (err) { return next(err); }
-
-            next(null, analyser);
-        });
-    });
-};
-
 var getSeedCategoryMatrix = function(seedCategoryId, next) {
     log.debug("Retrieving classification searches");
     adminRepo.getSeedSearches(seedCategoryId, function(err, seedSearches) {
@@ -476,11 +452,17 @@ var getSeedCategoryMatrix = function(seedCategoryId, next) {
 };
 
 var getSeedCategoryKeywords = function(seedCategoryId, next) {
-    getClassificationSearchesAnalyser(seedCategoryId, function(err, analyser) {
+    log.debug("Retrieving classification searches");
+    adminRepo.getSeedSearches(seedCategoryId, function(err, seedSearches) {
         if (err) { return next(err); }
 
-        var keywords = analyser.getTopTerms(20, 50);
-        next(null, keywords);
+        getClassifierAnalyser(seedSearches, function(err, analyser) {
+            if (err) { return next(err); }
+
+            log.debug("Retrieving top keywords");
+            var keywords = analyser.getTopTerms(20, 50);
+            next(null, keywords);
+        });
     });
 };
 
@@ -561,8 +543,27 @@ var getClassificationApps = function(seedCategoryId, isInclude, skip, take, next
     });
 };
 
+var getSeedTrainingSet = function(seedCategoryId, next) {
+    log.debug("Retrieving training data");
+    classifierRepo.getTrainingSet(seedCategoryId, function (err, trainingSet) {
+        if (err) {
+            return next(err);
+        }
+
+        return next(null, trainingSet);
+    });
+};
+
 var insertSeedTraining = function(seedCategoryId, appExtId, isIncluded, next) {
     classifierRepo.insertSeedTraining(seedCategoryId, appExtId, isIncluded, function(err, id) {
+        if (err) { return next(err); }
+
+        return next(null, id);
+    });
+};
+
+var deleteSeedTraining = function(seedCategoryId, appExtId, next) {
+    classifierRepo.deleteSeedTraining(seedCategoryId, appExtId, function(err, id) {
         if (err) { return next(err); }
 
         return next(null, id);
@@ -734,7 +735,9 @@ exports.getSeedCategoryKeywords = getSeedCategoryKeywords;
 exports.getAppTopKeywords = getAppTopKeywords;
 exports.classifySeedCategory = classifySeedCategory;
 exports.getClassificationApps = getClassificationApps;
+exports.getSeedTrainingSet = getSeedTrainingSet;
 exports.insertSeedTraining = insertSeedTraining;
+exports.deleteSeedTraining = deleteSeedTraining;
 
 
 

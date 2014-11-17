@@ -163,6 +163,24 @@ var insertSeedTraining = function(client, seedCategoryId, appExtId, isIncluded, 
     });
 };
 
+var deleteSeedTraining = function(client, seedCategoryId, appExtId, next) {
+    var queryStr =
+        "DELETE FROM seed_training\n" +
+        "WHERE seed_category_id = $1\n" +
+        "AND app_ext_id = $2;";
+
+    var queryParams = [
+        seedCategoryId,
+        appExtId
+    ];
+
+    client.query(queryStr, queryParams, function (err, result) {
+        if (err) { return next(err); }
+
+        next(null);
+    });
+};
+
 exports.getTrainingSet = function(seedCategoryId, next) {
     connection.open(function(err, conn) {
         if (err) {
@@ -208,6 +226,18 @@ exports.insertSeedTraining = function(seedCategoryId, appExtId, isIncluded, next
         insertSeedTraining(conn.client, seedCategoryId, appExtId, isIncluded, function(err, id) {
             conn.close(err, function(err) {
                 next(err, id);
+            });
+        });
+    });
+};
+
+exports.deleteSeedTraining = function(seedCategoryId, appExtId, next)  {
+    connection.open(function(err, conn) {
+        if (err) { return next(err); }
+
+        deleteSeedTraining(conn.client, seedCategoryId, appExtId, function(err) {
+            conn.close(err, function(err) {
+                next(err);
             });
         });
     });

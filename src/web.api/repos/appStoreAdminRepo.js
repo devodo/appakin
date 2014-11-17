@@ -854,56 +854,6 @@ var getSeedSearches = function(client, seedCategoryId, next) {
     });
 };
 
-var getClassificationSearch = function(client, seedId, next) {
-    var queryStr =
-        "SELECT id, seed_category_id, query, max_take\n" +
-        "FROM seed_classification_search\n" +
-        "WHERE id = $1;";
-
-    client.query(queryStr, [seedId], function (err, result) {
-        if (err) {
-            return next(err);
-        }
-
-        var seedSearch = null;
-        if (result.rows.length > 0) {
-            var item = result.rows[0];
-            seedSearch = {
-                id: item.id,
-                seedCategoryId: item.seed_category_id,
-                query: item.query,
-                maxTake: item.max_take
-            };
-        }
-
-        next(null, seedSearch);
-    });
-};
-
-var getClassificationSearches = function(client, seedCategoryId, next) {
-    var queryStr =
-        "SELECT id, seed_category_id, query, max_take\n" +
-        "FROM seed_classification_search\n" +
-        "WHERE seed_category_id = $1\n" +
-        "ORDER BY id;";
-
-    client.query(queryStr, [seedCategoryId], function (err, result) {
-        if (err) {
-            return next(err);
-        }
-
-        var items = result.rows.map(function(item) {
-            return {
-                id: item.id,
-                seedCategoryId: item.seed_category_id,
-                query: item.query,
-                maxTake: item.max_take
-            };
-        });
-
-        next(null, items);
-    });
-};
 
 exports.insertAppStoreApp = function(app, next) {
     connection.open(function(err, conn) {
@@ -1197,34 +1147,6 @@ exports.getSeedSearch = function(seedId, next) {
         getSeedSearch(conn.client, seedId, function(err, seedSearch) {
             conn.close(err, function(err) {
                 next(err, seedSearch);
-            });
-        });
-    });
-};
-
-exports.getClassificationSearch = function(seedId, next) {
-    connection.open(function(err, conn) {
-        if (err) {
-            return next(err);
-        }
-
-        getClassificationSearch(conn.client, seedId, function(err, seedSearch) {
-            conn.close(err, function(err) {
-                next(err, seedSearch);
-            });
-        });
-    });
-};
-
-exports.getClassificationSearches = function(seedCategoryId, next) {
-    connection.open(function(err, conn) {
-        if (err) {
-            return next(err);
-        }
-
-        getClassificationSearches(conn.client, seedCategoryId, function(err, seedSearches) {
-            conn.close(err, function(err) {
-                next(err, seedSearches);
             });
         });
     });

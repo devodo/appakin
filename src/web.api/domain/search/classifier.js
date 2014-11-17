@@ -90,6 +90,13 @@ ClassifierAnalyser.prototype.buildVectorMatrix = function() {
     };
 };
 
+ClassifierAnalyser.prototype.getTopTerms = function(limit) {
+    var self = this;
+    var result = self.termMatrix.getTopTerms(limit);
+
+    return result;
+};
+
 ClassifierAnalyser.prototype.getDocTopTerms = function(doc) {
     var self = this;
     var result = self.termMatrix.getTopScoringTerms(doc);

@@ -254,4 +254,38 @@ exports.init = function init(app) {
             res.json(result);
         });
     });
+
+    app.del('/admin/classification/train', function (req, res, next) {
+        var seedCategoryId = req.body.seedCategoryId;
+
+        if (!seedCategoryId || isNaN(seedCategoryId)) {
+            return res.status(400).send('Bad seedCategoryId parameter');
+        }
+
+        var appExtId = req.body.appExtId;
+
+        if (!uuidUtil.isValid(appExtId)) {
+            return res.status(400).send('Bad appExtId parameter');
+        }
+
+        clusterSearcher.deleteSeedTraining(seedCategoryId, appExtId, function (err, result) {
+            if (err) { return next(err); }
+
+            res.json(result);
+        });
+    });
+
+    app.get('/admin/classification/training/:seedCategoryId', function (req, res, next) {
+        var seedCategoryId = req.params.seedCategoryId;
+
+        if (!seedCategoryId || isNaN(seedCategoryId)) {
+            return res.status(400).send('Bad seedCategoryId parameter');
+        }
+
+        clusterSearcher.getSeedTrainingSet(seedCategoryId, function (err, result) {
+            if (err) { return next(err); }
+
+            res.json(result);
+        });
+    });
 };
