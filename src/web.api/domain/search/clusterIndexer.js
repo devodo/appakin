@@ -12,6 +12,8 @@ var createSolrDoc = function(app) {
         "desc_top": solrCore.getTopWords(app.description, 200),
         "primary_genre": app.genres[0],
         genres: app.genres,
+        "screenshot_urls": app.screenShotUrls,
+        "ipad_screenshot_urls": app.iPadScreenShotUrls,
         popularity: app.popularity
     };
 
