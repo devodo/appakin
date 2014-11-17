@@ -123,30 +123,16 @@ exports.init = function init(app) {
 
     app.get('/admin/cluster/search_seed_app/:seedId', function (req, res, next) {
         var seedId = req.params.seedId;
-        var boost = req.query.boost && !isNaN(req.query.boost) ? parseFloat(req.query.boost) : 1;
 
         if (!seedId || isNaN(seedId)) {
             return res.status(400).send('Bad seed Id query parameter');
         }
 
-        clusterSearcher.getSeedApps(seedId, boost, function (err, result) {
-            if (err) {
-                return next(err);
-            }
-
-            res.json(result);
-        });
-    });
-
-    app.get('/admin/cluster/classification_search_apps/:seedId', function (req, res, next) {
-        var seedId = req.params.seedId;
         var boost = req.query.boost && !isNaN(req.query.boost) ? parseFloat(req.query.boost) : 1;
+        var skip = req.query.skip && !isNaN(req.query.skip) ? parseInt(req.query.skip, 10): 0;
+        var take = req.query.take && !isNaN(req.query.take) ? parseInt(req.query.take, 10): 400;
 
-        if (!seedId || isNaN(seedId)) {
-            return res.status(400).send('Bad seed Id query parameter');
-        }
-
-        clusterSearcher.getClassificationSearchApps(seedId, boost, function (err, result) {
+        clusterSearcher.getSeedApps(seedId, boost, skip, take, function (err, result) {
             if (err) {
                 return next(err);
             }

@@ -364,7 +364,7 @@ var searchKeywords = function(appId, keywords, categoryId, next) {
     });
 };
 
-var buildSeedQuery = function(seedSearch, boostFactor, includeDetails) {
+var buildSeedQuery = function(seedSearch, boostFactor, includeDetails, skip, take) {
     var queryLines = seedSearch.query.
         replace(/\r/g,'').
         split(/\n/g).
@@ -374,15 +374,22 @@ var buildSeedQuery = function(seedSearch, boostFactor, includeDetails) {
 
     var queryTerms = encodeURIComponent(queryLines.join(' '));
     var qq = 'qq=' + queryTerms;
-    var rows = 'rows=' + (seedSearch.maxTake ? seedSearch.maxTake : 1000);
     var fl = includeDetails ? 'fl=id,name,desc,genres,popularity,score,screenshot_urls,ipad_screenshot_urls' : 'fl=id';
     var boost = 'b=' + (boostFactor || boostFactor === 0 ? boostFactor : 1);
 
-    return qq + '&' + rows + '&' + fl + '&' + boost;
+    if (!skip) {
+        skip = 0;
+    }
+
+    if (!take) {
+        take = 100;
+    }
+
+    return qq + '&' + fl + '&' + boost + '&rows=' + take + '&start=' + skip;
 };
 
-var searchSeedApps = function(seedSearch, boostFactor, includeDetails, next) {
-    var solrQuery = buildSeedQuery(seedSearch, boostFactor, includeDetails);
+var searchSeedApps = function(seedSearch, boostFactor, includeDetails, skip, take, next) {
+    var solrQuery = buildSeedQuery(seedSearch, boostFactor, includeDetails, skip, take);
     log.debug("Get seed apps: " + solrQuery);
 
     solrClusterCore.client.get('seed_search', solrQuery, function (err, obj) {
@@ -417,11 +424,11 @@ var searchSeedApps = function(seedSearch, boostFactor, includeDetails, next) {
     });
 };
 
-var getSeedApps = function(seedSearchId, boostFactor, next) {
+var getSeedApps = function(seedSearchId, boostFactor, skip, take, next) {
     adminRepo.getSeedSearch(seedSearchId, function(err, seedSearch) {
         if (err) { return next(err); }
 
-        searchSeedApps(seedSearch, boostFactor, true, function(err, searchResult) {
+        searchSeedApps(seedSearch, boostFactor, true, skip, take, function(err, searchResult) {
             if (err) { return next(err); }
 
             next(null, searchResult);
@@ -429,11 +436,11 @@ var getSeedApps = function(seedSearchId, boostFactor, next) {
     });
 };
 
-var getClassificationSearchApps = function(searchId, boostFactor, next) {
+var getClassificationSearchApps = function(searchId, boostFactor, skip, take, next) {
     adminRepo.getClassificationSearch(searchId, function(err, seedSearch) {
         if (err) { return next(err); }
 
-        searchSeedApps(seedSearch, boostFactor, true, function(err, searchResult) {
+        searchSeedApps(seedSearch, boostFactor, true, skip, take, function(err, searchResult) {
             if (err) { return next(err); }
 
             next(null, searchResult);
@@ -723,7 +730,6 @@ exports.runTrainingTest = runTrainingTest;
 exports.runClusterTest = runClusterTest;
 exports.runClusterCategoryTest = runClusterCategoryTest;
 exports.getSeedApps = getSeedApps;
-exports.getClassificationSearchApps = getClassificationSearchApps;
 exports.getSeedCategoryKeywords = getSeedCategoryKeywords;
 exports.getAppTopKeywords = getAppTopKeywords;
 exports.classifySeedCategory = classifySeedCategory;
