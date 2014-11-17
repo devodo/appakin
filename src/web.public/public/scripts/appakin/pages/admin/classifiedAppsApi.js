@@ -39,8 +39,39 @@
                     getApi(
                         'admin/cluster/search_seed_app/' + seedCategoryId + '?boost=' + boost,
                         function (data) {
-                            data.serverError = false;
-                            handleResponse(data);
+                            var i;
+
+                            getApi(
+                                'admin/classification/training/' + seedCategoryId,
+                                function (trainingData) {
+                                    var trainingDataLookup = {};
+                                    var trainingDataResult;
+
+                                    if (trainingData && trainingData.length > 0) {
+                                        for (i = 0; i < trainingData.length; ++i) {
+                                            trainingDataLookup[trainingData[i].appExtId.replace(/-/g, '')] = trainingData[i];
+                                        }
+
+                                        for (i = 0; i < data.apps.length; ++i) {
+                                            trainingDataResult = trainingDataLookup[data.apps[i].extId];
+
+                                            if (trainingDataResult) {
+                                                data.apps[i].isTrainingData = true;
+                                                data.apps[i].include = trainingDataResult.include;
+                                                data.apps[i].trainingDataId = trainingDataResult.id;
+                                            }
+                                        }
+                                    }
+
+                                    data.serverError = false;
+                                    handleResponse(data);
+                                },
+                                function () {
+                                    data = {data: data};
+                                    data.serverError = true;
+                                    handleResponse(data);
+                                }
+                            );
                         },
                         function (data) {
                             data = {data: data};
@@ -67,15 +98,29 @@
                             appExtId: appExtId,
                             include: include
                         }
-                    )
-                    .success(function(data) {
+                        )
+                        .success(function(data) {
                             console.log('successfully updated');
                             success();
-                    })
-                    .error(function(data, status) {
+                        })
+                        .error(function(data, status) {
                             console.log('failed to update');
-                            alert('failed to update training data')
-                    });
+                            alert('failed to update training data');
+                        });
+                },
+                deleteTrainingData: function(appExtId, seedCategoryId, success) {
+                    var url = webApiUrl + 'admin/classification/train?seedCategoryId=' + seedCategoryId + '&appExtId=' + appExtId;
+                    console.log(url);
+
+                    $http.delete(url)
+                        .success(function(data) {
+                            console.log('successfully deleted');
+                            success();
+                        })
+                        .error(function(data, status) {
+                            console.log('failed to delete');
+                            alert('failed to delete training data');
+                        });
                 }
             };
     });

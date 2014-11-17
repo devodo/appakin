@@ -23,9 +23,17 @@
 
         $scope.updateTrainingData = function(extId, seedCategoryId, include, searchSeedApp) {
             classifiedAppsApi.updateTrainingData(extId, seedCategoryId, include, function() {
-                searchSeedApp.updated = true;
+                searchSeedApp.isTrainingData = true;
+                searchSeedApp.include = include;
             });
         };
+
+        $scope.deleteTrainingData = function(extId, seedCategoryId, searchSeedApp) {
+            classifiedAppsApi.deleteTrainingData(extId, seedCategoryId, function() {
+                searchSeedApp.isTrainingData = false;
+                searchSeedApp.include = null;
+            })
+        }
     });
 
 }()); // use strict

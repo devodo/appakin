@@ -6,6 +6,7 @@
         Take:<input type="number" ng-model="take" name="take" min="1" max="99999999">
         <input type="submit" value="Submit">
     </form>
+    <a href="/classified-apps">Classified Apps</a>
     <div class="search-seed-apps-list-wrapper">
         <p>Total apps: <span ng-bind="searchSeedAppsData.total"></span></p>
         <ul class="search-seed-apps-list">
@@ -21,8 +22,9 @@
                     <img ng-repeat="screenshotUrl in ::searchSeedApp.ipadScreenShots track by $index" src="{{screenshotUrl}}">
                 </div>
                 <p class="actions">
-                    <button ng-if="!searchSeedApp.updated" ng-click="::updateTrainingData(searchSeedApp.extId, classifiedApps.seedCategoryId, true, searchSeedApp)">Include</button>
-                    <button ng-if="!searchSeedApp.updated" ng-click="::updateTrainingData(searchSeedApp.extId, classifiedApps.seedCategoryId, false, searchSeedApp)">Exclude</button>
+                    <button ng-if="!searchSeedApp.isTrainingData" ng-click="::updateTrainingData(searchSeedApp.extId, classifiedApps.seedCategoryId, true, searchSeedApp)">Include</button>
+                    <button ng-if="!searchSeedApp.isTrainingData" ng-click="::updateTrainingData(searchSeedApp.extId, classifiedApps.seedCategoryId, false, searchSeedApp)">Exclude</button>
+                    <button ng-if="searchSeedApp.isTrainingData" ng-click="::deleteTrainingData(searchSeedApp.extId, classifiedApps.seedCategoryId, searchSeedApp)">Remove from Training Data</button>
                 </p>
             </li>
         </ul>

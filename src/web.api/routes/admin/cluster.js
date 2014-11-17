@@ -256,13 +256,13 @@ exports.init = function init(app) {
     });
 
     app.del('/admin/classification/train', function (req, res, next) {
-        var seedCategoryId = req.body.seedCategoryId;
+        var seedCategoryId = req.query.seedCategoryId;
 
         if (!seedCategoryId || isNaN(seedCategoryId)) {
             return res.status(400).send('Bad seedCategoryId parameter');
         }
 
-        var appExtId = req.body.appExtId;
+        var appExtId = req.query.appExtId;
 
         if (!uuidUtil.isValid(appExtId)) {
             return res.status(400).send('Bad appExtId parameter');
