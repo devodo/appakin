@@ -12,9 +12,15 @@
                 <p class="description">{{::classifiedApp.description}}</p>
                 <p class="store-url"><a href="{{::classifiedApp.storeUrl}}" target="_blank"></a></p>
                 <p class="genres"><em>Genres:</em> <span ng-repeat="genre in classifiedApp.genres track by $index">{{genre}}, </span></p>
+                <div ng-if="::classifiedApp.screenshotUrls.length > 0" class="screenshots-wrapper">
+                    <img ng-repeat="screenshotUrl in ::classifiedApp.screenshotUrls track by $index" src="{{screenshotUrl}}">
+                </div>
+                <div ng-if="::classifiedApp.screenshotUrls.length === 0" class="screenshots-wrapper">
+                    <img ng-repeat="screenshotUrl in ::classifiedApp.ipadScreenshotUrls track by $index" src="{{screenshotUrl}}">
+                </div>
                 <p class="actions">
-                    <button ng-if="::!classifiedApps.include" ng-click="::updateTrainingData(classifiedApp.extId, classifiedApps.seedCategoryId, classifiedApps.include)">Include</button>
-                    <button ng-if="::classifiedApps.include" ng-click="::updateTrainingData(classifiedApp.extId, classifiedApps.seedCategoryId, classifiedApps.include)">Exclude</button>
+                    <button ng-if="!classifiedApps.include && !classifiedApp.updated" ng-click="::updateTrainingData(classifiedApp.extId, classifiedApps.seedCategoryId, true, classifiedApp)">Include</button>
+                    <button ng-if="classifiedApps.include && !classifiedApp.updated" ng-click="::updateTrainingData(classifiedApp.extId, classifiedApps.seedCategoryId, false, classifiedApp)">Exclude</button>
                 </p>
             </li>
         </ul>

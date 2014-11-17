@@ -19,8 +19,10 @@
                 });
         };
 
-        $scope.updateTrainingData = function(extId, seedCategoryId, include) {
-            classifiedAppsApi.updateTrainingData(extId, seedCategoryId, include);
+        $scope.updateTrainingData = function(extId, seedCategoryId, include, classifiedApp) {
+            classifiedAppsApi.updateTrainingData(extId, seedCategoryId, include, function() {
+                classifiedApp.updated = true;
+            });
         };
     });
 

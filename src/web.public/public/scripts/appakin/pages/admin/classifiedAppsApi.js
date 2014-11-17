@@ -2,7 +2,7 @@
     'use strict';
 
     angular.module('appAkin').factory('classifiedAppsApi', function(
-        $q, $timeout, $location, $http, httpGet, loading) {
+        $q, $timeout, $location, $http, httpGet, loading, webApiUrl) {
             var getApi = httpGet();
 
             function createUrl(seedCategoryId, include) {
@@ -35,7 +35,7 @@
 
                     return deferred.promise;
                 },
-                updateTrainingData: function(appExtId, seedCategoryId, include) {
+                updateTrainingData: function(appExtId, seedCategoryId, include, success) {
                     var url = webApiUrl + 'admin/classification/train';
                     console.log(url);
 
@@ -48,10 +48,11 @@
                         }
                     )
                     .success(function(data) {
-                        console.log('successfully updated');
+                            console.log('successfully updated');
+                            success();
                     })
                     .error(function(data, status) {
-                        console.log('failed to update');
+                            console.log('failed to update');
                             alert('failed to update training data')
                     });
                 }

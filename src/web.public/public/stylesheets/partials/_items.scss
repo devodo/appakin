@@ -1339,7 +1339,14 @@ h2 {
   }
 
   .classified-app {
-    margin-bottom: 18px;
+    margin-bottom: 24px;
+  }
+
+  .screenshots-wrapper {
+    img {
+      width: 150px;
+      margin-right: 3px;
+    }
   }
 
   p {
