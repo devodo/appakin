@@ -10,7 +10,7 @@
 
         $scope.submitForm = function() {
             classifiedAppsApi
-                .getSearchSeedApps(classifiedApps.seedCategoryId, 1)
+                .getSearchSeedApps(classifiedApps.seedCategoryId, classifiedApps.boost)
                 .then(function(data) {
                     if (data && !data.serverError) {
                         console.log('got data');

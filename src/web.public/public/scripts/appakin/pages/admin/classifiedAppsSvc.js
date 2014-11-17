@@ -7,7 +7,8 @@
 
             me.service = {
                 seedCategoryId: 176,
-                include: true
+                include: true,
+                boost: 1
             };
 
             return me.service;

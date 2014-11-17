@@ -1,6 +1,7 @@
 <div id="search-seed" class="main-wrapper" ng-cloak>
     <form ng-submit="submitForm()">
         <input type="number" ng-model="classifiedApps.seedCategoryId" name="seedCategoryId" min="1" max="99999999">
+        Boost:<input type="number" ng-model="classifiedApps.boost" name="boost" min="1" max="10">
         <input type="submit" value="Submit">
     </form>
     <div class="search-seed-apps-list-wrapper">
