@@ -1,7 +1,9 @@
 <div id="classified-apps" class="main-wrapper" ng-cloak>
     <form ng-submit="submitForm()">
-        <input type="number" ng-model="classifiedApps.seedCategoryId" name="seedCategoryId" min="1" max="99999999">
+        Seed Category ID:<input type="number" ng-model="classifiedApps.seedCategoryId" name="seedCategoryId" min="1" max="99999999">
         <input type="checkbox" ng-model="classifiedApps.include" name="include" value="true">Include
+        Skip:<input type="number" ng-model="skip" name="skip" min="0" max="99999999">
+        Take:<input type="number" ng-model="take" name="take" min="1" max="99999999">
         <input type="submit" value="Submit">
     </form>
     <div class="classified-apps-list-wrapper">

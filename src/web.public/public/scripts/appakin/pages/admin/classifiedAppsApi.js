@@ -6,13 +6,13 @@
             var getApi = httpGet();
 
             return {
-                getClassifiedApps: function(seedCategoryId, include) {
+                getClassifiedApps: function(seedCategoryId, include, skip, take) {
                     var deferred = $q.defer();
 
                     loading.started();
 
                     getApi(
-                        'admin/cluster/classified_apps/' + seedCategoryId + '?include=' + include + '&skip=0&take=400',
+                        'admin/cluster/classified_apps/' + seedCategoryId + '?include=' + include + '&skip=' + skip + '&take=' + take,
                         function (data) {
                             data.serverError = false;
                             handleResponse(data);

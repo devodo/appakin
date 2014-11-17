@@ -7,10 +7,12 @@
 
         $scope.classifiedApps = classifiedApps;
         $scope.classifiedAppsData = [];
+        $scope.skip = 0;
+        $scope.take = 200;
 
         $scope.submitForm = function() {
             classifiedAppsApi
-                .getClassifiedApps(classifiedApps.seedCategoryId, classifiedApps.include)
+                .getClassifiedApps(classifiedApps.seedCategoryId, classifiedApps.include, $scope.skip, $scope.take)
                 .then(function(data) {
                     if (data && !data.serverError) {
                         console.log('got data');
