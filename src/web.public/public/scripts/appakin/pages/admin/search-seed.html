@@ -21,10 +21,13 @@
                 <div ng-if="::!searchSeedApp.screenShots || searchSeedApp.screenShots.length === 0" class="screenshots-wrapper">
                     <img ng-repeat="screenshotUrl in ::searchSeedApp.ipadScreenShots track by $index" src="{{screenshotUrl}}">
                 </div>
-                <p class="actions">
-                    <button ng-if="!searchSeedApp.isTrainingData" ng-click="::updateTrainingData(searchSeedApp.extId, classifiedApps.seedCategoryId, true, searchSeedApp)">Include</button>
-                    <button ng-if="!searchSeedApp.isTrainingData" ng-click="::updateTrainingData(searchSeedApp.extId, classifiedApps.seedCategoryId, false, searchSeedApp)">Exclude</button>
-                    <button ng-if="searchSeedApp.isTrainingData" ng-click="::deleteTrainingData(searchSeedApp.extId, classifiedApps.seedCategoryId, searchSeedApp)">Remove from Training Data</button>
+                <p ng-if="!searchSeedApp.isTrainingData" class="actions">
+                    <button ng-click="::updateTrainingData(searchSeedApp.extId, classifiedApps.seedCategoryId, true, searchSeedApp)">Include</button>
+                    <button ng-click="::updateTrainingData(searchSeedApp.extId, classifiedApps.seedCategoryId, false, searchSeedApp)">Exclude</button>
+                </p>
+                <p ng-if="searchSeedApp.isTrainingData" class="actions">
+                    <em>{{searchSeedApp.include ? 'Included' : 'Excluded'}}</em>
+                    <button ng-click="::deleteTrainingData(searchSeedApp.extId, classifiedApps.seedCategoryId, searchSeedApp)">Remove from Training Data</button>
                 </p>
             </li>
         </ul>

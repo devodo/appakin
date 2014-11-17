@@ -6,7 +6,7 @@
             var me = this;
 
             me.service = {
-                seedCategoryId: 176,
+                seedCategoryId: 1,
                 include: true,
                 boost: 1
             };
