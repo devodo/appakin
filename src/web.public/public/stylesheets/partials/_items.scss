@@ -1329,7 +1329,8 @@ h2 {
   }
 }
 
-#classified-apps {
+#classified-apps,
+#search-seed {
   input[type="checkbox"] {
     -webkit-appearance: checkbox;
     -moz-appearance: checkbox;
@@ -1338,7 +1339,12 @@ h2 {
     appearance: checkbox;
   }
 
-  .classified-app {
+  .id {
+    color: #ccc;
+  }
+
+  .classified-app,
+  .search-seed-app {
     margin-bottom: 24px;
   }
 

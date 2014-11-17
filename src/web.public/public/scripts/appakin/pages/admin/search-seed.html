@@ -1,0 +1,27 @@
+<div id="search-seed" class="main-wrapper" ng-cloak>
+    <form ng-submit="submitForm()">
+        <input type="number" ng-model="classifiedApps.seedCategoryId" name="seedCategoryId" min="1" max="99999999">
+        <input type="submit" value="Submit">
+    </form>
+    <div class="search-seed-apps-list-wrapper">
+        <p>Total apps: <span ng-bind="searchSeedAppsData.total"></span></p>
+        <ul class="search-seed-apps-list">
+            <li ng-repeat="searchSeedApp in searchSeedAppsData.apps track by searchSeedApp.extId" class="search-seed-app">
+                <h2>{{::searchSeedApp.name}}</h2>
+                <p class="id">{{::searchSeedApp.extId}}</p>
+                <p class="description">{{::searchSeedApp.desc}}</p>
+                <p class="genres"><em>Genres:</em> <span ng-repeat="genre in searchSeedApp.genres track by $index">{{genre}}, </span></p>
+                <div ng-if="::searchSeedApp.screenshotUrls.length > 0" class="screenshots-wrapper">
+                    <img ng-repeat="screenshotUrl in ::searchSeedApp.screenshotUrls track by $index" src="{{screenshotUrl}}">
+                </div>
+                <div ng-if="::searchSeedApp.screenshotUrls.length === 0" class="screenshots-wrapper">
+                    <img ng-repeat="screenshotUrl in ::searchSeedApp.ipadScreenshotUrls track by $index" src="{{screenshotUrl}}">
+                </div>
+                <p class="actions">
+                    <button ng-if="!searchSeedApp.updated" ng-click="::updateTrainingData(searchSeedApp.extId, classifiedApps.seedCategoryId, true, searchSeedApp)">Include</button>
+                    <button ng-if="!searchSeedApp.updated" ng-click="::updateTrainingData(searchSeedApp.extId, classifiedApps.seedCategoryId, false, searchSeedApp)">Exclude</button>
+                </p>
+            </li>
+        </ul>
+    </div>
+<div>

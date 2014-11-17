@@ -34,6 +34,10 @@
                 templateUrl: '/public/templates/appakin/pages/admin/classified-apps.html',
                 controller: 'ClassifiedAppsCtrl'
             })
+            .when('/search-seed', {
+                templateUrl: '/public/templates/appakin/pages/admin/search-seed.html',
+                controller: 'SearchSeedCtrl'
+            })
             .when('/about', {
                 templateUrl: '/public/templates/appakin/pages/about/about.html',
                 controller: 'AboutCtrl'

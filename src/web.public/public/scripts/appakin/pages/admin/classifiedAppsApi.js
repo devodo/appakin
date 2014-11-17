@@ -5,18 +5,39 @@
         $q, $timeout, $location, $http, httpGet, loading, webApiUrl) {
             var getApi = httpGet();
 
-            function createUrl(seedCategoryId, include) {
-                return 'admin/cluster/classified_apps/' + seedCategoryId + '?include=' + include + '&skip=0&take=400';
-            }
-
             return {
-                get: function(seedCategoryId, include) {
+                getClassifiedApps: function(seedCategoryId, include) {
                     var deferred = $q.defer();
 
                     loading.started();
 
                     getApi(
-                        createUrl(seedCategoryId, include),
+                        'admin/cluster/classified_apps/' + seedCategoryId + '?include=' + include + '&skip=0&take=400',
+                        function (data) {
+                            data.serverError = false;
+                            handleResponse(data);
+                        },
+                        function (data) {
+                            data = {data: data};
+                            data.serverError = true;
+                            handleResponse(data);
+                        },
+                        true);
+
+                    function handleResponse(data) {
+                        deferred.resolve(data);
+                        loading.reset();
+                    }
+
+                    return deferred.promise;
+                },
+                getSearchSeedApps: function(seedCategoryId, boost) {
+                    var deferred = $q.defer();
+
+                    loading.started();
+
+                    getApi(
+                        'admin/cluster/search_seed_app/' + seedCategoryId + '?boost=' + boost,
                         function (data) {
                             data.serverError = false;
                             handleResponse(data);
