@@ -14,10 +14,10 @@
                 <p class="id">{{::searchSeedApp.extId}}</p>
                 <p class="description">{{::searchSeedApp.desc}}</p>
                 <p class="genres"><em>Genres:</em> <span ng-repeat="genre in searchSeedApp.genres track by $index">{{genre}}, </span></p>
-                <div ng-if="::searchSeedApp.screenShots.length > 0" class="screenshots-wrapper">
+                <div ng-if="::searchSeedApp.screenShots && searchSeedApp.screenShots.length > 0" class="screenshots-wrapper">
                     <img ng-repeat="screenshotUrl in ::searchSeedApp.screenShots track by $index" src="{{screenshotUrl}}">
                 </div>
-                <div ng-if="::searchSeedApp.screenShots.length === 0" class="screenshots-wrapper">
+                <div ng-if="::!searchSeedApp.screenShots || searchSeedApp.screenShots.length === 0" class="screenshots-wrapper">
                     <img ng-repeat="screenshotUrl in ::searchSeedApp.ipadScreenShots track by $index" src="{{screenshotUrl}}">
                 </div>
                 <p class="actions">
