@@ -31,13 +31,13 @@
 
                     return deferred.promise;
                 },
-                getSearchSeedApps: function(seedCategoryId, boost) {
+                getSearchSeedApps: function(seedCategoryId, boost, skip, take) {
                     var deferred = $q.defer();
 
                     loading.started();
 
                     getApi(
-                        'admin/cluster/search_seed_app/' + seedCategoryId + '?boost=' + boost,
+                        'admin/cluster/search_seed_app/' + seedCategoryId + '?boost=' + boost + '&skip=' + skip + '&take=' + take,
                         function (data) {
                             var i;
 
