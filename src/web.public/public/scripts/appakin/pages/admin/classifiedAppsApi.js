@@ -3,7 +3,7 @@
 
     angular.module('appAkin').factory('classifiedAppsApi', function(
         $q, $timeout, $location, $http, httpGet, loading, webApiUrl) {
-            var getApi = httpGet(25000);
+            var getApi = httpGet(60000);
 
             return {
                 getClassifiedApps: function(seedCategoryId, include, skip, take) {
