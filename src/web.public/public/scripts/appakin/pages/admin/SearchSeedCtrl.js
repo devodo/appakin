@@ -7,12 +7,10 @@
 
         $scope.classifiedApps = classifiedApps;
         $scope.searchSeedAppsData = {};
-        $scope.skip = 0;
-        $scope.take = 200;
 
         $scope.submitForm = function() {
             classifiedAppsApi
-                .getSearchSeedApps(classifiedApps.seedCategoryId, classifiedApps.boost, $scope.skip, $scope.take)
+                .getSearchSeedApps(classifiedApps.seedCategoryId, classifiedApps.boost, classifiedApps.skip, classifiedApps.take)
                 .then(function(data) {
                     if (data && !data.serverError) {
                         console.log('got data');
@@ -33,7 +31,19 @@
                 searchSeedApp.isTrainingData = false;
                 searchSeedApp.include = null;
             })
-        }
+        };
+
+        $scope.classify = function() {
+            classifiedAppsApi
+                .classify(classifiedApps.seedCategoryId)
+                .then(function(data) {
+                    if (data && !data.serverError) {
+                        alert('Classification succeeded.');
+                    } else {
+                        alert('Classification failed.');
+                    }
+                });
+        };
     });
 
 }()); // use strict

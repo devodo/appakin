@@ -87,6 +87,31 @@
 
                     return deferred.promise;
                 },
+                classify: function(seedCategoryId) {
+                    var deferred = $q.defer();
+
+                    loading.started();
+
+                    getApi(
+                        'admin/cluster/classify/' + seedCategoryId + '?save=true',
+                        function (data) {
+                            data.serverError = false;
+                            handleResponse(data);
+                        },
+                        function (data) {
+                            data = {data: data};
+                            data.serverError = true;
+                            handleResponse(data);
+                        },
+                        true);
+
+                    function handleResponse(data) {
+                        deferred.resolve(data);
+                        loading.reset();
+                    }
+
+                    return deferred.promise;
+                },
                 updateTrainingData: function(appExtId, seedCategoryId, include, success) {
                     var url = webApiUrl + 'admin/classification/train';
                     console.log(url);

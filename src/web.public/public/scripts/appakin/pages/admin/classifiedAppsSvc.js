@@ -8,7 +8,9 @@
             me.service = {
                 seedCategoryId: 1,
                 include: true,
-                boost: 1
+                boost: 1,
+                skip: 0,
+                take: 400
             };
 
             return me.service;
