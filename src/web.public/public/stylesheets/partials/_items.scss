@@ -1331,6 +1331,11 @@ h2 {
 
 #classified-apps,
 #search-seed {
+  #fixed {
+    max-height: 450px;
+    overflow: auto;
+  }
+
   input[type="checkbox"] {
     -webkit-appearance: checkbox;
     -moz-appearance: checkbox;
@@ -1341,6 +1346,11 @@ h2 {
 
   .id {
     color: #ccc;
+  }
+
+  .search-seed-apps-list-wrapper,
+  .classified-apps-list-wrapper {
+    margin-top: 24px;
   }
 
   .classified-app,

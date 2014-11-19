@@ -4,23 +4,24 @@
         <input type="checkbox" ng-model="classifiedApps.include" name="include" value="true">Include
         Skip:<input type="number" ng-model="classifiedApps.skip" name="skip" min="0" max="99999999">
         Take:<input type="number" ng-model="classifiedApps.take" name="take" min="1" max="99999999">
+        Image Count:<input type="number" ng-model="classifiedApps.imageCount" name="imageCount" min="1" max="5">
         <input type="submit" value="Submit">
     </form>
     <a href="/search-seed">Search Seed</a>
     <button ng-click="classify()">Classify</button>
-    <div class="classified-apps-list-wrapper">
+    <div class="classified-apps-list-wrapper" id="fixed" when-scrolled="loadMore()">
         <ul class="classified-apps-list">
-            <li ng-repeat="classifiedApp in classifiedAppsData track by classifiedApp.extId" class="classified-app">
+            <li ng-repeat="classifiedApp in classifiedAppsLive track by classifiedApp.extId" class="classified-app">
                 <h2>{{::classifiedApp.name}}</h2>
                 <p class="id">{{::classifiedApp.extId}}</p>
                 <p class="description">{{::classifiedApp.description}}</p>
                 <p class="store-url"><a href="{{::classifiedApp.storeUrl}}" target="_blank"></a></p>
                 <p class="genres"><em>Genres:</em> <span ng-repeat="genre in classifiedApp.genres track by $index">{{genre}}, </span></p>
                 <div ng-if="::classifiedApp.screenshotUrls.length > 0" class="screenshots-wrapper">
-                    <img ng-repeat="screenshotUrl in ::classifiedApp.screenshotUrls track by $index" src="{{screenshotUrl}}">
+                    <img ng-repeat="screenshotUrl in ::classifiedApp.screenshotUrls.slice(0, classifiedApps.imageCount) track by $index" src="{{screenshotUrl}}">
                 </div>
                 <div ng-if="::classifiedApp.screenshotUrls.length === 0" class="screenshots-wrapper">
-                    <img ng-repeat="screenshotUrl in ::classifiedApp.ipadScreenshotUrls track by $index" src="{{screenshotUrl}}">
+                    <img ng-repeat="screenshotUrl in ::classifiedApp.ipadScreenshotUrls.slice(0, classifiedApps.imageCount) track by $index" src="{{screenshotUrl}}">
                 </div>
                 <p class="actions">
                     <button ng-if="!classifiedApps.include && !classifiedApp.updated" ng-click="::updateTrainingData(classifiedApp.extId, classifiedApps.seedCategoryId, true, classifiedApp)">Include</button>

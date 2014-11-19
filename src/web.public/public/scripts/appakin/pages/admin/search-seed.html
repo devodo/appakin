@@ -4,23 +4,24 @@
         Boost:<input type="number" ng-model="classifiedApps.boost" name="boost" min="1" max="10">
         Skip:<input type="number" ng-model="classifiedApps.skip" name="skip" min="0" max="99999999">
         Take:<input type="number" ng-model="classifiedApps.take" name="take" min="1" max="99999999">
+        Image Count:<input type="number" ng-model="classifiedApps.imageCount" name="imageCount" min="1" max="5">
         <input type="submit" value="Submit">
     </form>
     <a href="/classified-apps">Classified Apps</a>
     <button ng-click="classify()">Classify</button>
-    <div class="search-seed-apps-list-wrapper">
+    <div class="search-seed-apps-list-wrapper" id="fixed" when-scrolled="loadMore()">
         <p>Total apps: <span ng-bind="searchSeedAppsData.total"></span></p>
         <ul class="search-seed-apps-list">
-            <li ng-repeat="searchSeedApp in searchSeedAppsData.apps track by searchSeedApp.extId" class="search-seed-app">
+            <li ng-repeat="searchSeedApp in searchSeedAppsLive track by searchSeedApp.extId" class="search-seed-app">
                 <h2>{{::searchSeedApp.name}}</h2>
                 <p class="id">{{::searchSeedApp.extId}}</p>
                 <p class="description">{{::searchSeedApp.desc}}</p>
                 <p class="genres"><em>Genres:</em> <span ng-repeat="genre in searchSeedApp.genres track by $index">{{genre}}, </span></p>
                 <div ng-if="::searchSeedApp.screenShots && searchSeedApp.screenShots.length > 0" class="screenshots-wrapper">
-                    <img ng-repeat="screenshotUrl in ::searchSeedApp.screenShots track by $index" src="{{screenshotUrl}}">
+                    <img ng-repeat="screenshotUrl in ::searchSeedApp.screenShots.slice(0, classifiedApps.imageCount) track by $index" src="{{screenshotUrl}}">
                 </div>
                 <div ng-if="::!searchSeedApp.screenShots || searchSeedApp.screenShots.length === 0" class="screenshots-wrapper">
-                    <img ng-repeat="screenshotUrl in ::searchSeedApp.ipadScreenShots track by $index" src="{{screenshotUrl}}">
+                    <img ng-repeat="screenshotUrl in ::searchSeedApp.ipadScreenShots.slice(0, classifiedApps.imageCount) track by $index" src="{{screenshotUrl}}">
                 </div>
                 <p ng-if="!searchSeedApp.isTrainingData" class="actions">
                     <button ng-click="::updateTrainingData(searchSeedApp.extId, classifiedApps.seedCategoryId, true, searchSeedApp)">Include</button>

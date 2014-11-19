@@ -7,6 +7,7 @@
 
         $scope.classifiedApps = classifiedApps;
         $scope.classifiedAppsData = [];
+        $scope.classifiedAppsLive = [];
 
         $scope.submitForm = function() {
             classifiedAppsApi
@@ -15,8 +16,22 @@
                     if (data && !data.serverError) {
                         console.log('got data');
                         $scope.classifiedAppsData = data;
+                        $scope.classifiedAppsLive = data.slice(0, 5);
                     }
                 });
+        };
+
+        $scope.loadMore = function() {
+            var currentAppCount = $scope.classifiedAppsLive.length;
+            var totalAppCount = $scope.classifiedAppsData.length;
+
+            if (currentAppCount < totalAppCount) {
+                for (var i = currentAppCount; i < Math.min(totalAppCount, currentAppCount + 5); ++i) {
+                    $scope.classifiedAppsLive.push($scope.classifiedAppsData[i]);
+                }
+
+                console.log('size: ' + $scope.classifiedAppsLive.length);
+            }
         };
 
         $scope.updateTrainingData = function(extId, seedCategoryId, include, classifiedApp) {
