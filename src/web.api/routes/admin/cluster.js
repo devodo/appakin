@@ -157,17 +157,37 @@ exports.init = function init(app) {
         });
     });
 
-    app.get('/admin/cluster/app_keywords/:appExtId', function (req, res, next) {
+    app.get('/admin/cluster/app_keywords/:seedCategoryId/:appExtId', function (req, res, next) {
+        var seedCategoryId = req.params.seedCategoryId;
+
+        if (!seedCategoryId || isNaN(seedCategoryId)) {
+            return res.status(400).send('Bad seed category Id query parameter');
+        }
+
         var appExtId = req.params.appExtId;
 
         if (!appExtId || appExtId.trim() === '') {
             return res.status(400).send('Bad seed category Id query parameter');
         }
 
-        clusterSearcher.getAppTopKeywords(appExtId, function (err, result) {
+        clusterSearcher.getAppTopKeywords(seedCategoryId, appExtId, function (err, result) {
             if (err) {
                 return next(err);
             }
+
+            res.json(result);
+        });
+    });
+
+    app.get('/admin/cluster/training_terms/:seedCategoryId', function (req, res, next) {
+        var seedCategoryId = req.params.seedCategoryId;
+
+        if (!seedCategoryId || isNaN(seedCategoryId)) {
+            return res.status(400).send('Bad seed category Id query parameter');
+        }
+
+        clusterSearcher.testTrainingSetTermData(seedCategoryId, function (err, result) {
+            if (err) { return next(err); }
 
             res.json(result);
         });

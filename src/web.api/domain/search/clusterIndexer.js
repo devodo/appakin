@@ -9,7 +9,6 @@ var createSolrDoc = function(app) {
         id : app.extId.replace(/\-/g, ''),
         name: app.name,
         desc: app.description,
-        "desc_top": solrCore.getTopWords(app.description, 200),
         "primary_genre": app.genres[0],
         genres: app.genres,
         "screenshot_urls": app.screenShotUrls,

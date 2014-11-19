@@ -270,43 +270,48 @@ var searchTermVectors = function(query, skip, take, next) {
     });
 };
 
-var getClassifierAnalyser = function(seedSearches, next) {
+var getClassifierAnalyser = function(seedSearches, trainingSet, next) {
     var batchSize = 1000;
-    var classifierAnalyser = classifier.createClassifierAnalyser();
 
-    var finish = function(err) {
+    getTrainingTermScores(trainingSet, function(err, termScores) {
         if (err) { return next(err); }
 
-        return next(null, classifierAnalyser);
-    };
+        var classifierAnalyser = classifier.createClassifierAnalyser(termScores);
 
-    async.eachSeries(seedSearches, function(seedSearch, callback) {
-        var query = buildSeedTermVectorQuery(seedSearch);
+        var finish = function(err) {
+            if (err) { return next(err); }
 
-        var processBatch = function(batchIndex) {
-            log.debug("Retrieving solr term vectors (batch:" + batchIndex +")");
-            searchTermVectors(query, batchSize * batchIndex, batchSize, function(err, searchResult) {
-                if (err) { return callback(err); }
-
-                searchResult.docs.forEach(function(doc) {
-                    classifierAnalyser.addDoc(doc);
-                });
-
-                if (searchResult.docs.length < batchSize) {
-                    if (classifierAnalyser.totalDocs() !== searchResult.total) {
-                        return callback("Expected " + searchResult.total + " docs but was " + classifierAnalyser.totalDocs());
-                    }
-
-                    return callback();
-                }
-
-                processBatch(batchIndex+1);
-            });
+            return next(null, classifierAnalyser);
         };
 
-        processBatch(0);
+        async.eachSeries(seedSearches, function(seedSearch, callback) {
+            var query = buildSeedTermVectorQuery(seedSearch);
 
-    }, finish);
+            var processBatch = function(batchIndex) {
+                log.debug("Retrieving solr term vectors (batch:" + batchIndex +")");
+                searchTermVectors(query, batchSize * batchIndex, batchSize, function(err, searchResult) {
+                    if (err) { return callback(err); }
+
+                    searchResult.docs.forEach(function(doc) {
+                        classifierAnalyser.addDoc(doc);
+                    });
+
+                    if (searchResult.docs.length < batchSize) {
+                        if (classifierAnalyser.totalDocs() !== searchResult.total) {
+                            return callback("Expected " + searchResult.total + " docs but was " + classifierAnalyser.totalDocs());
+                        }
+
+                        return callback();
+                    }
+
+                    processBatch(batchIndex+1);
+                });
+            };
+
+            processBatch(0);
+
+        }, finish);
+    });
 };
 
 var buildSearchQuery = function(keywords, useBoost, maxTerms) {
@@ -436,12 +441,12 @@ var getSeedApps = function(seedSearchId, boostFactor, skip, take, next) {
     });
 };
 
-var getSeedCategoryMatrix = function(seedCategoryId, next) {
+var getSeedCategoryMatrix = function(seedCategoryId, trainingSet, next) {
     log.debug("Retrieving classification searches");
     adminRepo.getSeedSearches(seedCategoryId, function(err, seedSearches) {
         if (err) { return next(err); }
 
-        getClassifierAnalyser(seedSearches, function(err, analyser) {
+        getClassifierAnalyser(seedSearches, trainingSet, function(err, analyser) {
             if (err) { return next(err); }
 
             log.debug("Building vector matrix");
@@ -466,13 +471,21 @@ var getSeedCategoryKeywords = function(seedCategoryId, next) {
     });
 };
 
-var getAppTopKeywords = function(appExtId, next) {
+var getAppTopKeywords = function(seedCategoryId, appExtId, next) {
     getTermVectors(appExtId, function(err, result) {
         if (err) { return next(err); }
 
-        var classifierAnalyser = classifier.createClassifierAnalyser();
-        var topTerms = classifierAnalyser.getDocTopTerms(result);
-        return next(null, topTerms);
+        classifierRepo.getTrainingSet(seedCategoryId, function(err, trainingSet) {
+            if (err) { return next(err); }
+
+            getTrainingTermScores(trainingSet, function(err, termScores) {
+                if (err) { return next(err); }
+
+                var classifierAnalyser = classifier.createClassifierAnalyser(termScores);
+                var topTerms = classifierAnalyser.getDocTopTerms(result);
+                return next(null, topTerms);
+            });
+        });
     });
 };
 
@@ -497,12 +510,87 @@ var buildTrainingData = function(matrixData, trainingSet) {
     return trainingData;
 };
 
-var classifySeedCategory = function(seedCategoryId, saveResults, next) {
-    getSeedCategoryMatrix(seedCategoryId, function(err, matrixData) {
+var testTrainingSetTermData = function(seedCategoryId, next) {
+    log.debug("Retrieving training data");
+    classifierRepo.getTrainingSet(seedCategoryId, function(err, trainingSet) {
         if (err) { return next(err); }
 
-        log.debug("Retrieving training data");
-        classifierRepo.getTrainingSet(seedCategoryId, function(err, trainingSet) {
+        getTrainingTermScores(trainingSet, function(err, termScores) {
+            if (err) { return next(err); }
+
+            next(null, termScores.desc.splice(0,100));
+        });
+    });
+};
+
+var buildTrainingSetTermVectorQuery = function(ids, position, batchSize) {
+    var query = '';
+    for (var i = position; i < ids.length && i < position + batchSize; i++) {
+        query += 'id:' + ids[i] + ' ';
+    }
+
+    return encodeURIComponent(query);
+};
+
+var getTrainingTermVectorDocs = function(trainingSet, next) {
+    var includeMap = {};
+    trainingSet.forEach(function(item) {
+        var id = item.appExtId.replace(/\-/g, '');
+        includeMap[id] = item.include;
+    });
+
+    var ids = Object.keys(includeMap);
+    var batchSize = 20;
+
+    var docs = [];
+
+    var processBatch = function(position) {
+        log.debug("Processing training set term query batch at position: " + position);
+
+        var query = buildTrainingSetTermVectorQuery(ids, position, batchSize);
+        searchTermVectors(query, 0, 10000, function(err, searchResult) {
+            if (err) { return next(err); }
+
+            searchResult.docs.forEach(function(doc) {
+                var include = includeMap[doc.id];
+
+                if (typeof include !== 'boolean') {
+                    return next("Could not determine include type for training document: " + doc.id);
+                }
+
+                doc.include = include;
+                docs.push(doc);
+            });
+
+            if (position < ids.length) {
+                return processBatch(position + batchSize);
+            }
+
+            return next(null, docs);
+        });
+    };
+
+    processBatch(0);
+};
+
+var getTrainingTermScores = function(trainingSet, next) {
+    getTrainingTermVectorDocs(trainingSet, function(err, trainingDocs) {
+        if (err) { return next(err); }
+
+        var trainingAnalyser = classifier.createTrainingAnalyser();
+        trainingAnalyser.addTrainingDocs(trainingDocs);
+        var termScores = trainingAnalyser.analyseTermScores();
+
+        return next(null, termScores);
+    });
+};
+
+var classifySeedCategory = function(seedCategoryId, saveResults, next) {
+    log.debug("Retrieving training data");
+    classifierRepo.getTrainingSet(seedCategoryId, function(err, trainingSet) {
+        if (err) { return next(err); }
+
+        getSeedCategoryMatrix(seedCategoryId, trainingSet, function(err, matrixData) {
             if (err) { return next(err); }
 
             var trainingData = buildTrainingData(matrixData, trainingSet);
@@ -528,6 +616,7 @@ var classifySeedCategory = function(seedCategoryId, saveResults, next) {
                 classifierRepo.setClassificationApps(results, seedCategoryId, function(err) {
                     if (err) { return next(err); }
 
+                    log.debug("Classification complete");
                     return next(null, results);
                 });
             });
@@ -738,6 +827,8 @@ exports.getClassificationApps = getClassificationApps;
 exports.getSeedTrainingSet = getSeedTrainingSet;
 exports.insertSeedTraining = insertSeedTraining;
 exports.deleteSeedTraining = deleteSeedTraining;
+
+exports.testTrainingSetTermData = testTrainingSetTermData;
 
 
 
