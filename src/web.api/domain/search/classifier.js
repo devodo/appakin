@@ -8,8 +8,8 @@ var Classifier = function() {
     var nodesvm = require('node-svm');
     this.svm = new nodesvm.CSVC({ // classification
         kernelType: nodesvm.KernelTypes.RBF,
-        //gamma: [0.01],
-        //C: [0.5, 1, 2, 4, 8],
+        gamma: [0.03125],
+        C: [8],
         reduce: false,
         normalize: false
     });
