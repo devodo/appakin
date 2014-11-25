@@ -19,6 +19,11 @@ var parseTermStats = function(fieldArray) {
         var indexBase = i * 2;
         var term = fieldArray[indexBase];
 
+        // ignore shingled terms
+        if (term.split(' ') > 1) {
+            continue;
+        }
+
         // ignore any term with a digit in it or that is not long enough
         if (term.length < 3 || termsToExclude.test(term)) {
             continue;
