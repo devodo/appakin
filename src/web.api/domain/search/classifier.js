@@ -45,8 +45,6 @@ var ClassifierAnalyser = function(termScores) {
     };
 
     var titleSettings = {
-        minDocFreq: 5,
-        minTermLength: 1,
         tfBoost: 0,
         posDecay: 0.1,
         dfWeight: 2.5,
@@ -54,8 +52,6 @@ var ClassifierAnalyser = function(termScores) {
     };
 
     var descSettings = {
-        minDocFreq: 5,
-        minTermLength: 1,
         tfBoost: 0.5,
         minPosLength: 20,
         posDecayWeight: 25,
@@ -108,7 +104,8 @@ var TrainingAnalyser = function() {
     this.settings = {
         minDocFreq: 3,
         maxDocFreq: 800000,
-        dfWeight: 2
+        dfWeight: 2,
+        trainFreqWeight: 1.0
     };
 
     this.nameTermDictionary = Object.create(null);
@@ -118,8 +115,6 @@ var TrainingAnalyser = function() {
 };
 
 var addTermInfos = function(termInfos, termDictionary, isInclude) {
-    var self = this;
-
     termInfos.forEach(function(termInfo) {
         if (containsStopWord(termInfo.term)) {
             return;
@@ -183,7 +178,7 @@ TrainingAnalyser.prototype.calculateTermScores = function(termDictionary) {
                 return 0;
             }
 
-            var tf = logBase(freq + 1, docCount + 1);
+            var tf = Math.pow(logBase(freq + 1, docCount + 1), self.settings.trainFreqWeight);
             return tf;
         };
 
@@ -198,6 +193,11 @@ TrainingAnalyser.prototype.calculateTermScores = function(termDictionary) {
 
         termScores.push({
             term: key,
+            df: termInfo.docFreq,
+            idf: idf,
+            includeTf: termInfo.includeFreq,
+            excludeTf: termInfo.excludeFreq,
+            trainingTfScore: maxTf,
             score: score
         });
     });
@@ -350,112 +350,8 @@ TermMatrix.prototype.getDescScores = function(termInfos) {
     return results;
 };
 
-TermMatrix.prototype.getTitleTermScoresMap = function(titleTermVector) {
-    var self = this;
-
-    var results = Object.create(null);
-
-    titleTermVector.forEach(function(termInfo) {
-        if (termInfo.term.length < self.titleSettings.minTermLength) {
-            return;
-        }
-
-        if (isStopWord(termInfo.term)) {
-            return;
-        }
-
-        if (termInfo.docFreq < self.titleSettings.minDocFreq) {
-            return;
-        }
-
-        var posDecay = 1 / Math.pow(termInfo.positions[0] + 1, self.titleSettings.posDecay);
-        var tf = Math.pow(termInfo.termFreq, self.titleSettings.tfBoost);
-
-        var idf = 0;
-        if (termInfo.docFreq < self.resultSettings.maxDocFreq) {
-            var df = logBase(termInfo.docFreq, self.resultSettings.maxDocFreq);
-            idf = 1 - Math.pow(df, self.titleSettings.dfWeight);
-        }
-
-        var tfIdf = Math.pow(tf * idf * posDecay, self.titleSettings.titleBoost);
-
-        results[termInfo.term] = {
-            term: termInfo.term,
-            title: {
-                termFreq: termInfo.termFreq,
-                position: termInfo.positions[0],
-                posDecay: posDecay,
-                tf: tf,
-                docFreq: termInfo.docFreq,
-                idf: idf,
-                tfIdf: tfIdf
-            }
-        };
-    });
-
-    return results;
-};
-
 var logBase = function(x,b) {
     return Math.log(x) / Math.log(b);
-};
-
-TermMatrix.prototype.getDescTermScores = function(descTermVector) {
-    var self = this;
-
-    var results = [];
-
-    var lastPosition = 0;
-
-    descTermVector.forEach(function(termInfo) {
-        var pos = termInfo.positions[termInfo.positions.length - 1];
-        if (pos > lastPosition) {
-            lastPosition = pos;
-        }
-    });
-
-    lastPosition = Math.max(lastPosition, self.descSettings.minPosLength);
-
-    descTermVector.forEach(function(termInfo) {
-        if (termInfo.term.length < self.descSettings.minTermLength) {
-            return;
-        }
-
-        if (isStopWord(termInfo.term)) {
-            return;
-        }
-
-        if (termInfo.docFreq < self.descSettings.minDocFreq) {
-            return;
-        }
-
-        var inversePosVal = logBase(termInfo.positions[0] + 1, (lastPosition + 1));
-        var posDecay = 1 - Math.pow(inversePosVal, self.descSettings.posDecayWeight);
-        var tf = Math.pow(termInfo.termFreq, self.descSettings.tfBoost);
-
-        var idf = 0;
-        if (termInfo.docFreq < self.resultSettings.maxDocFreq) {
-            var df = logBase(termInfo.docFreq, self.resultSettings.maxDocFreq);
-            idf = 1 - Math.pow(df, self.descSettings.dfWeight);
-        }
-
-        var tfIdf = tf * idf * posDecay;
-
-        results.push({
-            term: termInfo.term,
-            desc: {
-                termFreq: termInfo.termFreq,
-                position: termInfo.positions[0],
-                posDecay: posDecay,
-                tf: tf,
-                docFreq: termInfo.docFreq,
-                idf: idf,
-                tfIdf: tfIdf
-            }
-        });
-    });
-
-    return results;
 };
 
 TermMatrix.prototype.getTopScoringTerms = function(doc) {

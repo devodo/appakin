@@ -186,7 +186,7 @@ exports.init = function init(app) {
             return res.status(400).send('Bad seed category Id query parameter');
         }
 
-        clusterSearcher.testTrainingSetTermData(seedCategoryId, function (err, result) {
+        clusterSearcher.getTrainingSetTopTerms(seedCategoryId, function (err, result) {
             if (err) { return next(err); }
 
             res.json(result);

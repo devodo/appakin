@@ -510,7 +510,7 @@ var buildTrainingData = function(matrixData, trainingSet) {
     return trainingData;
 };
 
-var testTrainingSetTermData = function(seedCategoryId, next) {
+var getTrainingSetTopTerms = function(seedCategoryId, next) {
     log.debug("Retrieving training data");
     classifierRepo.getTrainingSet(seedCategoryId, function(err, trainingSet) {
         if (err) { return next(err); }
@@ -828,7 +828,7 @@ exports.getSeedTrainingSet = getSeedTrainingSet;
 exports.insertSeedTraining = insertSeedTraining;
 exports.deleteSeedTraining = deleteSeedTraining;
 
-exports.testTrainingSetTermData = testTrainingSetTermData;
+exports.getTrainingSetTopTerms = getTrainingSetTopTerms;
 
 
 
