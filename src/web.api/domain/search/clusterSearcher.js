@@ -232,6 +232,16 @@ var buildSeedTermVectorQuery = function(seedSearch) {
     return queryTerms;
 };
 
+var getTermVectorIndex = function(termVectors, termName) {
+    for (var i = 0; i < termVectors.length; i++) {
+        if (termVectors[i] === termName) {
+            return i + 1;
+        }
+    }
+
+    return -1;
+};
+
 var searchTermVectors = function(query, skip, take, next) {
     var solrQuery = 'q=' + query + '&rows=' + take + '&start=' + skip;
 
@@ -249,8 +259,12 @@ var searchTermVectors = function(query, skip, take, next) {
         for (var i = 1; i <= total; i++) {
             var index = i * 2;
             var id = obj.termVectors[index];
-            var nameTermVector = parseTermVector(obj.termVectors[index+1][3]);
-            var descTermVector = parseTermVector(obj.termVectors[index+1][5]);
+
+            var nameIndex = getTermVectorIndex(obj.termVectors[index+1], "name_shingle");
+            var nameTermVector = nameIndex > -1 ? parseTermVector(obj.termVectors[index+1][nameIndex]): [];
+
+            var descIndex = getTermVectorIndex(obj.termVectors[index+1], "desc_shingle");
+            var descTermVector = nameIndex > -1 ? parseTermVector(obj.termVectors[index+1][descIndex]): [];
 
             var doc = {
                 id: id,
@@ -270,47 +284,56 @@ var searchTermVectors = function(query, skip, take, next) {
     });
 };
 
-var getClassifierAnalyser = function(seedSearches, trainingSet, next) {
+var loadClassifierSeedSearches = function(seedSearches, classifierAnalyser, next) {
     var batchSize = 1000;
 
+    var finish = function(err) {
+        if (err) { return next(err); }
+
+        return next();
+    };
+
+    var processSeedSearch = function(seedSearch, callback) {
+        var query = buildSeedTermVectorQuery(seedSearch);
+
+        var processBatch = function(batchIndex) {
+            log.debug("Retrieving solr term vectors (batch:" + batchIndex +")");
+            searchTermVectors(query, batchSize * batchIndex, batchSize, function(err, searchResult) {
+                if (err) { return callback(err); }
+
+                searchResult.docs.forEach(function(doc) {
+                    classifierAnalyser.addDoc(doc);
+                });
+
+                if (searchResult.docs.length < batchSize) {
+                    if (classifierAnalyser.totalDocs() !== searchResult.total) {
+                        return callback("Expected " + searchResult.total + " docs but was " + classifierAnalyser.totalDocs());
+                    }
+
+                    return callback();
+                }
+
+                processBatch(batchIndex+1);
+            });
+        };
+
+        processBatch(0);
+    };
+
+    async.eachSeries(seedSearches, processSeedSearch, finish);
+};
+
+var getClassifierAnalyser = function(seedSearches, trainingSet, next) {
     getTrainingTermScores(trainingSet, function(err, termScores) {
         if (err) { return next(err); }
 
         var classifierAnalyser = classifier.createClassifierAnalyser(termScores);
 
-        var finish = function(err) {
+        loadClassifierSeedSearches(seedSearches, classifierAnalyser, function(err) {
             if (err) { return next(err); }
 
-            return next(null, classifierAnalyser);
-        };
-
-        async.eachSeries(seedSearches, function(seedSearch, callback) {
-            var query = buildSeedTermVectorQuery(seedSearch);
-
-            var processBatch = function(batchIndex) {
-                log.debug("Retrieving solr term vectors (batch:" + batchIndex +")");
-                searchTermVectors(query, batchSize * batchIndex, batchSize, function(err, searchResult) {
-                    if (err) { return callback(err); }
-
-                    searchResult.docs.forEach(function(doc) {
-                        classifierAnalyser.addDoc(doc);
-                    });
-
-                    if (searchResult.docs.length < batchSize) {
-                        if (classifierAnalyser.totalDocs() !== searchResult.total) {
-                            return callback("Expected " + searchResult.total + " docs but was " + classifierAnalyser.totalDocs());
-                        }
-
-                        return callback();
-                    }
-
-                    processBatch(batchIndex+1);
-                });
-            };
-
-            processBatch(0);
-
-        }, finish);
+            next(null, classifierAnalyser);
+        });
     });
 };
 
@@ -437,6 +460,32 @@ var getSeedApps = function(seedSearchId, boostFactor, skip, take, next) {
             if (err) { return next(err); }
 
             next(null, searchResult);
+        });
+    });
+};
+
+var getCategorySearchSeedApps = function(seedCategoryId, boostFactor, next) {
+    adminRepo.getSeedSearches(seedCategoryId, function(err, seedSearches) {
+        if (err) { return next(err); }
+
+        var results = [];
+
+        var processSeedSearch = function(seedSearch, callback) {
+            searchSeedApps(seedSearch, boostFactor, false, 0, seedSearch.maxTake, function(err, searchResult) {
+                if (err) { return callback(err); }
+
+                searchResult.apps.forEach(function(app) {
+                    results.push(app);
+                });
+
+                callback();
+            });
+        };
+
+        async.eachSeries(seedSearches, processSeedSearch, function(err) {
+            if (err) { return next(err); }
+
+            next(null, results);
         });
     });
 };
@@ -585,40 +634,48 @@ var getTrainingTermScores = function(trainingSet, next) {
     });
 };
 
+var classifyTrainedSeedCategory = function(seedCategoryId, trainingSet, next) {
+    getSeedCategoryMatrix(seedCategoryId, trainingSet, function(err, matrixData) {
+        if (err) { return next(err); }
+
+        var trainingData = buildTrainingData(matrixData, trainingSet);
+        var svm = classifier.createClassifier();
+
+        log.debug("Starting SVM training");
+        svm.train(trainingData, function() {
+            log.debug("Generating classification results");
+            var predictions = svm.predict(matrixData.vectorMatrix);
+            var results = [];
+            predictions.forEach(function(prediction, index) {
+                results.push({
+                    id: matrixData.docIndex[index],
+                    result: prediction
+                });
+            });
+
+            return next(null, results);
+        });
+    });
+};
+
 var classifySeedCategory = function(seedCategoryId, saveResults, next) {
     log.debug("Retrieving training data");
     classifierRepo.getTrainingSet(seedCategoryId, function(err, trainingSet) {
         if (err) { return next(err); }
 
-        getSeedCategoryMatrix(seedCategoryId, trainingSet, function(err, matrixData) {
+        classifyTrainedSeedCategory(seedCategoryId, trainingSet, saveResults, function(err, results) {
             if (err) { return next(err); }
 
-            var trainingData = buildTrainingData(matrixData, trainingSet);
-            var svm = classifier.createClassifier();
+            if (!saveResults) {
+                return next(null, results);
+            }
 
-            log.debug("Starting SVM training");
-            svm.train(trainingData, function() {
-                log.debug("Generating classification results");
-                var predictions = svm.predict(matrixData.vectorMatrix);
-                var results = [];
-                predictions.forEach(function(prediction, index) {
-                    results.push({
-                        id: matrixData.docIndex[index],
-                        result: prediction
-                    });
-                });
+            log.debug("Saving classififcation results to db");
+            classifierRepo.setClassificationApps(results, seedCategoryId, function(err) {
+                if (err) { return next(err); }
 
-                if (!saveResults) {
-                    return next(null, results);
-                }
-
-                log.debug("Saving classififcation results to db");
-                classifierRepo.setClassificationApps(results, seedCategoryId, function(err) {
-                    if (err) { return next(err); }
-
-                    log.debug("Classification complete");
-                    return next(null, results);
-                });
+                log.debug("Classification complete");
+                return next(null, results);
             });
         });
     });
@@ -820,8 +877,10 @@ exports.runTrainingTest = runTrainingTest;
 exports.runClusterTest = runClusterTest;
 exports.runClusterCategoryTest = runClusterCategoryTest;
 exports.getSeedApps = getSeedApps;
+exports.getCategorySearchSeedApps = getCategorySearchSeedApps;
 exports.getSeedCategoryKeywords = getSeedCategoryKeywords;
 exports.getAppTopKeywords = getAppTopKeywords;
+exports.classifyTrainedSeedCategory = classifyTrainedSeedCategory;
 exports.classifySeedCategory = classifySeedCategory;
 exports.getClassificationApps = getClassificationApps;
 exports.getSeedTrainingSet = getSeedTrainingSet;
