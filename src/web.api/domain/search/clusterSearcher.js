@@ -284,56 +284,14 @@ var searchTermVectors = function(query, skip, take, next) {
     });
 };
 
-var loadClassifierSeedSearches = function(seedSearches, classifierAnalyser, next) {
-    var batchSize = 1000;
-
-    var finish = function(err) {
+var getClassifierAnalyser = function(trainingSet, next) {
+    getTrainingTermVectorDocs(trainingSet, function(err, trainingDocs) {
         if (err) { return next(err); }
 
-        return next();
-    };
+        var classifierAnalyser = classifier.createClassifierAnalyser();
+        classifierAnalyser.addTrainingDocs(trainingDocs);
 
-    var processSeedSearch = function(seedSearch, callback) {
-        var query = buildSeedTermVectorQuery(seedSearch);
-
-        var processBatch = function(batchIndex) {
-            log.debug("Retrieving solr term vectors (batch:" + batchIndex +")");
-            searchTermVectors(query, batchSize * batchIndex, batchSize, function(err, searchResult) {
-                if (err) { return callback(err); }
-
-                searchResult.docs.forEach(function(doc) {
-                    classifierAnalyser.addDoc(doc);
-                });
-
-                if (searchResult.docs.length < batchSize) {
-                    if (classifierAnalyser.totalDocs() !== searchResult.total) {
-                        return callback("Expected " + searchResult.total + " docs but was " + classifierAnalyser.totalDocs());
-                    }
-
-                    return callback();
-                }
-
-                processBatch(batchIndex+1);
-            });
-        };
-
-        processBatch(0);
-    };
-
-    async.eachSeries(seedSearches, processSeedSearch, finish);
-};
-
-var getClassifierAnalyser = function(seedSearches, trainingSet, next) {
-    getTrainingTermScores(trainingSet, function(err, termScores) {
-        if (err) { return next(err); }
-
-        var classifierAnalyser = classifier.createClassifierAnalyser(termScores);
-
-        loadClassifierSeedSearches(seedSearches, classifierAnalyser, function(err) {
-            if (err) { return next(err); }
-
-            next(null, classifierAnalyser);
-        });
+        return next(null, classifierAnalyser);
     });
 };
 
@@ -538,27 +496,6 @@ var getAppTopKeywords = function(seedCategoryId, appExtId, next) {
     });
 };
 
-var buildTrainingData = function(matrixData, trainingSet) {
-    var trainingData = [];
-
-        trainingSet.forEach(function(trainingItem) {
-        var appId = trainingItem.appExtId.replace(/\-/g, '');
-        var rowIndex = matrixData.docMap[appId];
-
-        if (!rowIndex && rowIndex !== 0) {
-            log.warn("Training app not found in seed vector matrix:" + appId);
-            return;
-        }
-
-        var trainingRow = [];
-        trainingRow[0] = matrixData.vectorMatrix[rowIndex];
-        trainingRow[1] = trainingItem.include ? 1 : 0;
-        trainingData.push(trainingRow);
-    });
-
-    return trainingData;
-};
-
 var getTrainingSetTopTerms = function(seedCategoryId, next) {
     log.debug("Retrieving training data");
     classifierRepo.getTrainingSet(seedCategoryId, function(err, trainingSet) {
@@ -634,26 +571,81 @@ var getTrainingTermScores = function(trainingSet, next) {
     });
 };
 
-var classifyTrainedSeedCategory = function(seedCategoryId, trainingSet, next) {
-    getSeedCategoryMatrix(seedCategoryId, trainingSet, function(err, matrixData) {
+var iterateSeedSearches = function(seedSearches, visitor, next) {
+    var batchSize = 1000;
+
+    var finish = function(err) {
         if (err) { return next(err); }
 
-        var trainingData = buildTrainingData(matrixData, trainingSet);
+        return next();
+    };
+
+    var processSeedSearch = function(seedSearch, callback) {
+        var query = buildSeedTermVectorQuery(seedSearch);
+
+        var processBatch = function(batchIndex) {
+            log.debug("Retrieving solr term vectors (batch:" + batchIndex +")");
+            searchTermVectors(query, batchSize * batchIndex, batchSize, function(err, searchResult) {
+                if (err) { return callback(err); }
+
+                searchResult.docs.forEach(function(doc) {
+                    visitor(doc);
+                });
+
+                if (searchResult.docs.length < batchSize) {
+                    return callback();
+                }
+
+                processBatch(batchIndex+1);
+            });
+        };
+
+        processBatch(0);
+    };
+
+    async.eachSeries(seedSearches, processSeedSearch, finish);
+};
+
+var iterateCategorySeedSearches = function(seedCategoryId, visitor, next) {
+    log.debug("Retrieving seed searches");
+    adminRepo.getSeedSearches(seedCategoryId, function(err, seedSearches) {
+        if (err) { return next(err); }
+
+        iterateSeedSearches(seedSearches, visitor, function(err) {
+            return next(err);
+        });
+    });
+};
+
+var classifyTrainedSeedCategory = function(seedCategoryId, trainingSet, next) {
+    getClassifierAnalyser(trainingSet, function(err, classifierAnalyser) {
+        if (err) { return next(err); }
+
+        var trainingData = classifierAnalyser.buildTrainingMatrix();
         var svm = classifier.createClassifier();
+
+        var results = [];
 
         log.debug("Starting SVM training");
         svm.train(trainingData, function() {
             log.debug("Generating classification results");
-            var predictions = svm.predict(matrixData.vectorMatrix);
-            var results = [];
-            predictions.forEach(function(prediction, index) {
+
+            var classifyDoc = function(doc) {
+                var termVector = classifierAnalyser.getIndexedTermVector(doc);
+                var prediction = svm.predict(termVector);
+
                 results.push({
-                    id: matrixData.docIndex[index],
+                    id: doc.id,
                     result: prediction
                 });
-            });
+            };
 
-            return next(null, results);
+            iterateCategorySeedSearches(seedCategoryId, classifyDoc, function(err) {
+                if (err) { return next(err); }
+
+                return next(null, results);
+
+            });
         });
     });
 };
@@ -663,7 +655,7 @@ var classifySeedCategory = function(seedCategoryId, saveResults, next) {
     classifierRepo.getTrainingSet(seedCategoryId, function(err, trainingSet) {
         if (err) { return next(err); }
 
-        classifyTrainedSeedCategory(seedCategoryId, trainingSet, saveResults, function(err, results) {
+        classifyTrainedSeedCategory(seedCategoryId, trainingSet, function(err, results) {
             if (err) { return next(err); }
 
             if (!saveResults) {
