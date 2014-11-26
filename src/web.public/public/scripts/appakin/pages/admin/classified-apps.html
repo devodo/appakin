@@ -24,10 +24,15 @@
                     <img ng-repeat="screenshotUrl in ::classifiedApp.ipadScreenshotUrls.slice(0, classifiedApps.imageCount) track by $index" src="{{screenshotUrl}}">
                 </div>
                 <p class="actions">
-                    <button ng-if="!classifiedApps.include && !classifiedApp.updated" ng-click="::updateTrainingData(classifiedApp.extId, classifiedApps.seedCategoryId, true, classifiedApp)">Include</button>
-                    <span ng-if="classifiedApps.include && classifiedApp.updated">Excluded</span>
-                    <button ng-if="classifiedApps.include && !classifiedApp.updated" ng-click="::updateTrainingData(classifiedApp.extId, classifiedApps.seedCategoryId, false, classifiedApp)">Exclude</button>
-                    <span ng-if="!classifiedApps.include && classifiedApp.updated">Included</span>
+                    <button ng-if="!classifiedApp.include && !classifiedApp.updated" ng-click="::updateTrainingData(classifiedApp.extId, classifiedApps.seedCategoryId, true, classifiedApp)">Include</button>
+                    <span ng-if="classifiedApp.include && classifiedApp.updated">Included</span>
+                    <button ng-if="classifiedApp.include && !classifiedApp.updated" ng-click="::updateTrainingData(classifiedApp.extId, classifiedApps.seedCategoryId, true, classifiedApp)">Add to inclusions</button>
+
+                    <button ng-if="classifiedApp.include && !classifiedApp.updated" ng-click="::updateTrainingData(classifiedApp.extId, classifiedApps.seedCategoryId, false, classifiedApp)">Exclude</button>
+                    <span ng-if="!classifiedApp.include && classifiedApp.updated">Excluded</span>
+                    <button ng-if="!classifiedApp.include && !classifiedApp.updated" ng-click="::updateTrainingData(classifiedApp.extId, classifiedApps.seedCategoryId, false, classifiedApp)">Add to exclusions</button>
+
+                    <button ng-if="classifiedApp.updated" ng-click="::deleteTrainingData(classifiedApp.extId, classifiedApps.seedCategoryId, classifiedApp)">Remove from Training Data</button>
                 </p>
             </li>
         </ul>
