@@ -57,7 +57,7 @@ var getClassifiedOrSeedSearchCategoryAppExtIds = function(seedCategoryId, next) 
 };
 
 var processReloadSeedCategoryApps = function(seedCategory, next) {
-    log.debug("Get seed apps for category: " + seedCategory.id);
+    log.debug("Reloading seed apps for category: " + seedCategory.id);
     getClassifiedOrSeedSearchCategoryAppExtIds(seedCategory.id, function(err, appExtIds) {
         if (err) { return next(err); }
 
@@ -69,9 +69,20 @@ var processReloadSeedCategoryApps = function(seedCategory, next) {
         classificationRepo.resetSeedCategoryApps(seedCategory.id, appExtIds, function(err) {
             if (err) { return next(err); }
 
+            log.debug("Completed reloading seed apps for category: " + seedCategory.id);
             next();
         });
     });
+};
+
+var errorToString = function(err) {
+    var message = err;
+
+    if (typeof err === 'object') {
+        message = JSON.stringify(err);
+    }
+
+    return message;
 };
 
 var reloadAllSeedCategoryApps = function(next) {
@@ -82,15 +93,15 @@ var reloadAllSeedCategoryApps = function(next) {
             processReloadSeedCategoryApps(seedCategory, function(err) {
                 if (err) {
                     log.error(err);
-                    var message = JSON.stringify(err.toJSON());
+                    var message = errorToString(err);
                     classificationRepo.updateSeedCategoryBuildMessage(seedCategory.id, message, function(err) {
                         if (err) { return next(err); }
 
                         return callback();
                     });
+                } else {
+                    callback();
                 }
-
-                callback();
             });
         };
 
@@ -160,14 +171,14 @@ var processTransferSeedCategoryApps = function(seedCategory, next) {
 
                     return next();
                 });
+            } else {
+                log.debug("Creating new category from seed category: " + seedCategory.id);
+                classificationRepo.createCategoryFromSeed(seedCategory, seedCategoryApps, function(err) {
+                    if (err) { return next(err); }
+
+                    return next();
+                });
             }
-
-            log.debug("Creating new category from seed category: " + seedCategory.id);
-            classificationRepo.createCategoryFromSeed(seedCategory, seedCategoryApps, function(err) {
-                if (err) { return next(err); }
-
-                return next();
-            });
         });
     });
 };
@@ -176,9 +187,26 @@ var transferAllSeedCategoryApps = function(next) {
     classificationRepo.getActiveSeedCategories(function(err, seedCategories) {
         if (err) { return next(err); }
 
-        async.eachSeries(seedCategories, processTransferSeedCategoryApps, function(err) {
+        var asyncIterator = function(seedCategory, callback) {
+            processTransferSeedCategoryApps(seedCategory, function(err) {
+                if (err) {
+                    log.error(err);
+                    var message = errorToString(err);
+                    classificationRepo.updateSeedCategoryBuildMessage(seedCategory.id, message, function(err) {
+                        if (err) { return next(err); }
+
+                        return callback();
+                    });
+                } else {
+                    callback();
+                }
+            });
+        };
+
+        async.eachSeries(seedCategories, asyncIterator, function(err) {
             if (err) { return next(err); }
 
+            log.debug("Completed transfering all seed category apps");
             return next();
         });
     });

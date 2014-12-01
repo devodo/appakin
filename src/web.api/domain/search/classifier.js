@@ -31,6 +31,7 @@ Classifier.prototype.predict = function(vector) {
 var ClassifierAnalyser = function() {
     var resultSettings = {
         maxTerms: 50,
+        maxTrainingTerms: 50,
         smoothFactor: 1.0,
         tieBreak: 0.1,
         maxDocFreq: 800000
@@ -249,7 +250,7 @@ TermMatrix.prototype.addTrainingDocs = function(trainingDocs) {
     self.initialiseTrainingTermScores(trainingDocs);
 
     trainingDocs.forEach(function(doc) {
-        var termScores = self.getTopScoringTerms(doc);
+        var termScores = self.getTopScoringTerms(doc, self.resultSettings.maxTrainingTerms);
 
         var indexedTermVector = [];
 
@@ -360,8 +361,12 @@ var logBase = function(x,b) {
     return Math.log(x) / Math.log(b);
 };
 
-TermMatrix.prototype.getTopScoringTerms = function(doc) {
+TermMatrix.prototype.getTopScoringTerms = function(doc, maxTerms) {
     var self = this;
+
+    if (!maxTerms) {
+        maxTerms = self.resultSettings.maxTerms;
+    }
 
     var results = [];
 
@@ -399,7 +404,7 @@ TermMatrix.prototype.getTopScoringTerms = function(doc) {
         return b.tfIdf - a.tfIdf;
     });
 
-    results = results.splice(0, self.resultSettings.maxTerms);
+    results = results.splice(0, maxTerms);
     var topScore = Math.pow(results[0].tfIdf, self.resultSettings.smoothFactor);
 
     results.forEach(function(result) {
