@@ -54,11 +54,13 @@ ratings.forEach(function(rating) {
     console.log(rating.r + '\t' + rating.c + ':\t' + score(rating));
 });
 
+/*
 for (var i = 1; i <= 240; i++) {
     var val = 1 -(Math.pow(logBase(i, 10000),2));
     console.log(i + ": " + val);
     console.log(i + ": " + 1/Math.pow(i, 0.08));
 }
+*/
 
 
 

@@ -24,7 +24,8 @@ var addCategory = function(category, apps, next) {
             "image_url": app.imageUrl,
             position: app.position,
             price: app.price,
-            popularity: app.popularity
+            popularity: app.popularity,
+            app_cat_name: category.name
         };
     });
 

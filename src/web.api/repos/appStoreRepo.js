@@ -144,9 +144,7 @@ var getCategoryApps = function(client, categoryId, skip, take, next) {
         "substring(a.description from 0 for 200) as short_description, ca.position\n" +
         "FROM appstore_app a\n" +
         "JOIN category_app ca ON a.app_id = ca.app_id\n" +
-        "LEFT JOIN category_app_exclude ca_e on ca.category_id = ca_e.category_id AND ca.app_id = ca_e.app_id\n" +
         "WHERE ca.category_id = $1\n" +
-        "AND ca_e.id IS NULL\n" +
         "ORDER BY ca.position\n" +
         "LIMIT $2 OFFSET $3;";
 
@@ -179,6 +177,7 @@ var getCategories = function(client, next) {
         "FROM category c\n" +
         "LEFT JOIN category_popularity cp\n" +
         "ON c.id = cp.category_id\n" +
+        "WHERE date_deleted is null\n" +
         "ORDER BY name;";
 
     client.query(queryStr, [], function (err, result) {
