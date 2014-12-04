@@ -54,6 +54,9 @@ COST 100;
 
 -- Function: reset_app_popularity()
 
+--x^((5/5)* 0.2 * e^(-0.001x) + 0.2 * (1 - e^(-0.001x)))
+--http://fooplot.com/#W3sidHlwZSI6MCwiZXEiOiJ4XigoNS81KSowLjE1KmVeKC0wLjAwMXgpKzAuMTUqKDEtZV4oLTAuMDAxeCkpKSIsImNvbG9yIjoiI0VCMEUwRSJ9LHsidHlwZSI6MCwiZXEiOiJ4XigoNC81KSowLjE1KmVeKC0wLjAxeCkrMC4xNSooMS1lXigtMC4wMXgpKSkiLCJjb2xvciI6IiM0NUEzMjkifSx7InR5cGUiOjAsImVxIjoieF4oKDMvNSkqMC4xNSplXigtMC4wMXgpKzAuMTUqKDEtZV4oLTAuMDF4KSkpIiwiY29sb3IiOiIjQTkxMEU2In0seyJ0eXBlIjowLCJlcSI6InheKCgyLzUpKjAuMTUqZV4oLTAuMDF4KSswLjE1KigxLWVeKC0wLjAxeCkpKSIsImNvbG9yIjoiIzFFMjRENCJ9LHsidHlwZSI6MCwiZXEiOiJ4XigoMS81KSowLjE1KmV4cCgtMC4wMXgpKzAuMTUqKDEtZXhwKC0wLjAxeCkpKSIsImNvbG9yIjoiI0U4OTQzQSJ9LHsidHlwZSI6MTAwMCwid2luZG93IjpbIi0yIiwiMTAiLCItMiIsIjQiXX1d
+
 -- DROP FUNCTION reset_app_popularity();
 
 CREATE OR REPLACE FUNCTION reset_app_popularity()
@@ -62,33 +65,26 @@ CREATE OR REPLACE FUNCTION reset_app_popularity()
 DECLARE avg_rating double precision;
 DECLARE avg_rating_current double precision;
 BEGIN
-	SELECT ar, arc INTO avg_rating, avg_rating_current
-	from (
-		SELECT  avg(user_rating::double precision) as ar,
-			avg(user_rating_current::double precision) as arc
-		FROM    appstore_app
-	) t;
-
 	delete from app_popularity;
 
 	INSERT INTO app_popularity(app_id, popularity)
 	select rating.app_id, GREATEST(rating_rank, chart_rank) as rank
 	from (
-		select app_id, log(rm)/log(max_rm) as rating_rank
+		select a.app_id, power(rating_rate, ((0.15 * rating/5.0) * exp(-0.01 * rating_rate)) + (0.15 * (1 - exp(-0.01 * rating_rate)))) - 1 as rating_rank
 		from (
-			select app_id, rm, max(rm) over() as max_rm
+			select a.app_id, (r1 * r1_count_root + r2 * r2_count)/(r1_count_root + r2_count) as rating, rating_rate
 			from (
-				select app_id, rating_merge(r1, r1_count, avg_rating, 10, r2, r2_count, avg_rating_current, 10) * (1 + power(log(1 + rating_rate)/log(50000), 1)) as rm
-				from (
-					select a.app_id,
-						a.user_rating::double precision as r1, a.rating_count::double precision as r1_count,
-						a.user_rating_current::double precision as r2, a.rating_count_current::double precision as r2_count,
-						coalesce(user_rating::double precision,0) as rating, coalesce(rating_count,0) / power(GREATEST(((EXTRACT(EPOCH FROM NOW() at time zone 'utc') - EXTRACT(EPOCH FROM release_date)) / 86400), 10), 0.5) as rating_rate
-					from appstore_app a
-				) t
-			) t
-			where t.rm > 0
-		) t
+				select a.app_id,
+					coalesce(a.user_rating::double precision, 0) as r1,
+					coalesce(power(a.rating_count::double precision, 0.6), 0) as r1_count_root,
+					coalesce(a.user_rating_current::double precision, 0) as r2,
+					coalesce(a.rating_count_current::double precision, 0) as r2_count,
+					a.rating_count / power(GREATEST(((EXTRACT(EPOCH FROM NOW() at time zone 'utc') - EXTRACT(EPOCH FROM release_date)) / 86400), 10), 0.5) as rating_rate
+				from appstore_app a
+				where a.rating_count is not null
+			) a
+			where a.rating > 0
+		) a
 	) rating
 	left join (
 		select a.app_id, 1 - (power(log(min(chart.position))/log(10000),2)) as chart_rank
@@ -104,5 +100,6 @@ END;
 $BODY$
 LANGUAGE plpgsql VOLATILE
 COST 100;
+
 
 

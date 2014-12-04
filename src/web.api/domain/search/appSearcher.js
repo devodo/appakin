@@ -51,8 +51,8 @@ var search = function(queryStr, pageNum, next) {
 
             var app = {
                 id: doc.id,
-                name: doc.name,
-                url: urlUtil.makeUrl(doc.id, doc.name),
+                name: doc.name_split,
+                url: urlUtil.makeUrl(doc.id, doc.name_split),
                 imageUrl: doc.img_url,
                 price: doc.price,
                 popularity: doc.popularity

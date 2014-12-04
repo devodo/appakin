@@ -9,7 +9,6 @@ var createSolrApp = function(app) {
         id : app.extId.replace(/\-/g, ''),
         name: app.name,
         desc: app.description,
-        "desc_top": solrCore.getTopWords(app.description, 200),
         "img_url" : app.imageUrl,
         price: app.price,
         popularity: app.popularity
