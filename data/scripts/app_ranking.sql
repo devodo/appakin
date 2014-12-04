@@ -83,8 +83,8 @@ BEGIN
 				from appstore_app a
 				where a.rating_count is not null
 			) a
-			where a.rating > 0
 		) a
+		where a.rating > 0
 	) rating
 	left join (
 		select a.app_id, 1 - (power(log(min(chart.position))/log(10000),2)) as chart_rank
