@@ -31,7 +31,7 @@ Classifier.prototype.predict = function(vector) {
 var ClassifierAnalyser = function() {
     var resultSettings = {
         maxTerms: 50,
-        maxTrainingTerms: 50,
+        maxTrainingTerms: 100,
         smoothFactor: 1.0,
         tieBreak: 0.1,
         maxDocFreq: 800000

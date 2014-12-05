@@ -59,15 +59,15 @@ on live machine:
 gunzip < file.tar.gz | tar xvf -
 sudo cp -r v0.0.3 /var/www/appakin/releases/
 
+sudo rm -rf node_modules
+sudo npm install
+
 sudo ln -sfn v0.0.3 current
 readlink -f current
 
 sudo restart appakin
 
 ------------------
-
-sudo rm -rf node_modules
-sudo npm install
 
 # Mac Installation
 

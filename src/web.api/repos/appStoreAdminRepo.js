@@ -807,7 +807,7 @@ var getSeedSearch = function(client, seedId, next) {
     var queryStr =
         "SELECT id, seed_category_id, query, max_take\n" +
         "FROM seed_category_search\n" +
-        "WHERE id = $1;";
+        "WHERE seed_category_id = $1;";
 
     client.query(queryStr, [seedId], function (err, result) {
         if (err) {
