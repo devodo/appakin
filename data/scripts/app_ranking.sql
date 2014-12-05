@@ -59,18 +59,20 @@ COST 100;
 
 -- DROP FUNCTION reset_app_popularity();
 
+-- Function: reset_app_popularity()
+
+-- DROP FUNCTION reset_app_popularity();
+
 CREATE OR REPLACE FUNCTION reset_app_popularity()
   RETURNS boolean AS
   $BODY$
-DECLARE avg_rating double precision;
-DECLARE avg_rating_current double precision;
 BEGIN
 	delete from app_popularity;
 
 	INSERT INTO app_popularity(app_id, popularity)
 	select rating.app_id, GREATEST(rating_rank, chart_rank) as rank
 	from (
-		select a.app_id, power(rating_rate, ((0.15 * rating/5.0) * exp(-0.01 * rating_rate)) + (0.15 * (1 - exp(-0.01 * rating_rate)))) - 1 as rating_rank
+		select a.app_id, power(rating_rate, ((0.5 * rating/5.0) * exp(-0.01 * rating_rate)) + (0.5 * (1 - exp(-0.01 * rating_rate)))) - 1 as rating_rank
 		from (
 			select a.app_id, (r1 * r1_count_root + r2 * r2_count)/(r1_count_root + r2_count) as rating, rating_rate
 			from (
@@ -79,7 +81,7 @@ BEGIN
 					coalesce(power(a.rating_count::double precision, 0.6), 0) as r1_count_root,
 					coalesce(a.user_rating_current::double precision, 0) as r2,
 					coalesce(a.rating_count_current::double precision, 0) as r2_count,
-					a.rating_count / power(GREATEST(((EXTRACT(EPOCH FROM NOW() at time zone 'utc') - EXTRACT(EPOCH FROM release_date)) / 86400), 10), 0.5) as rating_rate
+					1 + (a.rating_count / power(GREATEST(((EXTRACT(EPOCH FROM NOW() at time zone 'utc') - EXTRACT(EPOCH FROM release_date)) / 86400), 10), 0.5)) as rating_rate
 				from appstore_app a
 				where a.rating_count is not null
 			) a
@@ -100,6 +102,7 @@ END;
 $BODY$
 LANGUAGE plpgsql VOLATILE
 COST 100;
+
 
 
 
