@@ -20,7 +20,6 @@ var addCategory = function(category, apps, next) {
             "parent_id": catId,
             name: app.name,
             desc: app.description,
-            "desc_top": solrCore.getTopWords(app.description, 200),
             "image_url": app.imageUrl,
             position: app.position,
             price: app.price,

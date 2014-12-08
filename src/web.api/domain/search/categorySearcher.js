@@ -49,8 +49,8 @@ var getApps = function(expanded, highlights, docId) {
     var apps = appDocs.map(function(appDoc) {
         var app = {
             id: appDoc.id,
-            name: appDoc.name,
-            url: urlUtil.makeUrl(appDoc.id, appDoc.name),
+            name: appDoc.name_split,
+            url: urlUtil.makeUrl(appDoc.id, appDoc.name_split),
             imageUrl: appDoc.image_url,
             price: appDoc.price,
             position: appDoc.position
@@ -95,8 +95,8 @@ var search = function(queryStr, pageNum, next) {
         var categories = obj.response.docs.map(function(doc) {
             var category = {
                 id: doc.id,
-                name: doc.cat_name,
-                url: urlUtil.makeUrl(doc.id, doc.cat_name)
+                name: doc.cat_name_split,
+                url: urlUtil.makeUrl(doc.id, doc.cat_name_split)
             };
 
             var appResult = getApps(expanded, highlights, doc.id);
@@ -149,8 +149,8 @@ var searchApps = function(queryStr, pageNum, categoryId, next) {
         var apps = obj.response.docs.map(function(doc) {
             var app = {
                 id: doc.id,
-                name: doc.name,
-                url: urlUtil.makeUrl(doc.id, doc.name),
+                name: doc.name_split,
+                url: urlUtil.makeUrl(doc.id, doc.name_split),
                 imageUrl: doc.image_url,
                 price: doc.price,
                 position: doc.position
