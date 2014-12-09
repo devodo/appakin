@@ -4,5 +4,6 @@ Allow: /
 
 Disallow: /terms
 Disallow: /privacy
+Disallow: /ios/app/
 
 Sitemap: http://www.appakin.com/sitemap.txt
