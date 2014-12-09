@@ -58,7 +58,9 @@ COST 100;
 
 -- DROP FUNCTION reset_app_popularity();
 
-select reset_app_popularity();
+-- Function: reset_app_popularity()
+
+-- DROP FUNCTION reset_app_popularity();
 
 CREATE OR REPLACE FUNCTION reset_app_popularity()
   RETURNS boolean AS
@@ -75,7 +77,7 @@ BEGIN
 		(
 			select a.app_id, score, max(score) over() as max_score
 			from (
-				select a.app_id, ln(1 + (20 * GREATEST(rating_count * rating / 5.0, 1) )/age_days) as score from
+				select a.app_id, ln(1 + (20 * GREATEST(rating_count * power(rating / 5.0, 2), 1) )/age_days) as score from
 				(
 					select a.app_id, (r1 * r1_count_root + r2 * r2_count)/(GREATEST(1, r1_count_root + r2_count)) as rating, rating_count, age_days
 					from (
@@ -106,6 +108,7 @@ END;
 $BODY$
 LANGUAGE plpgsql VOLATILE
 COST 100;
+
 
 
 
