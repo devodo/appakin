@@ -319,6 +319,7 @@ var getClusterIndexBatch = function(client, lastId, limit, next) {
         "ON a.app_id = ap.app_id\n" +
         "WHERE a.app_id > $1\n" +
         "AND aa.desc_is_english\n" +
+        "AND a.date_deleted is null\n" +
         "ORDER BY a.app_id\n" +
         "limit $2;";
 

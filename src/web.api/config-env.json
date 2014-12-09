@@ -29,6 +29,18 @@
         },
         "itunes": {
             "affiliateId": "10lNjB"
+        },
+        "featured": {
+            "homePage": {
+                "categories": 5,
+                "categoryBias": 2,
+                "apps": 5,
+                "appBias": 2
+            },
+            "category": {
+                "apps": 5,
+                "appBias": 2
+            }
         }
     },
     "development": {
