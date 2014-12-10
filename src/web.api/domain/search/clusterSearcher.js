@@ -264,7 +264,7 @@ var searchTermVectors = function(query, skip, take, next) {
             var nameTermVector = nameIndex > -1 ? parseTermVector(obj.termVectors[index+1][nameIndex]): [];
 
             var descIndex = getTermVectorIndex(obj.termVectors[index+1], "desc_shingle");
-            var descTermVector = nameIndex > -1 ? parseTermVector(obj.termVectors[index+1][descIndex]): [];
+            var descTermVector = descIndex > -1 ? parseTermVector(obj.termVectors[index+1][descIndex]): [];
 
             var doc = {
                 id: id,

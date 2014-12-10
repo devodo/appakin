@@ -16,11 +16,10 @@ exports.init = function init(app) {
         autoIndexer.rebuild(batchSize, maxNgramDepth, function(err) {
             if (err) {
                 log.error(err);
-                return res.status(500).json(err);
             }
-
-            res.json({status: 'success'});
         });
+
+        res.json({status: 'rebuild started'});
     });
 
     app.post('/admin/search/cat/rebuild', function (req, res) {
@@ -29,11 +28,10 @@ exports.init = function init(app) {
         catIndexer.rebuild(function(err) {
             if (err) {
                 log.error(err);
-                return res.status(500).json(err);
             }
-
-            res.json({status: 'success'});
         });
+
+        res.json({status: 'rebuild started'});
     });
 
     app.get('/admin/search/cat/index/:categoryId', function (req, res) {
@@ -48,11 +46,10 @@ exports.init = function init(app) {
         catIndexer.rebuildCategory(categoryId, function(err) {
             if (err) {
                 log.error(err);
-                return res.status(500).json(err);
             }
-
-            res.json({status: 'success'});
         });
+
+        res.json({status: 'rebuild started'});
     });
 
     app.post('/admin/search/app/rebuild', function (req, res) {
@@ -62,11 +59,10 @@ exports.init = function init(app) {
         appIndexer.rebuild(batchSize, function(err) {
             if (err) {
                 log.error(err);
-                return res.status(500).json(err);
             }
-
-            res.json({status: 'success'});
         });
+
+        res.json({status: 'rebuild started'});
     });
 
     app.post('/admin/search/cluster/rebuild', function (req, res) {
@@ -76,11 +72,10 @@ exports.init = function init(app) {
         clusterIndexer.rebuild(batchSize, function(err) {
             if (err) {
                 log.error(err);
-                return res.status(500).json(err);
             }
-
-            res.json({status: 'success'});
         });
+
+        res.json({status: 'rebuild started'});
     });
 
     app.get('/admin/search/cat/keywords/:catid', function (req, res) {

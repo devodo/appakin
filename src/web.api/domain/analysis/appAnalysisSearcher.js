@@ -20,7 +20,7 @@ var parseTermStats = function(fieldArray) {
         var term = fieldArray[indexBase];
 
         // ignore shingled terms
-        if (term.split(' ') > 1) {
+        if (term.split(' ').length > 1) {
             continue;
         }
 
@@ -45,7 +45,7 @@ var parseTermStats = function(fieldArray) {
 };
 
 var getDescriptionStats = function(appId, next) {
-    var solrQuery = 'q=' + appId.replace(/\-/g, '') + '&tv.fl=desc';
+    var solrQuery = 'q=' + appId.replace(/\-/g, '') + '&tv.fl=desc_shingle&fq=*:*';
 
     solrClusterCore.client.get('keyword', solrQuery, function (err, obj) {
         if (err) { return next(err); }
@@ -56,7 +56,7 @@ var getDescriptionStats = function(appId, next) {
 
         var stats = null;
 
-        if (!obj.docs || !obj.docs[3]) {
+        if (!obj.termVectors || !obj.termVectors[3]) {
             log.debug('Failed to get term vectors for app ' + appId);
 
             stats = {
@@ -64,7 +64,7 @@ var getDescriptionStats = function(appId, next) {
                 terms: []
             };
         } else {
-            stats = parseTermStats(obj.docs[3][3]);
+            stats = parseTermStats(obj.termVectors[3][3]);
         }
 
         next(null, stats);

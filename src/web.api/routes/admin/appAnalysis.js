@@ -19,4 +19,18 @@ exports.init = function init(app) {
         });
     });
 
+    app.post('/admin/analyse/new_apps', function (req, res) {
+        var batchSize = 100;
+        log.debug("Starting analysis of new apps");
+
+        appAnalyser.analyseNew(batchSize, function(err) {
+            if (err) {
+                log.error(err);
+                return res.status(500).json(err);
+            }
+
+            res.json({status: 'success'});
+        });
+    });
+
 };

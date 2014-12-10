@@ -13,7 +13,8 @@ var createSolrDoc = function(app) {
         genres: app.genres,
         "screenshot_urls": app.screenShotUrls,
         "ipad_screenshot_urls": app.iPadScreenShotUrls,
-        popularity: app.popularity
+        popularity: app.popularity,
+        "is_english": app.isEnglish
     };
 
     return doc;

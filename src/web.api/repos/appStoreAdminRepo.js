@@ -668,6 +668,41 @@ var getAppAnalysisBatch = function(client, lastId, limit, next) {
         "SELECT a.app_id, a.ext_id, a.name, a.description\n" +
         "FROM appstore_app a\n" +
         "WHERE a.app_id > $1\n" +
+        "AND a.date_deleted is null\n" +
+        "ORDER BY a.app_id\n" +
+        "limit $2;";
+
+    var queryParams = [
+        lastId,
+        limit
+    ];
+
+    client.query(queryStr, queryParams, function (err, result) {
+        if (err) {
+            return next(err);
+        }
+
+        var items = result.rows.map(function(item) {
+            return {
+                app_id: item.app_id,
+                ext_id: item.ext_id,
+                name: item.name,
+                description: item.description
+            };
+        });
+
+        next(null, items);
+    });
+};
+
+var getAppAnalysisBatchNew = function(client, lastId, limit, next) {
+    var queryStr =
+        "SELECT a.app_id, a.ext_id, a.name, a.description\n" +
+        "FROM appstore_app a\n" +
+        "LEFT JOIN app_analysis aa on a.app_id = aa.app_id\n" +
+        "WHERE a.app_id > $1\n" +
+        "AND aa.app_id is null\n" +
+        "AND a.date_deleted is null\n" +
         "ORDER BY a.app_id\n" +
         "limit $2;";
 
@@ -1089,6 +1124,20 @@ exports.getAppAnalysisBatch = function(lastId, limit, next) {
         }
 
         getAppAnalysisBatch(conn.client, lastId, limit, function(err, results) {
+            conn.close(err, function(err) {
+                next(err, results);
+            });
+        });
+    });
+};
+
+exports.getAppAnalysisBatchNew = function(lastId, limit, next) {
+    connection.open(function(err, conn) {
+        if (err) {
+            return next(err);
+        }
+
+        getAppAnalysisBatchNew(conn.client, lastId, limit, function(err, results) {
             conn.close(err, function(err) {
                 next(err, results);
             });

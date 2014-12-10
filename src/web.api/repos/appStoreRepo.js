@@ -279,6 +279,7 @@ var getAppIndexBatch = function(client, lastId, limit, next) {
         "LEFT JOIN app_popularity ap on a.app_id = ap.app_id\n" +
         "WHERE a.app_id > $1\n" +
         "AND a.name is not null\n" +
+        "AND a.date_deleted is null\n" +
         "ORDER BY a.app_id\n" +
         "limit $2;";
 
@@ -311,14 +312,13 @@ var getAppIndexBatch = function(client, lastId, limit, next) {
 
 var getClusterIndexBatch = function(client, lastId, limit, next) {
     var queryStr =
-        "SELECT a.app_id, a.ext_id, a.name, a.description, a.genres, a.screenshot_urls, a.ipad_screenshot_urls, ap.popularity\n" +
+        "SELECT a.app_id, a.ext_id, a.name, a.description, a.genres, a.screenshot_urls, a.ipad_screenshot_urls, ap.popularity, aa.desc_is_english\n" +
         "FROM appstore_app a\n" +
-        "INNER JOIN app_analysis aa\n" +
+        "LEFT JOIN app_analysis aa\n" +
         "ON a.app_id = aa.app_id\n" +
         "LEFT JOIN app_popularity ap\n" +
         "ON a.app_id = ap.app_id\n" +
         "WHERE a.app_id > $1\n" +
-        "AND aa.desc_is_english\n" +
         "AND a.date_deleted is null\n" +
         "ORDER BY a.app_id\n" +
         "limit $2;";
@@ -342,7 +342,8 @@ var getClusterIndexBatch = function(client, lastId, limit, next) {
                 genres: item.genres,
                 screenShotUrls: item.screenshot_urls,
                 iPadScreenShotUrls: item.ipad_screenshot_urls,
-                popularity: item.popularity
+                popularity: item.popularity,
+                isEnglish: item.desc_is_english
             };
         });
 
