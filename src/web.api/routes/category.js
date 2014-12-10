@@ -2,13 +2,14 @@
 var log = require('../logger');
 var urlUtil = require('../domain/urlUtil');
 var appStoreRepo = require('../repos/appStoreRepo');
+var featuredRepo = require('../repos/featuredRepo');
 
 var PAGE_SIZE = 20;
 var MAX_CAT_PAGES = 5;
 
 exports.init = function init(app) {
 
-    app.get('/ios/category/:encodedId/:slug', function (req, res) {
+    app.get('/ios/category/:encodedId/:slug', function (req, res, next) {
         var encodedId = req.params.encodedId;
         if (!encodedId)
         {
@@ -28,10 +29,7 @@ exports.init = function init(app) {
         }
 
         appStoreRepo.getCategoryByExtId(extId, function(err, category) {
-            if (err) {
-                log.error(err);
-                return res.status(500).send('Error retrieving category data');
-            }
+            if (err) { return next(err); }
 
             if (!category) {
                 return res.status(404).send('Category not found');
@@ -49,10 +47,7 @@ exports.init = function init(app) {
 
             var skip = (pageNum - 1) * PAGE_SIZE;
             appStoreRepo.getCategoryApps(category.id, skip, PAGE_SIZE, function(err, apps) {
-                if (err) {
-                    log.error(err);
-                    return res.status(500).send('Error retrieving category app data');
-                }
+                if (err) { return next(err); }
 
                 var pIndex = skip + 1;
                 apps.forEach(function(app) {
@@ -65,9 +60,24 @@ exports.init = function init(app) {
                 category.page = pageNum;
                 category.apps = apps;
 
-                delete category.id;
+                featuredRepo.getFeaturedApps(category.id, 2, 5, function(err, fApps) {
+                    if (err) { return next(err); }
 
-                res.json(category);
+                    var featuredApps = fApps.map(function(item) {
+                        return {
+                            id: item.extId,
+                            name: item.name,
+                            artworkUrl: item.artworkSmallUrl,
+                            url: urlUtil.makeUrl(item.extId, item.name),
+                            price: item.price
+                        };
+                    });
+
+                    category.featured = featuredApps;
+
+                    delete category.id;
+                    res.json(category);
+                });
             });
         });
     });

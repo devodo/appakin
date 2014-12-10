@@ -32,6 +32,7 @@
         },
         "featured": {
             "homePage": {
+                "ttl": 10000,
                 "categories": 5,
                 "categoryBias": 2,
                 "apps": 5,
