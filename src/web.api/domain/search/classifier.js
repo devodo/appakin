@@ -28,66 +28,6 @@ Classifier.prototype.predict = function(vector) {
 
 // Maths
 //http://fooplot.com/#W3sidHlwZSI6MCwiZXEiOiIxLShsb2coeCkvbG9nKDIyMCkpXjIqMC45IiwiY29sb3IiOiIjRTYyNTI1In0seyJ0eXBlIjowLCJlcSI6IjEtKGxvZyh4KS9sb2coMzAwKSleMjAiLCJjb2xvciI6IiMxNDVBRDEifSx7InR5cGUiOjAsImVxIjoiKGxuKHgpL2xuKDI4NDIxMDgpKSIsImNvbG9yIjoiIzI1RTMwQyJ9LHsidHlwZSI6MCwiZXEiOiJ4XjAuNSIsImNvbG9yIjoiIzAwMDAwMCJ9LHsidHlwZSI6MTAwMCwid2luZG93IjpbIi0zMDkuNzg5NTUwNzgxMjQ5ODMiLCI2MDguNzg5NTUwNzgxMjQ5OCIsIi03LjE1NTI3MzQzNzQ5OTk5NjQiLCIxMS4xNTUyNzM0Mzc0OTk5OTYiXX1d
-var ClassifierAnalyser = function() {
-    var resultSettings = {
-        maxTerms: 50,
-        maxTrainingTerms: 100,
-        smoothFactor: 1.0,
-        tieBreak: 0.1,
-        maxDocFreq: 800000
-    };
-
-    var titleSettings = {
-        tfBoost: 0,
-        posDecay: 0.1,
-        dfWeight: 2.5,
-        titleBoost: 1.0
-    };
-
-    var descSettings = {
-        tfBoost: 0.5,
-        minPosLength: 20,
-        posDecayWeight: 25,
-        dfWeight: 2.5
-    };
-
-    this.termMatrix = new TermMatrix(resultSettings, titleSettings, descSettings);
-};
-
-ClassifierAnalyser.prototype.addTrainingDocs = function(trainingDocs) {
-    var self = this;
-    this.trainingAnalyser = new TrainingAnalyser();
-    self.trainingAnalyser.addTrainingDocs(trainingDocs);
-    var termScores = self.trainingAnalyser.analyseTermScores();
-    self.termMatrix.addTrainingDocs(trainingDocs, termScores);
-};
-
-ClassifierAnalyser.prototype.buildTrainingMatrix = function() {
-    var self = this;
-    var trainingMatrix = self.termMatrix.buildTrainingMatrix();
-    return trainingMatrix;
-};
-
-ClassifierAnalyser.prototype.getTopTerms = function(limit) {
-    var self = this;
-    var result = self.termMatrix.getTopTerms(limit);
-
-    return result;
-};
-
-ClassifierAnalyser.prototype.getIndexedTermVector = function(doc) {
-    var self = this;
-    var vector = self.termMatrix.getIndexedTermVector(doc);
-
-    return vector;
-};
-
-ClassifierAnalyser.prototype.getDocTopTerms = function(doc) {
-    var self = this;
-    var result = self.termMatrix.getTopScoringTerms(doc);
-
-    return result;
-};
 
 var TrainingAnalyser = function() {
     this.settings = {
@@ -210,12 +150,30 @@ TrainingAnalyser.prototype.analyseTermScores = function() {
     };
 };
 
-var TermMatrix = function(resultSettings, titleSettings, descSettings) {
+var ClassifierAnalyser = function() {
     var self = this;
 
-    self.resultSettings = resultSettings;
-    self.titleSettings = titleSettings;
-    self.descSettings = descSettings;
+    self.resultSettings = {
+        maxTerms: 50,
+        maxTrainingTerms: 100,
+        smoothFactor: 1.0,
+        tieBreak: 0.1,
+        maxDocFreq: 800000
+    };
+
+    self.titleSettings = {
+        tfBoost: 0,
+        posDecay: 0.1,
+        dfWeight: 2.5,
+        titleBoost: 1.0
+    };
+
+    self.descSettings = {
+        tfBoost: 0.5,
+        minPosLength: 20,
+        posDecayWeight: 25,
+        dfWeight: 2.5
+    };
 
     self.termDictionary = Object.create(null);
     self.termIndex = 0;
@@ -225,7 +183,7 @@ var TermMatrix = function(resultSettings, titleSettings, descSettings) {
     self.descTermScoreMap = Object.create(null);
 };
 
-TermMatrix.prototype.initialiseTrainingTermScores = function(trainingDocs) {
+ClassifierAnalyser.prototype.initialiseTrainingTermScores = function(trainingDocs) {
     var self = this;
 
     var trainingAnalyser = new TrainingAnalyser();
@@ -244,7 +202,7 @@ TermMatrix.prototype.initialiseTrainingTermScores = function(trainingDocs) {
     });
 };
 
-TermMatrix.prototype.addTrainingDocs = function(trainingDocs) {
+ClassifierAnalyser.prototype.addTrainingDocs = function(trainingDocs) {
     var self = this;
 
     self.initialiseTrainingTermScores(trainingDocs);
@@ -277,7 +235,7 @@ TermMatrix.prototype.addTrainingDocs = function(trainingDocs) {
     });
 };
 
-TermMatrix.prototype.getTitleScoresMap = function(termInfos) {
+ClassifierAnalyser.prototype.getTitleScoresMap = function(termInfos) {
     var self = this;
 
     var results = Object.create(null);
@@ -311,7 +269,7 @@ TermMatrix.prototype.getTitleScoresMap = function(termInfos) {
     return results;
 };
 
-TermMatrix.prototype.getDescScores = function(termInfos) {
+ClassifierAnalyser.prototype.getDescScores = function(termInfos) {
     var self = this;
 
     var results = [];
@@ -361,7 +319,7 @@ var logBase = function(x,b) {
     return Math.log(x) / Math.log(b);
 };
 
-TermMatrix.prototype.getTopScoringTerms = function(doc, maxTerms) {
+ClassifierAnalyser.prototype.getTopScoringTerms = function(doc, maxTerms) {
     var self = this;
 
     if (!maxTerms) {
@@ -414,7 +372,7 @@ TermMatrix.prototype.getTopScoringTerms = function(doc, maxTerms) {
     return results;
 };
 
-TermMatrix.prototype.getIndexedTermVector = function(doc) {
+ClassifierAnalyser.prototype.getIndexedTermVector = function(doc) {
     var self = this;
 
     var termScores = self.getTopScoringTerms(doc);
@@ -441,7 +399,7 @@ TermMatrix.prototype.getIndexedTermVector = function(doc) {
     return indexedTermVector;
 };
 
-TermMatrix.prototype.buildTrainingMatrix = function() {
+ClassifierAnalyser.prototype.buildTrainingMatrix = function() {
     var self = this;
 
     log.debug("Term matrix size: " + self.trainingMatrix.length + " x " + self.termIndex);
@@ -459,7 +417,7 @@ TermMatrix.prototype.buildTrainingMatrix = function() {
     return self.trainingMatrix;
 };
 
-TermMatrix.prototype.getTopTerms = function(limit) {
+ClassifierAnalyser.prototype.getTopTerms = function(limit) {
     var self = this;
 
     var termInfos = [];

@@ -28,6 +28,34 @@ var getTrainingSet = function(client, seedCategoryId, next) {
     });
 };
 
+var getCategoryAppsAsTrainingSet = function(client, categoryId, next) {
+    var queryStr =
+        "SELECT ca.id, a.ext_id, true as include\n" +
+        "FROM category_app ca\n" +
+        "JOIN appstore_app a on ca.app_id = a.app_id\n" +
+        "where ca.category_id = $1\n" +
+        "and a.date_deleted is null\n" +
+        "order by ca.position;";
+
+    var queryParams = [ categoryId ];
+
+    client.query(queryStr, queryParams, function (err, result) {
+        if (err) {
+            return next(err);
+        }
+
+        var items = result.rows.map(function(item) {
+            return {
+                id: item.id,
+                appExtId: item.ext_id,
+                include: item.include
+            };
+        });
+
+        return next(null, items);
+    });
+};
+
 var deleteClassificationApps = function(client, seedCategoryId, next) {
     var queryStr =
         "DELETE FROM seed_classification_app\n" +
@@ -528,6 +556,20 @@ exports.getTrainingSet = function(seedCategoryId, next) {
         }
 
         getTrainingSet(conn.client, seedCategoryId, function(err, id) {
+            conn.close(err, function(err) {
+                next(err, id);
+            });
+        });
+    });
+};
+
+exports.getCategoryAppsAsTrainingSet = function(categoryId, next) {
+    connection.open(function(err, conn) {
+        if (err) {
+            return next(err);
+        }
+
+        getCategoryAppsAsTrainingSet(conn.client, categoryId, function(err, id) {
             conn.close(err, function(err) {
                 next(err, id);
             });

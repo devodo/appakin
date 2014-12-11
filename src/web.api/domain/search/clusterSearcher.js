@@ -4,100 +4,12 @@ var fs = require('fs');
 var async = require('async');
 
 var solrClusterCore = require('./solrCore').getClusterCore();
-var solrCategoryCore = require('./solrCore').getCategoryCore();
 var config = require('../../config');
 var adminRepo = require('../../repos/appStoreAdminRepo');
-var appStoreRepo = require('../../repos/appStoreRepo');
 var classifierRepo = require('../../repos/classificationRepo');
 var log = require('../../logger');
 var classifier = require('./classifier');
 
-
-var MAX_TERMS = 50;
-var USE_BOOST = true;
-var BOOST_SMOOTH = 0.8;
-var TITLE_POSITION_DECAY = 0.1;
-var DESC_POSITION_DECAY = 0.3;
-var TERM_FREQ_BOOST = 1.2;
-var TITLE_BOOST = 1.5;
-var TITLE_IDF_FACTOR = 0.5;
-var DESC_IDF_FACTOR = 0.3;
-
-var stopwords = null;
-
-var isStopWord = function(word) {
-    if (!stopwords) {
-        stopwords = {};
-        var contents = fs.readFileSync(config.search.stopwordFile).toString();
-        var lines = contents.replace(/\r/g, '').split(/\n/g);
-        lines.forEach(function(line) {
-            if (line.match(/^\s*#/)) { return; } // ignore commented lines
-            stopwords[line] = true;
-        });
-    }
-
-    return stopwords[word];
-};
-
-var searchSimilarByName = function(appId, rows, next) {
-    var options = {
-        minWordLength: 1,
-        minDocFreq: 20,
-        minTermFreq: 1,
-        maxQueryTerms: 20,
-        rows: rows
-    };
-
-    searchMlt(appId, "name_stem", options, next);
-};
-
-var buildSolrQuery = function(appId, field, options) {
-    var solrQuery = 'q=id:' + appId + '&mlt.fl=' + field;
-
-    if (!options) {
-        return solrQuery;
-    }
-
-    if (options.minWordLength) { solrQuery += '&mlt.minwl=' + options.minWordLength; }
-    if (options.minDocFreq) { solrQuery += '&mlt.mindf=' + options.minDocFreq; }
-    if (options.minTermFreq) { solrQuery += '&mlt.mintf=' + options.minTermFreq; }
-    if (options.maxQueryTerms) { solrQuery += '&mlt.maxqt=' + options.maxQueryTerms; }
-    if (options.rows) { solrQuery += '&rows=' + options.rows; }
-
-    return solrQuery;
-};
-
-var searchMlt = function(appId, field, options, next) {
-    var solrQuery = buildSolrQuery(appId, field, options);
-
-    solrClusterCore.client.get('mlt', solrQuery, function (err, obj) {
-        if (err) {
-            return next(err);
-        }
-
-        if (!obj || !obj.response) {
-            return next("Unexpected response from search server");
-        }
-
-        var apps = obj.response.docs.map(function(doc) {
-
-            var app = {
-                id: doc.id,
-                name: doc.name_stem,
-                score: doc.score
-            };
-
-            return app;
-        });
-
-        var searhcResult = {
-            total: obj.response.numFound,
-            apps: apps
-        };
-
-        next(null, searhcResult);
-    });
-};
 
 var parsePositions = function(positionsArray) {
     var positions  = [];
@@ -152,71 +64,6 @@ var getTermVectors = function(appId, next) {
         };
 
         next(null, stats);
-    });
-};
-
-function logBase(b, n) {
-    return Math.log(n) / Math.log(b);
-}
-
-var getKeywords = function(appId, next) {
-    var minDocFreq = 10;
-    var minTermLength = 2;
-
-    getTermVectors(appId, function(err, termStats) {
-        if (err) { return next(err); }
-
-        var keywordMap = {};
-
-        termStats.name.forEach(function(term) {
-            var tfIdf = 1 / Math.pow(term.docFreq, TITLE_IDF_FACTOR);
-            var positionFactor = 1 / (Math.pow(term.positions[0] + 1, TITLE_POSITION_DECAY));
-            var score = TITLE_BOOST * tfIdf * positionFactor;
-
-            keywordMap[term.term] = {
-                keyword: term.term,
-                score: score
-            };
-        });
-
-        termStats.desc.forEach(function(term) {
-            var keyword = keywordMap[term.term];
-            if (!keyword) {
-                keyword = {
-                    keyword: term.term,
-                    score: 0
-                };
-                keywordMap[term.term] = keyword;
-            }
-
-            var tfBoost = Math.pow(term.termFreq, TERM_FREQ_BOOST);
-            var tfIdf = tfBoost / Math.pow(term.docFreq, DESC_IDF_FACTOR);
-            var positionFactor = 1 / (Math.pow(term.positions[0] + 1, DESC_POSITION_DECAY));
-            var score = tfIdf * positionFactor;
-
-            keyword.score += score;
-            keyword.score = logBase(10, keyword.score + 1);
-            keyword.tfIdf = tfIdf;
-            keyword.pos = positionFactor;
-            keyword.termFreq = term.termFreq;
-            keyword.docFreq = term.docFreq;
-        });
-
-        var keywords = Object.keys(keywordMap).map(function(key) {
-            return keywordMap[key];
-        });
-
-        keywords.sort(function(a, b) {
-            return b.score - a.score;
-        });
-
-        keywords.forEach(function(keyword) {
-            var diff = keywords[0].score - keyword.score;
-            var smooth = keywords[0].score - (diff * BOOST_SMOOTH);
-            keyword.boost = (keyword.score / smooth);
-        });
-
-        next(null, keywords);
     });
 };
 
@@ -292,61 +139,6 @@ var getClassifierAnalyser = function(trainingSet, next) {
         classifierAnalyser.addTrainingDocs(trainingDocs);
 
         return next(null, classifierAnalyser);
-    });
-};
-
-var buildSearchQuery = function(keywords, useBoost, maxTerms) {
-    var queryTerms = [];
-    for (var i = 0; i < keywords.length && i < maxTerms; i++) {
-        if (keywords[i].boost < 0.1) {
-            break;
-        }
-
-        var queryTerm = solrClusterCore.escapeSpecialChars(keywords[i].keyword);
-
-        if (useBoost) {
-            queryTerm += '^' + keywords[i].boost;
-        }
-
-        queryTerms.push(queryTerm);
-    }
-
-    return encodeURIComponent(queryTerms.join(' '));
-};
-
-var searchKeywords = function(appId, keywords, categoryId, next) {
-    var q = buildSearchQuery(keywords, USE_BOOST, MAX_TERMS);
-    var solrQuery = 'rows=' + 20 + '&qq=' + q + '&app_id=' + appId;
-
-    if (categoryId) {
-        solrQuery += '&fq=id:' + categoryId;
-    }
-
-    solrCategoryCore.client.get('cluster', solrQuery, function (err, obj) {
-        if (err) {
-            return next(err);
-        }
-
-        if (!obj || !obj.response) {
-            return next("Unexpected response from search server");
-        }
-
-        var categories = obj.response.docs.map(function(doc) {
-            var category = {
-                id: doc.id,
-                name: doc.cat_name,
-                score: doc.score
-            };
-
-            return category;
-        });
-
-        var searhcResult = {
-            total: obj.response.numFound,
-            categories: categories
-        };
-
-        next(null, searhcResult);
     });
 };
 
@@ -448,48 +240,17 @@ var getCategorySearchSeedApps = function(seedCategoryId, boostFactor, next) {
     });
 };
 
-var getSeedCategoryMatrix = function(seedCategoryId, trainingSet, next) {
-    log.debug("Retrieving classification searches");
-    adminRepo.getSeedSearches(seedCategoryId, function(err, seedSearches) {
-        if (err) { return next(err); }
-
-        getClassifierAnalyser(seedSearches, trainingSet, function(err, analyser) {
-            if (err) { return next(err); }
-
-            log.debug("Building vector matrix");
-            var matrixData = analyser.buildVectorMatrix();
-            next(null, matrixData);
-        });
-    });
-};
-
-var getSeedCategoryKeywords = function(seedCategoryId, next) {
-    log.debug("Retrieving classification searches");
-    adminRepo.getSeedSearches(seedCategoryId, function(err, seedSearches) {
-        if (err) { return next(err); }
-
-        getClassifierAnalyser(seedSearches, function(err, analyser) {
-            if (err) { return next(err); }
-
-            log.debug("Retrieving top keywords");
-            var keywords = analyser.getTopTerms(20, 50);
-            next(null, keywords);
-        });
-    });
-};
-
 var getAppTopKeywords = function(seedCategoryId, appExtId, next) {
-    getTermVectors(appExtId, function(err, result) {
+    getTermVectors(appExtId, function(err, doc) {
         if (err) { return next(err); }
 
         classifierRepo.getTrainingSet(seedCategoryId, function(err, trainingSet) {
             if (err) { return next(err); }
 
-            getTrainingTermScores(trainingSet, function(err, termScores) {
+            getClassifierAnalyser(trainingSet, function(err, classifierAnalyser) {
                 if (err) { return next(err); }
 
-                var classifierAnalyser = classifier.createClassifierAnalyser(termScores);
-                var topTerms = classifierAnalyser.getDocTopTerms(result);
+                var topTerms = classifierAnalyser.getTopScoringTerms(doc, 100);
                 return next(null, topTerms);
             });
         });
@@ -505,6 +266,19 @@ var getTrainingSetTopTerms = function(seedCategoryId, next) {
             if (err) { return next(err); }
 
             next(null, termScores.desc.splice(0,100));
+        });
+    });
+};
+
+var getCategoryTopKeywords = function(categoryId, next) {
+    classifierRepo.getCategoryAppsAsTrainingSet(categoryId, function(err, trainingSet) {
+        if (err) { return next(err); }
+
+        getClassifierAnalyser(trainingSet, function(err, classifierAnalyser) {
+            if (err) { return next(err); }
+
+            var topTerms = classifierAnalyser.getTopTerms(100);
+            return next(null, topTerms);
         });
     });
 };
@@ -708,169 +482,8 @@ var deleteSeedTraining = function(seedCategoryId, appExtId, next) {
     });
 };
 
-var search = function(appId, next) {
-    getKeywords(appId, function(err, keywords) {
-        if (err) { return next(err); }
-
-        searchKeywords(appId, keywords, null, next);
-    });
-};
-
-var searchCategory = function(appId, categoryId, next) {
-    getKeywords(appId, function(err, keywords) {
-        if (err) { return next(err); }
-
-        searchKeywords(appId, keywords, categoryId, next);
-    });
-};
-
-var runTrainingTest = function(next) {
-    adminRepo.getClusterTrainingData(function(err, trainingItems) {
-        if (err) { return next(err); }
-
-        var hits = [];
-        var misses = [];
-
-        var processItem = function(trainingItem, callback) {
-            search(trainingItem.appId, function(err, searchResults) {
-                if (err) { return callback(err); }
-                var topResult = {
-                    expected: trainingItem
-                };
-
-                if (searchResults.categories.length > 0) {
-                    topResult.result = searchResults.categories[0];
-
-                    var catId = trainingItem.categoryId.replace(/\-/g, '');
-                    var isMatch = catId === topResult.result.id;
-
-                    if (isMatch) {
-                        hits.push(topResult);
-                    } else {
-                        misses.push(topResult);
-                    }
-                }
-                else {
-                    misses.push(topResult);
-                }
-
-                callback();
-            });
-        };
-
-        async.eachSeries(trainingItems, processItem, function(err) {
-            if (err) { return next(err); }
-
-            var testResult = {
-                misses: misses,
-                hits: hits
-            };
-
-            next(null, testResult);
-        });
-    });
-};
-
-var runClusterTest = function(batchSize, next) {
-    var processItem = function(app, callback) {
-        search(app.extId, function(err, searchResults) {
-            if (err) { return callback(err); }
-
-            if (!searchResults.categories || searchResults.categories.length === 0) {
-                return callback();
-            }
-
-            adminRepo.insertCategoryClusterTest(app.extId, searchResults.categories[0], function (err) {
-                callback(err);
-            });
-        });
-    };
-
-    var processBatch = function(lastId) {
-        log.debug("Clustring batch from id: " + lastId);
-
-        appStoreRepo.getAppIndexBatch(lastId, batchSize, function(err, apps) {
-            if (err) {
-                return next(err);
-            }
-
-            if (apps.length === 0) {
-                log.debug("Completed clustering.");
-                return next();
-            }
-
-            lastId = apps[apps.length - 1].id;
-            log.debug("Last app: " + apps[apps.length - 1].name);
-
-            async.eachSeries(apps, processItem, function(err) {
-                if (err) { return next(err); }
-
-                processBatch(lastId);
-            });
-        });
-    };
-
-    processBatch(0);
-};
-
-var runClusterCategoryTest = function(categoryId, extCategoryId, next) {
-    var processItem = function(app, callback) {
-        getKeywords(app.extId, function(err, keywords) {
-            if (err) { return next(err); }
-
-            if (keywords.length === 0) {
-                return callback();
-            }
-
-            var score = 0;
-            keywords.forEach(function(k) {
-                score += k.score;
-            });
-
-            var keywordResult = {
-                id: extCategoryId,
-                score: score
-            };
-
-            adminRepo.insertCategoryClusterTest(app.extId, keywordResult, function (err) {
-                callback(err);
-            });
-        });
-    };
-
-
-    appStoreRepo.getCategoryAppsForIndex(categoryId, function(err, apps) {
-        if (err) {
-            return next(err);
-        }
-
-        async.eachSeries(apps, processItem, function(err) {
-            if (err) { return next(err); }
-
-            log.debug("Completed clustering.");
-            return next();
-        });
-    });
-};
-
-exports.searchSimilarByName = searchSimilarByName;
-
-exports.getTopTerms = function(appId, num, next) {
-    getKeywords(appId, function(err, keywords) {
-        if (err) { return next(err); }
-
-        next(null, keywords.slice(0, num));
-    });
-};
-
-exports.search = search;
-exports.searchCategory = searchCategory;
-exports.runTrainingTest = runTrainingTest;
-exports.runClusterTest = runClusterTest;
-exports.runClusterCategoryTest = runClusterCategoryTest;
 exports.getSeedApps = getSeedApps;
 exports.getCategorySearchSeedApps = getCategorySearchSeedApps;
-exports.getSeedCategoryKeywords = getSeedCategoryKeywords;
 exports.getAppTopKeywords = getAppTopKeywords;
 exports.classifyTrainedSeedCategory = classifyTrainedSeedCategory;
 exports.classifySeedCategory = classifySeedCategory;
@@ -880,6 +493,7 @@ exports.insertSeedTraining = insertSeedTraining;
 exports.deleteSeedTraining = deleteSeedTraining;
 
 exports.getTrainingSetTopTerms = getTrainingSetTopTerms;
+exports.getCategoryTopKeywords = getCategoryTopKeywords;
 
 
 

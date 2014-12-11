@@ -636,33 +636,6 @@ var insertXyoCategoryMap = function(client, categoryId, xyoCategoryId, next) {
     });
 };
 
-var getClusterTrainingData = function(client, next) {
-    var queryStr =
-        "SELECT ct.id, ct.app_ext_id, ct.category_ext_id, c.name as cat_name, a.name as app_name\n" +
-        "FROM category_cluster_training ct\n" +
-        "JOIN category c on ct.category_ext_id = c.ext_id\n" +
-        "JOIN appstore_app a on ct.app_ext_id = a.ext_id\n" +
-        "ORDER BY id";
-
-    client.query(queryStr, function (err, result) {
-        if (err) {
-            return next(err);
-        }
-
-        var results = result.rows.map(function(row) {
-            return {
-                id: row.id,
-                appId: row.app_ext_id,
-                categoryId: row.category_ext_id,
-                appName: row.app_name,
-                categoryName: row.cat_name
-            };
-        });
-
-        next(null, results);
-    });
-};
-
 var getAppAnalysisBatch = function(client, lastId, limit, next) {
     var queryStr =
         "SELECT a.app_id, a.ext_id, a.name, a.description, aa.desc_md5_checksum, aa.desc_cleaned\n" +
@@ -791,27 +764,6 @@ var upsertAppAnalysis = function(client, appAnalysis, next) {
         }
 
         next(null, appAnalysis.app_id);
-    });
-};
-
-var insertCategoryClusterTest = function(client, appId, result, next) {
-    var queryStr =
-        "INSERT INTO category_cluster_test(app_ext_id, category_ext_id, score, date_created)\n" +
-        "VALUES ($1, $2, $3, NOW() at time zone 'utc')\n" +
-        "RETURNING id;";
-
-    var queryParams = [
-        appId,
-        result.id,
-        result.score
-    ];
-
-    client.query(queryStr, queryParams, function (err, result) {
-        if (err) {
-            return next(err);
-        }
-
-        next(null, result.rows[0].id);
     });
 };
 
@@ -1080,20 +1032,6 @@ exports.insertCategoryAppExclude = function(categoryExtId, appExtId, next) {
     });
 };
 
-exports.getClusterTrainingData = function(next) {
-    connection.open(function(err, conn) {
-        if (err) {
-            return next(err);
-        }
-
-        getClusterTrainingData(conn.client, function(err, results) {
-            conn.close(err, function(err) {
-                next(err, results);
-            });
-        });
-    });
-};
-
 exports.getAppAnalysisBatch = function(lastId, limit, next) {
     connection.open(function(err, conn) {
         if (err) {
@@ -1131,20 +1069,6 @@ exports.upsertAppAnalysis = function(appAnalysis, next) {
         upsertAppAnalysis(conn.client, appAnalysis, function(err, appId) {
             conn.close(err, function(err) {
                 next(err, appId);
-            });
-        });
-    });
-};
-
-exports.insertCategoryClusterTest = function(appId, result, next) {
-    connection.open(function(err, conn) {
-        if (err) {
-            return next(err);
-        }
-
-        insertCategoryClusterTest(conn.client, appId, result, function(err, id) {
-            conn.close(err, function(err) {
-                next(err, id);
             });
         });
     });
