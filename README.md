@@ -54,6 +54,9 @@ on build:
 pscp -i d:\work\appakin-key.ppk -r d:\work\appakin\build-output\web.public ubuntu@appakin.com:temp/
 <-- copies to temp/web.public
 
+mac: scp -i appakin-key.pem appakin/build-output/web.public ubuntu@appakin.com:temp/
+
+
 
 on live machine:
 gunzip < file.tar.gz | tar xvf -

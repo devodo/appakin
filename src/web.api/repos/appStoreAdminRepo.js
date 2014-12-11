@@ -665,43 +665,10 @@ var getClusterTrainingData = function(client, next) {
 
 var getAppAnalysisBatch = function(client, lastId, limit, next) {
     var queryStr =
-        "SELECT a.app_id, a.ext_id, a.name, a.description\n" +
-        "FROM appstore_app a\n" +
-        "WHERE a.app_id > $1\n" +
-        "AND a.date_deleted is null\n" +
-        "ORDER BY a.app_id\n" +
-        "limit $2;";
-
-    var queryParams = [
-        lastId,
-        limit
-    ];
-
-    client.query(queryStr, queryParams, function (err, result) {
-        if (err) {
-            return next(err);
-        }
-
-        var items = result.rows.map(function(item) {
-            return {
-                app_id: item.app_id,
-                ext_id: item.ext_id,
-                name: item.name,
-                description: item.description
-            };
-        });
-
-        next(null, items);
-    });
-};
-
-var getAppAnalysisBatchNew = function(client, lastId, limit, next) {
-    var queryStr =
-        "SELECT a.app_id, a.ext_id, a.name, a.description\n" +
+        "SELECT a.app_id, a.ext_id, a.name, a.description, aa.desc_md5_checksum, aa.desc_cleaned\n" +
         "FROM appstore_app a\n" +
         "LEFT JOIN app_analysis aa on a.app_id = aa.app_id\n" +
         "WHERE a.app_id > $1\n" +
-        "AND aa.app_id is null\n" +
         "AND a.date_deleted is null\n" +
         "ORDER BY a.app_id\n" +
         "limit $2;";
@@ -721,7 +688,9 @@ var getAppAnalysisBatchNew = function(client, lastId, limit, next) {
                 app_id: item.app_id,
                 ext_id: item.ext_id,
                 name: item.name,
-                description: item.description
+                description: item.description,
+                desc_md5_checksum: item.desc_md5_checksum,
+                desc_cleaned: item.desc_cleaned
             };
         });
 
@@ -754,8 +723,8 @@ var insertCategoryAppExclude = function(client, categoryExtId, appExtId, next) {
 
 var upsertAppAnalysis = function(client, appAnalysis, next) {
     var queryStr =
-        "WITH new_values (app_id, desc_english_score, desc_length, name_length, desc_valid_term_count, desc_english_term_count, desc_english_position, desc_is_english) AS (\n" +
-        "    values ($1::integer, $2::double precision, $3::integer, $4::integer, $5::integer, $6::integer, $7::integer, $8::boolean)\n" +
+        "WITH new_values (app_id, desc_english_score, desc_length, name_length, desc_valid_term_count, desc_english_term_count, desc_english_position, desc_is_english, desc_md5_checksum, desc_cleaned) AS (\n" +
+        "    values ($1::integer, $2::double precision, $3::integer, $4::integer, $5::integer, $6::integer, $7::integer, $8::boolean, $9::text, $10::text)\n" +
         "),\n" +
         "upsert AS\n" +
         "( \n" +
@@ -767,6 +736,8 @@ var upsertAppAnalysis = function(client, appAnalysis, next) {
         "        name_length = nv.name_length,\n" +
         "        desc_valid_term_count = nv.desc_valid_term_count,\n" +
         "        desc_english_term_count = nv.desc_english_term_count,\n" +
+        "        desc_md5_checksum = nv.desc_md5_checksum,\n" +
+        "        desc_cleaned = nv.desc_cleaned,\n" +
         "        date_modified = NOW() at time zone 'utc'\n" +
         "    FROM new_values nv\n" +
         "    WHERE aa.app_id = nv.app_id\n" +
@@ -781,6 +752,8 @@ var upsertAppAnalysis = function(client, appAnalysis, next) {
         "    name_length,\n" +
         "    desc_valid_term_count,\n" +
         "    desc_english_term_count,\n" +
+        "    desc_md5_checksum,\n" +
+        "    desc_cleaned,\n" +
         "    date_created,\n" +
         "    date_modified)\n" +
         "SELECT\n" +
@@ -792,6 +765,8 @@ var upsertAppAnalysis = function(client, appAnalysis, next) {
         "    name_length,\n" +
         "    desc_valid_term_count,\n" +
         "    desc_english_term_count,\n" +
+        "    desc_md5_checksum,\n" +
+        "    desc_cleaned,\n" +
         "    NOW() at time zone 'utc',\n" +
         "    NOW() at time zone 'utc'\n" +
         "FROM new_values\n" +
@@ -805,7 +780,9 @@ var upsertAppAnalysis = function(client, appAnalysis, next) {
         appAnalysis.desc_valid_term_count,
         appAnalysis.desc_english_term_count,
         appAnalysis.desc_english_position,
-        appAnalysis.desc_is_english
+        appAnalysis.desc_is_english,
+        appAnalysis.desc_md5_checksum,
+        appAnalysis.desc_cleaned
     ];
 
     client.query(queryStr, queryParams, function (err, result) {

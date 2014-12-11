@@ -9,21 +9,9 @@ exports.init = function init(app) {
         var batchSize = 100;
         log.debug("Starting analysis of apps");
 
-        appAnalyser.analyse(batchSize, function(err) {
-            if (err) {
-                log.error(err);
-                return res.status(500).json(err);
-            }
+        var forceAll = req.body.forceAll || false;
 
-            res.json({status: 'success'});
-        });
-    });
-
-    app.post('/admin/analyse/new_apps', function (req, res) {
-        var batchSize = 100;
-        log.debug("Starting analysis of new apps");
-
-        appAnalyser.analyseNew(batchSize, function(err) {
+        appAnalyser.analyse(batchSize, forceAll, function(err) {
             if (err) {
                 log.error(err);
                 return res.status(500).json(err);
