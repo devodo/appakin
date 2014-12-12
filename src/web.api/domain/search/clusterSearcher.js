@@ -293,7 +293,7 @@ var buildTrainingSetTermVectorQuery = function(ids, position, batchSize) {
 };
 
 var getTrainingTermVectorDocs = function(trainingSet, next) {
-    var includeMap = {};
+    var includeMap = Object.create(null);
     trainingSet.forEach(function(item) {
         var id = item.appExtId.replace(/\-/g, '');
         includeMap[id] = item.include;
@@ -326,7 +326,7 @@ var getTrainingTermVectorDocs = function(trainingSet, next) {
                 return processBatch(position + batchSize);
             }
 
-            return next(null, docs);
+            return next(null, docs, includeMap);
         });
     };
 
@@ -392,19 +392,45 @@ var iterateCategorySeedSearches = function(seedCategoryId, visitor, next) {
 };
 
 var classifyTrainedSeedCategory = function(seedCategoryId, trainingSet, next) {
-    getClassifierAnalyser(trainingSet, function(err, classifierAnalyser) {
+    getTrainingTermVectorDocs(trainingSet, function(err, trainingDocs, trainingIncludeMap) {
         if (err) { return next(err); }
 
+        var classifierAnalyser = classifier.createClassifierAnalyser();
+        classifierAnalyser.addTrainingDocs(trainingDocs);
         var trainingData = classifierAnalyser.buildTrainingMatrix();
         var svm = classifier.createClassifier();
 
         var results = [];
+
+        // Add all positive training docs to results
+        Object.keys(trainingIncludeMap).forEach(function(key) {
+            if (trainingIncludeMap[key]) {
+                results.push({
+                    id: key,
+                    result: true
+                });
+            }
+        });
 
         log.debug("Starting SVM training");
         svm.train(trainingData, function() {
             log.debug("Generating classification results");
 
             var classifyDoc = function(doc) {
+                // Exclude negative training docs
+                var trainingInclude = trainingIncludeMap[doc.id];
+
+                if (typeof trainingInclude === 'boolean') {
+                    if (!trainingInclude) {
+                        results.push({
+                            id: doc.id,
+                            result: false
+                        });
+                    }
+
+                    return;
+                }
+
                 var termVector = classifierAnalyser.getIndexedTermVector(doc);
                 var prediction = svm.predict(termVector);
 

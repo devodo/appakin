@@ -130,7 +130,7 @@ var reloadSeedCategoryApps = function(seedCategoryId, next) {
         processReloadSeedCategoryApps(seedCategory, function(err) {
             if (err) {
                 log.error(err);
-                var message = JSON.stringify(err.toJSON());
+                var message = JSON.stringify(err);
                 classificationRepo.updateSeedCategoryBuildMessage(seedCategory.id, message, function(err) {
                     return next(err);
                 });
