@@ -58,7 +58,7 @@ var getLookup = function(id, next) {
 };
 
 var getLookups = function(ids, next) {
-    var maxLookupSize = 250;
+    var maxLookupSize = 200;
     var results = [];
 
     var processBatch = function(idIndex) {
@@ -73,11 +73,13 @@ var getLookups = function(ids, next) {
 
         var url = 'https://itunes.apple.com/lookup?id=' + batchIds.join();
 
+        log.debug("Issuing iTunes apps lookup. Id count: " + batchIds.length);
         request(url, function (err, response, src) {
             if (err) { return next(err); }
 
             try {
                 var jsonData = JSON.parse(src);
+                log.debug("Received iTunes apps lookup response. Apps count: " + jsonData.results.length);
 
                 jsonData.results.forEach(function(result) {
                     results.push(result);
@@ -486,10 +488,13 @@ var updateAllAppsBatched = function(startId, batchSize, next) {
 };
 
 var refreshNextAppBatches = function(batchSize, next) {
+    log.debug("Refreshing next apps batch of size: " + batchSize);
+
     auditRepo.getLastAppStoreRefresh(function(err, audit) {
         if (err) { return next(err); }
 
         var lastAppId = audit ? audit.lastAppId : 0;
+        log.debug("Last valid app id found: " + lastAppId);
 
         var updateApps = function(callback) {
             processUpdateAppsBatch(lastAppId, batchSize, function(err, lastId) {
@@ -525,7 +530,7 @@ var refreshNextAppBatches = function(batchSize, next) {
 
             auditRepo.auditAppStoreRefresh(audit, function(auditError) {
                 var err = auditError ? auditError : updateError;
-                next(err);
+                next(err, lastId);
             });
         });
     });

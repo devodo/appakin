@@ -88,10 +88,12 @@ exports.init = function init(app) {
             return res.status(500).json({"error": "must specify batch size"});
         }
 
-        appStoreData.refreshNextAppBatches(batchSize, function(err) {
+        appStoreData.refreshNextAppBatches(batchSize, function(err, lastAppId) {
             if (err) {
-                log.error(err);
+                return log.error(err);
             }
+
+            log.info("Successfully refreshed apps batch to last app id: " + lastAppId);
         });
 
         res.json({status: 'ack'});
