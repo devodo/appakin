@@ -81,6 +81,22 @@ exports.init = function init(app) {
         });
     });
 
+    app.post('/admin/appstore/refresh_next_app_batch', function (req, res) {
+        var batchSize = parseInt(req.body.batchSize, 10);
+
+        if (isNaN(batchSize)) {
+            return res.status(500).json({"error": "must specify batch size"});
+        }
+
+        appStoreData.refreshNextAppBatches(batchSize, function(err) {
+            if (err) {
+                log.error(err);
+            }
+        });
+
+        res.json({status: 'ack'});
+    });
+
     app.post('/admin/appstore/reset_app_popularity', function (req, res) {
         var batchId = parseInt(req.body.batch, 10);
 

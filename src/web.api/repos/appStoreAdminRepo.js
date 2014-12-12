@@ -893,13 +893,13 @@ exports.getAppStoreCategories = function(next) {
     });
 };
 
-exports.getAppStoreSourceItemBatch = function(startId, batchSize, next) {
+exports.getAppStoreSourceItemBatch = function(lastId, batchSize, next) {
     connection.open(function(err, conn) {
         if (err) {
             return next(err);
         }
 
-        getAppStoreSourceItemBatch(conn.client, startId, batchSize, function(err, results) {
+        getAppStoreSourceItemBatch(conn.client, lastId, batchSize, function(err, results) {
             conn.close(err, function(err) {
                 next(err, results);
             });
@@ -907,13 +907,13 @@ exports.getAppStoreSourceItemBatch = function(startId, batchSize, next) {
     });
 };
 
-exports.getAppStoreIdBatch = function(startId, batchSize, next) {
+exports.getAppStoreIdBatch = function(lastId, batchSize, next) {
     connection.open(function(err, conn) {
         if (err) {
             return next(err);
         }
 
-        getAppStoreIdBatch(conn.client, startId, batchSize, function(err, results) {
+        getAppStoreIdBatch(conn.client, lastId, batchSize, function(err, results) {
             conn.close(err, function(err) {
                 next(err, results);
             });

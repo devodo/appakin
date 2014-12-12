@@ -4,6 +4,7 @@ var async = require('async');
 var request = require('request');
 var log = require('../../logger');
 var appStoreAdminRepo = require("../../repos/appStoreAdminRepo");
+var auditRepo = require("../../repos/auditRepo");
 var connection = require("../../repos/connection");
 var S = require('string');
 
@@ -57,21 +58,39 @@ var getLookup = function(id, next) {
 };
 
 var getLookups = function(ids, next) {
-    var url = 'https://itunes.apple.com/lookup?id=' + ids.join();
+    var maxLookupSize = 250;
+    var results = [];
 
-    request(url, function (err, response, src) {
-        if (err) {
-            return next(err);
+    var processBatch = function(idIndex) {
+        if (idIndex >= ids.length) {
+            return next(null, results);
         }
 
-        try {
-            var jsonData = JSON.parse(src);
-
-            next(null, jsonData.results);
-        } catch (ex) {
-            return next(ex);
+        var batchIds = [];
+        for (var i = idIndex; i < ids.length && i < idIndex + maxLookupSize; i++) {
+            batchIds.push(ids[i]);
         }
-    });
+
+        var url = 'https://itunes.apple.com/lookup?id=' + batchIds.join();
+
+        request(url, function (err, response, src) {
+            if (err) { return next(err); }
+
+            try {
+                var jsonData = JSON.parse(src);
+
+                jsonData.results.forEach(function(result) {
+                    results.push(result);
+                });
+
+                processBatch(idIndex + batchIds.length);
+            } catch (ex) {
+                return next(ex);
+            }
+        });
+    };
+
+    processBatch(0);
 };
 
 var parseLookup = function(data, next) {
@@ -426,36 +445,90 @@ var lookupSourceAppsBatched = function(startId, batchSize, next) {
     });
 };
 
+var processUpdateAppsBatch = function(fromId, batchSize, next) {
+    log.debug("Batch lookup start id: " + fromId);
+
+    appStoreAdminRepo.getAppStoreIdBatch(fromId, batchSize, function(err, results) {
+        if (err) { return next(err); }
+
+        if (results.length === 0) {
+            return next();
+        }
+
+        var lastId = results[results.length - 1].id;
+
+        var appIds = results.map(function(appSource) {
+            return appSource.storeAppId;
+        });
+
+        updateApps(appIds, function(err) {
+            if (err) { return next(err); }
+
+            next(null, lastId);
+        });
+    });
+};
+
 var updateAllAppsBatched = function(startId, batchSize, next) {
-    var processBatch = function(batchStartId) {
-        appStoreAdminRepo.getAppStoreIdBatch(batchStartId, batchSize, function(err, results) {
-            log.debug("Batch lookup start id: " + batchStartId);
+    var processLoop = function(lastId) {
+        processUpdateAppsBatch(lastId, batchSize, function(err, newLastId) {
+            if (err) { return next(err); }
 
-            if (err) {
-                return next(err);
-            }
-
-            if (results.length === 0) {
+            if (!newLastId) {
                 return next();
             }
 
-            var lastId = results[results.length - 1].id;
-
-            var appIds = results.map(function(appSource) {
-                return appSource.storeAppId;
-            });
-
-            updateApps(appIds, function(err) {
-                if (err) {
-                    return next(err);
-                }
-
-                processBatch(lastId);
-            });
+            processLoop(newLastId);
         });
     };
 
-    processBatch(startId);
+    processLoop(startId);
+};
+
+var refreshNextAppBatches = function(batchSize, next) {
+    auditRepo.getLastAppStoreRefresh(function(err, audit) {
+        if (err) { return next(err); }
+
+        var lastAppId = audit ? audit.lastAppId : 0;
+
+        var updateApps = function(callback) {
+            processUpdateAppsBatch(lastAppId, batchSize, function(err, lastId) {
+                if (err) { return callback(err); }
+
+                if (lastId) {
+                    return callback(null, lastId);
+                }
+
+                // We've reached the last app so loop round and start again
+                processUpdateAppsBatch(0, batchSize, function(err, lastId) {
+                    if (err) { return callback(err); }
+
+                    callback(null, lastId);
+                });
+            });
+        };
+
+        updateApps(function(updateError, lastId) {
+            var audit = null;
+            if (updateError) {
+                audit = {
+                    lastAppId: lastAppId,
+                    isSuccess: false,
+                    errorMessage: JSON.stringify(updateError)
+                };
+            } else {
+                audit = {
+                    lastAppId: lastId,
+                    isSuccess: true
+                };
+            }
+
+            auditRepo.auditAppStoreRefresh(audit, function(auditError) {
+                var err = auditError ? auditError : updateError;
+                next(err);
+            });
+        });
+    });
 };
 
 var retrieveMissingApps = function(appIds, next) {
@@ -595,6 +668,7 @@ exports.retrieveAppSources = retrieveAppSources;
 exports.retrieveAllAppSources = retrieveAllAppSources;
 exports.lookupSourceAppsBatched = lookupSourceAppsBatched;
 exports.updateAllAppsBatched = updateAllAppsBatched;
+exports.refreshNextAppBatches = refreshNextAppBatches;
 exports.retrieveAppCharts = retrieveAppCharts;
 exports.lookupMissingChartApps = lookupMissingChartApps;
 exports.lookupMissingSourceApps = lookupMissingSourceApps;
