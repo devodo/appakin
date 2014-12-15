@@ -274,11 +274,40 @@ var getCategoryTopKeywords = function(categoryId, next) {
     classifierRepo.getCategoryAppsAsTrainingSet(categoryId, function(err, trainingSet) {
         if (err) { return next(err); }
 
-        getClassifierAnalyser(trainingSet, function(err, classifierAnalyser) {
+        getTrainingTermVectorDocs(trainingSet, function(err, trainingDocs) {
             if (err) { return next(err); }
 
-            var topTerms = classifierAnalyser.getTopTerms(100);
-            return next(null, topTerms);
+            var classifierAnalyser = classifier.createClassifierAnalyser();
+            classifierAnalyser.addTrainingDocs(trainingDocs);
+
+            var topTermsMap = Object.create(null);
+
+            trainingDocs.forEach(function(doc) {
+                var termScores = classifierAnalyser.getTermScores(doc);
+                termScores.forEach(function(termScore) {
+                    var termEntry = topTermsMap[termScore.term];
+                    if (!termEntry) {
+                        termEntry = {
+                            term: termScore.term,
+                            score: 0
+                        };
+                        topTermsMap[termScore.term] = termEntry;
+                    }
+                    termEntry.score += termScore.tfIdf; // TODO: position factor
+                });
+            });
+
+            var results = [];
+            Object.keys(topTermsMap).forEach(function(key) {
+                results.push(topTermsMap[key]);
+            });
+
+            results.sort(function(a, b) {
+                return b.score - a.score;
+            });
+
+            results = results.splice(0, 100);
+            return next(null, results);
         });
     });
 };

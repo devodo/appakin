@@ -319,12 +319,8 @@ var logBase = function(x,b) {
     return Math.log(x) / Math.log(b);
 };
 
-ClassifierAnalyser.prototype.getTopScoringTerms = function(doc, maxTerms) {
+ClassifierAnalyser.prototype.getTermScores = function(doc) {
     var self = this;
-
-    if (!maxTerms) {
-        maxTerms = self.resultSettings.maxTerms;
-    }
 
     var results = [];
 
@@ -353,6 +349,18 @@ ClassifierAnalyser.prototype.getTopScoringTerms = function(doc, maxTerms) {
         termScoreEntry.tfIdf = termScoreEntry.title.tfIdf;
         results.push(termScoreEntry);
     });
+
+    return results;
+};
+
+ClassifierAnalyser.prototype.getTopScoringTerms = function(doc, maxTerms) {
+    var self = this;
+
+    if (!maxTerms) {
+        maxTerms = self.resultSettings.maxTerms;
+    }
+
+    var results = self.getTermScores(doc);
 
     if (results.length === 0) {
         return results;

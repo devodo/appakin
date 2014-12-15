@@ -30,7 +30,7 @@ var getTrainingSet = function(client, seedCategoryId, next) {
 
 var getCategoryAppsAsTrainingSet = function(client, categoryId, next) {
     var queryStr =
-        "SELECT ca.id, a.ext_id, true as include\n" +
+        "SELECT ca.id, a.ext_id, true as include, ca.position\n" +
         "FROM category_app ca\n" +
         "JOIN appstore_app a on ca.app_id = a.app_id\n" +
         "where ca.category_id = $1\n" +
@@ -48,7 +48,8 @@ var getCategoryAppsAsTrainingSet = function(client, categoryId, next) {
             return {
                 id: item.id,
                 appExtId: item.ext_id,
-                include: item.include
+                include: item.include,
+                position: item.position
             };
         });
 
