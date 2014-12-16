@@ -9,7 +9,6 @@ var fs = require('fs');
 var PARENT_TYPE = 1;
 var CHILD_TYPE = 2;
 
-
 var addCategory = function(category, apps, next) {
     var catId = category.extId.replace(/\-/g, '');
 
@@ -30,6 +29,7 @@ var addCategory = function(category, apps, next) {
 
     var solrCategory = {
         id: catId,
+        cat_id: category.id,
         "parent_id": catId,
         type: PARENT_TYPE,
         cat_name: category.name,

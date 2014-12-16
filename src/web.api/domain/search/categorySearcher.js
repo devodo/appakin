@@ -1,5 +1,4 @@
 'use strict';
-var slug = require('slug');
 var solrCore = require('./solrCore').getCategoryCore();
 var urlUtil = require('../urlUtil');
 
@@ -95,6 +94,7 @@ var search = function(queryStr, pageNum, next) {
         var categories = obj.response.docs.map(function(doc) {
             var category = {
                 id: doc.id,
+                categoryId: doc.cat_id,
                 name: doc.cat_name_split,
                 url: urlUtil.makeUrl(doc.id, doc.cat_name_split)
             };

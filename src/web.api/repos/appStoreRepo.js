@@ -170,6 +170,42 @@ var getCategoryApps = function(client, categoryId, skip, take, next) {
     });
 };
 
+var getMultiCategoryApps = function(client, categoryIds, take, next) {
+    var queryParams = [ take ];
+    var params = [];
+    categoryIds.forEach(function(categoryId, i) {
+        params.push('$'+ (i + 2));
+        queryParams.push(categoryId);
+    });
+
+    var queryStr =
+        "SELECT ca.category_id, a.ext_id, a.name, a.artwork_small_url, a.price,\n" +
+        "substring(a.description from 0 for 200) as short_description, ca.position\n" +
+        "FROM appstore_app a\n" +
+        "JOIN category_app ca ON a.app_id = ca.app_id\n" +
+        "WHERE ca.category_id in (" + params.join(',') + ")\n" +
+        "AND ca.position <= $1\n" +
+        "ORDER BY ca.category_id, ca.position;";
+
+    client.query(queryStr, queryParams, function (err, result) {
+        if (err) { return next(err); }
+
+        var results = result.rows.map(function(item) {
+            return {
+                categoryId: item.category_id,
+                extId: item.ext_id,
+                name: item.name,
+                artworkSmallUrl: item.artwork_small_url,
+                price: item.price,
+                shortDescription: item.short_description,
+                position: item.position
+            };
+        });
+
+        next(null, results);
+    });
+};
+
 var getCategories = function(client, next) {
     var queryStr =
         "SELECT c.id, c.ext_id, c.name, c.description,\n" +
@@ -534,6 +570,20 @@ exports.getCategoryApps = function(categoryId, skip, take, next) {
         }
 
         getCategoryApps(conn.client, categoryId, skip, take, function(err, apps) {
+            conn.close(err, function(err) {
+                next(err, apps);
+            });
+        });
+    });
+};
+
+exports.getMultiCategoryApps = function(categoryIds, take, next) {
+    connection.open(function(err, conn) {
+        if (err) {
+            return next(err);
+        }
+
+        getMultiCategoryApps(conn.client, categoryIds, take, function(err, apps) {
             conn.close(err, function(err) {
                 next(err, apps);
             });

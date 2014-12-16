@@ -36,7 +36,7 @@ RedisCache.prototype.createClient = function(next) {
     log.info("Opening Redis connection to db: " + self.db);
 
     self.client = redis.createClient(config.cache.redis.port, config.cache.redis.host);
-    self.client.on("error", self.onError);
+    self.client.on("error", function(err) { self.onError(err); });
     self.client.select(self.db, function(err) {
         if (err) { return next(err); }
 
@@ -119,15 +119,21 @@ RedisCache.prototype.getObjects = function(keys, next) {
 
         var results = [];
 
+        var currentIndex;
         try {
-            res.forEach(function(reply) {
-                var result = JSON.parse(reply);
-                results.push(result);
+            res.forEach(function(reply, i) {
+                currentIndex = i
+                if (reply === null) {
+                    results.push(null);
+                } else {
+                    var result = JSON.parse(reply);
+                    results.push(result);
+                }
             });
 
             return next(null, results);
         } catch (ex) {
-            log.error(ex, 'Error parsing redis string on key: %s in db: %d', key, self.db);
+            log.error(ex, 'Error parsing redis string on key: %s in db: %d', keys[currentIndex], self.db);
             return next(ex);
         }
     });
@@ -265,6 +271,7 @@ exports.createRedisCache = function(db) {
 exports.dbPartitions = {
     test: 15,
     category: 0,
+    chart: 1,
     search: 4
 };
 

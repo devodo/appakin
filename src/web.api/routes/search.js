@@ -1,14 +1,14 @@
 'use strict';
 
 var autoSearcher = require('../domain/search/autoSearcher');
-var catSearcher = require('../domain/search/categorySearcher');
+var catViewProvider = require('../domain/viewProvider/categoryViewProvider');
 var appSearcher = require('../domain/search/appSearcher');
 
 var MAX_CAT_APP_PAGES = 8;
 
 exports.init = function init(app) {
 
-    app.get('/ios/search/auto', function (req, res) {
+    app.get('/ios/search/auto', function (req, res, next) {
         var query = req.query.q;
 
         if (!query || query.trim() === '') {
@@ -16,9 +16,7 @@ exports.init = function init(app) {
         }
 
         autoSearcher.search(query, 1, function(err, result) {
-            if (err) {
-                return res.status(500).send(err);
-            }
+            if (err) { return next(err); }
 
             res.json(result.suggestions);
         });
@@ -36,16 +34,14 @@ exports.init = function init(app) {
             return res.status(400).send("Bad page number");
         }
 
-        catSearcher.search(query, pageNum, function (err, result) {
-            if (err) {
-                return next(err);
-            }
+        catViewProvider.searchCategories(query, pageNum, function (err, result) {
+            if (err) { return next(err); }
 
             res.json(result);
         });
     });
 
-    app.get('/ios/search/cat_app', function (req, res) {
+    app.get('/ios/search/cat_app', function (req, res, next) {
         var query = req.query.q;
         var pageNum = req.query.p ? parseInt(req.query.p, 10) : 1;
         var categoryId = req.query.cat_id;
@@ -62,16 +58,14 @@ exports.init = function init(app) {
             return res.status(400).send("Page number must be between 1 and " + MAX_CAT_APP_PAGES);
         }
 
-        catSearcher.searchApps(query, pageNum, categoryId, function (err, result) {
-            if (err) {
-                return res.status(500).send(err);
-            }
+        catViewProvider.searchApps(query, pageNum, categoryId, function (err, result) {
+            if (err) { return next(err); }
 
             res.json(result);
         });
     });
 
-    app.get('/ios/search/app', function (req, res) {
+    app.get('/ios/search/app', function (req, res, next) {
         var query = req.query.q;
         var pageNum = req.query.p ? parseInt(req.query.p, 10) : 1;
 
@@ -84,9 +78,7 @@ exports.init = function init(app) {
         }
 
         appSearcher.search(query, pageNum, function(err, result) {
-            if (err) {
-                return res.status(500).send(err);
-            }
+            if (err) { return next(err); }
 
             res.json(result);
         });
