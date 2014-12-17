@@ -64,7 +64,7 @@ exports.init = function init(app) {
                 var r2Count = app.ratingCountCurrent ? app.ratingCountCurrent : 0;
                 var r1Count = app.ratingCount && app.ratingCount > r2Count ? app.ratingCount - r2Count : 0;
                 var r1CountWeighted = r1Count ? Math.pow(r1Count, RATING_COUNT_WEIGTH) : 0;
-                var r2CountWeighted = r1Count ? Math.pow(r2Count, CURRENT_COUNT_WEIGTH) : 0;
+                var r2CountWeighted = r2Count ? Math.pow(r2Count, CURRENT_COUNT_WEIGTH) : 0;
                 var countSum = Math.max(1, r1CountWeighted + r2CountWeighted);
 
                 app.rating = ((r1 * r1CountWeighted) + (r2 * r2CountWeighted))/countSum;
