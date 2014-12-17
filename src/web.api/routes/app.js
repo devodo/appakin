@@ -61,13 +61,20 @@ exports.init = function init(app) {
 
                 var r1 = app.userRating ? parseFloat(app.userRating) : 0;
                 var r2 = app.userRatingCurrent ? parseFloat(app.userRatingCurrent) : 0;
-                var r2Count = app.ratingCountCurrent ? app.ratingCountCurrent : 0;
-                var r1Count = app.ratingCount && app.ratingCount > r2Count ? app.ratingCount - r2Count : 0;
-                var r1CountWeighted = r1Count ? Math.pow(r1Count, RATING_COUNT_WEIGTH) : 0;
-                var r2CountWeighted = r2Count ? Math.pow(r2Count, CURRENT_COUNT_WEIGTH) : 0;
-                var countSum = Math.max(1, r1CountWeighted + r2CountWeighted);
 
-                app.rating = ((r1 * r1CountWeighted) + (r2 * r2CountWeighted))/countSum;
+                if (r1 === r2 || r2 === 0) {
+                    app.rating = r1;
+                } else if (r1 === 0) {
+                    app.rating = r2;
+                }
+                else {
+                    var r2Count = app.ratingCountCurrent ? app.ratingCountCurrent : 0;
+                    var r1Count = app.ratingCount && app.ratingCount > r2Count ? app.ratingCount - r2Count : 0;
+                    var r1CountWeighted = r1Count ? Math.pow(r1Count, RATING_COUNT_WEIGTH) : 0;
+                    var r2CountWeighted = r2Count ? Math.pow(r2Count, CURRENT_COUNT_WEIGTH) : 0;
+                    var countSum = Math.max(1, r1CountWeighted + r2CountWeighted);
+                    app.rating = ((r1 * r1CountWeighted) + (r2 * r2CountWeighted)) / countSum;
+                }
 
                 delete app.id;
                 delete app.storeAppId;
