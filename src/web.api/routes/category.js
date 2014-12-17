@@ -28,6 +28,12 @@ exports.init = function init(app) {
             return res.status(400).send('Bad page number');
         }
 
+        var filters = {
+            isIphone: req.query.is_iphone === 'true',
+            isIpad: req.query.is_ipad === 'true',
+            isFree: req.query.is_free === 'true'
+        };
+
         appStoreRepo.getCategoryByExtId(extId, function(err, category) {
             if (err) { return next(err); }
 
@@ -46,13 +52,11 @@ exports.init = function init(app) {
             }
 
             var skip = (pageNum - 1) * PAGE_SIZE;
-            appStoreRepo.getCategoryApps(category.id, skip, PAGE_SIZE, function(err, apps) {
+            appStoreRepo.getCategoryApps(category.id, filters, skip, PAGE_SIZE, function(err, apps) {
                 if (err) { return next(err); }
 
-                var pIndex = skip + 1;
                 apps.forEach(function(app) {
                     app.url = urlUtil.makeUrl(app.extId, app.name);
-                    app.position = pIndex++;
                     delete app.extId;
                 });
 
@@ -60,7 +64,7 @@ exports.init = function init(app) {
                 category.page = pageNum;
                 category.apps = apps;
 
-                featuredRepo.getFeaturedApps(category.id, 2, 5, function(err, fApps) {
+                featuredRepo.getFeaturedApps(category.id, 2, 5, filters, function(err, fApps) {
                     if (err) { return next(err); }
 
                     var featuredApps = fApps.map(function(item) {
@@ -81,5 +85,4 @@ exports.init = function init(app) {
             });
         });
     });
-
 };

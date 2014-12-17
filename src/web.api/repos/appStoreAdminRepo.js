@@ -36,7 +36,7 @@ var insertAppStoreAppInternal = function (client, appId, extId, app, next) {
         "currency, version, primary_genre, genres, release_date, bundle_id,\n" +
         "seller_name, release_notes, min_os_version, language_codes, file_size_bytes,\n" +
         "advisory_rating, content_rating, user_rating_current, rating_count_current, user_rating,\n" +
-        "rating_count, date_created, date_modified)\n" +
+        "rating_count, is_free, is_iphone, is_ipad, date_created, date_modified)\n" +
         "VALUES ($1, $2, $3, $4, $5, $6,\n" +
         "$7, $8, $9, $10, $11,\n" +
         "$12, $13, $14,\n" +
@@ -45,6 +45,10 @@ var insertAppStoreAppInternal = function (client, appId, extId, app, next) {
         "$25, $26, $27, $28, $29,\n" +
         "$30, $31, $32, $33, $34, $35, $36,\n" +
         "NOW(), NOW());";
+
+    var supportedDevicesString = app.supportedDevices.join().toLowerCase();
+    var isIphone = supportedDevicesString.indexOf('iphone') !== -1;
+    var isIpad = supportedDevicesString.indexOf('ipad') !== -1;
 
     var queryParams = [
         appId,
@@ -82,7 +86,10 @@ var insertAppStoreAppInternal = function (client, appId, extId, app, next) {
         app.userRatingCurrent,
         app.ratingCountCurrent,
         app.userRating,
-        app.ratingCount
+        app.ratingCount,
+        app.price === 0 || app.price === '0',
+        isIphone,
+        isIpad
     ];
 
     client.query(queryStr, queryParams, function (err) {
@@ -135,8 +142,13 @@ var updateAppStoreApp = function(client, app, next) {
         "genres=$21, release_date=$22, bundle_id=$23, seller_name=$24, release_notes=$25,\n" +
         "min_os_version=$26, language_codes=$27, file_size_bytes=$28, advisory_rating=$29,\n" +
         "content_rating=$30, user_rating_current=$31, rating_count_current=$32,\n" +
-        "user_rating=$33, rating_count=$34, date_modified=NOW() at time zone 'utc', date_deleted=NULL\n" +
+        "user_rating=$33, rating_count=$34, is_free=$35, is_iphone=$36, is_ipad=$37,\n" +
+        "date_modified=NOW() at time zone 'utc', date_deleted=NULL\n" +
         "WHERE store_app_id=$1;";
+
+    var supportedDevicesString = app.supportedDevices.join().toLowerCase();
+    var isIphone = supportedDevicesString.indexOf('iphone') !== -1;
+    var isIpad = supportedDevicesString.indexOf('ipad') !== -1;
 
     var queryParams = [
         app.storeAppId,
@@ -172,7 +184,10 @@ var updateAppStoreApp = function(client, app, next) {
         app.userRatingCurrent,
         app.ratingCountCurrent,
         app.userRating,
-        app.ratingCount
+        app.ratingCount,
+        app.price === 0 || app.price === '0',
+        isIphone,
+        isIpad
     ];
 
     client.query(queryStr, queryParams, function (err) {

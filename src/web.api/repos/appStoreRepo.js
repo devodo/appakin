@@ -11,7 +11,7 @@ var getAppByExtId = function (client, extId, next) {
         "currency, version, primary_genre, genres, release_date, bundle_id,\n" +
         "seller_name, release_notes, min_os_version, language_codes, file_size_bytes,\n" +
         "advisory_rating, content_rating, user_rating_current, rating_count_current, user_rating,\n" +
-        "rating_count, date_created, date_modified\n" +
+        "rating_count, is_iphone, is_ipad, date_created, date_modified\n" +
         "FROM appstore_app\n" +
         "WHERE ext_id = $1;";
 
@@ -63,6 +63,8 @@ var getAppByExtId = function (client, extId, next) {
             ratingCountCurrent: item.rating_count_current,
             userRating: item.user_rating,
             ratingCount: item.rating_count,
+            isIphone: item.is_iphone,
+            isIpad: item.is_ipad,
             dateCreated: item.date_created,
             dateModified: item.date_modified
         };
@@ -138,13 +140,16 @@ var getCategoryByExtId = function (client, extId, next) {
     });
 };
 
-var getCategoryApps = function(client, categoryId, skip, take, next) {
+var getCategoryApps = function(client, categoryId, filters, skip, take, next) {
     var queryStr =
-        "SELECT a.ext_id, a.name, a.artwork_small_url, a.price,\n" +
+        "SELECT a.ext_id, a.name, a.artwork_small_url, a.price, a.is_iphone, a.is_ipad,\n" +
         "substring(a.description from 0 for 200) as short_description, ca.position\n" +
         "FROM appstore_app a\n" +
         "JOIN category_app ca ON a.app_id = ca.app_id\n" +
         "WHERE ca.category_id = $1\n" +
+        (filters.isFree === true ? "AND a.is_free\n" : "") +
+        (filters.isIphone === true ? "AND a.is_iphone\n": "") +
+        (filters.isIpad === true ? "AND a.is_ipad\n": "") +
         "ORDER BY ca.position\n" +
         "LIMIT $2 OFFSET $3;";
 
@@ -161,6 +166,8 @@ var getCategoryApps = function(client, categoryId, skip, take, next) {
                 name: item.name,
                 artworkSmallUrl: item.artwork_small_url,
                 price: item.price,
+                isIphone: item.is_iphone,
+                isIpad: item.is_ipad,
                 shortDescription: item.short_description,
                 position: item.position
             };
@@ -170,7 +177,7 @@ var getCategoryApps = function(client, categoryId, skip, take, next) {
     });
 };
 
-var getMultiCategoryApps = function(client, categoryIds, take, next) {
+var getMultiCategoryApps = function(client, categoryIds, take, filters, next) {
     var queryParams = [ take ];
     var params = [];
     categoryIds.forEach(function(categoryId, i) {
@@ -185,6 +192,9 @@ var getMultiCategoryApps = function(client, categoryIds, take, next) {
         "JOIN category_app ca ON a.app_id = ca.app_id\n" +
         "WHERE ca.category_id in (" + params.join(',') + ")\n" +
         "AND ca.position <= $1\n" +
+        (filters.isFree === true ? "AND a.is_free\n" : "") +
+        (filters.isIphone === true ? "AND a.is_iphone\n" : "") +
+        (filters.isIpad === true ? "AND a.is_ipad\n" : "") +
         "ORDER BY ca.category_id, ca.position;";
 
     client.query(queryStr, queryParams, function (err, result) {
@@ -310,7 +320,7 @@ var getAppCategories = function(client, appId, skip, take, next) {
 var getAppIndexBatch = function(client, lastId, limit, next) {
     var queryStr =
         "SELECT a.app_id, a.ext_id, a.name, a.description, a.store_url, a.supported_devices,\n" +
-        "a.artwork_small_url, a.price, ap.popularity\n" +
+        "a.artwork_small_url, a.price, a.is_iphone, a.is_ipad, ap.popularity\n" +
         "FROM appstore_app a\n" +
         "LEFT JOIN app_popularity ap on a.app_id = ap.app_id\n" +
         "WHERE a.app_id > $1\n" +
@@ -338,6 +348,8 @@ var getAppIndexBatch = function(client, lastId, limit, next) {
                 supportedDevices: item.supported_devices,
                 imageUrl: item.artwork_small_url,
                 price: item.price,
+                isIphone: item.is_iphone,
+                isIpad: item.is_ipad,
                 popularity: item.popularity
             };
         });
@@ -488,7 +500,7 @@ var getCategoryAppDescriptions = function(client, categoryId, limit, next) {
 var getCategoryAppsForIndex = function(client, categoryId, next) {
     var queryStr =
         "SELECT a.app_id, a.ext_id, a.name, a.description, a.store_url, a.supported_devices,\n" +
-        "a.artwork_small_url, a.price, ap.popularity, ca.position\n" +
+        "a.artwork_small_url, a.price, a.is_iphone, a.is_ipad, ap.popularity, ca.position\n" +
         "FROM appstore_app a\n" +
         "JOIN category_app ca on a.app_id = ca.app_id\n" +
         "LEFT JOIN app_popularity ap on a.app_id = ap.app_id\n" +
@@ -512,6 +524,8 @@ var getCategoryAppsForIndex = function(client, categoryId, next) {
                 supportedDevices: item.supported_devices,
                 imageUrl: item.artwork_small_url,
                 price: item.price,
+                isIphone: item.is_iphone,
+                isIpad: item.is_ipad,
                 popularity: item.popularity,
                 position: item.position
             };
@@ -563,13 +577,13 @@ exports.getCategoryByExtId = function(extId, next) {
     });
 };
 
-exports.getCategoryApps = function(categoryId, skip, take, next) {
+exports.getCategoryApps = function(categoryId, filters, skip, take, next) {
     connection.open(function(err, conn) {
         if (err) {
             return next(err);
         }
 
-        getCategoryApps(conn.client, categoryId, skip, take, function(err, apps) {
+        getCategoryApps(conn.client, categoryId, filters, skip, take, function(err, apps) {
             conn.close(err, function(err) {
                 next(err, apps);
             });
@@ -577,13 +591,13 @@ exports.getCategoryApps = function(categoryId, skip, take, next) {
     });
 };
 
-exports.getMultiCategoryApps = function(categoryIds, take, next) {
+exports.getMultiCategoryApps = function(categoryIds, take, filters, next) {
     connection.open(function(err, conn) {
         if (err) {
             return next(err);
         }
 
-        getMultiCategoryApps(conn.client, categoryIds, take, function(err, apps) {
+        getMultiCategoryApps(conn.client, categoryIds, take, filters, function(err, apps) {
             conn.close(err, function(err) {
                 next(err, apps);
             });

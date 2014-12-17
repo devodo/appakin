@@ -25,9 +25,26 @@ var getHighlight = function(highlights, docId) {
     return hDoc;
 };
 
-var search = function(queryStr, pageNum, next) {
+var buildFilterQuery = function(filters) {
+    var filterQuery = '&filter=';
+
+    if (filters.isIphone === true) {
+        filterQuery += '+is_iphone:true';
+    } else if (filters.isIpad === true) {
+        filterQuery += '+is_ipad:true';
+    }
+
+    if (filters.isFree === true) {
+        filterQuery += '+is_free:true';
+    }
+
+    return filterQuery;
+};
+
+var search = function(queryStr, pageNum, filters, next) {
     var q = encodeURIComponent(solrCore.escapeSpecialCharsAllowQuotes(queryStr));
-    var solrQuery = 'rows=' + PAGE_SIZE + '&qq=' + q + '&spellcheck.q=' + q;
+    var filter = buildFilterQuery(filters);
+    var solrQuery = 'rows=' + PAGE_SIZE + '&qq=' + q + '&spellcheck.q=' + q + filter;
 
     if (pageNum && pageNum > 1) {
         var start = (pageNum - 1) * PAGE_SIZE;

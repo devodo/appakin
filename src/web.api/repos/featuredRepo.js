@@ -87,7 +87,7 @@ var getFeaturedCategoriesAndApps = function(client, cat_bias, cat_take, app_bias
     });
 };
 
-var getFeaturedApps = function(client, category_id, app_bias, app_take, next) {
+var getFeaturedApps = function(client, category_id, app_bias, app_take, filters, next) {
     var queryStr =
         "SELECT a.ext_id, a.name, a.artwork_small_url, a.price\n" +
         "FROM appstore_app a\n" +
@@ -97,6 +97,9 @@ var getFeaturedApps = function(client, category_id, app_bias, app_take, next) {
         "and (fa.start_date is null or fa.start_date <= NOW() at time zone 'utc')\n" +
         "and (fa.end_date is null or fa.end_date >= NOW() at time zone 'utc')\n" +
         "and a.date_deleted is null\n" +
+        (filters.isFree === true ? "AND a.is_free\n" : "") +
+        (filters.isIphone === true ? "AND a.is_iphone\n": "") +
+        (filters.isIpad === true ? "AND a.is_ipad\n": "") +
         "order by fa.fixed_order is null, fa.fixed_order, (random() * power(fa.weight, $2)) desc\n" +
         "limit $3";
 
@@ -148,13 +151,13 @@ exports.getFeaturedCategoriesAndApps = function(cat_bias, cat_take, app_bias, ap
     });
 };
 
-exports.getFeaturedApps = function(category_id, app_bias, app_take, next) {
+exports.getFeaturedApps = function(category_id, app_bias, app_take, filters, next) {
     connection.open(function(err, conn) {
         if (err) {
             return next(err);
         }
 
-        getFeaturedApps(conn.client, category_id, app_bias, app_take, function(err, results) {
+        getFeaturedApps(conn.client, category_id, app_bias, app_take, filters, function(err, results) {
             conn.close(err, function(err) {
                 next(err, results);
             });

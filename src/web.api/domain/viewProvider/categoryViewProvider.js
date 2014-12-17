@@ -10,16 +10,21 @@ var NUM_CHART_APPS = 20;
 var CHART_CACHE_EXPIRY_SECONDS = 600;
 
 
-var getCacheKeys = function(categoryIds) {
+var getCacheKeys = function(categoryIds, filters) {
+    var filterMask =
+        (filters.isIphone === true ? "-iphone": "") +
+        (filters.isIpad === true ? "-ipad": "") +
+        (filters.isFree === true ? "-free" : "");
+
     var cacheKeys = categoryIds.map(function(categoryId) {
-        return ('cat-' + categoryId);
+        return ('cat-' + categoryId + filterMask);
     });
 
     return cacheKeys;
 };
 
-var getCategoryCharts = function(categoryIds, next) {
-    var cacheKeys = getCacheKeys(categoryIds);
+var getCategoryCharts = function(categoryIds, filters, next) {
+    var cacheKeys = getCacheKeys(categoryIds, filters);
 
     categoryChartCache.getObjects(cacheKeys, function(err, cacheResults) {
         if (err) {
@@ -48,7 +53,7 @@ var getCategoryCharts = function(categoryIds, next) {
             return next(null, resultMap);
         }
 
-        getCategoryChartsRepo(missingIds, function(err, categoryMap) {
+        getCategoryChartsRepo(missingIds, filters, function(err, categoryMap) {
             if (err) { return next(err); }
 
             var cacheKeyValuePairs = [];
@@ -82,8 +87,8 @@ var getCategoryCharts = function(categoryIds, next) {
 
 };
 
-var getCategoryChartsRepo = function(categoryIds, next) {
-    appStoreRepo.getMultiCategoryApps(categoryIds, NUM_CHART_APPS, function(err, apps) {
+var getCategoryChartsRepo = function(categoryIds, filters, next) {
+    appStoreRepo.getMultiCategoryApps(categoryIds, NUM_CHART_APPS, filters, function(err, apps) {
         if (err) { return next(err); }
 
         var categoryAppsMap = Object.create(null);
@@ -105,15 +110,15 @@ var getCategoryChartsRepo = function(categoryIds, next) {
     });
 };
 
-var searchCategories = function(queryStr, pageNum, next) {
-    categorySearcher.search(queryStr, pageNum, function(err, searchResult) {
+var searchCategories = function(queryStr, pageNum, filters, next) {
+    categorySearcher.search(queryStr, pageNum, filters, function(err, searchResult) {
         if (err) { return next(err); }
 
         var categoryIds = searchResult.categories.map(function(category) {
             return category.categoryId;
         });
 
-        getCategoryCharts(categoryIds, function(err, categoryAppsMap) {
+        getCategoryCharts(categoryIds, filters, function(err, categoryAppsMap) {
             if (err) { return next(err); }
 
             searchResult.categories.forEach(function(category) {
@@ -127,8 +132,8 @@ var searchCategories = function(queryStr, pageNum, next) {
     });
 };
 
-var searchApps = function(queryStr, pageNum, categoryId, next) {
-    categorySearcher.searchApps(queryStr, pageNum, categoryId, next);
+var searchApps = function(queryStr, pageNum, categoryId, filters, next) {
+    categorySearcher.searchApps(queryStr, pageNum, categoryId, filters, next);
 };
 
 exports.searchCategories = searchCategories;

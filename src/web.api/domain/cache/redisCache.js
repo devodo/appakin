@@ -119,10 +119,10 @@ RedisCache.prototype.getObjects = function(keys, next) {
 
         var results = [];
 
-        var currentIndex;
+        var currentIndex = null;
         try {
             res.forEach(function(reply, i) {
-                currentIndex = i
+                currentIndex = i;
                 if (reply === null) {
                     results.push(null);
                 } else {

@@ -11,6 +11,9 @@ var createSolrApp = function(app) {
         desc: app.description,
         "img_url" : app.imageUrl,
         price: app.price,
+        is_free: app.price === 0,
+        is_iphone: app.isIphone === true,
+        is_ipad: app.isIpad === true,
         popularity: app.popularity
     };
 

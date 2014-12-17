@@ -24,17 +24,22 @@ exports.init = function init(app) {
 
     app.get('/ios/search/cat', function (req, res, next) {
         var query = req.query.q;
-        var pageNum = req.query.p ? parseInt(req.query.p, 10) : 1;
-
         if (!query || query.trim() === '') {
             return res.status(400).send('Bad query string');
         }
 
+        var pageNum = req.query.p ? parseInt(req.query.p, 10) : 1;
         if (isNaN(pageNum) || pageNum < 1) {
             return res.status(400).send("Bad page number");
         }
 
-        catViewProvider.searchCategories(query, pageNum, function (err, result) {
+        var filters = {
+            isIphone: req.query.is_iphone === 'true',
+            isIpad: req.query.is_ipad === 'true',
+            isFree: req.query.is_free === 'true'
+        };
+
+        catViewProvider.searchCategories(query, pageNum, filters, function (err, result) {
             if (err) { return next(err); }
 
             res.json(result);
@@ -58,7 +63,13 @@ exports.init = function init(app) {
             return res.status(400).send("Page number must be between 1 and " + MAX_CAT_APP_PAGES);
         }
 
-        catViewProvider.searchApps(query, pageNum, categoryId, function (err, result) {
+        var filters = {
+            isIphone: req.query.is_iphone === 'true',
+            isIpad: req.query.is_ipad === 'true',
+            isFree: req.query.is_free === 'true'
+        };
+
+        catViewProvider.searchApps(query, pageNum, categoryId, filters, function (err, result) {
             if (err) { return next(err); }
 
             res.json(result);
@@ -77,7 +88,13 @@ exports.init = function init(app) {
             return res.status(400).send("Bad page number");
         }
 
-        appSearcher.search(query, pageNum, function(err, result) {
+        var filters = {
+            isIphone: req.query.is_iphone === 'true',
+            isIpad: req.query.is_ipad === 'true',
+            isFree: req.query.is_free === 'true'
+        };
+
+        appSearcher.search(query, pageNum, filters, function(err, result) {
             if (err) { return next(err); }
 
             res.json(result);

@@ -70,9 +70,26 @@ var getApps = function(expanded, highlights, docId) {
     };
 };
 
-var search = function(queryStr, pageNum, next) {
+var buildFilterQuery = function(filters) {
+    var filterQuery = '&filter=';
+
+    if (filters.isIphone === true) {
+        filterQuery += '+is_iphone:true';
+    } else if (filters.isIpad === true) {
+        filterQuery += '+is_ipad:true';
+    }
+
+    if (filters.isFree === true) {
+        filterQuery += '+is_free:true';
+    }
+
+    return filterQuery;
+};
+
+var search = function(queryStr, pageNum, filters, next) {
     var q = encodeURIComponent(solrCore.escapeSpecialCharsAllowQuotes(queryStr));
-    var solrQuery = 'rows=' + CAT_PAGE_SIZE + '&qq=' + q + '&spellcheck.q=' + q;
+    var filter = buildFilterQuery(filters);
+    var solrQuery = 'rows=' + CAT_PAGE_SIZE + '&qq=' + q + '&spellcheck.q=' + q + filter;
 
     if (pageNum && pageNum > 1) {
         var start = (pageNum - 1) * CAT_PAGE_SIZE;
@@ -126,9 +143,10 @@ var search = function(queryStr, pageNum, next) {
     });
 };
 
-var searchApps = function(queryStr, pageNum, categoryId, next) {
+var searchApps = function(queryStr, pageNum, categoryId, filters, next) {
     var q = encodeURIComponent(solrCore.escapeSpecialChars(queryStr));
-    var solrQuery = 'rows=' + APP_PAGE_SIZE + '&qq=' + q + '&cat_id=' + categoryId;
+    var filter = buildFilterQuery(filters);
+    var solrQuery = 'rows=' + APP_PAGE_SIZE + '&qq=' + q + '&cat_id=' + categoryId + filter;
 
     if (pageNum && pageNum > 1) {
         var start = (pageNum - 1) * APP_PAGE_SIZE;
