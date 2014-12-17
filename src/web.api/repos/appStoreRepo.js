@@ -12,7 +12,7 @@ var getAppByExtId = function (client, extId, next) {
         "seller_name, release_notes, min_os_version, language_codes, file_size_bytes,\n" +
         "advisory_rating, content_rating, user_rating_current, rating_count_current, user_rating,\n" +
         "rating_count, is_iphone, is_ipad, date_created, date_modified\n" +
-        "FROM appstore_app\n" +
+        "FROM appstore_app a\n" +
         "WHERE ext_id = $1;";
 
     client.query(queryStr, [extId], function (err, result) {
@@ -294,7 +294,7 @@ var getAppCategories = function(client, appId, skip, take, next) {
         "WHERE ca.app_id = $1\n" +
         "AND c.date_deleted is null\n" +
         "AND ca_e.id is null\n" +
-        "ORDER BY ca.position, ca.id\n" +
+        "ORDER BY ca.position, cp.popularity desc\n" +
         "LIMIT $2 OFFSET $3";
 
     var queryParams = [appId, take, skip];
@@ -308,7 +308,6 @@ var getAppCategories = function(client, appId, skip, take, next) {
             return {
                 extId: item.ext_id,
                 name: item.name,
-                popularity: item.popularity,
                 position: item.position
             };
         });

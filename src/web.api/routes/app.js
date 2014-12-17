@@ -3,6 +3,10 @@ var log = require('../logger');
 var urlUtil = require('../domain/urlUtil');
 var appStoreRepo = require('../repos/appStoreRepo');
 
+var MS_PER_DAY = 24*60*60*1000; // hours*minutes*seconds*milliseconds
+var POPULARITY_WEIGTH = 0.8;
+var RATING_COUNT_WEIGTH = 0.5;
+var CURRENT_COUNT_WEIGTH = 1.5;
 var PAGE_SIZE = 10;
 
 exports.init = function init(app) {
@@ -49,6 +53,21 @@ exports.init = function init(app) {
 
                 app.url = appUrl;
                 app.categories = cats;
+
+                var ageDays = (new Date().getTime() - app.releaseDate.getTime()) / MS_PER_DAY;
+                var ratingCount = app.ratingCount ? app.ratingCount : 1;
+
+                app.popularity = 1 - Math.exp(-POPULARITY_WEIGTH * Math.log(1 + (ratingCount/ageDays)));
+
+                var r1 = app.userRating ? parseFloat(app.userRating) : 0;
+                var r2 = app.userRatingCurrent ? parseFloat(app.userRatingCurrent) : 0;
+                var r2Count = app.ratingCountCurrent ? app.ratingCountCurrent : 0;
+                var r1Count = app.ratingCount && app.ratingCount > r2Count ? app.ratingCount - r2Count : 0;
+                var r1CountWeighted = r1Count ? Math.pow(r1Count, RATING_COUNT_WEIGTH) : 0;
+                var r2CountWeighted = r1Count ? Math.pow(r2Count, CURRENT_COUNT_WEIGTH) : 0;
+                var countSum = Math.max(1, r1CountWeighted + r2CountWeighted);
+
+                app.rating = ((r1 * r1CountWeighted) + (r2 * r2CountWeighted))/countSum;
 
                 delete app.id;
                 delete app.storeAppId;

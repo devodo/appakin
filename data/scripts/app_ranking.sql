@@ -111,6 +111,32 @@ COST 100;
 
 
 
+CREATE OR REPLACE FUNCTION reset_category_popularity()
+	RETURNS boolean AS
+	$BODY$
+BEGIN
+	delete from category_popularity;
+
+	INSERT INTO category_popularity(category_id, popularity)
+	select category_id, score/max_score
+	from (
+		select category_id, score, max(score) over() as max_score
+		from (
+			select ca.category_id, ln(1 + sum(ap.popularity)) as score
+			from category_app ca
+			join app_popularity ap on ca.app_id = ca.app_id
+			group by ca.category_id
+		) t
+	) t
+	order by category_id;
+
+        RETURN true;
+END;
+$BODY$
+LANGUAGE plpgsql VOLATILE
+COST 100;
+
+
 
 
 
