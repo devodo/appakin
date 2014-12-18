@@ -4,8 +4,9 @@ var urlUtil = require('../domain/urlUtil');
 var appStoreRepo = require('../repos/appStoreRepo');
 
 var MS_PER_DAY = 24*60*60*1000; // hours*minutes*seconds*milliseconds
-var POPULARITY_WEIGTH = 0.8;
-var RATING_COUNT_WEIGTH = 0.5;
+var POPULARITY_WEIGTH = 0.7;
+var RATING_COUNT_WEIGTH = 0.6;
+var RATING_AMPLIFY = 1.05;
 var CURRENT_COUNT_WEIGTH = 1.5;
 var PAGE_SIZE = 10;
 
@@ -54,11 +55,13 @@ exports.init = function init(app) {
                 app.url = appUrl;
                 app.categories = cats;
 
-                var ageDays = (new Date().getTime() - app.releaseDate.getTime()) / MS_PER_DAY;
-                var ratingCount = app.ratingCount ? app.ratingCount : 1;
-
-                app.popularity = 1 - Math.exp(-POPULARITY_WEIGTH * Math.log(1 + (ratingCount/ageDays)));
-
+                if (app.ratingCount) {
+                    var ageDays = Math.max(10, (new Date().getTime() - app.releaseDate.getTime()) / MS_PER_DAY);
+                    app.popularity = RATING_AMPLIFY * (1 - Math.exp(-POPULARITY_WEIGTH * Math.log(1 + (app.ratingCount/ageDays))));
+                } else {
+                    app.popularity = 0;
+                }
+                
                 var r1 = app.userRating ? parseFloat(app.userRating) : 0;
                 var r2 = app.userRatingCurrent ? parseFloat(app.userRatingCurrent) : 0;
 
@@ -92,7 +95,7 @@ exports.init = function init(app) {
         });
     });
 
-    app.get('/ios/app/:extId', function (req, res) {
+    app.get('/ios/app/:extId', function (req, res, next) {
         var extId = req.params.extId;
         if (!extId)
         {
@@ -100,15 +103,13 @@ exports.init = function init(app) {
         }
 
         appStoreRepo.getAppByExtId(extId, function(err, app) {
-            if (err) {
-                log.error(err);
-                return res.status(500).send('Error retrieving app data');
-            }
+            if (err) { return next(err); }
 
             if (!app) {
                 return res.status(404).send('App not found');
             }
 
+            app.url = urlUtil.makeUrl(app.extId, app.name);
             res.json(app);
         });
     });
