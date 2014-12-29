@@ -24,6 +24,10 @@ var getCacheKeys = function(categoryIds, filters) {
 };
 
 var getCategoryCharts = function(categoryIds, filters, next) {
+    if (categoryIds.length === 0) {
+        return next(null, Object.create(null));
+    }
+
     var cacheKeys = getCacheKeys(categoryIds, filters);
 
     categoryChartCache.getObjects(cacheKeys, function(err, cacheResults) {
@@ -47,9 +51,13 @@ var getCategoryCharts = function(categoryIds, filters, next) {
 
         if (missingIds.length === 0) {
             var resultMap = Object.create(null);
-            cacheResults.forEach(function(cacheResult, i) {
-                resultMap[categoryIds[i]] = cacheResult;
-            });
+
+            if (cacheResults) {
+                cacheResults.forEach(function (cacheResult, i) {
+                    resultMap[categoryIds[i]] = cacheResult;
+                });
+            }
+
             return next(null, resultMap);
         }
 
@@ -123,7 +131,13 @@ var searchCategories = function(queryStr, pageNum, filters, next) {
 
             searchResult.categories.forEach(function(category) {
                 var categoryChart = categoryAppsMap[category.categoryId];
-                category.chart = categoryChart.apps;
+
+                if (!categoryChart) {
+                    log.warn("No category chart found for category id: " + category.categoryId);
+                } else {
+                    category.chart = categoryChart.apps;
+                }
+
                 delete category.categoryId;
             });
 

@@ -57,11 +57,11 @@ exports.init = function init(app) {
 
                 if (app.ratingCount) {
                     var ageDays = Math.max(10, (new Date().getTime() - app.releaseDate.getTime()) / MS_PER_DAY);
-                    app.popularity = RATING_AMPLIFY * (1 - Math.exp(-POPULARITY_WEIGTH * Math.log(1 + (app.ratingCount/ageDays))));
+                    app.popularity = Math.min(1.0, RATING_AMPLIFY * (1 - Math.exp(-POPULARITY_WEIGTH * Math.log(1 + (app.ratingCount/ageDays)))));
                 } else {
                     app.popularity = 0;
                 }
-                
+
                 var r1 = app.userRating ? parseFloat(app.userRating) : 0;
                 var r2 = app.userRatingCurrent ? parseFloat(app.userRatingCurrent) : 0;
 

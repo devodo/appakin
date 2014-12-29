@@ -250,7 +250,7 @@ var getAppTopKeywords = function(seedCategoryId, appExtId, next) {
             getClassifierAnalyser(trainingSet, function(err, classifierAnalyser) {
                 if (err) { return next(err); }
 
-                var topTerms = classifierAnalyser.getTopScoringTerms(doc, 100);
+                var topTerms = classifierAnalyser.getDocStats(doc, 100);
                 return next(null, topTerms);
             });
         });

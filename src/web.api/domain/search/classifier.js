@@ -1,6 +1,7 @@
 'use strict';
 
 var fs = require('fs');
+var compute = require( 'compute.io' );
 var config = require('../../config');
 var log = require('../../logger');
 
@@ -8,7 +9,7 @@ var Classifier = function() {
     var nodesvm = require('node-svm');
     this.svm = new nodesvm.CSVC({ // classification
         kernelType: nodesvm.KernelTypes.RBF,
-        gamma: [0.125],
+        gamma: [0.5],
         C: [2],
         reduce: false,
         normalize: false
@@ -371,10 +372,11 @@ ClassifierAnalyser.prototype.getTopScoringTerms = function(doc, maxTerms) {
     });
 
     results = results.splice(0, maxTerms);
-    var topScore = Math.pow(results[0].tfIdf, self.resultSettings.smoothFactor);
+    //var topScore = Math.pow(results[0].tfIdf, self.resultSettings.smoothFactor);
 
     results.forEach(function(result) {
-        result.score = Math.pow(result.tfIdf, self.resultSettings.smoothFactor) / topScore;
+        //result.score = Math.pow(result.tfIdf, self.resultSettings.smoothFactor) / topScore;
+        result.score = result.tfIdf;
     });
 
     return results;
@@ -394,9 +396,13 @@ ClassifierAnalyser.prototype.getIndexedTermVector = function(doc) {
         }
     });
 
+    var norm = compute.l2norm(indexedTermVector);
+
     for (var i = 0; i < self.termIndex; i++) {
-        if (!indexedTermVector[i]) {
+        if (!indexedTermVector[i] || norm === 0) {
             indexedTermVector[i] = 0;
+        } else {
+            indexedTermVector[i] = indexedTermVector[i] / norm;
         }
     }
 
@@ -404,7 +410,31 @@ ClassifierAnalyser.prototype.getIndexedTermVector = function(doc) {
         log.warn("Empty term vector for doc:" + doc.id);
     }
 
+
     return indexedTermVector;
+};
+
+ClassifierAnalyser.prototype.getDocStats = function(doc, maxTerms) {
+    var self = this;
+
+    var termScores = self.getTopScoringTerms(doc, maxTerms);
+
+    var indexedTermVector = [];
+
+    termScores.forEach(function(termScore) {
+        var termEntry = self.termDictionary[termScore.term];
+        if (termEntry) {
+            indexedTermVector[termEntry.index] = termScore.score;
+        }
+    });
+
+    var norm = compute.l2norm(indexedTermVector);
+
+    termScores.forEach(function(termScore) {
+        termScore.normal = termScore.score / norm;
+    });
+
+    return termScores;
 };
 
 ClassifierAnalyser.prototype.buildTrainingMatrix = function() {
@@ -413,9 +443,17 @@ ClassifierAnalyser.prototype.buildTrainingMatrix = function() {
     log.debug("Term matrix size: " + self.trainingMatrix.length + " x " + self.termIndex);
 
     for (var j = 0; j < self.trainingMatrix.length; j++) {
+        var norm = compute.l2norm(self.trainingMatrix[j][0]);
+
+        if (norm === 0) {
+            log.warn("Training vector norm is zero");
+        }
+
         for (var i = 0; i < self.termIndex; i++) {
             if (!self.trainingMatrix[j][0][i]) {
                 self.trainingMatrix[j][0][i] = 0;
+            } else {
+                self.trainingMatrix[j][0][i] = self.trainingMatrix[j][0][i] / norm;
             }
         }
     }
