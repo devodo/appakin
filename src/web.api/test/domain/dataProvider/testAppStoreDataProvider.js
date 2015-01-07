@@ -161,5 +161,16 @@ exports.group = {
             test.ok(!err, err);
             test.done();
         });
+    },
+
+    retrieveNewAppStoreIds: function(test) {
+        return test.done(); //ignore test
+
+        appStoreData.lookupNewAppStoreIds(function(err, ids) {
+            test.expect(2);
+            test.ok(!err, err);
+            test.ok(ids.length > 0, "No app store ids returned");
+            test.done();
+        });
     }
 };

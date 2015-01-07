@@ -663,6 +663,52 @@ var insertMissingXyoCategories = function(next) {
     });
 };
 
+var lookupNewAppStoreIds = function(next) {
+    var feedUrl = "https://itunes.apple.com/us/rss/newapplications/limit=100/json";
+
+    log.debug("Issuing new apps rss feed lookup");
+    request(feedUrl, function (err, response, src) {
+        if (err) { return next(err); }
+
+        try {
+            var jsonData = JSON.parse(src);
+
+            var ids = jsonData.feed.entry.map(function(entry) {
+                return entry.id.attributes["im:id"];
+            });
+
+            return next(null, ids);
+        } catch (ex) {
+            return next(ex);
+        }
+    });
+};
+
+var retrieveNewApps = function(next) {
+    lookupNewAppStoreIds(function(err, ids) {
+        if (err) { return next(err); }
+
+        appStoreAdminRepo.getExistingAppStoreIds(ids, function(err, existingIds) {
+            if (err) { return next(err); }
+
+            var existingIdsMap = Object.create(null);
+            existingIds.forEach(function(id) {
+                existingIdsMap[id] = true;
+            });
+
+            var newIds = ids.filter(function(id) {
+                return !existingIdsMap[id];
+            });
+
+            retrieveMissingApps(newIds, function(err) {
+                if (err) { return next(err); }
+
+                return next(null, newIds);
+            });
+        });
+    });
+};
+
 exports.getPageSrc = getPageSrc;
 exports.parseHtml = parseHtml;
 exports.getLookup = getLookup;
@@ -679,5 +725,8 @@ exports.lookupMissingChartApps = lookupMissingChartApps;
 exports.lookupMissingSourceApps = lookupMissingSourceApps;
 exports.getCategories = getCategories;
 exports.insertMissingXyoCategories = insertMissingXyoCategories;
+
+exports.lookupNewAppStoreIds = lookupNewAppStoreIds;
+exports.retrieveNewApps = retrieveNewApps;
 
 

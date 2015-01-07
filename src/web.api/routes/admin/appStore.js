@@ -99,6 +99,22 @@ exports.init = function init(app) {
         res.json({status: 'ack'});
     });
 
+    app.post('/admin/appstore/retrieve_new_apps', function (req, res) {
+        appStoreData.retrieveNewApps(function(err, newIds) {
+            if (err) {
+                return log.error(err);
+            }
+
+            if (newIds.length > 0) {
+                log.info("Successfully retrieved new apps: " + newIds.length);
+            }
+
+            log.debug("Completed retrieve new apps");
+        });
+
+        res.json({status: 'ack'});
+    });
+
     app.post('/admin/appstore/reset_app_popularity', function (req, res) {
         var batchId = parseInt(req.body.batch, 10);
 

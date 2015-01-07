@@ -43,7 +43,7 @@ var insertAppStoreAppInternal = function (client, appId, extId, app, next) {
         "$15, $16, $17, $18,\n" +
         "$19, $20, $21, $22, $23, $24,\n" +
         "$25, $26, $27, $28, $29,\n" +
-        "$30, $31, $32, $33, $34, $35, $36,\n" +
+        "$30, $31, $32, $33, $34, $35, $36, $37, $38, $39,\n" +
         "NOW(), NOW());";
 
     var supportedDevicesString = app.supportedDevices.join().toLowerCase();
@@ -808,6 +808,32 @@ var getSeedSearch = function(client, seedId, next) {
     });
 };
 
+var getExistingAppStoreIds = function(client, appStoreIds, next) {
+    var queryParams = [];
+    var params = [];
+    appStoreIds.forEach(function(id, i) {
+        queryParams.push(id);
+        params.push('$'+ (i + 1));
+    });
+
+    var queryStr =
+        "select store_app_id\n" +
+        "from appstore_app\n" +
+        "where store_app_id in (" + params.join(',') + ");";
+
+    client.query(queryStr, queryParams, function (err, result) {
+        if (err) {
+            return next(err);
+        }
+
+        var items = result.rows.map(function(item) {
+            return item.store_app_id;
+        });
+
+        next(null, items);
+    });
+};
+
 var getSeedSearches = function(client, seedCategoryId, next) {
     var queryStr =
         "SELECT id, seed_category_id, query, max_take\n" +
@@ -1098,6 +1124,18 @@ exports.getSeedSearch = function(seedId, next) {
         getSeedSearch(conn.client, seedId, function(err, seedSearch) {
             conn.close(err, function(err) {
                 next(err, seedSearch);
+            });
+        });
+    });
+};
+
+exports.getExistingAppStoreIds = function(appStoreIds, next) {
+    connection.open(function(err, conn) {
+        if (err) { return next(err); }
+
+        getExistingAppStoreIds(conn.client, appStoreIds, next, function(err, ids) {
+            conn.close(err, function(err) {
+                next(err, ids);
             });
         });
     });
