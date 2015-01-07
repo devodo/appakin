@@ -61,7 +61,7 @@
     "production": {
         "test": "test production",
         "connectionString": {
-            "appakin": "postgres://appakin:allawedapap@appakin-db-micro1.czfejgbveylk.us-east-1.rds.amazonaws.com:/appakin"
+            "appakin": "postgres://appakin:password@localhost/appakin"
         },
         "cluster": {
             "enabled": true,
