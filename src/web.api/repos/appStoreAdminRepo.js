@@ -1061,20 +1061,6 @@ exports.getAppAnalysisBatch = function(lastId, limit, next) {
     });
 };
 
-exports.getAppAnalysisBatchNew = function(lastId, limit, next) {
-    connection.open(function(err, conn) {
-        if (err) {
-            return next(err);
-        }
-
-        getAppAnalysisBatchNew(conn.client, lastId, limit, function(err, results) {
-            conn.close(err, function(err) {
-                next(err, results);
-            });
-        });
-    });
-};
-
 exports.upsertAppAnalysis = function(appAnalysis, next) {
     connection.open(function(err, conn) {
         if (err) {
