@@ -81,6 +81,9 @@ function configureApp(app) {
 
         return false;
     });
+
+    app.set('etag', false);
+    app.set('x-powered-by', false);
 }
 
 function configureCors(app) {

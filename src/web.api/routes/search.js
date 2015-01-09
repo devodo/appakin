@@ -8,6 +8,12 @@ var MAX_CAT_APP_PAGES = 8;
 
 exports.init = function init(app) {
 
+    app.use('/ios/search/*', function (req, res, next) {
+        var expirySeconds = 600;
+        res.setHeader("Cache-Control", "public, max-age=" + expirySeconds);
+        next();
+    });
+
     app.get('/ios/search/auto', function (req, res, next) {
         var query = req.query.q;
 
