@@ -66,6 +66,11 @@
         "cluster": {
             "enabled": true,
             "workers": "cpu_count"
+        },
+        "cache": {
+            "redis": {
+                "enabled": true
+            }
         }
     }
 }

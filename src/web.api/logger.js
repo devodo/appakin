@@ -6,6 +6,23 @@ var path = require('path');
 var pjson = require('./package');
 var config = require('./config');
 
+var winston = require('winston');
+
+var logger = new winston.Logger({
+    transports: [
+        new winston.transports.Console({
+            handleExceptions: true,
+            json: false,
+            timestamp: function() {
+                var dateNow = new Date();
+                return dateNow.toISOString() + ' [' + process.pid + ']';
+            },
+            level: config.log.level
+        })
+    ],
+    exitOnError: true
+});
+
 var serializers = bunyan.stdSerializers;
 
 var log = bunyan.createLogger({
@@ -19,4 +36,5 @@ var log = bunyan.createLogger({
     ]
 });
 
-module.exports = log;
+//module.exports = log;
+module.exports = logger;

@@ -157,7 +157,7 @@ exports.init = function init(app) {
         });
     });
 
-    app.del('/admin/classification/train', function (req, res, next) {
+    app.delete('/admin/classification/train', function (req, res, next) {
         var seedCategoryId = req.query.seedCategoryId;
 
         if (!seedCategoryId || isNaN(seedCategoryId)) {

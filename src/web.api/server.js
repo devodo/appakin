@@ -1,6 +1,5 @@
 'use strict';
 
-var cluster = require('cluster');
 var config = require('./config');
 var log = require('./logger');
 var app = require('./app');
