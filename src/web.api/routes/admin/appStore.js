@@ -105,14 +105,8 @@ exports.init = function init(app) {
                 return log.error(err);
             }
 
-            if (newIds.length > 0) {
-                log.info("Successfully retrieved new apps: " + newIds.length);
-            }
-
-            log.debug("Completed retrieve new apps");
+            res.json({time: new Date(), status: 'success', newApps: newIds.length });
         });
-
-        res.json({status: 'ack'});
     });
 
     app.post('/admin/appstore/reset_app_popularity', function (req, res) {

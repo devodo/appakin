@@ -700,7 +700,7 @@ var retrieveNewApps = function(next) {
                 return !existingIdsMap[id];
             });
 
-            retrieveMissingApps(newIds, function(err) {
+            retrieveApps(newIds, function(err) {
                 if (err) { return next(err); }
 
                 return next(null, newIds);

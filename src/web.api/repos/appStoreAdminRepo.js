@@ -1133,7 +1133,7 @@ exports.getExistingAppStoreIds = function(appStoreIds, next) {
     connection.open(function(err, conn) {
         if (err) { return next(err); }
 
-        getExistingAppStoreIds(conn.client, appStoreIds, next, function(err, ids) {
+        getExistingAppStoreIds(conn.client, appStoreIds, function(err, ids) {
             conn.close(err, function(err) {
                 next(err, ids);
             });
