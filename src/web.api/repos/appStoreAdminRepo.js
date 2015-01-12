@@ -298,6 +298,34 @@ var getAppStoreCategories = function(client, next) {
     });
 };
 
+var getAppStoreCategory = function(client, categoryId, next) {
+    var queryStr =
+        "SELECT id, store_category_id, name, store_url, parent_id, date_created, date_modified\n" +
+        "FROM appstore_category\n" +
+        "WHERE id = $1;";
+
+    client.query(queryStr, [categoryId], function (err, result) {
+        if (err) { return next(err); }
+
+        if (result.rows.length === 0) {
+            return next();
+        }
+
+        var item = result.rows[0];
+        var category = {
+                id: item.id,
+                storeAppId: item.store_category_id,
+                name: item.name,
+                storeUrl: item.store_url,
+                parentId: item.parent_id,
+                dateCreated: item.date_created,
+                dateModified: item.date_modified
+            };
+
+        next(null, category);
+    });
+};
+
 var getAppStoreSourceItemBatch = function(client, startId, batchSize, next) {
     var queryStr =
         "SELECT id, appstore_category_id, store_app_id, name, letter, page_number,\n" +
@@ -809,6 +837,10 @@ var getSeedSearch = function(client, seedId, next) {
 };
 
 var getExistingAppStoreIds = function(client, appStoreIds, next) {
+    if (appStoreIds.length === 0) {
+        return next(null, []);
+    }
+
     var queryParams = [];
     var params = [];
     appStoreIds.forEach(function(id, i) {
@@ -819,6 +851,32 @@ var getExistingAppStoreIds = function(client, appStoreIds, next) {
     var queryStr =
         "select store_app_id\n" +
         "from appstore_app\n" +
+        "where store_app_id in (" + params.join(',') + ");";
+
+    client.query(queryStr, queryParams, function (err, result) {
+        if (err) {
+            return next(err);
+        }
+
+        var items = result.rows.map(function(item) {
+            return item.store_app_id;
+        });
+
+        next(null, items);
+    });
+};
+
+var getExistingAppSourceIds = function(client, appSources, next) {
+    var queryParams = [];
+    var params = [];
+    appSources.forEach(function(id, i) {
+        queryParams.push(id);
+        params.push('$'+ (i + 1));
+    });
+
+    var queryStr =
+        "SELECT store_app_id\n" +
+        "FROM appstore_app_src\n" +
         "where store_app_id in (" + params.join(',') + ");";
 
     client.query(queryStr, queryParams, function (err, result) {
@@ -927,6 +985,20 @@ exports.getAppStoreCategories = function(next) {
         }
 
         getAppStoreCategories(conn.client, function(err, results) {
+            conn.close(err, function(err) {
+                next(err, results);
+            });
+        });
+    });
+};
+
+exports.getAppStoreCategory = function(categoryId, next) {
+    connection.open(function(err, conn) {
+        if (err) {
+            return next(err);
+        }
+
+        getAppStoreCategory(conn.client, categoryId, function(err, results) {
             conn.close(err, function(err) {
                 next(err, results);
             });
@@ -1134,6 +1206,18 @@ exports.getExistingAppStoreIds = function(appStoreIds, next) {
         if (err) { return next(err); }
 
         getExistingAppStoreIds(conn.client, appStoreIds, function(err, ids) {
+            conn.close(err, function(err) {
+                next(err, ids);
+            });
+        });
+    });
+};
+
+exports.getExistingAppSourceIds = function(appSources, next) {
+    connection.open(function(err, conn) {
+        if (err) { return next(err); }
+
+        getExistingAppSourceIds(conn.client, appSources, function(err, ids) {
             conn.close(err, function(err) {
                 next(err, ids);
             });

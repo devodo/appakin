@@ -99,6 +99,18 @@ exports.init = function init(app) {
         res.json({status: 'ack'});
     });
 
+    app.post('/admin/appstore/refresh_next_app_source', function (req, res) {
+        appStoreData.refreshNextAppSource(function(err, resultTotal) {
+            if (err) {
+                return log.error(err);
+            }
+
+            log.info("Successfully refreshed next app source. New apps: " + resultTotal);
+        });
+
+        res.json({status: 'ack'});
+    });
+
     app.post('/admin/appstore/retrieve_new_apps', function (req, res) {
         appStoreData.retrieveNewApps(function(err, newIds) {
             if (err) {

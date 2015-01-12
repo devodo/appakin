@@ -13,6 +13,7 @@ var logger = new winston.Logger({
         new winston.transports.Console({
             handleExceptions: true,
             json: false,
+            prettyPrint: true,
             timestamp: function() {
                 var dateNow = new Date();
                 return dateNow.toISOString() + ' [' + process.pid + ']';

@@ -250,7 +250,9 @@ var parseAppSources = function(pageSrc) {
 
     var $ = cheerio.load(pageSrc);
 
-    var appSources = $('#selectedcontent a').map(function(i, el) {
+    var appSources = [];
+
+    $('#selectedcontent a').map(function(i, el) {
         var url = $(this).attr('href');
         var name = $(this).text();
         var match = idRegex.exec(url);
@@ -261,7 +263,7 @@ var parseAppSources = function(pageSrc) {
             name: name
         };
 
-        return appSrc;
+        appSources.push(appSrc);
     });
 
     return appSources;
@@ -487,6 +489,146 @@ var updateAllAppsBatched = function(startId, batchSize, next) {
     processLoop(startId);
 };
 
+var getNextSourceIndex = function(audit) {
+    var LAST_CATEGORY_ID = 69;
+    var letter = 'A';
+    var categoryId = 1;
+
+    if (audit) {
+        categoryId = audit.appstoreCategoryId;
+        var letterCode = audit.letter.charCodeAt(0);
+
+        if (letterCode >= 65 && letterCode < 90) {
+            letter = String.fromCharCode(letterCode + 1);
+        } else if (letterCode === 90) {
+            letter = '*';
+        }
+        else {
+            letter = 'A';
+            categoryId++;
+
+            if (categoryId > LAST_CATEGORY_ID) {
+                categoryId = 1;
+            }
+        }
+    }
+
+    return {
+        letter: letter,
+        categoryId: categoryId
+    };
+};
+
+var retrieveAppSources = function(category, letter, next) {
+    var prevAppSources = [];
+    var results = [];
+
+    var retrievePage = function(pageNumber) {
+        log.debug("Retrieving app sources for category: " + category.id + " letter: " + letter + " page: " + pageNumber);
+
+        var callback = function(err, response, pageSrc) {
+            if (err) {
+                return next(err);
+            }
+
+            var appSources = parseAppSources(pageSrc);
+
+            if (appSources.length === prevAppSources.length) {
+                var isSame = true;
+                for (var i = 0; i < appSources.length; i++) {
+                    if (appSources[i].storeAppId !== prevAppSources[i].storeAppId) {
+                        isSame = false;
+                        break;
+                    }
+                }
+
+                if (isSame) {
+                    return next(null, results);
+                }
+            }
+
+            prevAppSources = appSources;
+            appSources.forEach(function(appSource) {
+                results.push(appSource);
+            });
+
+            retrievePage(pageNumber + 1);
+        };
+
+        var url = category.storeUrl + '&letter=' + letter + '&page=' + pageNumber;
+
+        request(url, callback);
+    };
+
+    retrievePage(1);
+};
+
+var refreshNextAppSource = function(next) {
+    log.debug("Refreshing next apps source");
+
+    auditRepo.getLastAppStoreSourceRefresh(function(err, audit) {
+        if (err) { return next(err); }
+
+        var nextSource = getNextSourceIndex(audit);
+
+        var handleError = function(err) {
+            var errorAudit = {
+                appstoreCategoryId: nextSource.categoryId,
+                letter: nextSource.letter,
+                isSuccess: false,
+                errorMessage: JSON.stringify(err)
+            };
+
+            auditRepo.auditAppStoreSourceRefresh(errorAudit, function(auditErr) {
+                next(auditErr ? auditErr : err);
+            });
+        };
+
+        appStoreAdminRepo.getAppStoreCategory(nextSource.categoryId, function(err, category) {
+            if (err) { return handleError(err); }
+
+            retrieveAppSources(category, nextSource.letter, function(err, appSources) {
+                if (err) { return handleError(err); }
+
+                var appIds = appSources.map(function(appSource) {
+                    return appSource.storeAppId;
+                });
+
+                appStoreAdminRepo.getExistingAppStoreIds(appIds, function(err, ids) {
+                    if (err) { return handleError(err); }
+
+                    var existingIdsMap = Object.create(null);
+                    ids.forEach(function(id) {
+                        existingIdsMap[id] = true;
+                    });
+
+                    var newAppIds = appIds.filter(function(appId) {
+                        return !existingIdsMap[appId];
+                    });
+
+                    insertNewApps(newAppIds, function(err) {
+                        if (err) { return handleError(err); }
+
+                        var successAudit = {
+                            appstoreCategoryId: category.id,
+                            letter: nextSource.letter,
+                            newApps: newAppIds.length,
+                            isSuccess: true
+                        };
+
+                        auditRepo.auditAppStoreSourceRefresh(successAudit, function(err) {
+                            if (err) { return next(err); }
+
+                            next(null, newAppIds.length);
+                        });
+                    });
+                });
+            });
+        });
+
+    });
+};
+
 var refreshNextAppBatches = function(batchSize, next) {
     log.debug("Refreshing next apps batch of size: " + batchSize);
 
@@ -684,27 +826,33 @@ var lookupNewAppStoreIds = function(next) {
     });
 };
 
+var insertNewApps = function(ids, next) {
+    appStoreAdminRepo.getExistingAppStoreIds(ids, function(err, existingIds) {
+        if (err) { return next(err); }
+
+        var existingIdsMap = Object.create(null);
+        existingIds.forEach(function(id) {
+            existingIdsMap[id] = true;
+        });
+
+        var newIds = ids.filter(function(id) {
+            return !existingIdsMap[id];
+        });
+
+        retrieveApps(newIds, function(err) {
+            if (err) { return next(err); }
+
+            return next(null, newIds);
+        });
+    });
+};
+
 var retrieveNewApps = function(next) {
     lookupNewAppStoreIds(function(err, ids) {
         if (err) { return next(err); }
 
-        appStoreAdminRepo.getExistingAppStoreIds(ids, function(err, existingIds) {
-            if (err) { return next(err); }
-
-            var existingIdsMap = Object.create(null);
-            existingIds.forEach(function(id) {
-                existingIdsMap[id] = true;
-            });
-
-            var newIds = ids.filter(function(id) {
-                return !existingIdsMap[id];
-            });
-
-            retrieveApps(newIds, function(err) {
-                if (err) { return next(err); }
-
-                return next(null, newIds);
-            });
+        insertNewApps(ids, function(err) {
+            next(err);
         });
     });
 };
@@ -720,6 +868,7 @@ exports.retrieveAllAppSources = retrieveAllAppSources;
 exports.lookupSourceAppsBatched = lookupSourceAppsBatched;
 exports.updateAllAppsBatched = updateAllAppsBatched;
 exports.refreshNextAppBatches = refreshNextAppBatches;
+exports.refreshNextAppSource = refreshNextAppSource;
 exports.retrieveAppCharts = retrieveAppCharts;
 exports.lookupMissingChartApps = lookupMissingChartApps;
 exports.lookupMissingSourceApps = lookupMissingSourceApps;
