@@ -851,8 +851,10 @@ var retrieveNewApps = function(next) {
     lookupNewAppStoreIds(function(err, ids) {
         if (err) { return next(err); }
 
-        insertNewApps(ids, function(err) {
-            next(err);
+        insertNewApps(ids, function(err, newIds) {
+            if (err) { return next(err); }
+
+            next(null, newIds);
         });
     });
 };
