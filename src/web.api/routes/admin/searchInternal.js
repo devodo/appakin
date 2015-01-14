@@ -5,6 +5,7 @@ var autoIndexer = require('../../domain/search/autoIndexer');
 var catIndexer = require('../../domain/search/categoryIndexer');
 var appIndexer = require('../../domain/search/appIndexer');
 var clusterIndexer = require('../../domain/search/clusterIndexer');
+var solrCore = require('../../domain/search/solrCore');
 
 exports.init = function init(app) {
     app.post('/admin/search/auto/rebuild', function (req, res) {
@@ -20,6 +21,15 @@ exports.init = function init(app) {
         });
 
         res.json({status: 'rebuild started'});
+    });
+
+    app.get('/admin/search/auto/status', function (req, res, next) {
+
+        autoIndexer.getCoreStatus(function(err, result) {
+            if (err) { return next(err); }
+
+            res.json(result);
+        });
     });
 
     app.post('/admin/search/cat/rebuild', function (req, res) {

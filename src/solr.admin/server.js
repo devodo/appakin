@@ -10,5 +10,5 @@ var port = argv.port ? argv.port : config.server.port;
 app.set('port', port);
 
 var server = app.listen(app.get('port'), function() {
-    log.info('Appakin web.api server listening on port ' + server.address().port);
+    log.info('Solr admin server listening on port ' + server.address().port);
 });

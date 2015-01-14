@@ -1,0 +1,29 @@
+{
+    "common": {
+        "server": {
+            "port": 3005
+        },
+        "log": {
+            "level": "info"
+        },
+        "solr": {
+            "host": "localhost",
+            "port": "8983",
+            "rootPath": "/opt/solr/solr",
+            "tempCorePrefix": "temp_"
+        }
+    },
+    "development": {
+        "log": {
+            "level": "debug"
+        },
+        "solr": {
+            "rootPath": "/opt/solr/solr"
+        }
+    },
+    "production": {
+        "solr": {
+            "rootPath": "/opt/solr/solr"
+        }
+    }
+}

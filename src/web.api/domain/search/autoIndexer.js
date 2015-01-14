@@ -10,7 +10,7 @@ var NGRAM_TYPE = 3;
 var APP_ID_OFFSET = 10000000;
 var NGRAM_ID_OFFSET = 20000000;
 
-var addCategory = function(category, next) {
+var addCategory = function(core, category, next) {
     var nameDisplay = solrCore.preProcessDisplayText(category.name);
     var nameIndex = solrCore.preProcessIndexText(category.name);
 
@@ -29,7 +29,7 @@ var addCategory = function(category, next) {
         solrCategory.name_alt = nameAscii;
     }
 
-    solrCore.client.add(solrCategory, function(err, obj) {
+    core.client.add(solrCategory, function(err, obj) {
         if(err){
             return next(err);
         }
@@ -86,7 +86,7 @@ var nGramCountToFreq = function(count) {
     return Math.log(count) / Math.log(10);
 };
 
-var addAllCategories = function(next) {
+var addAllCategories = function(core, next) {
     appStoreRepo.getCategories(function(err, categories) {
         if (err) {
             return next(err);
@@ -97,45 +97,37 @@ var addAllCategories = function(next) {
         var processCategory = function(category, callback) {
             log.debug("Adding category: " + category.name);
 
-            addCategory(category, function(err, solrCategory) {
+            addCategory(core, category, function(err, solrCategory) {
                 solrCategoryNames.push(solrCategory.name);
                 callback(err);
             });
         };
 
         async.eachSeries(categories, processCategory, function(err) {
-            if (err) {
-                return next(err);
-            }
+            if (err) { return next(err); }
 
-            solrCore.commit(function(err) {
+            core.commit(function(err) {
                 next(err, solrCategoryNames);
             });
         });
     });
 };
 
-var addChartApps = function(next) {
+var addChartApps = function(core, next) {
     log.debug("Adding chart apps to index");
 
     appStoreRepo.getChartAppIndex(function(err, apps) {
-        if (err) {
-            return next(err);
-        }
+        if (err) { return next(err); }
 
         var solrApps = apps.map(function(app) {
             return createSolrApp(app);
         });
 
-        solrCore.client.add(solrApps, function(err){
-            if(err){
-                return next(err);
-            }
+        core.client.add(solrApps, function(err){
+            if(err){ return next(err); }
 
-            solrCore.commit(function(err) {
-                if (err) {
-                    return next(err);
-                }
+            core.commit(function(err) {
+                if (err) { return next(err); }
 
                 next();
             });
@@ -143,7 +135,7 @@ var addChartApps = function(next) {
     });
 };
 
-var addAllApps = function(lastId, batchSize, next) {
+var addAllApps = function(core, lastId, batchSize, next) {
     var processBatch = function(lastId) {
         log.debug("Adding batch from id: " + lastId);
 
@@ -164,12 +156,12 @@ var addAllApps = function(lastId, batchSize, next) {
                 return createSolrApp(app);
             });
 
-            solrCore.client.add(solrApps, function(err, obj){
+            core.client.add(solrApps, function(err, obj){
                 if(err){
                     return next(err);
                 }
 
-                solrCore.commit(function(err) {
+                core.commit(function(err) {
                     if (err) {
                         return next(err);
                     }
@@ -317,11 +309,9 @@ var flattenNgramTree = function(ngramTree) {
     return ngramNodes;
 };
 
-var indexNGramMap = function(batchSize, nGramSize, solrCategoryNames, next) {
+var indexNGramMap = function(core, batchSize, nGramSize, solrCategoryNames, next) {
     createNGramTree(batchSize, nGramSize, function(err, ngramTree) {
-        if (err) {
-            return next(err);
-        }
+        if (err) { return next(err); }
 
         var ngramNodes = flattenNgramTree(ngramTree);
 
@@ -357,12 +347,12 @@ var indexNGramMap = function(batchSize, nGramSize, solrCategoryNames, next) {
 
             log.debug("Adding batch starting at: " + batch[0].id);
 
-            solrCore.client.add(batch, function(err){
+            core.client.add(batch, function(err){
                 if(err){
                     return next(err);
                 }
 
-                solrCore.commit(function(err) {
+                core.commit(function(err) {
                     if (err) {
                         return next(err);
                     }
@@ -377,52 +367,41 @@ var indexNGramMap = function(batchSize, nGramSize, solrCategoryNames, next) {
     });
 };
 
-var rebuildWithAllApps = function(lastId, batchSize, outputHandler, next) {
-    addAllCategories(outputHandler, function(err) {
-        if (err) { return next(err); }
-
-        addAllApps(lastId, batchSize, outputHandler, function(err) {
-            if (err) { return next(err); }
-
-            solrCore.optimise(function(err) {
-                return next(err);
-            });
-        });
-    });
-};
-
-var rebuildWithPopularApps = function(next) {
-    addAllCategories(function(err) {
-        if (err) { return next(err); }
-
-        addChartApps(function(err) {
-            if (err) { return next(err); }
-
-            solrCore.optimise(function(err) {
-                return next(err);
-            });
-        });
-    });
-};
-
 var rebuild = function(batchSize, nGramSize, next) {
-    addAllCategories(function(err, solrCategoryNames) {
+    log.debug("Creating temp core");
+    solrCore.createTempCore(function(err, tempCore) {
         if (err) { return next(err); }
 
-        indexNGramMap(batchSize, nGramSize, solrCategoryNames, function(err) {
+        addAllCategories(tempCore, function(err, solrCategoryNames) {
             if (err) { return next(err); }
 
-            solrCore.optimise(function(err) {
-                return next(err);
-            });
+            //indexNGramMap(tempCore, batchSize, nGramSize, solrCategoryNames, function(err) {
+            //    if (err) { return next(err); }
+
+                tempCore.optimise(function(err) {
+                    return next(err);
+                });
+
+                log.debug("Swapping in temp core");
+                solrCore.swapOrRenameCore(tempCore, function(err) {
+                    if (err) { return next(err); }
+
+                    next();
+                });
+            //});
         });
     });
+};
+
+var getCoreStatus = function(next) {
+    solrCore.getCoreStatus(next);
 };
 
 exports.rebuild = rebuild;
 exports.createNGramTree = createNGramTree;
 exports.buildNgramTree = buildNgramTree;
 exports.flattenNgramTree = flattenNgramTree;
+exports.getCoreStatus = getCoreStatus;
 
 
 

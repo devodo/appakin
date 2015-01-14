@@ -18,7 +18,7 @@ gulp.task('build',
 // http://jshint.com/docs/options/
 gulp.task('jshint', function() {
     return gulp
-	    .src(['./routes/**/*.js', './repos/**/*.js', './domain/**/*.js'])
+	    .src(['./routes/**/*.js'])
 	    .pipe(plugins.jshint({ globalstrict: true, node: true }))
 		.pipe(plugins.jshint.reporter(stylish))
 		.pipe(plugins.jshint.reporter('fail'))
@@ -38,12 +38,9 @@ gulp.task('build:copy', ['build:clean'], function() {
 	var filesToCopy = [
 	    './node_modules/**/*.*',
 		'./routes/**/*.*',
-        './repos/**/*.*',
-        './domain/**/*.*',
 		'./*.*',
 		'!./gulpfile.js',
-        '!./config-local.json',
-        '!./domain/search/docfreq.json'
+        '!./config-local.json'
 	];
 		
 	return gulp
@@ -57,6 +54,6 @@ gulp.task('build:copy', ['build:clean'], function() {
 // Helper functions 
 // ----------------
 
-function handleError(error) {
+var handleError = function(error) {
     gutil.log(error.Message);
 };

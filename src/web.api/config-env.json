@@ -31,7 +31,9 @@
                     "category": "appakin_cat",
                     "app": "appakin_app",
                     "cluster": "appakin_cluster"
-                }
+                },
+                "tempCorePrefix": "temp_",
+                "createTempCoreUrl": "http://localhost:3005/solr/admin/create_temp_core"
             },
             "stopwordFile": "domain/search/stopwords_en.txt"
         },
