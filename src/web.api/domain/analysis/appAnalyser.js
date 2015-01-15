@@ -18,7 +18,7 @@ var SimpleCache = require("simple-lru-cache"),
     tokensLruCache = new SimpleCache({"maxSize":30000});
 
 var invalidTermsRegex = new XRegExp('[\\p{Z}\\p{S}\\p{P}]');
-var englishWordRegex = /^[a-z]+$/
+var englishWordRegex = /^[a-z]+$/;
 
 function isNumeric(n) {
     return !isNaN(parseFloat(n)) && isFinite(n);
@@ -30,8 +30,7 @@ var setDescIsEnglishStatus = function(appAnalysis) {
         appAnalysis.desc_english_position === 1 ||
         appAnalysis.desc_english_score >= 0.3 ||
         (appAnalysis.desc_valid_term_count > 0 && (appAnalysis.desc_english_term_count / appAnalysis.desc_valid_term_count) > 0.6) ||
-        (appAnalysis.desc_english_term_count > (appAnalysis.desc_valid_term_count * 0.2) && appAnalysis.desc_english_position <= 2)
-        );
+        (appAnalysis.desc_english_term_count > (appAnalysis.desc_valid_term_count * 0.2) && appAnalysis.desc_english_position <= 2));
 };
 
 var upsertAppAnalysis = function(appAnalysis, callback) {
