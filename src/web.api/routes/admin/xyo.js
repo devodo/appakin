@@ -8,7 +8,7 @@ exports.init = function init(app) {
 
         xyoData.lookupCategoryLinks(categoryUrl, function(err, categories) {
             if (err) {
-                return res.status(500).send(err);
+                return res.status(500).json({error: err});
             }
 
             res.json(categories);

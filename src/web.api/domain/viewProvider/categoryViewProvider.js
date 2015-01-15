@@ -5,8 +5,9 @@ var appStoreRepo = require("../../repos/appStoreRepo");
 var categorySearcher = require("../search/categorySearcher");
 var redisCacheFactory = require("../cache/redisCache");
 var categoryChartCache = redisCacheFactory.createRedisCache(redisCacheFactory.dbPartitions.chart);
+var urlUtil = require('../urlUtil');
 
-var NUM_CHART_APPS = 20;
+var NUM_CHART_APPS = 10;
 var CHART_CACHE_EXPIRY_SECONDS = 600;
 
 
@@ -109,6 +110,8 @@ var getCategoryChartsRepo = function(categoryIds, filters, next) {
                 };
                 categoryAppsMap[app.categoryId] = currentCategory;
             }
+
+            app.url = urlUtil.makeUrl(app.extId, app.name);
 
             delete app.categoryId;
             currentCategory.apps.push(app);

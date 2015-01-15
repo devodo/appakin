@@ -144,11 +144,10 @@ function notFoundErrorHandler(err, req, res, next) {
         return next(err);
     }
 
-    res.status(404);
-    res.send(err.message || '404');
+    res.status(404).json({error: err.message || '404'});
 }
 
 function serverErrorHandler(err, req, res, next) {
     log.error(err);
-    res.send(err.status || 500, {error: err.message});
+    res.status(err.status || 500).json({error: err.message});
 }

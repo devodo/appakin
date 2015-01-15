@@ -11,7 +11,7 @@ exports.init = function init(app) {
 
         appStoreData.retrieveApp(id, function(err, data) {
             if (err) {
-                return res.status(500).send(err);
+                return res.status(500).json({error: err});
             }
 
             res.json({status: 'success'});
@@ -42,7 +42,7 @@ exports.init = function init(app) {
         var batchId = parseInt(req.body.batch, 10);
 
         if (isNaN(batchId)) {
-            return res.status(500).json({"error": "must specify batch id"});
+            return res.status(500).json({"error": 'must specify batch id'});
         }
 
         appStoreData.retrieveAppCharts(batchId, function(err) {

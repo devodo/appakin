@@ -13,19 +13,19 @@ exports.init = function init(app) {
         var encodedId = req.params.encodedId;
         if (!encodedId)
         {
-            return res.status(400).send('Bad query string');
+            return res.status(400).json({error: 'Bad query string'});
         }
 
         var extId = urlUtil.decodeId(encodedId);
 
         if (!extId) {
-            return res.status(400).send('Bad category id');
+            return res.status(400).json({error: 'Bad category id'});
         }
 
         var pageNum = (req.query && req.query.p) ? parseInt(req.query.p, 10) : 1;
 
         if (isNaN(pageNum) || pageNum < 1 || pageNum > MAX_CAT_PAGES) {
-            return res.status(400).send('Bad page number');
+            return res.status(400).json({error: 'Bad page number'});
         }
 
         var filters = {
@@ -34,11 +34,13 @@ exports.init = function init(app) {
             isFree: req.query.is_free === 'true'
         };
 
-        appStoreRepo.getCategoryByExtId(extId, function(err, category) {
-            if (err) { return next(err); }
+        appStoreRepo.getCategoryByExtId(extId, function (err, category) {
+            if (err) {
+                return next(err);
+            }
 
             if (!category) {
-                return res.status(404).send('Category not found');
+                return res.status(404).json({error: 'Category not found'});
             }
 
             var urlName = urlUtil.slugifyName(category.name);
@@ -52,10 +54,12 @@ exports.init = function init(app) {
             }
 
             var skip = (pageNum - 1) * PAGE_SIZE;
-            appStoreRepo.getCategoryApps(category.id, filters, skip, PAGE_SIZE, function(err, apps) {
-                if (err) { return next(err); }
+            appStoreRepo.getCategoryApps(category.id, filters, skip, PAGE_SIZE, function (err, apps) {
+                if (err) {
+                    return next(err);
+                }
 
-                apps.forEach(function(app) {
+                apps.forEach(function (app) {
                     app.url = urlUtil.makeUrl(app.extId, app.name);
                     delete app.extId;
                 });
@@ -64,15 +68,19 @@ exports.init = function init(app) {
                 category.page = pageNum;
                 category.apps = apps;
 
-                featuredRepo.getFeaturedApps(category.id, 2, 5, filters, function(err, fApps) {
-                    if (err) { return next(err); }
+                featuredRepo.getFeaturedApps(category.id, 2, 5, filters, function (err, fApps) {
+                    if (err) {
+                        return next(err);
+                    }
 
-                    var featuredApps = fApps.map(function(item) {
+                    var featuredApps = fApps.map(function (item) {
                         return {
                             id: item.extId,
                             name: item.name,
                             artworkUrl: item.artworkSmallUrl,
                             url: urlUtil.makeUrl(item.extId, item.name),
+                            isIphone: item.isIphone,
+                            isIpad: item.isIpad,
                             price: item.price
                         };
                     });

@@ -9,7 +9,7 @@ exports.init = function init(app) {
         var seedId = req.params.seedId;
 
         if (!seedId || isNaN(seedId)) {
-            return res.status(400).send('Bad seed Id query parameter');
+            return res.status(400).json({error: 'Bad seed Id query parameter'});
         }
 
         var boost = req.query.boost && !isNaN(req.query.boost) ? parseFloat(req.query.boost) : 1;
@@ -29,13 +29,13 @@ exports.init = function init(app) {
         var seedCategoryId = req.params.seedCategoryId;
 
         if (!seedCategoryId || isNaN(seedCategoryId)) {
-            return res.status(400).send('Bad seed category Id query parameter');
+            return res.status(400).json({error: 'Bad seed category Id query parameter'});
         }
 
         var appExtId = req.params.appExtId;
 
         if (!appExtId || appExtId.trim() === '') {
-            return res.status(400).send('Bad seed category Id query parameter');
+            return res.status(400).json({error: 'Bad seed category Id query parameter'});
         }
 
         clusterSearcher.getAppTopKeywords(seedCategoryId, appExtId, function (err, result) {
@@ -51,7 +51,7 @@ exports.init = function init(app) {
         var seedCategoryId = req.params.seedCategoryId;
 
         if (!seedCategoryId || isNaN(seedCategoryId)) {
-            return res.status(400).send('Bad seed category Id query parameter');
+            return res.status(400).json({error: 'Bad seed category Id query parameter'});
         }
 
         clusterSearcher.getTrainingSetTopTerms(seedCategoryId, function (err, result) {
@@ -65,7 +65,7 @@ exports.init = function init(app) {
         var categoryId = req.params.categoryId;
 
         if (!categoryId || isNaN(categoryId)) {
-            return res.status(400).send('Bad category id query parameter');
+            return res.status(400).json({error: 'Bad category id query parameter'});
         }
 
         clusterSearcher.getCategoryTopKeywords(categoryId, function (err, result) {
@@ -79,7 +79,7 @@ exports.init = function init(app) {
         var seedCategoryId = req.params.seedCategoryId;
 
         if (!seedCategoryId || isNaN(seedCategoryId)) {
-            return res.status(400).send('Bad seed category Id query parameter');
+            return res.status(400).json({error: 'Bad seed category Id query parameter'});
         }
 
         var saveResults = req.query.save === 'true';
@@ -97,13 +97,13 @@ exports.init = function init(app) {
         var seedCategoryId = req.params.seedCategoryId;
 
         if (!seedCategoryId || isNaN(seedCategoryId)) {
-            return res.status(400).send('Bad seed category Id query parameter');
+            return res.status(400).json({error: 'Bad seed category Id query parameter'});
         }
 
         var skip = parseInt(req.query.skip, 10);
 
         if (req.query.skip && isNaN(skip)) {
-            return res.status(400).send('Bad skip parameter');
+            return res.status(400).json({error: 'Bad skip parameter'});
         }
 
         skip = isNaN(skip) ? 0 : skip;
@@ -111,7 +111,7 @@ exports.init = function init(app) {
         var take = parseInt(req.query.take, 10);
 
         if (req.query.take && isNaN(take)) {
-            return res.status(400).send('Bad take parameter');
+            return res.status(400).json({error: 'Bad take parameter'});
         }
 
         take = isNaN(take) ? 100 : take;
@@ -119,7 +119,7 @@ exports.init = function init(app) {
         var isInclude = req.query.include !== 'false';
 
         if (isInclude && req.query.include && req.query.include !== 'true') {
-            return res.status(400).send('Bad include parameter');
+            return res.status(400).json({error: 'Bad include parameter'});
         }
 
         clusterSearcher.getClassificationApps(seedCategoryId, isInclude, skip, take, function (err, result) {
@@ -135,17 +135,17 @@ exports.init = function init(app) {
         var seedCategoryId = req.body.seedCategoryId;
 
         if (!seedCategoryId || isNaN(seedCategoryId)) {
-            return res.status(400).send('Bad seedCategoryId parameter');
+            return res.status(400).json({error: 'Bad seedCategoryId parameter'});
         }
 
         var appExtId = req.body.appExtId;
 
         if (!uuidUtil.isValid(appExtId)) {
-            return res.status(400).send('Bad appExtId parameter');
+            return res.status(400).json({error: 'Bad appExtId parameter'});
         }
 
         if (typeof req.body.include !== 'boolean') {
-            return res.status(400).send('Bad include parameter');
+            return res.status(400).json({error: 'Bad include parameter'});
         }
 
         var isIncluded =  req.body.include;
@@ -161,13 +161,13 @@ exports.init = function init(app) {
         var seedCategoryId = req.query.seedCategoryId;
 
         if (!seedCategoryId || isNaN(seedCategoryId)) {
-            return res.status(400).send('Bad seedCategoryId parameter');
+            return res.status(400).json({error: 'Bad seedCategoryId parameter'});
         }
 
         var appExtId = req.query.appExtId;
 
         if (!uuidUtil.isValid(appExtId)) {
-            return res.status(400).send('Bad appExtId parameter');
+            return res.status(400).json({error: 'Bad appExtId parameter'});
         }
 
         clusterSearcher.deleteSeedTraining(seedCategoryId, appExtId, function (err, result) {
@@ -181,7 +181,7 @@ exports.init = function init(app) {
         var seedCategoryId = req.params.seedCategoryId;
 
         if (!seedCategoryId || isNaN(seedCategoryId)) {
-            return res.status(400).send('Bad seedCategoryId parameter');
+            return res.status(400).json({error: 'Bad seedCategoryId parameter'});
         }
 
         clusterSearcher.getSeedTrainingSet(seedCategoryId, function (err, result) {

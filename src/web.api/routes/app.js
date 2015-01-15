@@ -16,23 +16,23 @@ exports.init = function init(app) {
         var encodedId = req.params.encodedId;
         if (!encodedId)
         {
-            return res.status(400).send('Bad query string');
+            return res.status(400).json({error: 'Bad query string'});
         }
 
         var extId = urlUtil.decodeId(encodedId);
 
         if (!extId) {
-            return res.status(400).send('Bad app id');
+            return res.status(400).json({error: 'Bad app id'});
         }
 
         appStoreRepo.getAppByExtId(extId, function(err, app) {
             if (err) {
                 log.error(err);
-                return res.status(500).send('Error retrieving app data');
+                return res.status(500).json({error: 'Error retrieving app data'});
             }
 
             if (!app) {
-                return res.status(404).send('App not found');
+                return res.status(404).json({error: 'App not found'});
             }
 
             var urlName = urlUtil.slugifyName(app.name);
@@ -44,7 +44,7 @@ exports.init = function init(app) {
             appStoreRepo.getAppCategories(app.id, 0, PAGE_SIZE, function(err, cats) {
                 if (err) {
                     log.error(err);
-                    return res.status(500).send('Error retrieving app category data');
+                    return res.status(500).json({error: 'Error retrieving app category data'});
                 }
 
                 cats.forEach(function(cat) {
@@ -99,14 +99,14 @@ exports.init = function init(app) {
         var extId = req.params.extId;
         if (!extId)
         {
-            return res.status(400).send('Bad query string');
+            return res.status(400).json({error: 'Bad query string'});
         }
 
         appStoreRepo.getAppByExtId(extId, function(err, app) {
             if (err) { return next(err); }
 
             if (!app) {
-                return res.status(404).send('App not found');
+                return res.status(404).json({error: 'App not found'});
             }
 
             app.url = urlUtil.makeUrl(app.extId, app.name);

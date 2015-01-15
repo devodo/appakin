@@ -691,7 +691,7 @@ var insertXyoCategoryMap = function(client, categoryId, xyoCategoryId, next) {
 
 var getAppAnalysisBatch = function(client, lastId, limit, next) {
     var queryStr =
-        "SELECT a.app_id, a.ext_id, a.name, a.description, aa.desc_md5_checksum, aa.desc_cleaned\n" +
+        "SELECT a.app_id, a.ext_id, a.name, a.description, a.language_codes, aa.desc_md5_checksum, aa.desc_cleaned\n" +
         "FROM appstore_app a\n" +
         "LEFT JOIN app_analysis aa on a.app_id = aa.app_id\n" +
         "WHERE a.app_id > $1\n" +
@@ -715,6 +715,7 @@ var getAppAnalysisBatch = function(client, lastId, limit, next) {
                 ext_id: item.ext_id,
                 name: item.name,
                 description: item.description,
+                language_codes: item.language_codes,
                 desc_md5_checksum: item.desc_md5_checksum,
                 desc_cleaned: item.desc_cleaned
             };

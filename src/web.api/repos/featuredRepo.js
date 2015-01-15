@@ -35,9 +35,9 @@ var getFeaturedCategories = function(client, bias, take, next) {
 
 var getFeaturedCategoriesAndApps = function(client, cat_bias, cat_take, app_bias, app_take, next) {
     var queryStr =
-        "SELECT t.ext_id, t.name, t.artwork_small_url, t.price, t.cat_ext_id, t.cat_name\n" +
+        "SELECT t.ext_id, t.name, t.artwork_small_url, t.price, t.cat_ext_id, t.cat_name, t.is_iphone, t.is_ipad, t.desc\n" +
         "FROM (\n" +
-        "	SELECT a.ext_id, a.name, a.artwork_small_url, a.price,\n" +
+        "	SELECT a.ext_id, a.name, a.artwork_small_url, a.price, a.is_iphone, a.is_ipad, substring(a.description from 0 for 200) as desc,\n" +
         "	fa.category_id, fa.app_id, c.ext_id as cat_ext_id, c.name as cat_name, c.cat_num,\n" +
         "	row_number() over(partition by c.id order by fa.fixed_order is null, fa.fixed_order, random() * power(fa.weight, $3)) as num\n" +
         "	FROM featured_homepage_app fa\n" +
@@ -78,6 +78,9 @@ var getFeaturedCategoriesAndApps = function(client, cat_bias, cat_take, app_bias
                 appName: item.name,
                 appArtworkSmallUrl: item.artwork_small_url,
                 appPrice: item.price,
+                appIsIphone: item.is_iphone,
+                appIsIpad: item.is_ipad,
+                appDesc: item.desc,
                 catExtId: item.cat_ext_id,
                 catName: item.cat_name
             };
@@ -89,7 +92,7 @@ var getFeaturedCategoriesAndApps = function(client, cat_bias, cat_take, app_bias
 
 var getFeaturedApps = function(client, category_id, app_bias, app_take, filters, next) {
     var queryStr =
-        "SELECT a.ext_id, a.name, a.artwork_small_url, a.price\n" +
+        "SELECT a.ext_id, a.name, a.artwork_small_url, a.price, a.is_iphone, a.is_ipad\n" +
         "FROM appstore_app a\n" +
         "JOIN featured_category_app fa on a.app_id = fa.app_id\n" +
         "where fa.category_id = $1\n" +
@@ -115,7 +118,9 @@ var getFeaturedApps = function(client, category_id, app_bias, app_take, filters,
                 extId: item.ext_id,
                 name: item.name,
                 artworkSmallUrl: item.artwork_small_url,
-                price: item.price
+                price: item.price,
+                isIphone: item.is_iphone,
+                isIpad: item.is_ipad
             };
         });
 

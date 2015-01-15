@@ -53,7 +53,7 @@ exports.init = function init(app) {
         if (!appId || !uuidUtil.isValid(appId))
         {
             log.warn('Received bad IOS referral url: ' + req.originalUrl);
-            return res.status(400).send('Bad app id');
+            return res.status(400).json({error: 'Bad app id'});
         }
 
         if (catId && !uuidUtil.isValid(catId)) {
@@ -64,12 +64,12 @@ exports.init = function init(app) {
         appStoreRepo.getAppStoreLink(appId, catId, function(err, appLink) {
             if (err) {
                 log.error(err);
-                return res.status(500).send('Error retrieving app data');
+                return res.status(500).json({error: 'Error retrieving app data'});
             }
 
             if (!appLink) {
                 log.warn('App not found for IOS referral url: ' + req.originalUrl);
-                return res.status(404).send('App not found');
+                return res.status(404).json({error: 'App not found'});
             }
 
             var ct = getAffiliateTracking(catId);

@@ -48,7 +48,7 @@ exports.init = function init(app) {
         var categoryId = parseInt(req.params.categoryId, 10);
 
         if (isNaN(categoryId)) {
-            return res.status(400).send('Bad category id in query string');
+            return res.status(400).json({error: 'Bad category id in query string'});
         }
 
         log.debug("Starting index of category: " + categoryId);
@@ -92,7 +92,7 @@ exports.init = function init(app) {
         var categoryId = parseInt(req.params.catid, 10);
 
         if (isNaN(categoryId)) {
-            return res.status(400).send('Bad query string');
+            return res.status(400).json({error: 'Bad query string'});
         }
 
         catIndexer.getCategoryKeywords(categoryId, function(err, keywords) {

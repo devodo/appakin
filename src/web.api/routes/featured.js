@@ -35,7 +35,10 @@ var getFeatured = function(next) {
                 name: item.appName,
                 artworkUrl: item.appArtworkSmallUrl,
                 url: urlUtil.makeUrl(item.appExtId, item.appName),
-                price: item.appPrice
+                price: item.appPrice,
+                isIphone: item.appIsIphone,
+                isIpad: item.appIsIpad,
+                desc: item.appDesc
             };
 
             currentCategory.apps.push(app);

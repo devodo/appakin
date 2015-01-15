@@ -5,23 +5,56 @@ var appStoreAdminRepo = require('../../repos/appStoreAdminRepo');
 var log = require('../../logger');
 var LanguageDetect = require('languagedetect');
 var lngDetector = new LanguageDetect();
-var SpellChecker = require('spellchecker'); // TODO: lazy load this
 var crypto = require('crypto');
+var XRegExp = require('xregexp').XRegExp;
 var natural = require('natural'),
     tokenizer = new natural.WordTokenizer();
 
-var getTokenizedMap = function(input) {
-    var termsToExclude = /[0-9.@]/;
+var SpellCheck = require('spellcheck'),
+    base = __dirname + (process.platform === 'win32' ? '\\' : '/'),
+    spell = new SpellCheck(base + 'en_US.aff', base + 'en_US.dic');
 
+var SimpleCache = require("simple-lru-cache"),
+    tokensLruCache = new SimpleCache({"maxSize":30000});
+
+var invalidTermsRegex = new XRegExp('[\\p{Z}\\p{S}\\p{P}]');
+var englishWordRegex = /^[a-z]+$/
+
+function isNumeric(n) {
+    return !isNaN(parseFloat(n)) && isFinite(n);
+}
+
+var setDescIsEnglishStatus = function(appAnalysis) {
+    appAnalysis.desc_is_english =
+        appAnalysis.desc_english_score >= 0.1 && (
+        appAnalysis.desc_english_position === 1 ||
+        appAnalysis.desc_english_score >= 0.3 ||
+        (appAnalysis.desc_valid_term_count > 0 && (appAnalysis.desc_english_term_count / appAnalysis.desc_valid_term_count) > 0.6) ||
+        (appAnalysis.desc_english_term_count > (appAnalysis.desc_valid_term_count * 0.2) && appAnalysis.desc_english_position <= 2)
+        );
+};
+
+var upsertAppAnalysis = function(appAnalysis, callback) {
+    appStoreAdminRepo.upsertAppAnalysis(appAnalysis, function(err) {
+        if (err) {
+            callback(err);
+        } else {
+            callback();
+        }
+    });
+};
+
+var getTokenizedMap = function(input) {
     var tokensMap = Object.create(null);
 
-    var tokens = tokenizer.tokenize(input.toLowerCase());
-    tokens.forEach(function(token) {
-        // ignore any term with a digit in it or that is not long enough
-        if (token.length < 3 || termsToExclude.test(token)) {
-            return;
-        }
+    var tokens = input
+        .toLowerCase()
+        .split(/\s+|^|\(|\)|\/|"/)
+        .filter(function(token) {
+            return token.length >= 3 && !invalidTermsRegex.test(token);
+        });
 
+    tokens.forEach(function(token) {
         var tokenEntry = tokensMap[token];
 
         if (!tokenEntry) {
@@ -35,7 +68,7 @@ var getTokenizedMap = function(input) {
     return tokensMap;
 };
 
-var processApp = function(app, forceAll, callback) {
+var processApp = function(app, forceAll, processAppCallback) {
     var i;
 
     var appAnalysis = {
@@ -52,16 +85,26 @@ var processApp = function(app, forceAll, callback) {
     };
 
     var md5sum = app.description ? crypto.createHash('md5').update(app.description).digest('hex') : null;
-    log.debug(md5sum);
 
-    if (!forceAll && md5sum && md5sum === app.desc_md5_checksum && app.desc_cleaned) {
-        // description has not changed and the cleaned description exists, so no processing required.
-        callback();
+    if (!forceAll && md5sum && md5sum === app.desc_md5_checksum) {
+        // description has not changed so no processing required.
+
+        processAppCallback();
     } else {
+        // Need to analyse the description.
+
         appAnalysis.desc_md5_checksum = md5sum;
 
-        if (app.description) {
-            // Description language detection.
+        if (app.language_codes && app.language_codes.length > 0 && app.language_codes.indexOf('EN') === -1) {
+            // Assume description is definitely not english if the app publisher says it's not.
+
+            appAnalysis.desc_valid_term_count = -1;
+            appAnalysis.desc_english_term_count = -1;
+
+            setDescIsEnglishStatus(appAnalysis);
+            upsertAppAnalysis(appAnalysis, processAppCallback);
+        } else if (app.description) {
+            // There is a description to analyse.
 
             var languages = lngDetector.detect(app.description);
 
@@ -69,42 +112,82 @@ var processApp = function(app, forceAll, callback) {
                 if (languages[i][0] === 'english') {
                     appAnalysis.desc_english_score = languages[i][1];
                     appAnalysis.desc_english_position = i + 1;
+
                     break;
                 }
             }
 
-            appAnalysis.desc_valid_term_count = 0;
-            appAnalysis.desc_english_term_count = 0;
-            var tokenMap = getTokenizedMap(app.description);
-            Object.keys(tokenMap).forEach(function(term) {
-                var termCount = tokenMap[term].count;
-                appAnalysis.desc_valid_term_count += termCount;
+            var descIsDefinitelyEnglish = appAnalysis.desc_english_score >= 0.1 &&
+                (
+                    appAnalysis.desc_english_position === 1 ||
+                    appAnalysis.desc_english_score >= 0.3
+                );
 
-                if (!SpellChecker.isMisspelled(term)) {
-                    appAnalysis.desc_english_term_count += termCount;
-                }
-            });
+            var descIsDefinitelyNotEnglish = appAnalysis.desc_english_score < 0.1;
 
-            // Description cleaning
+            if (descIsDefinitelyEnglish || descIsDefinitelyNotEnglish) {
+                // No need to determine valid term and english terms values.
 
+                appAnalysis.desc_valid_term_count = -1;
+                appAnalysis.desc_english_term_count = -1;
 
-        }
-
-        appAnalysis.desc_is_english =
-            appAnalysis.desc_english_score >= 0.1 && (
-            appAnalysis.desc_english_position === 1 ||
-            appAnalysis.desc_english_score >= 0.3 ||
-            (appAnalysis.desc_valid_term_count > 0 && (appAnalysis.desc_english_term_count / appAnalysis.desc_valid_term_count) > 0.6) ||
-            (appAnalysis.desc_english_term_count > (appAnalysis.desc_valid_term_count * 0.2) && appAnalysis.desc_english_position <= 2)
-            );
-
-        appStoreAdminRepo.upsertAppAnalysis(appAnalysis, function(err) {
-            if (err) {
-                callback(err);
+                setDescIsEnglishStatus(appAnalysis);
+                //cleanDescription(app, appAnalysis);
+                upsertAppAnalysis(appAnalysis, processAppCallback);
             } else {
-                callback();
+                // Determine valid term and english terms values.
+
+                appAnalysis.desc_valid_term_count = 0;
+                appAnalysis.desc_english_term_count = 0;
+
+                var tokenMap = getTokenizedMap(app.description);
+
+                async.each(Object.keys(tokenMap),
+                    function (term, termCallback) {
+                        if (!term.match(englishWordRegex)) {
+                            return termCallback();
+                        }
+
+                        var termCount = tokenMap[term].count;
+                        appAnalysis.desc_valid_term_count += termCount;
+
+                        if (tokensLruCache.get(term)) {
+                            appAnalysis.desc_english_term_count += termCount;
+                            termCallback();
+                        } else {
+                            spell.check(term, function (err, correct) {
+                                if (err) {
+                                    termCallback(err);
+                                }
+
+                                if (correct) {
+                                    appAnalysis.desc_english_term_count += termCount;
+                                    tokensLruCache.set(term, true);
+                                } else {
+                                    tokensLruCache.set(term, false);
+                                }
+
+                                if (termCount > 1) {
+                                    tokensLruCache.set(term, correct);
+                                }
+
+                                termCallback();
+                            });
+                        }
+                    },
+                    function (err) {
+                        if (err) {
+                            processAppCallback(err);
+                        } else {
+                            setDescIsEnglishStatus(appAnalysis);
+                            //cleanDescription(app, appAnalysis);
+                            upsertAppAnalysis(appAnalysis, processAppCallback);
+                        }
+                    });
             }
-        });
+        } else {
+            upsertAppAnalysis(appAnalysis, processAppCallback);
+        }
     }
 };
 
@@ -118,6 +201,7 @@ var analyse = function(batchSize, forceAll, next) {
             }
 
             if (apps.length === 0) {
+                tokensLruCache.reset();
                 return next();
             }
 
@@ -133,8 +217,7 @@ var analyse = function(batchSize, forceAll, next) {
                     if (err) {
                         next(err);
                     } else {
-                        return next();
-                        //processBatch(lastId);  !!!!!!!!!!!!!  CHANGE THIS!!
+                        processBatch(lastId);
                     }
                 });
         });

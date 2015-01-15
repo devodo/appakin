@@ -16,7 +16,7 @@ exports.init = function init(app) {
         var seedCategoryId = req.params.seedCategoryId;
 
         if (!seedCategoryId || isNaN(seedCategoryId)) {
-            return res.status(400).send('Bad seed category Id query parameter');
+            return res.status(400).json({error: 'Bad seed category Id query parameter'});
         }
 
         categoryClassification.reloadSeedCategoryApps(seedCategoryId, function (err) {

@@ -18,7 +18,7 @@ exports.init = function init(app) {
         var query = req.query.q;
 
         if (!query || query.trim() === '') {
-            return res.status(400).send('Bad query string');
+            return res.status(400).json({error: 'Bad query string'});
         }
 
         autoSearcher.search(query, 1, function(err, result) {
@@ -31,12 +31,12 @@ exports.init = function init(app) {
     app.get('/ios/search/cat', function (req, res, next) {
         var query = req.query.q;
         if (!query || query.trim() === '') {
-            return res.status(400).send('Bad query string');
+            return res.status(400).json({error: 'Bad query string'});
         }
 
         var pageNum = req.query.p ? parseInt(req.query.p, 10) : 1;
         if (isNaN(pageNum) || pageNum < 1) {
-            return res.status(400).send("Bad page number");
+            return res.status(400).json({error: 'Bad page number'});
         }
 
         var filters = {
@@ -58,15 +58,15 @@ exports.init = function init(app) {
         var categoryId = req.query.cat_id;
 
         if (!query || query.trim() === '') {
-            return res.status(400).send('Bad query string');
+            return res.status(400).json({error: 'Bad query string'});
         }
 
         if (!categoryId || categoryId.trim() === '') {
-            return res.status(400).send('Bad category id');
+            return res.status(400).json({error: 'Bad category id'});
         }
 
         if (isNaN(pageNum) || pageNum < 1 || pageNum > MAX_CAT_APP_PAGES) {
-            return res.status(400).send("Page number must be between 1 and " + MAX_CAT_APP_PAGES);
+            return res.status(400).json({error: 'Page number must be between 1 and ' + MAX_CAT_APP_PAGES});
         }
 
         var filters = {
@@ -87,11 +87,11 @@ exports.init = function init(app) {
         var pageNum = req.query.p ? parseInt(req.query.p, 10) : 1;
 
         if (!query || query.trim() === '') {
-            return res.status(400).send('Bad query string');
+            return res.status(400).json({error: 'Bad query string'});
         }
 
         if (isNaN(pageNum) || pageNum < 1) {
-            return res.status(400).send("Bad page number");
+            return res.status(400).json({error: 'Bad page number'});
         }
 
         var filters = {
