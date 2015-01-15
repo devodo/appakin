@@ -121,17 +121,9 @@ exports.init = function init(app) {
         });
     });
 
-    app.post('/admin/appstore/reset_app_popularity', function (req, res) {
-        var batchId = parseInt(req.body.batch, 10);
-
-        if (isNaN(batchId)) {
-            return res.status(500).json({"error": "must specify batch id"});
-        }
-
-        appStoreAdminRepo.resetAppPopularities(batchId, function(err) {
-            if (err) {
-                return res.status(500).json(err);
-            }
+    app.post('/admin/appstore/reset_app_popularity', function (req, res, next) {
+        appStoreAdminRepo.resetAppPopularities(function(err) {
+            if (err) { return next(err); }
 
             res.json({status: 'success'});
         });

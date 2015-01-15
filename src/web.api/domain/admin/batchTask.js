@@ -5,6 +5,7 @@ var clusterIndexer = require('../../domain/search/clusterIndexer');
 var autoIndexer = require('../../domain/search/autoIndexer');
 var appIndexer = require('../../domain/search/appIndexer');
 var categoryIndexer = require('../../domain/search/categoryIndexer');
+var appStoreAdminRepo = require('../../repos/appStoreAdminRepo');
 var log = require('../../logger');
 
 var APP_BATCH_SIZE = 1000;
@@ -50,6 +51,11 @@ var reloadCategoryApps = function(next) {
     });
 };
 
+var resetAppPopularity = function(next) {
+    log.info("Resetting app popularities");
+    appStoreAdminRepo.resetAppPopularities(next);
+};
+
 var rebuildCategories = function(next) {
     rebuildClusterIndex(function(err) {
         if (err) { return next(err); }
@@ -65,25 +71,35 @@ var rebuildCategories = function(next) {
 };
 
 var rebuildAll = function(next) {
-    var errors = [];
-    rebuildCategories(function(err) {
-        if (err) { errors.push(err); }
+    resetAppPopularity(function(err) {
+        if (err) { return next(err); }
 
-        rebuildAutoIndex(function(err) {
+        var errors = [];
+        rebuildCategories(function(err) {
             if (err) { errors.push(err); }
 
-            rebuildAppIndex(function(err) {
+            rebuildAutoIndex(function(err) {
                 if (err) { errors.push(err); }
 
-                if (errors.length > 0) {
-                    return next(errors);
-                } else {
-                    return next();
-                }
+                rebuildAppIndex(function(err) {
+                    if (err) { errors.push(err); }
+
+                    if (errors.length > 0) {
+                        return next(errors);
+                    } else {
+                        return next();
+                    }
+                });
             });
         });
     });
 };
 
 exports.rebuildAll = rebuildAll;
+exports.reloadCategoryApps = reloadCategoryApps;
+exports.rebuildClusterIndex = rebuildClusterIndex;
+exports.rebuildAutoIndex = rebuildAutoIndex;
+exports.rebuildAppIndex = rebuildAppIndex;
+exports.rebuildCategoryIndex = rebuildCategoryIndex;
+exports.resetAppPopularity = resetAppPopularity;
 

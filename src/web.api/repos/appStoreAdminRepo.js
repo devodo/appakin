@@ -584,7 +584,17 @@ var insertAppPopularity = function(client, appPopularity, next) {
     });
 };
 
-var resetAppPopularities = function(conn, appStoreBatchId, next) {
+var resetAppPopularities = function(client, next) {
+    var queryStr = "select reset_app_popularity();";
+
+    client.query(queryStr, function (err, result) {
+        if (err) { return next(err); }
+
+        next();
+    });
+};
+
+var resetAppPopularitiesOld = function(conn, appStoreBatchId, next) {
     conn.beginTran(function(err) {
         if (err) { return next(err); }
 
@@ -1090,13 +1100,11 @@ exports.resetCategoryPopularities = function(appStoreBatchId, next) {
     });
 };
 
-exports.resetAppPopularities = function(appStoreBatchId, next) {
+exports.resetAppPopularities = function(next) {
     connection.open(function(err, conn) {
-        if (err) {
-            return next(err);
-        }
+        if (err) { return next(err); }
 
-        resetAppPopularities(conn, appStoreBatchId, function(err, results) {
+        resetAppPopularities(conn.client, function(err, results) {
             conn.close(err, function(err) {
                 next(err, results);
             });
