@@ -18,17 +18,37 @@ exports.init = function init(app) {
         res.json({ "status": "Rebuild all task started" });
     });
 
-    app.post('/admin/task/rebuild_category_apps', function (req, res, next) {
-        log.info("Starting rebuild category apps batch task");
+    app.post('/admin/task/rebuild_seed_categories', function (req, res, next) {
+        log.info("Starting rebuild seed categories batch task");
         var start = process.hrtime();
-        batchTask.reloadCategoryApps(function(err) {
+        batchTask.rebuildAllSeedCategories(function(err) {
             if (err) { return next(err); }
 
             var end = process.hrtime(start);
-            log.info("Completed rebuild category apps batch task in: " + prettyHrtime(end));
+            log.info("Completed rebuild seed categories batch task in: " + prettyHrtime(end));
         });
 
-        res.json({ "status": "Rebuild category apps task started" });
+        res.json({ "status": "Rebuild seed categories task started" });
+    });
+
+    app.post('/admin/task/rebuild_seed_category', function (req, res, next) {
+        var seedCategoryId = req.body.seedCategoryId;
+
+        if (!seedCategoryId || isNaN(seedCategoryId)) {
+            return res.status(400).send('Bad seedCategoryId parameter');
+        }
+
+        log.info("Starting rebuild of seed category: " + seedCategoryId);
+
+        var start = process.hrtime();
+        batchTask.rebuildSeedCategory(seedCategoryId, function(err) {
+            if (err) { return next(err); }
+
+            var end = process.hrtime(start);
+            log.info("Completed rebuild of seed category: " + seedCategoryId + " in: " + prettyHrtime(end));
+        });
+
+        res.json({ "status": "Rebuild seed categories task started" });
     });
 
     app.post('/admin/task/rebuild_cluster_index', function (req, res, next) {

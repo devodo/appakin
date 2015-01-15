@@ -6,6 +6,7 @@ var autoIndexer = require('../../domain/search/autoIndexer');
 var appIndexer = require('../../domain/search/appIndexer');
 var categoryIndexer = require('../../domain/search/categoryIndexer');
 var appStoreAdminRepo = require('../../repos/appStoreAdminRepo');
+var classificationRepo = require('../../repos/classificationRepo');
 var log = require('../../logger');
 
 var APP_BATCH_SIZE = 1000;
@@ -39,7 +40,7 @@ var rebuildCategoryIndex = function(next) {
     });
 };
 
-var reloadCategoryApps = function(next) {
+var rebuildAllSeedCategories = function(next) {
     log.info("Reloading all seed category apps");
     categoryClassification.reloadAllSeedCategoryApps(function (err) {
         if (err) { return next(err); }
@@ -60,11 +61,35 @@ var rebuildCategories = function(next) {
     rebuildClusterIndex(function(err) {
         if (err) { return next(err); }
 
-        reloadCategoryApps(function(err) {
+        rebuildAllSeedCategories(function(err) {
             if (err) { return next(err); }
 
             rebuildCategoryIndex(function(err) {
                 next(err);
+            });
+        });
+    });
+};
+
+var rebuildSeedCategory = function(seedCategoryId, next) {
+    categoryClassification.reloadSeedCategoryApps(seedCategoryId, function(err) {
+        if (err) { return next(err); }
+
+        categoryClassification.transferSeedCategoryApps(seedCategoryId, function(err) {
+            if (err) { return next(err); }
+
+            classificationRepo.getSeedCategoryMap(seedCategoryId, function(err, seedCategoryMap) {
+                if (err) { return next(err); }
+
+                if (!seedCategoryMap) {
+                    return next("No seed category map found for seed category id: " + seedCategoryId);
+                }
+
+                categoryIndexer.rebuildCategory(seedCategoryMap.categoryId, function(err) {
+                    if (err) { return next(err); }
+
+                    next();
+                });
             });
         });
     });
@@ -96,10 +121,12 @@ var rebuildAll = function(next) {
 };
 
 exports.rebuildAll = rebuildAll;
-exports.reloadCategoryApps = reloadCategoryApps;
+exports.rebuildAllSeedCategories = rebuildAllSeedCategories;
 exports.rebuildClusterIndex = rebuildClusterIndex;
 exports.rebuildAutoIndex = rebuildAutoIndex;
 exports.rebuildAppIndex = rebuildAppIndex;
 exports.rebuildCategoryIndex = rebuildCategoryIndex;
 exports.resetAppPopularity = resetAppPopularity;
+
+exports.rebuildSeedCategory = rebuildSeedCategory;
 

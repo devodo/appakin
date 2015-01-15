@@ -183,6 +183,24 @@ var processTransferSeedCategoryApps = function(seedCategory, next) {
     });
 };
 
+var transferSeedCategoryApps = function(seedCategoryId, next) {
+    classificationRepo.getSeedCategory(seedCategoryId, function(err, seedCategory) {
+        processTransferSeedCategoryApps(seedCategory, function(err) {
+            if (err) {
+                log.error(err);
+                var message = errorToString(err);
+                classificationRepo.updateSeedCategoryBuildMessage(seedCategory.id, message, function(err) {
+                    if (err) { return next(err); }
+
+                    return next(message);
+                });
+            } else {
+                next();
+            }
+        });
+    });
+};
+
 var transferAllSeedCategoryApps = function(next) {
     classificationRepo.getActiveSeedCategories(function(err, seedCategories) {
         if (err) { return next(err); }
@@ -213,5 +231,8 @@ var transferAllSeedCategoryApps = function(next) {
 };
 
 exports.reloadAllSeedCategoryApps = reloadAllSeedCategoryApps;
-exports.reloadSeedCategoryApps = reloadSeedCategoryApps;
+exports.rebuildAllSeedCategories = reloadSeedCategoryApps;
 exports.transferAllSeedCategoryApps = transferAllSeedCategoryApps;
+
+exports.reloadSeedCategoryApps = reloadSeedCategoryApps;
+exports.transferSeedCategoryApps = transferSeedCategoryApps;

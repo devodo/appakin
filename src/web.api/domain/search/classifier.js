@@ -9,8 +9,10 @@ var Classifier = function() {
     var nodesvm = require('node-svm');
     this.svm = new nodesvm.CSVC({ // classification
         kernelType: nodesvm.KernelTypes.RBF,
-        gamma: [0.5],
-        C: [2],
+        gamma: [0.5], // lower for more fuzzy classification
+        C: [10], // lower for smoother classification edge
+        //gamma: [0.1, 0.5, 0.8, 1, 10, 100],
+        //C: [1,2,10,100,1000],
         reduce: false,
         normalize: false
     });
@@ -19,7 +21,7 @@ var Classifier = function() {
 Classifier.prototype.train = function(trainingData, next) {
     this.svm.train(trainingData, function(report) {
         log.debug('SVM trained. report :\n%s', JSON.stringify(report, null, '\t'));
-        next();
+        next(null, report);
     });
 };
 

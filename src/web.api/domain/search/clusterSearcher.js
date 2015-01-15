@@ -502,6 +502,28 @@ var classifySeedCategory = function(seedCategoryId, saveResults, next) {
     });
 };
 
+var testSeedCategoryTraining = function(seedCategoryId, next) {
+    classifierRepo.getTrainingSet(seedCategoryId, function(err, trainingSet) {
+        if (err) { return next(err); }
+
+        getTrainingTermVectorDocs(trainingSet, function(err, trainingDocs) {
+            if (err) { return next(err); }
+
+            var classifierAnalyser = classifier.createClassifierAnalyser();
+            classifierAnalyser.addTrainingDocs(trainingDocs);
+            var trainingData = classifierAnalyser.buildTrainingMatrix();
+            var svm = classifier.createClassifier();
+
+            log.debug("Starting SVM training");
+            svm.train(trainingData, function(err, report) {
+                if (err) { return next(err); }
+
+                next(null, report);
+            });
+        });
+    });
+};
+
 var getClassificationApps = function(seedCategoryId, isInclude, skip, take, next) {
     classifierRepo.getClassificationApps(seedCategoryId, isInclude, skip, take, function(err, results) {
         if (err) { return next(err); }
@@ -549,6 +571,8 @@ exports.deleteSeedTraining = deleteSeedTraining;
 
 exports.getTrainingSetTopTerms = getTrainingSetTopTerms;
 exports.getCategoryTopKeywords = getCategoryTopKeywords;
+
+exports.testSeedCategoryTraining = testSeedCategoryTraining;
 
 
 
