@@ -118,7 +118,8 @@ var search = function(queryStr, pageNum, filters, next) {
 
             var appResult = getApps(expanded, highlights, doc.id);
             if (appResult && appResult.apps.length > 0) {
-                category.totalApps = Math.min(appResult.total, MAX_CAT_APPS);
+                //category.totalApps = Math.min(appResult.total, MAX_CAT_APPS);
+                category.totalApps = appResult.total;
                 category.apps = appResult.apps;
             }
 
@@ -184,7 +185,8 @@ var searchApps = function(queryStr, pageNum, categoryId, filters, next) {
         });
 
         var searhcResult = {
-            total: Math.min(obj.response.numFound, MAX_CAT_APPS),
+            //total: Math.min(obj.response.numFound, MAX_CAT_APPS),
+            total: obj.response.numFound,
             page: pageNum,
             apps: apps
         };

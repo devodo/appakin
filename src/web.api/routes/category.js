@@ -5,7 +5,7 @@ var appStoreRepo = require('../repos/appStoreRepo');
 var featuredRepo = require('../repos/featuredRepo');
 
 var PAGE_SIZE = 20;
-var MAX_CAT_PAGES = 5;
+var MAX_CAT_PAGES = 10;
 
 exports.init = function init(app) {
 
