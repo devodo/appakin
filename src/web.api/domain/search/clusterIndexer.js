@@ -20,20 +20,15 @@ var createSolrDoc = function(app) {
     return doc;
 };
 
-var rebuild = function(batchSize, next) {
+var indexApps = function(tempCore, batchSize, next) {
     var processBatch = function(lastId) {
         log.debug("Adding batch from id: " + lastId);
 
         appStoreRepo.getClusterIndexBatch(lastId, batchSize, function(err, apps) {
-            if (err) {
-                return next(err);
-            }
+            if (err) { return next(err); }
 
             if (apps.length === 0) {
-                log.debug("Optimising index");
-                return solrCore.optimise(function(err) {
-                    next(err);
-                });
+                return next();
             }
 
             lastId = apps[apps.length - 1].id;
@@ -43,15 +38,11 @@ var rebuild = function(batchSize, next) {
                 return createSolrDoc(app);
             });
 
-            solrCore.client.add(solrApps, function(err){
-                if(err){
-                    return next(err);
-                }
+            tempCore.client.add(solrApps, function(err){
+                if(err) { return next(err); }
 
-                solrCore.commit(function(err) {
-                    if (err) {
-                        return next(err);
-                    }
+                tempCore.commit(function(err) {
+                    if (err) { return next(err); }
 
                     processBatch(lastId);
                 });
@@ -60,6 +51,31 @@ var rebuild = function(batchSize, next) {
     };
 
     processBatch(0);
+};
+
+var rebuild = function(batchSize, next) {
+    log.debug("Creating temp core");
+    solrCore.createTempCore(function(err, tempCore) {
+        if (err) { return next(err); }
+
+        log.debug("Indexing apps");
+        indexApps(tempCore, batchSize, function(err) {
+            if (err) { return next(err); }
+
+            log.debug("Optimising temp core");
+            tempCore.optimise(function(err) {
+                if (err) { return next(err); }
+
+                log.debug("Swapping in temp core");
+                solrCore.swapInTempCore(tempCore, true, function(err) {
+                    if (err) { return next(err); }
+
+                    next();
+                });
+            });
+        });
+    });
+
 };
 
 exports.rebuild = rebuild;

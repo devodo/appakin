@@ -18,7 +18,7 @@ var Classifier = function() {
 
 Classifier.prototype.train = function(trainingData, next) {
     this.svm.train(trainingData, function(report) {
-        log.info('SVM trained. report :\n%s', JSON.stringify(report, null, '\t'));
+        log.debug('SVM trained. report :\n%s', JSON.stringify(report, null, '\t'));
         next();
     });
 };

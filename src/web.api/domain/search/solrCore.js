@@ -205,24 +205,52 @@ SolrCore.prototype.swapCore = function (solrCore, next) {
     });
 };
 
-SolrCore.prototype.swapOrRenameCore = function (solrCore, next) {
+SolrCore.prototype.renameCore = function (solrCore, next) {
+    var self = this;
+
+    var endpoint = "action=RENAME&core=" + self.coreName + "&other=" + solrCore.coreName;
+    solrAdminClient.get('cores', endpoint, function (err, obj) {
+        if (err) { return next(err); }
+
+        next(null, obj);
+    });
+};
+
+SolrCore.prototype.swapInTempCore = function (tempCore, deleteInstanceDir, next) {
     var self = this;
 
     self.getCoreExists(function(err, coreExists) {
         if (err) { return next(err); }
 
-        var endpoint;
         if (coreExists) {
-            endpoint = "action=SWAP&core=" + solrCore.coreName + "&other=" + self.coreName;
+            self.swapCore(tempCore, function(err) {
+                if (err) { return next(err); }
+
+                tempCore.unloadCore(deleteInstanceDir, function(err) {
+                    if (err) { return next(err); }
+
+                    return next();
+                });
+            });
         } else {
-            endpoint = "action=RENAME&core=" + solrCore.coreName + "&other=" + self.coreName;
+            tempCore.renameCore(self, function(err) {
+                if (err) { return next(err); }
+
+                return next();
+            });
         }
+    });
+};
 
-        solrAdminClient.get('cores', endpoint, function (err, obj) {
-            if (err) { return next(err); }
+SolrCore.prototype.unloadCore = function(deleteInstanceDir, next) {
+    var self = this;
+    log.info("Unloading core: " + self.coreName + " (" + deleteInstanceDir + ")");
 
-            next(null, obj);
-        });
+    var endpoint = "action=UNLOAD&core=" + self.coreName + (deleteInstanceDir ? "&deleteInstanceDir=true" : "");
+    solrAdminClient.get('cores', endpoint, function (err, obj) {
+        if (err) { return next(err); }
+
+        next(null, obj);
     });
 };
 

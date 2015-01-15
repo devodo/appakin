@@ -375,20 +375,20 @@ var rebuild = function(batchSize, nGramSize, next) {
         addAllCategories(tempCore, function(err, solrCategoryNames) {
             if (err) { return next(err); }
 
-            //indexNGramMap(tempCore, batchSize, nGramSize, solrCategoryNames, function(err) {
-            //    if (err) { return next(err); }
+            indexNGramMap(tempCore, batchSize, nGramSize, solrCategoryNames, function(err) {
+                if (err) { return next(err); }
 
                 tempCore.optimise(function(err) {
-                    return next(err);
-                });
-
-                log.debug("Swapping in temp core");
-                solrCore.swapOrRenameCore(tempCore, function(err) {
                     if (err) { return next(err); }
 
-                    next();
+                    log.debug("Swapping in temp core");
+                    solrCore.swapInTempCore(tempCore, true, function(err) {
+                        if (err) { return next(err); }
+
+                        next();
+                    });
                 });
-            //});
+            });
         });
     });
 };

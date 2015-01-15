@@ -9,7 +9,7 @@ var fs = require('fs');
 var PARENT_TYPE = 1;
 var CHILD_TYPE = 2;
 
-var addCategory = function(category, apps, next) {
+var addCategory = function(localSolrCore, category, apps, next) {
     var catId = category.extId.replace(/\-/g, '');
 
     var children = apps.map(function(app) {
@@ -39,7 +39,7 @@ var addCategory = function(category, apps, next) {
         "_childDocuments_": children
     };
 
-    solrCore.client.add(solrCategory, function(err, obj){
+    localSolrCore.client.add(solrCategory, function(err, obj){
         if(err){
             return next(err);
         }
@@ -49,42 +49,49 @@ var addCategory = function(category, apps, next) {
 };
 
 var rebuild = function(next) {
-    appStoreRepo.getCategories(function (err, categories) {
-        if (err) {
-            return next(err);
-        }
+    log.debug("Creating temp core");
+    solrCore.createTempCore(function(err, tempCore) {
+        if (err) { return next(err); }
 
-        var processCategory = function (category, callback) {
-            log.debug("Adding category: " + category.name);
-            appStoreRepo.getCategoryAppsForIndex(category.id, function (err, apps) {
-                if (err) {
-                    return callback(err);
-                }
+        appStoreRepo.getCategories(function (err, categories) {
+            if (err) { return next(err); }
 
-                addCategory(category, apps, function (err) {
-                    callback(err);
+            var processCategory = function (category, callback) {
+                log.debug("Adding category: " + category.name);
+                appStoreRepo.getCategoryAppsForIndex(category.id, function (err, apps) {
+                    if (err) { return callback(err); }
+
+                    addCategory(tempCore, category, apps, function (err) {
+                        callback(err);
+                    });
                 });
-            });
-        };
+            };
 
-        async.eachSeries(categories, processCategory, function (err) {
-            if (err) {
-                return next(err);
-            }
+            async.eachSeries(categories, processCategory, function (err) {
+                if (err) { return next(err); }
 
-            log.debug("Solr committing changes");
-            solrCore.commit(function (err) {
-                if (err) {
-                    return next(err);
-                }
+                log.debug("Solr committing changes");
+                tempCore.commit(function (err) {
+                    if (err) {
+                        return next(err);
+                    }
 
-                log.debug("Solr optimising");
-                solrCore.optimise(function (err) {
-                    next(err);
+                    log.debug("Solr optimising");
+                    tempCore.optimise(function (err) {
+                        if (err) { return next(err); }
+
+                        log.debug("Swapping in temp core");
+                        solrCore.swapInTempCore(tempCore, true, function(err) {
+                            if (err) { return next(err); }
+
+                            next();
+                        });
+                    });
                 });
             });
         });
     });
+
 };
 
 var rebuildCategory = function(categoryId, next) {
@@ -96,7 +103,7 @@ var rebuildCategory = function(categoryId, next) {
         appStoreRepo.getCategoryAppsForIndex(category.id, function (err, apps) {
             if (err) { return next(err); }
 
-            addCategory(category, apps, function (err) {
+            addCategory(solrCore, category, apps, function (err) {
                 if (err) { return next(err); }
 
                 log.debug("Solr committing changes");

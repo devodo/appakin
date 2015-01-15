@@ -6,7 +6,7 @@ var plugins = require('gulp-load-plugins')({config: '../../package.json'});
 var path = require('path');
 var stylish = require('jshint-stylish');
 
-var buildRoot = path.resolve('../../build-output/web.api');
+var buildRoot = path.resolve('../../build-output/solr.admin');
 
 gulp.task('build', 
     [

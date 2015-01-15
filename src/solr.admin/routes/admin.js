@@ -70,6 +70,8 @@ exports.init = function init(app) {
 
     app.post('/solr/admin/clean_temp_cores', function (req, res, next) {
         var endpoint = "action=STATUS";
+        var deleteInstanceDir = req.body.deleteInstanceDir === true;
+
         solrAdminClient.get('cores', endpoint, function (err, obj) {
             if (err) { return next(err); }
 
@@ -78,7 +80,7 @@ exports.init = function init(app) {
             });
 
             var processCore = function(core, callback) {
-                unloadCore(true, core, function(err) {
+                unloadCore(deleteInstanceDir, core, function(err) {
                     callback(err);
                 });
             };
