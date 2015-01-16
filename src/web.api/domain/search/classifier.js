@@ -5,6 +5,7 @@ var compute = require( 'compute.io' );
 var config = require('../../config');
 var log = require('../../logger');
 
+// Selecting Gamma and C values http://scikit-learn.org/stable/auto_examples/svm/plot_rbf_parameters.html
 var Classifier = function() {
     var nodesvm = require('node-svm');
     this.svm = new nodesvm.CSVC({ // classification
