@@ -41,8 +41,8 @@ SolrCore.prototype.optimise = function (next) {
     });
 };
 
-SolrCore.prototype.escapeSpecialCharsAllowQuotes = function(s){
-    return s.replace(/([\+\-&\|!\(\)\{\}\[\]\^~\*\?:\\])/g, function(match) {
+SolrCore.prototype.escapeSolrParserChars = function(s){
+    return s.replace(/(\band\b|\bor\b|\bnot\b|[\+\-&\|!\(\)\{\}\[\]\^"~\*\?:\\])/gi, function(match) {
         return '\\' + match;
     });
 };

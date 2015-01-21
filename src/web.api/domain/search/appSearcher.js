@@ -42,7 +42,7 @@ var buildFilterQuery = function(filters) {
 };
 
 var search = function(queryStr, pageNum, filters, next) {
-    var q = encodeURIComponent(solrCore.escapeSpecialCharsAllowQuotes(queryStr));
+    var q = encodeURIComponent(solrCore.escapeSolrParserChars(queryStr));
     var filter = buildFilterQuery(filters);
     var solrQuery = 'rows=' + PAGE_SIZE + '&qq=' + q + '&spellcheck.q=' + q + filter;
 

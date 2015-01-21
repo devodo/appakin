@@ -24,7 +24,7 @@ var addCategory = function(localSolrCore, category, apps, next) {
             price: app.price,
             popularity: app.popularity,
             is_iphone: app.isIphone === true,
-            is_ipad: app.isIPad === true,
+            is_ipad: app.isIpad === true,
             is_free: app.price === 0,
             app_cat_name: category.name
         };
