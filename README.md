@@ -66,9 +66,12 @@ sudo rm -rf node_modules
 sudo npm install
 
 sudo ln -sfn v0.0.3 current
-readlink -f current
+ls -l
 
 sudo restart appakin
+sudo restart appakin-admin
+sudo restart solr-admin << logs folder not there or
+
 
 ------------------
 
