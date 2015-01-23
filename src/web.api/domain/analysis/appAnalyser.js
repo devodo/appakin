@@ -228,14 +228,7 @@ var analyse = function(batchSize, forceAll, next) {
                     if (err) {
                         next(err);
                     } else {
-
-                        if (lastId >= 1000) {
-                            next(err);
-                        } else {
-                            processBatch(lastId);
-                        }
-
-                        //processBatch(lastId);
+                        processBatch(lastId);
                     }
                 });
         });
