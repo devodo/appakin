@@ -4,7 +4,7 @@ var urlUtil = require('../urlUtil');
 
 var CAT_PAGE_SIZE = 10;
 var APP_PAGE_SIZE = 12;
-var MAX_CAT_APPS = 96;
+var CAT_APP_PAGE_SIZE = 20;
 
 var getAppHighlight = function(highlights, docId) {
     if (!highlights) { return null; }
@@ -111,14 +111,12 @@ var search = function(queryStr, pageNum, filters, next) {
         var categories = obj.response.docs.map(function(doc) {
             var category = {
                 id: doc.id,
-                categoryId: doc.cat_id,
                 name: doc.cat_name_split,
                 url: urlUtil.makeUrl(doc.id, doc.cat_name_split)
             };
 
             var appResult = getApps(expanded, highlights, doc.id);
             if (appResult && appResult.apps.length > 0) {
-                //category.totalApps = Math.min(appResult.total, MAX_CAT_APPS);
                 category.totalApps = appResult.total;
                 category.apps = appResult.apps;
             }
@@ -147,10 +145,10 @@ var search = function(queryStr, pageNum, filters, next) {
 var searchApps = function(queryStr, pageNum, categoryId, filters, next) {
     var q = encodeURIComponent(solrCore.escapeSpecialChars(queryStr));
     var filter = buildFilterQuery(filters);
-    var solrQuery = 'rows=' + APP_PAGE_SIZE + '&qq=' + q + '&cat_id=' + categoryId + filter;
+    var solrQuery = 'rows=' + CAT_APP_PAGE_SIZE + '&qq=' + q + '&cat_id=' + categoryId + filter;
 
     if (pageNum && pageNum > 1) {
-        var start = (pageNum - 1) * APP_PAGE_SIZE;
+        var start = (pageNum - 1) * CAT_APP_PAGE_SIZE;
         solrQuery += '&start=' + start;
     }
 
@@ -185,7 +183,6 @@ var searchApps = function(queryStr, pageNum, categoryId, filters, next) {
         });
 
         var searhcResult = {
-            //total: Math.min(obj.response.numFound, MAX_CAT_APPS),
             total: obj.response.numFound,
             page: pageNum,
             apps: apps

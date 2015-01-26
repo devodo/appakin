@@ -11,6 +11,7 @@ var fs = require('fs');
 var log = require('./logger');
 var config = require('./config');
 var S = require('string');
+var argv = require('yargs').argv;
 
 // ================================
 
@@ -88,7 +89,7 @@ function configureApp(app) {
 
 function configureCors(app) {
     var corsOptions = {
-        origin: config.environment === 'production' ? 'http://www.appakin.com' : true
+        origin: config.environment === 'production' && !argv.no-cors ? 'http://www.appakin.com' : true
     };
 
     app.use(cors(corsOptions));          // for regular requests

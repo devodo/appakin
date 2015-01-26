@@ -5,23 +5,61 @@ var appStoreRepo = require("../../repos/appStoreRepo");
 var categorySearcher = require("../search/categorySearcher");
 var redisCacheFactory = require("../cache/redisCache");
 var categoryChartCache = redisCacheFactory.createRedisCache(redisCacheFactory.dbPartitions.chart);
+var categoryCache = redisCacheFactory.createRedisCache(redisCacheFactory.dbPartitions.category);
 var urlUtil = require('../urlUtil');
 
 var NUM_CHART_APPS = 10;
 var CHART_CACHE_EXPIRY_SECONDS = 600;
 
-
-var getCacheKeys = function(categoryIds, filters) {
+var getFilterMask = function(filters) {
     var filterMask =
         (filters.isIphone === true ? "-iphone": "") +
         (filters.isIpad === true ? "-ipad": "") +
         (filters.isFree === true ? "-free" : "");
 
+    return filterMask;
+};
+
+var getCategoryChartCacheKeys = function(categoryIds, filters) {
+    var filterMask = getFilterMask(filters);
+
     var cacheKeys = categoryIds.map(function(categoryId) {
-        return ('cat-' + categoryId + filterMask);
+        return ('cat_chart-' + categoryId + filterMask);
     });
 
     return cacheKeys;
+};
+
+var getCategoryCacheKey = function(categoryId) {
+    return ('cat-' + categoryId);
+};
+
+var getCategory = function(categoryId, next) {
+    var cacheKey = getCategoryCacheKey(categoryId);
+
+    categoryCache.getObject(cacheKey, function(err, cacheResult) {
+        if (err) {
+            log.error(err, "Error getting category from redis cache: " + categoryId);
+        }
+
+        if (cacheResult) {
+            next(null, cacheResult);
+        } else {
+            getCategoryRepo(categoryId, function(err, category) {
+                if (err) { return next(err); }
+
+                categoryCache.setEx(cacheKey, category, CHART_CACHE_EXPIRY_SECONDS, function (err) {
+                    if (err) {
+                        log.error(err);
+                    }
+
+                    return;
+                });
+
+                return next(null, category);
+            });
+        }
+    });
 };
 
 var getCategoryCharts = function(categoryIds, filters, next) {
@@ -29,7 +67,7 @@ var getCategoryCharts = function(categoryIds, filters, next) {
         return next(null, Object.create(null));
     }
 
-    var cacheKeys = getCacheKeys(categoryIds, filters);
+    var cacheKeys = getCategoryChartCacheKeys(categoryIds, filters);
 
     categoryChartCache.getObjects(cacheKeys, function(err, cacheResults) {
         if (err) {
@@ -111,13 +149,23 @@ var getCategoryChartsRepo = function(categoryIds, filters, next) {
                 categoryAppsMap[app.categoryId] = currentCategory;
             }
 
-            app.url = urlUtil.makeUrl(app.extId, app.name);
+            app.id = app.extId.replace(/\-/g, '');
+            delete app.extId;
+            app.url = urlUtil.makeUrl(app.id, app.name);
 
             delete app.categoryId;
             currentCategory.apps.push(app);
         });
 
         next(null, categoryAppsMap);
+    });
+};
+
+var getCategoryRepo = function(categoryId, next) {
+    appStoreRepo.getCategoryByExtId(categoryId, function(err, category) {
+        if (err) { return next(err); }
+
+        return next(null, category);
     });
 };
 
@@ -150,7 +198,36 @@ var searchCategories = function(queryStr, pageNum, filters, next) {
 };
 
 var searchApps = function(queryStr, pageNum, categoryId, filters, next) {
-    categorySearcher.searchApps(queryStr, pageNum, categoryId, filters, next);
+    categoryId = categoryId.replace(/\-/g, '');
+
+    getCategory(categoryId, function(err, category) {
+        if (err) { return next(err); }
+
+        if (!category) {
+            return next("No category found id: " + categoryId);
+        }
+
+        getCategoryCharts([category.id], filters, function(err, categoryAppsMap) {
+            if (err) { return next(err); }
+
+            var categoryChart = categoryAppsMap[category.id];
+
+            if (!categoryChart) {
+                log.error("No category chart found for category id: " + categoryId);
+            }
+
+            categorySearcher.searchApps(queryStr, pageNum, categoryId, filters, function(err, searchResult) {
+                if (err) { return next(err); }
+
+                searchResult.catgoryId = categoryId;
+                searchResult.catgoryName = category.name;
+                searchResult.categoryUrl = urlUtil.makeUrl(categoryId, category.name);
+                searchResult.categoryChart = categoryChart.apps;
+
+                next(null, searchResult);
+            });
+        });
+    });
 };
 
 exports.searchCategories = searchCategories;

@@ -79,7 +79,8 @@ exports.init = function init(app) {
                     app.rating = ((r1 * r1CountWeighted) + (r2 * r2CountWeighted)) / countSum;
                 }
 
-                delete app.id;
+                app.id = app.extId.replace(/\-/g, '');
+                delete app.extId;
                 delete app.storeAppId;
                 delete app.censoredName;
                 delete app.storeUrl;
@@ -90,6 +91,11 @@ exports.init = function init(app) {
                 delete app.genres;
                 delete app.bundleId;
                 delete app.sellerName;
+                delete app.supportedDevices;
+                delete app.releaseNotes;
+                delete app.languageCodes;
+                delete app.features;
+                delete app.isGameCenterEnabled;
                 res.json(app);
             });
         });

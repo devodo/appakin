@@ -22,7 +22,7 @@ var getFeatured = function(next) {
 
             if (!currentCategory || currentCategory.id !== item.catExtId) {
                 currentCategory = {
-                    id: item.catExtId,
+                    id: item.catExtId.replace(/\-/g, ''),
                     name: item.catName,
                     url: urlUtil.makeUrl(item.catExtId, item.catName),
                     apps: []
@@ -31,7 +31,7 @@ var getFeatured = function(next) {
             }
 
             var app = {
-                id: item.appExtId,
+                id: item.appExtId.replace(/\-/g, ''),
                 name: item.appName,
                 artworkUrl: item.appArtworkSmallUrl,
                 url: urlUtil.makeUrl(item.appExtId, item.appName),

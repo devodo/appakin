@@ -60,6 +60,7 @@ exports.init = function init(app) {
                 }
 
                 apps.forEach(function (app) {
+                    app.id = app.extId.replace(/\-/g, '');
                     app.url = urlUtil.makeUrl(app.extId, app.name);
                     delete app.extId;
                 });
@@ -75,7 +76,7 @@ exports.init = function init(app) {
 
                     var featuredApps = fApps.map(function (item) {
                         return {
-                            id: item.extId,
+                            id: item.extId.replace(/\-/g, ''),
                             name: item.name,
                             artworkUrl: item.artworkSmallUrl,
                             url: urlUtil.makeUrl(item.extId, item.name),
@@ -87,7 +88,8 @@ exports.init = function init(app) {
 
                     category.featured = featuredApps;
 
-                    delete category.id;
+                    category.id = category.extId.replace(/\-/g, '');
+                    delete category.extId;
                     res.json(category);
                 });
             });

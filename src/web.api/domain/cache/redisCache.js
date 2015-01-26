@@ -270,8 +270,8 @@ exports.createRedisCache = function(db) {
 
 exports.dbPartitions = {
     test: 15,
-    category: 0,
     chart: 1,
+    category: 2,
     search: 4
 };
 
