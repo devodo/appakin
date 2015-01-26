@@ -163,6 +163,32 @@ RedisCache.prototype.setEx = function(key, value, expirySeconds, next) {
     });
 };
 
+RedisCache.prototype.setExNx = function(key, value, expirySeconds, next) {
+    var self = this;
+
+    self.getClient(function(err, client) {
+        if (err) { return next(err); }
+
+        if (!client) { return next(); }
+
+        var val = typeof value === 'object' ? JSON.stringify(value) : value;
+        var args = [key, val];
+
+        if (expirySeconds) {
+            args.push('EX');
+            args.push(expirySeconds);
+        }
+
+        args.push('NX');
+
+        client.set(args, function(err, res) {
+            if (err) { return next(err); }
+
+            next(null, res);
+        });
+    });
+};
+
 RedisCache.prototype.msetEx = function(keyValuePairs, expirySeconds, next) {
     var self = this;
 

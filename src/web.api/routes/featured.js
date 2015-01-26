@@ -59,13 +59,15 @@ var getFeatured = function(next) {
                 currentCategory.apps.push(app);
             });
 
-            remoteCache.setEx(cacheKey, categories, remoteCacheExpirySeconds, function (err) {
-                if (err) {
-                    log.error(err);
+            remoteCache.setExNx(cacheKey, categories, remoteCacheExpirySeconds, function (err, result) {
+                if (err) { return next(err); }
+
+                if (!result) {
+                    getFeatured(next);
+                } else {
+                    next(null, categories);
                 }
             });
-
-            next(null, categories);
         });
     });
 };
