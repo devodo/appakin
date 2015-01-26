@@ -272,7 +272,8 @@ exports.dbPartitions = {
     test: 15,
     chart: 1,
     category: 2,
-    search: 4
+    search: 4,
+    featured: 8
 };
 
 

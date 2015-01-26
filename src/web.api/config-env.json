@@ -42,7 +42,8 @@
         },
         "featured": {
             "homePage": {
-                "ttl": 10000,
+                "localCacheExpirySeconds": 30,
+                "remoteCacheExpirySeconds": 120,
                 "categories": 5,
                 "categoryBias": 2,
                 "apps": 8,

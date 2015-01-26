@@ -111,6 +111,7 @@ var search = function(queryStr, pageNum, filters, next) {
         var categories = obj.response.docs.map(function(doc) {
             var category = {
                 id: doc.id,
+                categoryId: doc.cat_id,
                 name: doc.cat_name_split,
                 url: urlUtil.makeUrl(doc.id, doc.cat_name_split)
             };

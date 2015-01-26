@@ -10,6 +10,7 @@ var urlUtil = require('../urlUtil');
 
 var NUM_CHART_APPS = 10;
 var CHART_CACHE_EXPIRY_SECONDS = 600;
+var CATEGORY_CACHE_EXPIRY_SECONDS = 3600;
 
 var getFilterMask = function(filters) {
     var filterMask =
@@ -48,12 +49,10 @@ var getCategory = function(categoryId, next) {
             getCategoryRepo(categoryId, function(err, category) {
                 if (err) { return next(err); }
 
-                categoryCache.setEx(cacheKey, category, CHART_CACHE_EXPIRY_SECONDS, function (err) {
+                categoryCache.setEx(cacheKey, category, CATEGORY_CACHE_EXPIRY_SECONDS, function (err) {
                     if (err) {
                         log.error(err);
                     }
-
-                    return;
                 });
 
                 return next(null, category);
@@ -123,11 +122,10 @@ var getCategoryCharts = function(categoryIds, filters, next) {
                     if (err) {
                         log.error(err);
                     }
-
-                    return;
                 });
             }
 
+            log.debug("here");
             next(null, categoryMap);
         });
     });
