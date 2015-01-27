@@ -70,7 +70,17 @@ var getCategoryCharts = function(categoryIds, filters, next) {
 
     categoryChartCache.getObjects(cacheKeys, function(err, cacheResults) {
         if (err) {
-            log.error(err, "Error getting category charts from redis cache");
+            log.error(err, "Error getting category charts from redis cache.");
+
+            if (err.isParseError) {
+                log.warn(err, "Parse errors encountered. Will attempt to clear cache and retry.");
+
+                return categoryChartCache.deleteKeys(err.keys, function(err) {
+                    if (err) { return next(err); }
+
+                    getCategoryCharts(categoryIds, filters, next);
+                });
+            }
         }
 
         var missingIds;

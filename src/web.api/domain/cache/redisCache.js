@@ -120,26 +120,31 @@ RedisCache.prototype.getObjects = function(keys, next) {
         }
 
         var results = [];
+        var parseError = null;
 
-        var currentIndex = null;
-        try {
-            res.forEach(function(reply, i) {
-                currentIndex = i;
-                if (reply === null) {
-                    results.push(null);
-                } else {
+        res.forEach(function(reply, i) {
+            if (reply === null) {
+                results.push(null);
+            } else {
+                try {
                     var result = JSON.parse(reply);
                     results.push(result);
+                } catch (ex) {
+                    log.error(ex, 'Error parsing redis string on key: ' + keys[i] + ' in db: ' + self.db);
+
+                    if (!parseError) {
+                        parseError = {
+                            isParseError: true,
+                            keys: []
+                        };
+                    }
+
+                    parseError.keys.push(keys[i]);
                 }
-            });
+            }
+        });
 
-            return next(null, results);
-        } catch (ex) {
-            log.error(ex, 'Error parsing redis string on key: ' + keys[currentIndex] + ' in db: ' + self.db);
-            ex.isParseError = true;
-
-            return next(ex);
-        }
+        return next(parseError, results);
     });
 };
 
