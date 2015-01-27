@@ -36,7 +36,6 @@ gulp.task('build:clean', ['jshint'], function() {
 
 gulp.task('build:copy', ['build:clean'], function() {
 	var filesToCopy = [
-	    './node_modules/**/*.*',
 		'./routes/**/*.*',
 		'./*.*',
 		'!./gulpfile.js',
