@@ -216,8 +216,8 @@ var searchApps = function(queryStr, pageNum, categoryId, filters, next) {
             categorySearcher.searchApps(queryStr, pageNum, categoryId, filters, function(err, searchResult) {
                 if (err) { return next(err); }
 
-                searchResult.catgoryId = categoryId;
-                searchResult.catgoryName = category.name;
+                searchResult.categoryId = categoryId;
+                searchResult.categoryName = category.name;
                 searchResult.categoryUrl = urlUtil.makeUrl(categoryId, category.name);
                 searchResult.categoryChart = categoryChart.apps;
 
