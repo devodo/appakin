@@ -20,7 +20,17 @@ var cacheKey = "home_featured";
 var getFeatured = function(next) {
     remoteCache.getObject(cacheKey, function(err, cacheResult) {
         if (err) {
-            log.error(err, "Error getting home featured apps from redis cache");
+            if (err.isParseError) {
+                log.warn(err, "Parse error encountered. Attempting clear cache and retry");
+                
+                return remoteCache.deleteKey(cacheKey, function(err) {
+                    if (err) { return next(err); }
+
+                    getFeatured(next);
+                });
+            }
+
+            log.error(err, "Error getting home featured apps from redis cache. Attempting to bypass");
         }
 
         if (cacheResult) {
@@ -62,7 +72,7 @@ var getFeatured = function(next) {
             remoteCache.setExNx(cacheKey, categories, remoteCacheExpirySeconds, function (err, result) {
                 if (err) { return next(err); }
 
-                if (!result) {
+                if (result === false) { // cache already set so try again
                     getFeatured(next);
                 } else {
                     next(null, categories);

@@ -102,7 +102,9 @@ RedisCache.prototype.getObject = function(key, next) {
             var result = JSON.parse(res);
             return next(null, result);
         } catch (ex) {
-            log.error(ex, 'Error parsing redis string on key: %s in db: %d', key, self.db);
+            log.error(ex, 'Error parsing redis string on key: ' + key + ' in db: ' + self.db);
+            ex.isParseError = true;
+
             return next(ex);
         }
     });
@@ -133,7 +135,9 @@ RedisCache.prototype.getObjects = function(keys, next) {
 
             return next(null, results);
         } catch (ex) {
-            log.error(ex, 'Error parsing redis string on key: %s in db: %d', keys[currentIndex], self.db);
+            log.error(ex, 'Error parsing redis string on key: ' + keys[currentIndex] + ' in db: ' + self.db);
+            ex.isParseError = true;
+
             return next(ex);
         }
     });
@@ -184,7 +188,13 @@ RedisCache.prototype.setExNx = function(key, value, expirySeconds, next) {
         client.set(args, function(err, res) {
             if (err) { return next(err); }
 
-            next(null, res);
+            if (res === 'OK') {
+                next(null, true);
+            } else if (res === null) {
+                next(null, false);
+            } else {
+                next("Unexpected response from Redis: " + res);
+            }
         });
     });
 };

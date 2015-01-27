@@ -125,7 +125,6 @@ var getCategoryCharts = function(categoryIds, filters, next) {
                 });
             }
 
-            log.debug("here");
             next(null, categoryMap);
         });
     });
