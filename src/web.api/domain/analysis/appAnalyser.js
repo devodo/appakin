@@ -14,8 +14,8 @@ var SpellCheck = require('spellcheck'),
     base = __dirname + (process.platform === 'win32' ? '\\' : '/'),
     spell = new SpellCheck(base + 'en_US.aff', base + 'en_US.dic');
 
-var SimpleCache = require("simple-lru-cache"),
-    tokensLruCache = new SimpleCache({"maxSize":30000});
+//var SimpleCache = require("simple-lru-cache"),
+//    tokensLruCache = new SimpleCache({"maxSize":30000});
 
 var invalidTermsRegex = new XRegExp('[\\p{Z}\\p{S}\\p{P}]');
 var englishWordRegex = /^[a-z]+$/;
@@ -162,10 +162,10 @@ var processApp = function(app, forceAll, processAppCallback) {
                         var termCount = tokenMap[term].count;
                         appAnalysis.desc_valid_term_count += termCount;
 
-                        if (tokensLruCache.get(term)) {
-                            appAnalysis.desc_english_term_count += termCount;
-                            termCallback();
-                        } else {
+                        //if (tokensLruCache.get(term)) {
+                        //    appAnalysis.desc_english_term_count += termCount;
+                        //    termCallback();
+                        //} else {
                             spell.check(term, function (err, correct) {
                                 if (err) {
                                     termCallback(err);
@@ -173,18 +173,18 @@ var processApp = function(app, forceAll, processAppCallback) {
 
                                 if (correct) {
                                     appAnalysis.desc_english_term_count += termCount;
-                                    tokensLruCache.set(term, true);
+                                    //tokensLruCache.set(term, true);
                                 } else {
-                                    tokensLruCache.set(term, false);
+                                    //tokensLruCache.set(term, false);
                                 }
 
-                                if (termCount > 1) {
-                                    tokensLruCache.set(term, correct);
-                                }
+                                //if (termCount > 1) {
+                                //    tokensLruCache.set(term, correct);
+                                //}
 
                                 termCallback();
                             });
-                        }
+                        //}
                     },
                     function (err) {
                         if (err) {
@@ -212,7 +212,7 @@ var analyse = function(batchSize, forceAll, next) {
             }
 
             if (apps.length === 0) {
-                tokensLruCache.reset();
+                //tokensLruCache.reset();
                 return next();
             }
 
