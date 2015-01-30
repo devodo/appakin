@@ -80,7 +80,7 @@ exports.init = function init(app) {
                 }
 
                 app.id = app.extId.replace(/\-/g, '');
-                delete app.extId;
+                //delete app.extId;
                 delete app.storeAppId;
                 delete app.censoredName;
                 delete app.storeUrl;
