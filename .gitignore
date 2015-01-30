@@ -23,6 +23,7 @@ build/Release
 .lock-wscript
 
 # Build output
+/deploy/output/
 /build-output/
 public-generated/
 

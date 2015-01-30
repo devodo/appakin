@@ -5,13 +5,16 @@ var gutil = require('gulp-util');
 var plugins = require('gulp-load-plugins')({config: '../../package.json'});
 var path = require('path');
 var stylish = require('jshint-stylish');
+var fs = require('fs');
+var pkg = require('./package.json');
 
 var buildRoot = path.resolve('../../build-output/solr.admin');
 
 gulp.task('build', 
     [
-    'build:clean',
-	'build:copy'
+        'build:clean',
+	    'build:copy',
+		'build:version'
 	]
 );
 
@@ -47,6 +50,10 @@ gulp.task('build:copy', ['build:clean'], function() {
 	    .pipe(gulp.dest(buildRoot))
 		.on('end', gutil.log.bind(gutil, 'Files copied'))
 		.on('error', handleError);
+});
+
+gulp.task('build:version', ['build:copy'], function() {
+	fs.writeFileSync(buildRoot + '/version.txt', 'Version: ' + pkg.version + '\n' + new Date().toUTCString());
 });
 
 // ----------------
