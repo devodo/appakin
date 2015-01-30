@@ -43,9 +43,9 @@ pushd /mnt/data/www/appakin/releases
 sudo ln -sfn v$1 current
 ls -l
 
-#sudo restart appakin
-#sudo restart appakin-admin
-#sudo restart solr-admin
+sudo restart appakin
+sudo restart appakin-admin
+sudo restart solr-admin
 
 popd
 
