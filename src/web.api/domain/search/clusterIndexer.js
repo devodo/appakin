@@ -3,12 +3,13 @@ var async = require('async');
 var appStoreRepo = require('../../repos/appStoreRepo');
 var solrCore = require('./solrCore').getClusterCore();
 var log = require('../../logger');
+var stringUtil = require('../../domain/stringUtil');
 
 var createSolrDoc = function(app) {
     var doc = {
-        id : app.extId.replace(/\-/g, ''),
+        id : stringUtil.stripDashes(app.extId),
         name: app.name,
-        desc: app.description,
+        desc: stringUtil.stripForIndex(app.description),
         "primary_genre": app.genres[0],
         genres: app.genres,
         "screenshot_urls": app.screenShotUrls,

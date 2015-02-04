@@ -4,6 +4,7 @@ var appStoreRepo = require('../../repos/appStoreRepo');
 var solrCore = require('./solrCore').getCategoryCore();
 var text = require('../text');
 var log = require('../../logger');
+var stringUtil = require('../../domain/stringUtil');
 var fs = require('fs');
 
 var PARENT_TYPE = 1;
@@ -14,11 +15,11 @@ var addCategory = function(localSolrCore, category, apps, next) {
 
     var children = apps.map(function(app) {
         return {
-            id : app.extId.replace(/\-/g, ''),
+            id : stringUtil.stripDashes(app.extId),
             type: CHILD_TYPE,
             "parent_id": catId,
             name: app.name,
-            desc: app.description,
+            desc: stringUtil.stripForIndex(app.description),
             "image_url": app.imageUrl,
             position: app.position,
             price: app.price,

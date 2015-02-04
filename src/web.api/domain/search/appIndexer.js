@@ -3,12 +3,13 @@ var async = require('async');
 var appStoreRepo = require('../../repos/appStoreRepo');
 var solrCore = require('./solrCore').getAppSolrCore();
 var log = require('../../logger');
+var stringUtil = require('../../domain/stringUtil');
 
 var createSolrApp = function(app) {
     var appIndex = {
-        id : app.extId.replace(/\-/g, ''),
+        id : stringUtil.stripDashes(app.extId),
         name: app.name,
-        desc: app.description,
+        desc: stringUtil.stripForIndex(app.description),
         "img_url" : app.imageUrl,
         price: app.price,
         is_free: app.price === 0,
