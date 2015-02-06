@@ -20,6 +20,7 @@ var addCategory = function(localSolrCore, category, apps, next) {
             "parent_id": catId,
             name: app.name,
             desc: stringUtil.stripForIndex(app.description),
+            publisher: app.developerName,
             "image_url": app.imageUrl,
             position: app.position,
             price: app.price,

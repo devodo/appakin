@@ -10,6 +10,7 @@ var createSolrApp = function(app) {
         id : stringUtil.stripDashes(app.extId),
         name: app.name,
         desc: stringUtil.stripForIndex(app.description),
+        publisher: app.developerName,
         "img_url" : app.imageUrl,
         price: app.price,
         is_free: app.price === 0,
