@@ -58,7 +58,7 @@ exports.group = {
 
     testStripUrlsAndEmails5: function (test) {
         var testString = "This is a google.com test";
-        var expectedResult = "This is a google.com test";
+        var expectedResult = "This is a  test";
         var result = stringUtil.stripUrlsAndEmails(testString);
         test.expect(1);
         test.equal(result, expectedResult);
@@ -74,9 +74,27 @@ exports.group = {
         test.done();
     },
 
+    testStripUrlsAndEmails6b: function (test) {
+        var testString = "This is a another_test@google.com test";
+        var expectedResult = "This is a  test";
+        var result = stringUtil.stripUrlsAndEmails(testString);
+        test.expect(1);
+        test.equal(result, expectedResult);
+        test.done();
+    },
+
     testStripUrlsAndEmails7: function (test) {
         var testString = "This is a url http://www.google.com/ and email test@google.co.uk test";
         var expectedResult = "This is a url  and email  test";
+        var result = stringUtil.stripUrlsAndEmails(testString);
+        test.expect(1);
+        test.equal(result, expectedResult);
+        test.done();
+    },
+
+    testStripUrlsAndEmails8: function (test) {
+        var testString = "Follow us at twitter.com/blah test";
+        var expectedResult = "Follow us at  test";
         var result = stringUtil.stripUrlsAndEmails(testString);
         test.expect(1);
         test.equal(result, expectedResult);

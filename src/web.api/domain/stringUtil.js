@@ -13,7 +13,7 @@ var stripUrlsAndEmails = function(input) {
         return null;
     }
 
-    var stripRegex = /\b(https?:\/\/|www\.|[a-zA-Z0-9]+@[a-zA-Z0-9]+\.)\S*/gi;
+    var stripRegex = /\b(https?:\/\/|www\.|\S+\.com|\S+@\S+\.)\S*/gi;
     return input.replace(stripRegex, '');
 };
 
