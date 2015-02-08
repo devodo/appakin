@@ -120,5 +120,24 @@ exports.group = {
                 test.done();
             });
         });
+    },
+
+    testScriptEval: function (test) {
+        var script =
+            "local current\n" +
+            "current = redis.call(\"incr\",KEYS[1])\n" +
+            "if tonumber(current) == 1 then\n" +
+            "  redis.call(\"expire\",KEYS[1], ARGV[1])\n" +
+            "end\n" +
+            "return current";
+
+        redisCache.scriptEval(script, ['script_test'], [10], function(err, res) {
+            test.expect(3);
+            test.ok(err === null, err);
+            test.ok(res, "No reply");
+            test.ok(res === 1);
+
+            test.done();
+        });
     }
 };

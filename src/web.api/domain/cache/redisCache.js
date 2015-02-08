@@ -282,6 +282,40 @@ RedisCache.prototype.deleteKeys = function(keys, next) {
     });
 };
 
+RedisCache.prototype.scriptEval = function(script, keys, argv, next) {
+    var self = this;
+
+    self.getClient(function(err, client) {
+        if (err) { return next(err); }
+
+        if (!client) { return next(); }
+
+        var keyCount = keys ? keys.length : 0;
+        var args = [script, keyCount];
+
+        if (keys) {
+            keys.forEach(function(key) {
+                args.push(key);
+            });
+        }
+
+        if (argv) {
+            argv.forEach(function(arg) {
+                args.push(arg);
+            });
+        }
+
+        // js_hint does not like calling a function to named eval
+        /* jshint ignore:start */
+        client.eval(args, function (err, res) {
+            if (err) { return next(err); }
+
+            return next(null, res);
+        });
+        /* jshint ignore:end */
+    });
+};
+
 RedisCache.prototype.end = function(next) {
     var self = this;
     self.getClient(function(err, client) {
@@ -314,7 +348,8 @@ exports.dbPartitions = {
     chart: 1,
     category: 2,
     search: 4,
-    featured: 8
+    featured: 8,
+    out: 12
 };
 
 
