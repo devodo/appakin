@@ -7,6 +7,7 @@ var appIndexer = require('../../domain/search/appIndexer');
 var categoryIndexer = require('../../domain/search/categoryIndexer');
 var appStoreAdminRepo = require('../../repos/appStoreAdminRepo');
 var classificationRepo = require('../../repos/classificationRepo');
+var ambiguityAnalyser = require('../analysis/ambiguityAnalyser');
 var log = require('../../logger');
 
 var APP_BATCH_SIZE = 1000;
@@ -120,6 +121,14 @@ var rebuildAll = function(next) {
     });
 };
 
+var analyseAmbiguity = function(next) {
+    log.debug("Starting amiguity analysis");
+
+    ambiguityAnalyser.analyse(function(err) {
+        next(err);
+    });
+};
+
 exports.rebuildAll = rebuildAll;
 exports.rebuildAllSeedCategories = rebuildAllSeedCategories;
 exports.rebuildClusterIndex = rebuildClusterIndex;
@@ -129,4 +138,6 @@ exports.rebuildCategoryIndex = rebuildCategoryIndex;
 exports.resetAppPopularity = resetAppPopularity;
 
 exports.rebuildSeedCategory = rebuildSeedCategory;
+
+exports.analyseAmbiguity = analyseAmbiguity;
 

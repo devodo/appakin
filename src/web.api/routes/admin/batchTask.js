@@ -115,5 +115,18 @@ exports.init = function init(app) {
 
         res.json({ "status": "Rebuild reset app popularity task started" });
     });
+
+    app.post('/admin/task/analyse_ambiguity', function (req, res, next) {
+        log.info("Starting analyse ambiguity batch task");
+        var start = process.hrtime();
+        batchTask.analyseAmbiguity(function(err) {
+            if (err) { return next(err); }
+
+            var end = process.hrtime(start);
+            log.info("Completed analyse ambiguity batch task in: " + prettyHrtime(end));
+        });
+
+        res.json({ "status": "Analyse ambiguity task started" });
+    });
 };
 

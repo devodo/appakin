@@ -1233,3 +1233,84 @@ exports.getExistingAppSourceIds = function(appSources, next) {
         });
     });
 };
+
+var insertAppAmbiguity = function(client, appAmbiguity, next) {
+    var queryStr =
+        "INSERT INTO app_ambiguity(" +
+        "app_id, is_dev_ambiguous, is_globally_ambiguous, top_ambiguous_app_ext_id," +
+        "ambiguous_dev_terms, date_created, date_modified)\n" +
+        "VALUES ($1, $2, $3, $4, $5, NOW() at time zone 'utc', NOW() at time zone 'utc');";
+
+    var queryParams = [
+        appAmbiguity.appId,
+        appAmbiguity.isDevAmbiguous,
+        appAmbiguity.isGloballyAmbiguous,
+        appAmbiguity.topAmbiguousAppExtId,
+        appAmbiguity.ambiguousDevTerms
+    ];
+
+    client.query(queryStr, queryParams, function (err) {
+        return next(err);
+    });
+};
+
+exports.insertAppAmbiguity = function(appAmbiguity, next) {
+    connection.open(function(err, conn) {
+        if (err) { return next(err); }
+
+        insertAppAmbiguity(conn.client, appAmbiguity, function(err) {
+            conn.close(err, function(err) {
+                next(err);
+            });
+        });
+    });
+};
+
+var getMissingAppAmbiguityBatch = function(client, lastId, limit, next) {
+    var queryStr =
+        "SELECT a.app_id, a.ext_id, a.name, a.dev_name, ap.popularity\n" +
+        "FROM appstore_app a\n" +
+        "LEFT JOIN app_popularity ap on a.app_id = ap.app_id\n" +
+        "LEFT JOIN app_ambiguity aa on a.app_id = aa.app_id\n" +
+        "WHERE a.app_id > $1\n" +
+        "AND aa.app_id is null\n" +
+        "AND a.date_deleted is null\n" +
+        "ORDER BY a.app_id\n" +
+        "limit $2;";
+
+    var queryParams = [
+        lastId,
+        limit
+    ];
+
+    client.query(queryStr, queryParams, function (err, result) {
+        if (err) {
+            return next(err);
+        }
+
+        var items = result.rows.map(function(item) {
+            return {
+                id: item.app_id,
+                extId: item.ext_id,
+                name: item.name,
+                devName: item.dev_name,
+                popularity: item.popularity
+            };
+        });
+
+        next(null, items);
+    });
+};
+
+exports.getMissingAppAmbiguityBatch = function(lastId, limit, next) {
+    connection.open(function(err, conn) {
+        if (err) { return next(err); }
+
+        getMissingAppAmbiguityBatch(conn.client, lastId, limit, function(err, items) {
+            conn.close(err, function(err) {
+                next(err, items);
+            });
+        });
+    });
+};
+

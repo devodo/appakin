@@ -4,15 +4,17 @@ var connection = require('./connection');
 
 var getAppByExtId = function (client, extId, next) {
     var queryStr =
-        "SELECT app_id, ext_id, store_app_id, name, censored_name, description, store_url,\n" +
+        "SELECT a.app_id, ext_id, store_app_id, name, censored_name, description, store_url,\n" +
         "dev_id, dev_name, dev_url, features, supported_devices,\n" +
         "is_game_center_enabled, screenshot_urls, ipad_screenshot_urls,\n" +
         "artwork_small_url, artwork_medium_url, artwork_large_url, price,\n" +
         "currency, version, primary_genre, genres, release_date, bundle_id,\n" +
         "seller_name, release_notes, min_os_version, language_codes, file_size_bytes,\n" +
         "advisory_rating, content_rating, user_rating_current, rating_count_current, user_rating,\n" +
-        "rating_count, is_iphone, is_ipad, date_created, date_modified\n" +
+        "rating_count, is_iphone, is_ipad, a.date_created, a.date_modified,\n" +
+        "aa.is_globally_ambiguous, aa.ambiguous_dev_terms\n" +
         "FROM appstore_app a\n" +
+        "LEFT JOIN app_ambiguity aa on a.app_id = aa.app_id\n" +
         "WHERE ext_id = $1;";
 
     client.query(queryStr, [extId], function (err, result) {
@@ -65,6 +67,8 @@ var getAppByExtId = function (client, extId, next) {
             ratingCount: item.rating_count,
             isIphone: item.is_iphone,
             isIpad: item.is_ipad,
+            excludeTerms: item.ambiguous_dev_terms,
+            includeDevName: item.is_globally_ambiguous === true,
             dateCreated: item.date_created,
             dateModified: item.date_modified
         };

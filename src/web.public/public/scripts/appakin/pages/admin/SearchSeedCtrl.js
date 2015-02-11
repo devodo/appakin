@@ -45,7 +45,7 @@
             classifiedAppsApi.deleteTrainingData(extId, seedCategoryId, function() {
                 searchSeedApp.isTrainingData = false;
                 searchSeedApp.include = null;
-            })
+            });
         };
 
         $scope.classify = function() {
