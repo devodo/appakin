@@ -10,11 +10,11 @@ var CREATE_TEMP_CORE_URL = config.search.solr.createTempCoreUrl;
 var host = config.search.solr.host;
 var port = config.search.solr.port;
 
-var solrAdminClient = solr.createClient(host, port, 'admin');
+var solrAdminClient = solr.createClient(host, port, 'admin', null, false);
 
 var SolrCore = function(coreName) {
     this.coreName = coreName;
-    this.client = solr.createClient(host, port, coreName);
+    this.client = solr.createClient(host, port, coreName, null, false);
 };
 
 SolrCore.prototype.commit = function (next) {
