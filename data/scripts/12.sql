@@ -5,6 +5,7 @@ CREATE TABLE app_ambiguity
 	is_globally_ambiguous boolean NOT NULL,
 	top_ambiguous_app_ext_id uuid,
 	ambiguous_dev_terms text[],
+	error_msg text,
 	date_created timestamp without time zone NOT NULL,
 	date_modified timestamp without time zone NOT NULL,
 	CONSTRAINT app_ambiguity_pkey PRIMARY KEY (app_id),

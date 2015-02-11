@@ -119,7 +119,7 @@ exports.init = function init(app) {
 };
 
 exports.init = function init(app) {
-    app.get('/ios/app_out/:appEncodedId', function (req, res) {
+    app.get('/ios/out/app/:appEncodedId', function (req, res) {
         res.contentType("text/html; charset=UTF-8");
 
         var appEncodedId = req.params.appEncodedId;

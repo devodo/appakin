@@ -28,7 +28,8 @@ var ignoreTerms = {
     'by': true,
     'for': true,
     'of': true,
-    'with': true
+    'with': true,
+    'from': true
 };
 
 var getAmbiguousDevTerms = function(app, next) {
@@ -37,42 +38,38 @@ var getAmbiguousDevTerms = function(app, next) {
     appSearcher.searchDevAmbiguous(app.name, app.devName, function(err, searchResult) {
         if (err) { return next(err); }
 
-        var ambiguousTermMap;
-
         if (searchResult.total === 0) {
-            log.warn("No ambiguous dev search results for app:" + app.extId);
+            return next("No ambiguous dev search results for app:" + app.extId);
         } else if (searchResult.total === 1) {
             if (searchResult.apps[0].id !== uuidUtil.stripDashes(app.extId)) {
-                log.warn("Ambiguous dev search did not return source app:" + app.extId);
+                return next("Ambiguous dev search did not return source app:" + app.extId);
             }
-        } else {
-            var termMap = Object.create(null);
-            ambiguousTermMap = Object.create(null);
-
-            app.name.toLowerCase().split(termRegex).forEach(function(term) {
-                termMap[term] = true;
-            });
-
-            searchResult.apps.forEach(function(searchApp) {
-                if (searchApp.id === uuidUtil.stripDashes(app.extId)) {
-                    return;
-                }
-
-                searchApp.name.toLowerCase().split(termRegex).forEach(function(term) {
-                    if (!ignoreTerms[term] && !termMap[term]) {
-                        ambiguousTermMap[term] = true;
-                    }
-                });
-            });
         }
+
+        var termMap = Object.create(null);
+        var ambiguousTermMap = Object.create(null);
+
+        app.name.toLowerCase().split(termRegex).forEach(function(term) {
+            termMap[term] = true;
+        });
+
+        searchResult.apps.forEach(function(searchApp) {
+            if (searchApp.id === uuidUtil.stripDashes(app.extId)) {
+                return;
+            }
+
+            searchApp.name.toLowerCase().split(termRegex).forEach(function(term) {
+                if (!ignoreTerms[term] && !termMap[term]) {
+                    ambiguousTermMap[term] = true;
+                }
+            });
+        });
 
         var ambiguousTerms;
 
-        if (ambiguousTermMap) {
-            var keys = Object.keys(ambiguousTermMap);
-            if (keys.length > 0) {
-                ambiguousTerms = keys;
-            }
+        var keys = Object.keys(ambiguousTermMap);
+        if (keys.length > 0) {
+            ambiguousTerms = keys;
         }
 
         next(null, ambiguousTerms);
@@ -80,7 +77,7 @@ var getAmbiguousDevTerms = function(app, next) {
 };
 
 var getTopAmbiguousAppId = function(app, next) {
-    var deltaThreshold = 0.2;
+    var deltaThreshold = 0.1;
 
     appSearcher.searchGlobalAmbiguous(app.name, app.devName, function(err, searchResult) {
         if (err) { return next(err); }
@@ -116,29 +113,41 @@ var getTopAmbiguousAppId = function(app, next) {
 };
 
 var processApp = function(app, next) {
+    var appAmbiguity = {
+        appId: app.id,
+        isDevAmbiguous: false,
+        isGloballyAmbiguous: false,
+        topAmbiguousAppExtId: null,
+        ambiguousDevTerms: null
+    };
+
     getAmbiguousDevTerms(app, function(err, ambiguousTerms) {
-        if (err) { return next(err); }
+        if (err) {
+            appAmbiguity.errorMsg = err;
+
+            return appStoreAdminRepo.insertAppAmbiguity(appAmbiguity, function(err) {
+                next(err);
+            });
+        }
+
+        if (ambiguousTerms && ambiguousTerms.length > 0) {
+            appAmbiguity.isDevAmbiguous = true;
+            appAmbiguity.ambiguousDevTerms = ambiguousTerms;
+        }
 
         getTopAmbiguousAppId(app, function(err, topAppId) {
-            if (err) { return next(err); }
+            if (err) {
+                appAmbiguity.errorMsg = err;
 
-            var isDevAmbiguous = false;
-            if (ambiguousTerms && ambiguousTerms.length > 0) {
-                isDevAmbiguous = true;
+                return appStoreAdminRepo.insertAppAmbiguity(appAmbiguity, function(err) {
+                    next(err);
+                });
             }
 
-            var isGloballyAmbiguous = false;
             if (topAppId) {
-                isGloballyAmbiguous = true;
+                appAmbiguity.isGloballyAmbiguous = true;
+                appAmbiguity.topAmbiguousAppExtId = topAppId;
             }
-
-            var appAmbiguity = {
-                appId: app.id,
-                isDevAmbiguous: isDevAmbiguous,
-                isGloballyAmbiguous: isGloballyAmbiguous,
-                topAmbiguousAppExtId: topAppId,
-                ambiguousDevTerms: ambiguousTerms
-            };
 
             appStoreAdminRepo.insertAppAmbiguity(appAmbiguity, function(err) {
                 next(err);
