@@ -32,10 +32,47 @@ var ignoreTerms = {
     'from': true
 };
 
-var getAmbiguousDevTerms = function(app, next) {
+// Remove ignore terms from front and back of input string.
+// If all terms are ignore terms return original string
+var stripIgnoreTerms = function(input) {
+    if (!input) {
+        return input;
+    }
+
+    var terms = input.toLowerCase().split(/[\s:;\-_\/\\\(\)\.]+/g);
+
+    if (terms.length <= 1) {
+        return input;
+    }
+
+    for (var frontIndex = 0; frontIndex < terms.length; frontIndex++) {
+        if (!ignoreTerms[terms[frontIndex]]) {
+            break;
+        }
+    }
+
+    for (var backIndex = terms.length - 1; backIndex >= 0; backIndex--) {
+        if (!ignoreTerms[terms[backIndex]]) {
+            break;
+        }
+    }
+
+    if (frontIndex > backIndex) {
+        return input;
+    }
+
+    var result = terms[frontIndex];
+    for (var i = frontIndex + 1; i <= backIndex; i++) {
+        result += ' ' + terms[i];
+    }
+
+    return result;
+};
+
+var getAmbiguousDevTerms = function(strippedName, app, next) {
     var termRegex = /[^a-zA-Z0-9]+/g;
 
-    appSearcher.searchDevAmbiguous(app.name, app.devName, function(err, searchResult) {
+    appSearcher.searchDevAmbiguous(strippedName, app.devName, function(err, searchResult) {
         if (err) { return next(err); }
 
         if (searchResult.total === 0) {
@@ -76,10 +113,10 @@ var getAmbiguousDevTerms = function(app, next) {
     });
 };
 
-var getTopAmbiguousAppId = function(app, next) {
-    var deltaThreshold = 0.1;
+var getTopAmbiguousAppId = function(strippedName, app, next) {
+    var deltaThreshold = 0.2;
 
-    appSearcher.searchGlobalAmbiguous(app.name, app.devName, function(err, searchResult) {
+    appSearcher.searchGlobalAmbiguous(strippedName, app.devName, function(err, searchResult) {
         if (err) { return next(err); }
 
         if (searchResult.total === 0) {
@@ -121,7 +158,9 @@ var processApp = function(app, next) {
         ambiguousDevTerms: null
     };
 
-    getAmbiguousDevTerms(app, function(err, ambiguousTerms) {
+    var strippedName = stripIgnoreTerms(app.name);
+
+    getAmbiguousDevTerms(strippedName, app, function(err, ambiguousTerms) {
         if (err) {
             appAmbiguity.errorMsg = err;
 
@@ -135,7 +174,7 @@ var processApp = function(app, next) {
             appAmbiguity.ambiguousDevTerms = ambiguousTerms;
         }
 
-        getTopAmbiguousAppId(app, function(err, topAppId) {
+        getTopAmbiguousAppId(strippedName, app, function(err, topAppId) {
             if (err) {
                 appAmbiguity.errorMsg = err;
 
@@ -182,3 +221,4 @@ var analyse = function(next) {
 
 
 exports.analyse = analyse;
+exports.stripIgnoreTerms = stripIgnoreTerms;

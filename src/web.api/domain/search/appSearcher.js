@@ -101,7 +101,7 @@ var searchDevAmbiguous = function(name, devName, next) {
     var devNameEncoded = encodeURIComponent(solrCore.escapeSolrParserChars(devName));
 
     var solrQuery =
-        'q=name:(' + nameEncoded + ')' +
+        'q=name:"' + nameEncoded + '"' +
         '&fq=publisher:"' + devNameEncoded +'"' +
         '&sort=popularity%20desc&q.op=AND&rows=100' +
         '&fl=id,name_split,popularity';
@@ -140,7 +140,7 @@ var searchGlobalAmbiguous = function(name, devName, next) {
     var devNameEncoded = encodeURIComponent(solrCore.escapeSolrParserChars(devName));
 
     var solrQuery =
-        'q=name:(' + nameEncoded + ')' +
+        'q=name:"' + nameEncoded + '"' +
         '&fq=-publisher:"' + devNameEncoded +'"' +
         '&sort=popularity%20desc&q.op=AND&rows=1' +
         '&fl=id,popularity';
