@@ -11,11 +11,15 @@ var ignoreTerms = {
     'free': true,
     'ipad': true,
     'iphone': true,
+    'ipod': true,
     'app': true,
     'ios': true,
+    'premium': true,
     'edition': true,
     'version': true,
     'preview': true,
+    'trial': true,
+    'pro': true,
     'full': true,
     'plus': true,
     'lite': true,
@@ -32,6 +36,8 @@ var ignoreTerms = {
     'from': true
 };
 
+var termRegex = /[^a-zA-Z0-9]+/g;
+
 // Remove ignore terms from front and back of input string.
 // If all terms are ignore terms return original string
 var stripIgnoreTerms = function(input) {
@@ -39,7 +45,7 @@ var stripIgnoreTerms = function(input) {
         return input;
     }
 
-    var terms = input.toLowerCase().split(/[\s:;\-_\/\\\(\)\.]+/g);
+    var terms = input.split(/[\s:;\-_\/\\\(\)\.]+/g);
 
     if (terms.length <= 1) {
         return input;
@@ -69,27 +75,51 @@ var stripIgnoreTerms = function(input) {
     return result;
 };
 
-var getShortName = function(input) {
-    var formatRegex = /(.*?)((:\s+|\s+\-|\s+\u2013|\s+\u2014).*)/;
+var getShortAnalysis = function(input) {
+    var formatRegex = /(.*?)(:\s+|\s+\-|\s+\u2013|\s+\u2014)(.*)/;
     var matches = formatRegex.exec(input);
 
     if (!matches) {
+        return null;
+    }
+
+    if (matches[1].trim() === '') {
+        return null;
+    }
+
+    return {
+        shortName: matches[1],
+        remainder: matches[3]
+    };
+};
+
+var getStrippedAnalysis = function(input) {
+    if (!input) {
         return input;
     }
 
-    return matches[1];
+    var inputLower = input.toLowerCase();
+    var strippedName = stripIgnoreTerms(inputLower);
+    var shortAnalysis = getShortAnalysis(inputLower);
+    var strippedShortName = shortAnalysis ? stripIgnoreTerms(shortAnalysis.shortName) : null;
+
+    return {
+        strippedName: strippedName,
+        strippedShortName: strippedShortName,
+        shortAnalysis: shortAnalysis
+    };
 };
 
-var getAmbiguousDevTerms = function(strippedName, app, next) {
-    var termRegex = /[^a-zA-Z0-9]+/g;
-
-    appSearcher.searchDevAmbiguous(strippedName, app.devName, function(err, searchResult) {
+var getAmbiguousDevTerms = function(strippedAnalysis, app, next) {
+    appSearcher.searchDevAmbiguous(strippedAnalysis.strippedName, app.devName, function(err, searchResult) {
         if (err) { return next(err); }
+
+        var appExtId = uuidUtil.stripDashes(app.extId);
 
         if (searchResult.total === 0) {
             return next("No ambiguous dev search results for app:" + app.extId);
         } else if (searchResult.total === 1) {
-            if (searchResult.apps[0].id !== uuidUtil.stripDashes(app.extId)) {
+            if (searchResult.apps[0].id !== appExtId) {
                 return next("Ambiguous dev search did not return source app:" + app.extId);
             }
         }
@@ -102,7 +132,7 @@ var getAmbiguousDevTerms = function(strippedName, app, next) {
         });
 
         searchResult.apps.forEach(function(searchApp) {
-            if (searchApp.id === uuidUtil.stripDashes(app.extId)) {
+            if (searchApp.id === appExtId) {
                 return;
             }
 
@@ -124,10 +154,10 @@ var getAmbiguousDevTerms = function(strippedName, app, next) {
     });
 };
 
-var getTopAmbiguousAppId = function(strippedName, app, next) {
+var getTopAmbiguousAppId = function(strippedAnalysis, app, next) {
     var deltaThreshold = 0.2;
 
-    appSearcher.searchGlobalAmbiguous(strippedName, app.devName, function(err, searchResult) {
+    appSearcher.searchGlobalAmbiguous(strippedAnalysis.strippedName, app.devName, function(err, searchResult) {
         if (err) { return next(err); }
 
         if (searchResult.total === 0) {
@@ -160,18 +190,12 @@ var getTopAmbiguousAppId = function(strippedName, app, next) {
     });
 };
 
-var getCanUseShortName = function(app, strippedName, next) {
-    var strippedShortName = stripIgnoreTerms(getShortName(app.name));
-
-    if (!strippedShortName || strippedShortName.trim() === '') {
+var getGlobalCanUseShortName = function(app, strippedAnalysis, next) {
+    if (!strippedAnalysis.strippedShortName) {
         return next(null, false);
     }
 
-    if (strippedName === strippedShortName) {
-        return next(null, false);
-    }
-
-    appSearcher.searchGlobalAmbiguous(strippedShortName, null, function(err, searchResult) {
+    appSearcher.searchGlobalAmbiguous(strippedAnalysis.strippedShortName, null, function(err, searchResult) {
         if (err) { return next(err); }
 
         if (searchResult.total === 0) {
@@ -190,7 +214,89 @@ var getCanUseShortName = function(app, strippedName, next) {
     });
 };
 
-var processApp = function(app, next) {
+var getDevShortNameAmbiguousTerms = function(app, strippedAnalysis, next) {
+    if (!strippedAnalysis.strippedShortName) {
+        return next(null, false);
+    }
+
+    appSearcher.searchDevAmbiguous(strippedAnalysis.strippedShortName, app.devName, function(err, searchResult) {
+        if (err) { return next(err); }
+
+        var appExtId = uuidUtil.stripDashes(app.extId);
+
+        if (searchResult.total === 0) {
+            return next("No short name dev search results for app:" + app.extId);
+        } else if (searchResult.total === 1) {
+            if (searchResult.apps[0].id !== appExtId) {
+                return next("Dev short name search did not return source app:" + app.extId);
+            }
+        }
+
+        var termMap = Object.create(null);
+        var ambiguousTermMap = Object.create(null);
+
+        strippedAnalysis.shortAnalysis.shortName.split(termRegex).forEach(function(term) {
+            termMap[term] = true;
+        });
+
+        var addAmbiguousTerm = function(term) {
+            if (!ignoreTerms[term] && !termMap[term]) {
+                ambiguousTermMap[term] = true;
+            }
+        };
+
+        for (var i = 0; i < searchResult.apps.length; i++) {
+            var searchApp = searchResult.apps[i];
+            if (searchApp.id === appExtId) {
+                continue;
+            }
+
+            var searchAppLower = searchApp.name.toLowerCase();
+            var shortAnalysis = getShortAnalysis(searchAppLower);
+
+            if (!shortAnalysis) {
+                return next(null, false);
+            }
+
+            if (shortAnalysis.remainder !== strippedAnalysis.shortAnalysis.remainder) {
+                return next(null, false);
+            }
+
+            shortAnalysis.shortName.split(termRegex).forEach(addAmbiguousTerm);
+        }
+
+        var ambiguousTerms;
+
+        var keys = Object.keys(ambiguousTermMap);
+        if (keys.length > 0) {
+            ambiguousTerms = keys;
+        }
+
+        next(null, true, ambiguousTerms);
+    });
+};
+
+var analyseShortName = function(app, strippedAnalysis, next) {
+    getGlobalCanUseShortName(app, strippedAnalysis, function(err, result) {
+        if (err) { return next(err); }
+
+        if (result === true) {
+            return next(null, true);
+        }
+
+        getDevShortNameAmbiguousTerms(app, strippedAnalysis, function(err, result, terms) {
+            if (err) { return next(err); }
+
+            if (result === true) {
+                return next(null, true, terms);
+            }
+
+            return next(null, false);
+        });
+    });
+};
+
+var analyseAmbiguity = function(app, next) {
     var appAmbiguity = {
         appId: app.id,
         isDevAmbiguous: false,
@@ -200,51 +306,54 @@ var processApp = function(app, next) {
         ambiguousDevTerms: null
     };
 
-    var strippedName = stripIgnoreTerms(app.name);
+    var strippedAnalysis = getStrippedAnalysis(app.name);
 
-    getAmbiguousDevTerms(strippedName, app, function(err, ambiguousTerms) {
+    analyseShortName(app, strippedAnalysis, function(err, canUseShortName, ambiguousDevTerms) {
         if (err) {
             appAmbiguity.errorMsg = err;
-
-            return appStoreAdminRepo.insertAppAmbiguity(appAmbiguity, function(err) {
-                next(err);
-            });
+            return next(null, appAmbiguity);
         }
 
-        if (ambiguousTerms && ambiguousTerms.length > 0) {
-            appAmbiguity.isDevAmbiguous = true;
-            appAmbiguity.ambiguousDevTerms = ambiguousTerms;
+        if (canUseShortName === true) {
+            appAmbiguity.canUseShortName = true;
+            appAmbiguity.ambiguousDevTerms = ambiguousDevTerms;
+            return next(null, appAmbiguity);
         }
 
-        getTopAmbiguousAppId(strippedName, app, function(err, topAppId) {
+        getAmbiguousDevTerms(strippedAnalysis, app, function(err, ambiguousTerms) {
             if (err) {
                 appAmbiguity.errorMsg = err;
-
-                return appStoreAdminRepo.insertAppAmbiguity(appAmbiguity, function(err) {
-                    next(err);
-                });
+                return next(null, appAmbiguity);
             }
 
-            if (topAppId) {
-                appAmbiguity.isGloballyAmbiguous = true;
-                appAmbiguity.topAmbiguousAppExtId = topAppId;
+            if (ambiguousTerms && ambiguousTerms.length > 0) {
+                appAmbiguity.isDevAmbiguous = true;
+                appAmbiguity.ambiguousDevTerms = ambiguousTerms;
             }
 
-            getCanUseShortName(app, strippedName, function(err, canUseShortName) {
+            getTopAmbiguousAppId(strippedAnalysis, app, function(err, topAppId) {
                 if (err) {
                     appAmbiguity.errorMsg = err;
-
-                    return appStoreAdminRepo.insertAppAmbiguity(appAmbiguity, function(err) {
-                        next(err);
-                    });
+                    return next(null, appAmbiguity);
                 }
 
-                appAmbiguity.canUseShortName = canUseShortName;
+                if (topAppId) {
+                    appAmbiguity.isGloballyAmbiguous = true;
+                    appAmbiguity.topAmbiguousAppExtId = topAppId;
+                }
 
-                appStoreAdminRepo.insertAppAmbiguity(appAmbiguity, function(err) {
-                    next(err);
-                });
+                return next(null, appAmbiguity);
             });
+        });
+    });
+};
+
+var processApp = function(app, next) {
+    analyseAmbiguity(app, function(err, appAmbiguity) {
+        if (err) { return next(err); }
+
+        appStoreAdminRepo.insertAppAmbiguity(appAmbiguity, function(err) {
+            next(err);
         });
     });
 };
@@ -272,7 +381,6 @@ var analyse = function(next) {
 
     batchLoop(0);
 };
-
 
 exports.analyse = analyse;
 exports.stripIgnoreTerms = stripIgnoreTerms;
