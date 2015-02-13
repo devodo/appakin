@@ -191,10 +191,6 @@ var getTopAmbiguousAppId = function(strippedAnalysis, app, next) {
 };
 
 var getGlobalCanUseShortName = function(app, strippedAnalysis, next) {
-    if (!strippedAnalysis.strippedShortName) {
-        return next(null, false);
-    }
-
     appSearcher.searchGlobalAmbiguous(strippedAnalysis.strippedShortName, null, function(err, searchResult) {
         if (err) { return next(err); }
 
@@ -203,22 +199,18 @@ var getGlobalCanUseShortName = function(app, strippedAnalysis, next) {
         }
 
         if (searchResult.total > 1) {
-            return next(null, false);
+            return next(null, false, searchResult.total);
         }
 
         if (searchResult.apps[0].id !== uuidUtil.stripDashes(app.extId)) {
             return next("Short name search result does not equal source app:" + app.extId);
         }
 
-        return next(null, true);
+        return next(null, true, searchResult.total);
     });
 };
 
-var getDevShortNameAmbiguousTerms = function(app, strippedAnalysis, next) {
-    if (!strippedAnalysis.strippedShortName) {
-        return next(null, false);
-    }
-
+var getDevShortNameAmbiguousTerms = function(app, strippedAnalysis, globalTotal, next) {
     appSearcher.searchDevAmbiguous(strippedAnalysis.strippedShortName, app.devName, function(err, searchResult) {
         if (err) { return next(err); }
 
@@ -230,6 +222,11 @@ var getDevShortNameAmbiguousTerms = function(app, strippedAnalysis, next) {
             if (searchResult.apps[0].id !== appExtId) {
                 return next("Dev short name search did not return source app:" + app.extId);
             }
+        }
+
+        // If the totals are not equal there are matches external to the dev apps
+        if (searchResult.total !== globalTotal) {
+            return next(null, false);
         }
 
         var termMap = Object.create(null);
@@ -277,17 +274,21 @@ var getDevShortNameAmbiguousTerms = function(app, strippedAnalysis, next) {
 };
 
 var analyseShortName = function(app, strippedAnalysis, next) {
-    getGlobalCanUseShortName(app, strippedAnalysis, function(err, result) {
+    if (!strippedAnalysis.strippedShortName) {
+        return next(null, false);
+    }
+
+    getGlobalCanUseShortName(app, strippedAnalysis, function(err, canUse, total) {
         if (err) { return next(err); }
 
-        if (result === true) {
+        if (canUse === true) {
             return next(null, true);
         }
 
-        getDevShortNameAmbiguousTerms(app, strippedAnalysis, function(err, result, terms) {
+        getDevShortNameAmbiguousTerms(app, strippedAnalysis, total, function(err, canUse, terms) {
             if (err) { return next(err); }
 
-            if (result === true) {
+            if (canUse === true) {
                 return next(null, true, terms);
             }
 
@@ -384,3 +385,4 @@ var analyse = function(next) {
 
 exports.analyse = analyse;
 exports.stripIgnoreTerms = stripIgnoreTerms;
+exports.getStrippedAnalysis = getStrippedAnalysis;
