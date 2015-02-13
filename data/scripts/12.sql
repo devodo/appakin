@@ -3,6 +3,7 @@ CREATE TABLE app_ambiguity
 	app_id integer NOT NULL,
 	is_dev_ambiguous boolean NOT NULL,
 	is_globally_ambiguous boolean NOT NULL,
+	can_use_short_name boolean NOT NULL,
 	top_ambiguous_app_ext_id uuid,
 	ambiguous_dev_terms text[],
 	error_msg text,

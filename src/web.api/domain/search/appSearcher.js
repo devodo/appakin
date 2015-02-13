@@ -137,13 +137,16 @@ var searchDevAmbiguous = function(name, devName, next) {
 
 var searchGlobalAmbiguous = function(name, devName, next) {
     var nameEncoded = encodeURIComponent(solrCore.escapeSolrParserChars(name));
-    var devNameEncoded = encodeURIComponent(solrCore.escapeSolrParserChars(devName));
 
     var solrQuery =
         'q=name:"' + nameEncoded + '"' +
-        '&fq=-publisher:"' + devNameEncoded +'"' +
         '&sort=popularity%20desc&q.op=AND&rows=1' +
         '&fl=id,popularity';
+
+    if (devName) {
+        var devNameEncoded = encodeURIComponent(solrCore.escapeSolrParserChars(devName));
+        solrQuery += '&fq=-publisher:"' + devNameEncoded +'"';
+    }
 
     solrCore.client.get('select', solrQuery, function (err, obj) {
         if (err) {

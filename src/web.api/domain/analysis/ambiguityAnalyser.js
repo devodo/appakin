@@ -69,6 +69,17 @@ var stripIgnoreTerms = function(input) {
     return result;
 };
 
+var getShortName = function(input) {
+    var formatRegex = /(.*?)((:\s+|\s+\-|\s+\u2013|\s+\u2014).*)/;
+    var matches = formatRegex.exec(input);
+
+    if (!matches) {
+        return input;
+    }
+
+    return matches[1];
+};
+
 var getAmbiguousDevTerms = function(strippedName, app, next) {
     var termRegex = /[^a-zA-Z0-9]+/g;
 
@@ -149,11 +160,42 @@ var getTopAmbiguousAppId = function(strippedName, app, next) {
     });
 };
 
+var getCanUseShortName = function(app, strippedName, next) {
+    var strippedShortName = stripIgnoreTerms(getShortName(app.name));
+
+    if (!strippedShortName || strippedShortName.trim() === '') {
+        return next(null, false);
+    }
+
+    if (strippedName === strippedShortName) {
+        return next(null, false);
+    }
+
+    appSearcher.searchGlobalAmbiguous(strippedShortName, null, function(err, searchResult) {
+        if (err) { return next(err); }
+
+        if (searchResult.total === 0) {
+            return next("No short name search results for app:" + app.extId);
+        }
+
+        if (searchResult.total > 1) {
+            return next(null, false);
+        }
+
+        if (searchResult.apps[0].id !== uuidUtil.stripDashes(app.extId)) {
+            return next("Short name search result does not equal source app:" + app.extId);
+        }
+
+        return next(null, true);
+    });
+};
+
 var processApp = function(app, next) {
     var appAmbiguity = {
         appId: app.id,
         isDevAmbiguous: false,
         isGloballyAmbiguous: false,
+        canUseShortName: false,
         topAmbiguousAppExtId: null,
         ambiguousDevTerms: null
     };
@@ -188,8 +230,20 @@ var processApp = function(app, next) {
                 appAmbiguity.topAmbiguousAppExtId = topAppId;
             }
 
-            appStoreAdminRepo.insertAppAmbiguity(appAmbiguity, function(err) {
-                next(err);
+            getCanUseShortName(app, strippedName, function(err, canUseShortName) {
+                if (err) {
+                    appAmbiguity.errorMsg = err;
+
+                    return appStoreAdminRepo.insertAppAmbiguity(appAmbiguity, function(err) {
+                        next(err);
+                    });
+                }
+
+                appAmbiguity.canUseShortName = canUseShortName;
+
+                appStoreAdminRepo.insertAppAmbiguity(appAmbiguity, function(err) {
+                    next(err);
+                });
             });
         });
     });

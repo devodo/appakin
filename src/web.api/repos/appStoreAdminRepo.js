@@ -1238,14 +1238,15 @@ var insertAppAmbiguity = function(client, appAmbiguity, next) {
     var queryStr =
         "INSERT INTO app_ambiguity(" +
         "app_id, is_dev_ambiguous, is_globally_ambiguous, top_ambiguous_app_ext_id," +
-        "ambiguous_dev_terms, error_msg, date_created, date_modified)\n" +
-        "VALUES ($1, $2, $3, $4, $5, $6, NOW() at time zone 'utc', NOW() at time zone 'utc');";
+        "can_use_short_name, ambiguous_dev_terms, error_msg, date_created, date_modified)\n" +
+        "VALUES ($1, $2, $3, $4, $5, $6, $7, NOW() at time zone 'utc', NOW() at time zone 'utc');";
 
     var queryParams = [
         appAmbiguity.appId,
         appAmbiguity.isDevAmbiguous,
         appAmbiguity.isGloballyAmbiguous,
         appAmbiguity.topAmbiguousAppExtId,
+        appAmbiguity.canUseShortName,
         appAmbiguity.ambiguousDevTerms,
         appAmbiguity.errorMsg
     ];

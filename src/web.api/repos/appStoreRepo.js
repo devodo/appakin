@@ -12,7 +12,7 @@ var getAppByExtId = function (client, extId, next) {
         "seller_name, release_notes, min_os_version, language_codes, file_size_bytes,\n" +
         "advisory_rating, content_rating, user_rating_current, rating_count_current, user_rating,\n" +
         "rating_count, is_iphone, is_ipad, a.date_created, a.date_modified,\n" +
-        "aa.is_globally_ambiguous, aa.ambiguous_dev_terms\n" +
+        "aa.is_globally_ambiguous, aa.ambiguous_dev_terms, aa.can_use_short_name\n" +
         "FROM appstore_app a\n" +
         "LEFT JOIN app_ambiguity aa on a.app_id = aa.app_id\n" +
         "WHERE ext_id = $1;";
@@ -69,6 +69,7 @@ var getAppByExtId = function (client, extId, next) {
             isIpad: item.is_ipad,
             excludeTerms: item.ambiguous_dev_terms,
             includeDevName: item.is_globally_ambiguous === true,
+            canUseShortName: item.can_use_short_name === true,
             dateCreated: item.date_created,
             dateModified: item.date_modified
         };
