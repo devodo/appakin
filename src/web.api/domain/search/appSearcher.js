@@ -96,14 +96,14 @@ var search = function(queryStr, pageNum, filters, next) {
     });
 };
 
-var searchDevAmbiguous = function(name, devName, next) {
+var searchDevAmbiguous = function(name, devName, maxRows, next) {
     var nameEncoded = encodeURIComponent(solrCore.escapeSolrParserChars(name));
     var devNameEncoded = encodeURIComponent(solrCore.escapeSolrParserChars(devName));
 
     var solrQuery =
         'q=name:"' + nameEncoded + '"' +
         '&fq=publisher:"' + devNameEncoded +'"' +
-        '&sort=popularity%20desc&q.op=AND&rows=100' +
+        '&sort=popularity%20desc&q.op=AND&rows=' + maxRows
         '&fl=id,name_split,popularity';
 
     solrCore.client.get('select', solrQuery, function (err, obj) {
@@ -135,17 +135,21 @@ var searchDevAmbiguous = function(name, devName, next) {
     });
 };
 
-var searchGlobalAmbiguous = function(name, devName, next) {
+var searchNameMatches = function(name, devName, isDev, maxRows, minPopularity, next) {
     var nameEncoded = encodeURIComponent(solrCore.escapeSolrParserChars(name));
 
     var solrQuery =
         'q=name:"' + nameEncoded + '"' +
-        '&sort=popularity%20desc&q.op=AND&rows=1' +
-        '&fl=id,popularity';
+        '&sort=popularity%20desc&q.op=AND&rows=' + maxRows +
+        '&fl=id,name_split,popularity';
 
     if (devName) {
         var devNameEncoded = encodeURIComponent(solrCore.escapeSolrParserChars(devName));
-        solrQuery += '&fq=-publisher:"' + devNameEncoded +'"';
+        solrQuery += '&fq=' + (isDev === false ? '-' : '' ) + 'publisher:"' + devNameEncoded +'"';
+    }
+
+    if (minPopularity && minPopularity > 0) {
+        solrQuery += '&fq=popularity:[' + minPopularity +' TO *]';
     }
 
     solrCore.client.get('select', solrQuery, function (err, obj) {
@@ -161,6 +165,7 @@ var searchGlobalAmbiguous = function(name, devName, next) {
 
             var app = {
                 id: doc.id,
+                name: doc.name_split,
                 popularity: doc.popularity
             };
 
@@ -178,7 +183,7 @@ var searchGlobalAmbiguous = function(name, devName, next) {
 
 exports.search = search;
 exports.searchDevAmbiguous = searchDevAmbiguous;
-exports.searchGlobalAmbiguous = searchGlobalAmbiguous;
+exports.searchNameMatches = searchNameMatches;
 
 
 

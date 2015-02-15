@@ -63,5 +63,14 @@ exports.group = {
         test.expect(1);
         test.equal(result, output);
         test.done();
+    },
+
+    testAnalysis: function(test) {
+        var input = "A.B.C Mix Up - Do You Know Your Alphabet?";
+        var output = "alice";
+        var result = ambiguityAnalyser.getStrippedAnalysis(input);
+        test.expect(1);
+        test.equal(result, output);
+        test.done();
     }
 };
