@@ -172,7 +172,8 @@ var searchApps = function(queryStr, pageNum, categoryId, filters, next) {
                 url: urlUtil.makeUrl(doc.id, doc.name_split),
                 imageUrl: doc.image_url,
                 price: doc.price,
-                position: doc.position
+                position: doc.position,
+                rating: doc.rating
             };
 
             var highlight = getAppHighlight(highlights, doc.id);
