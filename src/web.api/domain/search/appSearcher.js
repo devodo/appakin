@@ -73,7 +73,7 @@ var search = function(queryStr, pageNum, filters, next) {
                 url: urlUtil.makeUrl(doc.id, doc.name_split),
                 imageUrl: doc.img_url,
                 price: doc.price,
-                popularity: doc.popularity
+                rating: doc.rating
             };
 
             if (highlight) {

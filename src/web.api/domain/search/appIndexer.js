@@ -4,6 +4,7 @@ var appStoreRepo = require('../../repos/appStoreRepo');
 var solrCore = require('./solrCore').getAppSolrCore();
 var log = require('../../logger');
 var stringUtil = require('../../domain/stringUtil');
+var appRank = require('../../domain/analysis/appRank');
 
 var createSolrApp = function(app) {
     var appIndex = {
@@ -16,7 +17,8 @@ var createSolrApp = function(app) {
         is_free: app.price === 0,
         is_iphone: app.isIphone === true,
         is_ipad: app.isIpad === true,
-        popularity: app.popularity
+        popularity: app.popularity,
+        rating: appRank.getRating(app)
     };
 
     var nameAscii = solrCore.asciiFold(app.name);

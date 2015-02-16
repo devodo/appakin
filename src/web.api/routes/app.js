@@ -2,13 +2,9 @@
 var log = require('../logger');
 var urlUtil = require('../domain/urlUtil');
 var appStoreRepo = require('../repos/appStoreRepo');
+var appRank = require('../domain/analysis/appRank');
 
-var MS_PER_DAY = 24*60*60*1000; // hours*minutes*seconds*milliseconds
-var POPULARITY_WEIGTH = 0.7;
-var RATING_COUNT_WEIGTH = 0.6;
-var RATING_AMPLIFY = 1.05;
-var CURRENT_COUNT_WEIGTH = 1.5;
-var PAGE_SIZE = 10;
+var MAX_CATEGORIES = 10;
 
 exports.init = function init(app) {
 
@@ -41,7 +37,7 @@ exports.init = function init(app) {
                 return res.redirect(301, '/ios/app/' + appUrl);
             }
 
-            appStoreRepo.getAppCategories(app.id, 0, PAGE_SIZE, function(err, cats) {
+            appStoreRepo.getAppCategories(app.id, 0, MAX_CATEGORIES, function(err, cats) {
                 if (err) {
                     log.error(err);
                     return res.status(500).json({error: 'Error retrieving app category data'});
@@ -55,32 +51,11 @@ exports.init = function init(app) {
                 app.url = appUrl;
                 app.categories = cats;
 
-                if (app.ratingCount) {
-                    var ageDays = Math.max(10, (new Date().getTime() - app.releaseDate.getTime()) / MS_PER_DAY);
-                    app.popularity = Math.min(1.0, RATING_AMPLIFY * (1 - Math.exp(-POPULARITY_WEIGTH * Math.log(1 + (app.ratingCount/ageDays)))));
-                } else {
-                    app.popularity = 0;
-                }
-
-                var r1 = app.userRating ? parseFloat(app.userRating) : 0;
-                var r2 = app.userRatingCurrent ? parseFloat(app.userRatingCurrent) : 0;
-
-                if (r1 === r2 || r2 === 0) {
-                    app.rating = r1;
-                } else if (r1 === 0) {
-                    app.rating = r2;
-                }
-                else {
-                    var r2Count = app.ratingCountCurrent ? app.ratingCountCurrent : 0;
-                    var r1Count = app.ratingCount && app.ratingCount > r2Count ? app.ratingCount - r2Count : 0;
-                    var r1CountWeighted = r1Count ? Math.pow(r1Count, RATING_COUNT_WEIGTH) : 0;
-                    var r2CountWeighted = r2Count ? Math.pow(r2Count, CURRENT_COUNT_WEIGTH) : 0;
-                    var countSum = Math.max(1, r1CountWeighted + r2CountWeighted);
-                    app.rating = ((r1 * r1CountWeighted) + (r2 * r2CountWeighted)) / countSum;
-                }
+                app.popularity = appRank.getPopularity(app);
+                app.rating = appRank.getRating(app);
 
                 app.id = app.extId.replace(/\-/g, '');
-                //delete app.extId;
+                delete app.extId;
                 delete app.storeAppId;
                 delete app.censoredName;
                 delete app.storeUrl;

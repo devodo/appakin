@@ -5,6 +5,7 @@ var solrCore = require('./solrCore').getCategoryCore();
 var text = require('../text');
 var log = require('../../logger');
 var stringUtil = require('../../domain/stringUtil');
+var appRank = require('../../domain/analysis/appRank');
 var fs = require('fs');
 
 var PARENT_TYPE = 1;
@@ -25,6 +26,7 @@ var addCategory = function(localSolrCore, category, apps, next) {
             position: app.position,
             price: app.price,
             popularity: app.popularity,
+            rating: appRank.getRating(app),
             is_iphone: app.isIphone === true,
             is_ipad: app.isIpad === true,
             is_free: app.price === 0,

@@ -324,7 +324,9 @@ var getAppCategories = function(client, appId, skip, take, next) {
 var getAppIndexBatch = function(client, lastId, limit, next) {
     var queryStr =
         "SELECT a.app_id, a.ext_id, a.name, a.description, a.store_url, a.supported_devices,\n" +
-        "a.artwork_small_url, a.price, a.is_iphone, a.is_ipad, a.dev_name, ap.popularity\n" +
+        "a.artwork_small_url, a.price, a.is_iphone, a.is_ipad, a.dev_name,\n" +
+        "a.user_rating_current, a.rating_count_current, a.user_rating, a.rating_count,\n" +
+        "ap.popularity\n" +
         "FROM appstore_app a\n" +
         "LEFT JOIN app_popularity ap on a.app_id = ap.app_id\n" +
         "WHERE a.app_id > $1\n" +
@@ -355,6 +357,10 @@ var getAppIndexBatch = function(client, lastId, limit, next) {
                 isIphone: item.is_iphone,
                 isIpad: item.is_ipad,
                 developerName: item.dev_name,
+                userRatingCurrent: item.user_rating_current,
+                ratingCountCurrent: item.rating_count_current,
+                userRating: item.user_rating,
+                ratingCount: item.rating_count,
                 popularity: item.popularity
             };
         });
@@ -505,7 +511,9 @@ var getCategoryAppDescriptions = function(client, categoryId, limit, next) {
 var getCategoryAppsForIndex = function(client, categoryId, next) {
     var queryStr =
         "SELECT a.app_id, a.ext_id, a.name, a.description, a.store_url, a.supported_devices,\n" +
-        "a.artwork_small_url, a.price, a.is_iphone, a.is_ipad, a.dev_name, ap.popularity, ca.position\n" +
+        "a.artwork_small_url, a.price, a.is_iphone, a.is_ipad, a.dev_name,\n" +
+        "a.user_rating_current, a.rating_count_current, a.user_rating, a.rating_count,\n" +
+        "ap.popularity, ca.position\n" +
         "FROM appstore_app a\n" +
         "JOIN category_app ca on a.app_id = ca.app_id\n" +
         "LEFT JOIN app_popularity ap on a.app_id = ap.app_id\n" +
@@ -532,6 +540,10 @@ var getCategoryAppsForIndex = function(client, categoryId, next) {
                 isIphone: item.is_iphone,
                 isIpad: item.is_ipad,
                 developerName: item.dev_name,
+                userRatingCurrent: item.user_rating_current,
+                ratingCountCurrent: item.rating_count_current,
+                userRating: item.user_rating,
+                ratingCount: item.rating_count,
                 popularity: item.popularity,
                 position: item.position
             };

@@ -52,7 +52,8 @@ var getApps = function(expanded, highlights, docId) {
             url: urlUtil.makeUrl(appDoc.id, appDoc.name_split),
             imageUrl: appDoc.image_url,
             price: appDoc.price,
-            position: appDoc.position
+            position: appDoc.position,
+            rating: appDoc.rating
         };
 
         var highlight = getAppHighlight(highlights, appDoc.id);
