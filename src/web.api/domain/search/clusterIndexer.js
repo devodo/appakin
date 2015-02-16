@@ -15,7 +15,8 @@ var createSolrDoc = function(app) {
         "screenshot_urls": app.screenShotUrls,
         "ipad_screenshot_urls": app.iPadScreenShotUrls,
         popularity: app.popularity,
-        "is_english": app.isEnglish
+        "is_english": app.isEnglish,
+        "dev_id": app.devId
     };
 
     return doc;

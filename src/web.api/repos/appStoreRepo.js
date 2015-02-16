@@ -371,7 +371,9 @@ var getAppIndexBatch = function(client, lastId, limit, next) {
 
 var getClusterIndexBatch = function(client, lastId, limit, next) {
     var queryStr =
-        "SELECT a.app_id, a.ext_id, a.name, a.description, a.genres, a.screenshot_urls, a.ipad_screenshot_urls, ap.popularity, aa.desc_is_english\n" +
+        "SELECT a.app_id, a.ext_id, a.name, a.description, a.genres," +
+        "a.screenshot_urls, a.ipad_screenshot_urls, a.dev_id, " +
+        "ap.popularity, aa.desc_is_english\n" +
         "FROM appstore_app a\n" +
         "LEFT JOIN app_analysis aa\n" +
         "ON a.app_id = aa.app_id\n" +
@@ -397,6 +399,7 @@ var getClusterIndexBatch = function(client, lastId, limit, next) {
                 id: item.app_id,
                 extId: item.ext_id,
                 name: item.name,
+                devId: item.dev_id,
                 description: item.description,
                 genres: item.genres,
                 screenShotUrls: item.screenshot_urls,
