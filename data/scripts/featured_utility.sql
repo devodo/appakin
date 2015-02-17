@@ -1,3 +1,8 @@
+begin transaction;
+
+delete from featured_homepage_app
+where featured_app_type = 1;
+
 INSERT INTO featured_homepage_app(app_id, category_id, weight, featured_app_type, date_created, date_modified)
 select app_id, category_id, popularity, 1, NOW() at time zone 'utc', NOW() at time zone 'utc'
 from (
@@ -18,6 +23,9 @@ from (
 	where num <= 20
 	order by category_id, popularity desc
 ) t;
+
+delete from featured_category_app
+where featured_app_type = 1;
 
 INSERT INTO featured_category_app(app_id, category_id, weight, featured_app_type, date_created, date_modified)
 select app_id, category_id, popularity, 1, NOW() at time zone 'utc', NOW() at time zone 'utc'
@@ -40,6 +48,7 @@ from (
 	order by category_id, popularity desc
 ) t;
 
+delete from featured_homepage_category;
 
 INSERT INTO featured_homepage_category(category_id, weight, date_created, date_modified)
 select c.id, t.score, NOW() at time zone 'utc', NOW() at time zone 'utc'
@@ -72,3 +81,10 @@ where c.date_deleted is null
 and (x.id is null or not x.include)
 order by t.score desc
 limit 50;
+
+commit;
+
+
+INSERT INTO featured_category_app(app_id, category_id, weight, fixed_order, featured_app_type,
+																	date_created, date_modified, date_deleted, start_date, end_date)
+VALUES (1133860, 865, 0, 1, 3, now(), now(), null, now(), null);
