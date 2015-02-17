@@ -75,6 +75,16 @@ exports.init = function init(app) {
         res.json({status: 'rebuild started'});
     });
 
+    app.post('/admin/search/app/index_app', function (req, res, next) {
+        var appId = req.body.appId;
+
+        appIndexer.indexApp(appId, function(err) {
+            if (err) { return next(err); }
+
+            res.json({status: 'success'});
+        });
+    });
+
     app.post('/admin/search/cluster/rebuild', function (req, res) {
         var batchSize = 10000;
         log.debug("Starting rebuild of cluster index");
@@ -86,6 +96,17 @@ exports.init = function init(app) {
         });
 
         res.json({status: 'rebuild started'});
+    });
+
+    app.post('/admin/search/cluster/index_app', function (req, res, next) {
+        var appId = req.body.appId;
+        var forceIsEnglish = true;
+
+        clusterIndexer.indexApp(appId, forceIsEnglish, function(err) {
+            if (err) { return next(err); }
+
+            res.json({status: 'success'});
+        });
     });
 
     app.get('/admin/search/cat/keywords/:catid', function (req, res) {

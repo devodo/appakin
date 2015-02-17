@@ -55,6 +55,34 @@ var indexApps = function(tempCore, batchSize, next) {
     processBatch(0);
 };
 
+var indexApp = function(appId, forceIsEnglish, next) {
+    log.debug("Indexing app id: " + appId);
+
+    appStoreRepo.getClusterIndexApp(appId, function(err, app) {
+        if (err) { return next(err); }
+
+        if (!app) {
+            return next("No app found for id: " + appId);
+        }
+
+        if (forceIsEnglish === true) {
+            app.isEnglish = true;
+        }
+
+        var solrApp = createSolrDoc(app);
+
+        solrCore.client.add(solrApp, function(err){
+            if(err) { return next(err); }
+
+            solrCore.commit(function(err) {
+                if (err) { return next(err); }
+
+                next();
+            });
+        });
+    });
+};
+
 var rebuild = function(batchSize, next) {
     log.debug("Creating temp core");
     solrCore.createTempCore(function(err, tempCore) {
@@ -77,9 +105,17 @@ var rebuild = function(batchSize, next) {
             });
         });
     });
+};
 
+var rebuildApp = function(appId, next) {
+    indexApp(solrCore, appId, function(err) {
+        if (err) { return next(err); }
+
+        next();
+    });
 };
 
 exports.rebuild = rebuild;
+exports.indexApp = indexApp;
 
 

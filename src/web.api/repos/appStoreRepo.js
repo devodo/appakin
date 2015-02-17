@@ -369,6 +369,48 @@ var getAppIndexBatch = function(client, lastId, limit, next) {
     });
 };
 
+var getAppIndexApp = function(client, appId, next) {
+    var queryStr =
+        "SELECT a.app_id, a.ext_id, a.name, a.description, a.store_url, a.supported_devices,\n" +
+        "a.artwork_small_url, a.price, a.is_iphone, a.is_ipad, a.dev_name,\n" +
+        "a.user_rating_current, a.rating_count_current, a.user_rating, a.rating_count,\n" +
+        "ap.popularity\n" +
+        "FROM appstore_app a\n" +
+        "LEFT JOIN app_popularity ap on a.app_id = ap.app_id\n" +
+        "WHERE a.app_id = $1\n" +
+        "AND a.name is not null\n" +
+        "AND a.date_deleted is null;";
+
+    client.query(queryStr, [appId], function (err, result) {
+        if (err) { return next(err); }
+
+        if (result.rows.length === 0) {
+            return next(null, null);
+        }
+
+        var item = result.rows[0];
+        var app = {
+                id: item.app_id,
+                extId: item.ext_id,
+                name: item.name,
+                description: item.description,
+                supportedDevices: item.supported_devices,
+                imageUrl: item.artwork_small_url,
+                price: item.price,
+                isIphone: item.is_iphone,
+                isIpad: item.is_ipad,
+                developerName: item.dev_name,
+                userRatingCurrent: item.user_rating_current,
+                ratingCountCurrent: item.rating_count_current,
+                userRating: item.user_rating,
+                ratingCount: item.rating_count,
+                popularity: item.popularity
+            };
+
+        next(null, app);
+    });
+};
+
 var getClusterIndexBatch = function(client, lastId, limit, next) {
     var queryStr =
         "SELECT a.app_id, a.ext_id, a.name, a.description, a.genres," +
@@ -410,6 +452,44 @@ var getClusterIndexBatch = function(client, lastId, limit, next) {
         });
 
         next(null, items);
+    });
+};
+
+var getClusterIndexApp = function(client, appId, next) {
+    var queryStr =
+        "SELECT a.app_id, a.ext_id, a.name, a.description, a.genres," +
+        "a.screenshot_urls, a.ipad_screenshot_urls, a.dev_id, " +
+        "ap.popularity, aa.desc_is_english\n" +
+        "FROM appstore_app a\n" +
+        "LEFT JOIN app_analysis aa\n" +
+        "ON a.app_id = aa.app_id\n" +
+        "LEFT JOIN app_popularity ap\n" +
+        "ON a.app_id = ap.app_id\n" +
+        "WHERE a.app_id = $1\n" +
+        "AND a.date_deleted is null;";
+
+    client.query(queryStr, [appId], function (err, result) {
+        if (err) { return next(err); }
+
+        if (result.rows.length === 0) {
+            return next(null, null);
+        }
+
+        var item = result.rows[0];
+        var app = {
+            id: item.app_id,
+            extId: item.ext_id,
+            name: item.name,
+            devId: item.dev_id,
+            description: item.description,
+            genres: item.genres,
+            screenShotUrls: item.screenshot_urls,
+            iPadScreenShotUrls: item.ipad_screenshot_urls,
+            popularity: item.popularity,
+            isEnglish: item.desc_is_english
+        };
+
+        next(null, app);
     });
 };
 
@@ -682,6 +762,18 @@ exports.getAppIndexBatch = function(lastId, limit, next) {
     });
 };
 
+exports.getAppIndexApp = function(appId, next) {
+    connection.open(function(err, conn) {
+        if (err) { return next(err); }
+
+        getAppIndexApp(conn.client, appId, function(err, app) {
+            conn.close(err, function(err) {
+                next(err, app);
+            });
+        });
+    });
+};
+
 exports.getClusterIndexBatch = function(lastId, limit, next) {
     connection.open(function(err, conn) {
         if (err) {
@@ -695,6 +787,22 @@ exports.getClusterIndexBatch = function(lastId, limit, next) {
         });
     });
 };
+
+exports.getClusterIndexApp = function(appId, next) {
+    connection.open(function(err, conn) {
+        if (err) {
+            return next(err);
+        }
+
+        getClusterIndexApp(conn.client, appId, function(err, app) {
+            conn.close(err, function(err) {
+                next(err, app);
+            });
+        });
+    });
+};
+
+
 
 exports.getCategoryAppsIndexBatch = function(lastId, limit, next) {
     connection.open(function(err, conn) {
