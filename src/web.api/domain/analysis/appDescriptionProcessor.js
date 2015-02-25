@@ -101,7 +101,7 @@ function formLineGroupings(lines) {
         if (currentLine.content === '') {
             if (currentLineGrouping.length > 0) {
                 lineGroupings.push(currentLineGrouping);
-                currentLineGrouping = []
+                currentLineGrouping = [];
             }
         } else {
             currentLineGrouping.push(currentLine);
