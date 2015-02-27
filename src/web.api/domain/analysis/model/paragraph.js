@@ -73,6 +73,23 @@ Paragraph.prototype.forEachActiveSentence = function(includeLists, callback) {
     }
 };
 
+Paragraph.prototype.forEachActiveList = function(callback) {
+    if (this.isRemoved) {
+        return;
+    }
+
+    for (var i = 0; i < this.elements.length; ++i) {
+        var element = this.elements[i];
+
+        if (element instanceof List && !element.isRemoved) {
+            var result = callback(element);
+            if (result) {
+                break;
+            }
+        }
+    }
+};
+
 Paragraph.prototype.getResult = function() {
     var result = '';
 

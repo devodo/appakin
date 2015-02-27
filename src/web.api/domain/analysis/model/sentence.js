@@ -19,6 +19,10 @@ Sentence.prototype.conditionallyMarkAsRemoved = function(regex, reason) {
     this.removalReason = reason;
 };
 
+Sentence.prototype.getLength = function() {
+    return this.content.length;
+};
+
 Sentence.prototype.getResult = function() {
     return this.isRemoved ? '' : this.content;
 };
@@ -26,5 +30,13 @@ Sentence.prototype.getResult = function() {
 Sentence.prototype.getRemovedResult = function(force) {
     return !this.isRemoved && !force ? '' : (this.removalReason ? '<<' + this.removalReason + '>> ' : '') + this.content;
 };
+
+Sentence.prototype.getHtmlResult = function(force) {
+    if (this.isRemoved) {
+        return this.getResult();
+    } else {
+        return '<span class="">'
+    }
+}
 
 exports.Sentence = Sentence;

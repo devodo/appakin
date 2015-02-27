@@ -1,6 +1,6 @@
 'use strict';
 
-var nlpCompromise = require('nlp_compromise');
+var similarityTest = require('./similarityTest');
 var List = require('./model/list').List;
 
 // --------------------------------
@@ -147,6 +147,56 @@ function removeSentencesWithManyTrademarkSymbols(description) {
 
 // --------------------------------
 
+function removeListsOfAppsBySameDeveloperByMatchingAppNames(description) {
+    //if (description.appName.length)
+    description.forEachActiveParagraph(function(paragraph) {
+       paragraph.forEachActiveList(function(list) {
+           var listItemCount = list.getListItemCount();
+
+           // ignore short lists
+           if (listItemCount <= 2) {
+               return;
+           }
+
+           var appNameMatchCount = 0;
+
+           list.forEachListItem(function(listItem) {
+               // ignore lists with multi-sentence list items.
+               if (listItem.getSentenceCount() > 1) {
+                   return true;
+               }
+
+               var firstSentence = listItem.getSentence(0);
+
+               // ignore list items that are too long.
+               if (!firstSentence  || firstSentence.getLength() > 5) {
+                   return;
+               }
+
+               for (var i = 0; i < description.sameDeveloperAppNames.length; ++i) {
+                   var appNameToTest = description.sameDeveloperAppNames[i];
+
+                   if (similarityTest.isSimilar(firstSentence.content, appNameToTest)) {
+                       ++appNameMatchCount;
+                       return;
+                   }
+               }
+           });
+
+           if (appNameMatchCount > 0) {
+               list.markAsRemoved('by same developer')
+           }
+
+           //var matchRatio = (appNameMatchCount * 1.0) / listItemCount;
+           //if (matchRatio >= 0.7) {
+           //    list.markAsRemoved('by same developer');
+           //}
+       });
+    });
+}
+
+// --------------------------------
+
 exports.removeCopyrightParagraphs = removeCopyrightParagraphs;
 exports.removeSentencesWithUrls = removeSentencesWithUrls;
 exports.removeSentencesWithEmailAddresses = removeSentencesWithEmailAddresses;
@@ -154,10 +204,9 @@ exports.removeTermsAndConditionsParagraphs = removeTermsAndConditionsParagraphs;
 exports.removeListSentences = removeListSentences;
 exports.removeLongSentences = removeLongSentences;
 exports.removeSentencesWithManyTrademarkSymbols = removeSentencesWithManyTrademarkSymbols;
-
+exports.removeListsOfAppsBySameDeveloperByMatchingAppNames = removeListsOfAppsBySameDeveloperByMatchingAppNames;
 
 //"** DON'T MISS OUR OTHER EXCITING GAMES! **
-
-// all rights reserved
+// by same developer
 
 // MORE LITTLE GOLDEN BOOK APPS:\n- Barbie Princess and the Popstar\n- The Poky Little Puppy\n- The Little Red Hen\n\nMORE APPS FROM RANDOM HOUSE CHILDREN’S BOOKS:\n- Pat the Bunny\n- Princess Baby\n- Wild About Books\n- How Rocket Learned to Read\n\n",

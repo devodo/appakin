@@ -928,10 +928,9 @@ var getSeedSearches = function(client, seedCategoryId, next) {
     });
 };
 
-
 var getAppStoreApp = function(client, appId, next) {
     var queryStr =
-        "SELECT app_id, description\n" +
+        "SELECT app_id, name, description\n" +
         "FROM appstore_app\n" +
         "WHERE app_id = $1;";
 
@@ -945,17 +944,38 @@ var getAppStoreApp = function(client, appId, next) {
         }
 
         var item = result.rows[0];
-        var category = {
+        var app = {
             id: item.app_id,
+            name: item.name,
             description: item.description
         };
 
-        next(null, category);
+        next(null, app);
     });
 };
 
+var getAppStoreSameDeveloperApps = function(client, appId, next) {
+    var queryStr =
+        "SELECT name\n" +
+        "FROM appstore_app\n" +
+        "WHERE app_id != $1 AND dev_id = (SELECT dev_id FROM appstore_app WHERE app_id = $1);";
 
-var getAppStoreAppBatch = function(client, lastId, limit, next) {
+    client.query(queryStr, [appId], function (err, result) {
+        if (err) {
+            return next(err);
+        }
+
+        var items = result.rows.map(function(item) {
+            return {
+                name: item.name
+            };
+        });
+
+        next(null, items);
+    });
+};
+
+var getAppStoreEnglishAppBatch = function(client, lastId, limit, next) {
     var queryStr =
         "SELECT a.app_id, a.ext_id, a.name, a.description, a.dev_name\n" +
         "FROM appstore_app a\n" +
@@ -1389,15 +1409,29 @@ exports.getAppStoreApp = function(appId, next) {
     });
 };
 
-exports.getAppStoreAppBatch = function(lastId, limit, next) {
+exports.getAppStoreEnglishAppBatch = function(lastId, limit, next) {
     connection.open(function(err, conn) {
         if (err) {
             return next(err);
         }
 
-        getAppStoreAppBatch(conn.client, lastId, limit, function(err, result) {
+        getAppStoreEnglishAppBatch(conn.client, lastId, limit, function(err, result) {
             conn.close(err, function(err) {
                 next(err, result);
+            });
+        });
+    });
+};
+
+exports.getAppStoreSameDeveloperApps = function(appId, next) {
+    connection.open(function(err, conn) {
+        if (err) {
+            return next(err);
+        }
+
+        getAppStoreSameDeveloperApps(conn.client, appId, function(err, results) {
+            conn.close(err, function(err) {
+                next(err, results);
             });
         });
     });

@@ -11,6 +11,10 @@ List.prototype.markAsRemoved = function(reason) {
     this.removalReason = reason;
 };
 
+List.prototype.getListItemCount = function() {
+    return this.listItems.length;
+}
+
 List.prototype.getSentenceCount = function() {
     var sentenceCount = 0;
 
@@ -19,6 +23,22 @@ List.prototype.getSentenceCount = function() {
     }
 
     return sentenceCount;
+};
+
+List.prototype.forEachListItem = function(callback) {
+    var loopTerminated = false;
+
+    for (var i = 0; i < this.listItems.length; ++i) {
+        var listItem = this.listItems[i];
+
+        var result = callback(listItem);
+        if (result) {
+            loopTerminated = true;
+            break;
+        }
+    }
+
+    return loopTerminated;
 };
 
 List.prototype.forEachSentence = function(callback) {

@@ -3,7 +3,7 @@
 var proc = require('../../../domain/analysis/descriptionNormaliser');
 
 var nlpCompromise = require('nlp_compromise');
-
+var natural = require('natural');
 
 
 
@@ -48,10 +48,23 @@ exports.group = {
     testFoo: function (test) {
         var result = nlpCompromise.tokenize('This is a sentence. This is another.');
 
-        var parsedSentences = sentence_parser('How are you!?! That iss great.');
+        console.log(natural.JaroWinklerDistance("Zombie Tower Defence","Zombie Major Tower Defence"));
+        console.log(natural.JaroWinklerDistance("Zombie Tower Defence","Zombie Defence"));
+        console.log(natural.JaroWinklerDistance("Zombie Tower Defence"," Tower Defence Zombie Major"));
+        console.log(natural.JaroWinklerDistance("Zombie Tower Defence","cosy beds"));
+        console.log(natural.JaroWinklerDistance("Zombie Tower Defence"," beds"));
 
-        test.strictEqual(result[0].tokens.length, 4);
-        test.strictEqual(parsedSentences.length, 2);
+        // > 0.8, or > 0.9 for safety.
+        console.log('----');
+
+        console.log(natural.LevenshteinDistance("Zombie Tower Defence","Zombie Major Tower Defence"));
+        console.log(natural.LevenshteinDistance("Zombie Tower Defence","Zombie Defence"));
+        console.log(natural.LevenshteinDistance("Zombie Tower Defence"," Tower Defence Zombie Major"));
+        console.log(natural.LevenshteinDistance("Zombie Tower Defence","cosy beds"));
+        console.log(natural.LevenshteinDistance("Zombie Tower Defence"," beds"));
+        // < 10
+
+       // test.strictEqual(result[0].tokens.length, 2);
         test.done();
     }
 };

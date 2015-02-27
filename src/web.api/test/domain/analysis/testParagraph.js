@@ -1,6 +1,8 @@
 'use strict';
 
 var Paragraph = require('../../../domain/analysis/model/paragraph').Paragraph;
+var List = require('../../../domain/analysis/model/list').List;
+var ListItem = require('../../../domain/analysis/model/listItem').ListItem;
 var SentenceGroup = require('../../../domain/analysis/model/sentenceGroup').SentenceGroup;
 var Sentence = require('../../../domain/analysis/model/sentence').Sentence;
 
@@ -31,24 +33,76 @@ exports.group = {
         test.done();
     },
 
-    //testForEachActiveElement: function (test) {
-    //    var lines = [
-    //        new Line('aaa'),
-    //        new Line('bbb')
-    //    ];
-    //
-    //    lines[0].markAsRemoved();
-    //
-    //    var paragraph = new Paragraph(lines);
-    //    var resultLines = [];
-    //
-    //    paragraph.forEachActiveElement(true, function(line) {
-    //        resultLines.push(line);
-    //    });
-    //
-    //    test.equal(resultLines.length, 1);
-    //    test.done();
-    //},
+    testForEachActiveList: function (test) {
+        var paragraph = new Paragraph([
+            new List([
+                new ListItem([]),
+                new ListItem([])
+            ]),
+            new List([
+                new ListItem([]),
+                new ListItem([])
+            ])
+        ]);
+
+        var resultLists = [];
+
+        paragraph.forEachActiveList(function(list) {
+            resultLists.push(list);
+        });
+
+        test.strictEqual(resultLists.length, 2);
+        test.done();
+    },
+
+    testForEachActiveListWhenParagraphIsRemoved: function (test) {
+        var paragraph = new Paragraph([
+            new List([
+                new ListItem([]),
+                new ListItem([])
+            ]),
+            new List([
+                new ListItem([]),
+                new ListItem([])
+            ])
+        ]);
+
+        paragraph.markAsRemoved();
+        var resultLists = [];
+
+        paragraph.forEachActiveList(function(list) {
+            resultLists.push(list);
+        });
+
+        test.strictEqual(resultLists.length, 0);
+        test.done();
+    },
+
+    testForEachActiveListWhenOneListIsRemoved: function (test) {
+        var removedList = new List([
+            new ListItem([]),
+            new ListItem([])
+        ]);
+
+        removedList.markAsRemoved();
+
+        var paragraph = new Paragraph([
+            removedList,
+            new List([
+                new ListItem([]),
+                new ListItem([])
+            ])
+        ]);
+
+        var resultLists = [];
+
+        paragraph.forEachActiveList(function(list) {
+            resultLists.push(list);
+        });
+
+        test.strictEqual(resultLists.length, 1);
+        test.done();
+    },
 
     testGetElement: function (test) {
         var paragraph = new Paragraph([

@@ -12,6 +12,10 @@ ListItem.prototype.markAsRemoved = function(reason) {
     this.removalReason = reason;
 };
 
+ListItem.prototype.getSentence = function(index) {
+    return this.sentenceGroup.getSentence(index);
+};
+
 ListItem.prototype.getSentenceCount = function() {
     return this.sentenceGroup.getSentenceCount();
 };

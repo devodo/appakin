@@ -1,6 +1,7 @@
 'use strict';
 
 var XRegExp = require('xregexp').XRegExp;
+var similarityTest = require('./similarityTest');
 var Description = require('./model/description').Description;
 var Sentence = require('./model/sentence').Sentence;
 var SentenceGroup = require('./model/sentenceGroup').SentenceGroup;
@@ -198,7 +199,7 @@ function identifyOrderedBulletLists(lineGrouping) {
     return lineGrouping;
 }
 
-function createDescriptionModel(lineGroupings) {
+function createDescriptionModel(lineGroupings, sameDeveloperAppNames, appName, normalisedAppName) {
     // Create the description model.
 
     var paragraphs = [];
@@ -234,7 +235,7 @@ function createDescriptionModel(lineGroupings) {
         paragraphs.push(new Paragraph(elements));
     }
 
-    return new Description(paragraphs);
+    return new Description(paragraphs, sameDeveloperAppNames, appName, normalisedAppName);
 }
 
 function createListItem(content, bullet) {
@@ -305,7 +306,34 @@ function attachHeaderlessListsToPreviousLineGrouping(lineGroupings) {
     return fixedLineGroupings;
 }
 
-function createNormalisedDescription(appDescription) {
+function normaliseSameDeveloperAppNames(appName, sameDeveloperAppNames) {
+    var result = [];
+
+    for (var i = 0; i < sameDeveloperAppNames.length; ++i) {
+        var appNameToTest = sameDeveloperAppNames[i];
+        appNameToTest = normaliseAppName(appNameToTest);
+
+        if (similarityTest.isSimilar(appName, appNameToTest)) {
+            result.push('REMOVED>> ' + appNameToTest);
+            continue;
+        }
+
+        result.push(appNameToTest)
+    }
+
+    return result;
+}
+
+var normaliseAppNameRegex = /(.*?)((:\s+|\s+\-|\s+\u2013|\s+\u2014).*)/;
+
+function normaliseAppName(appName) {
+    var matches = normaliseAppNameRegex.exec(appName);
+    return matches ? matches[1] : appName;
+}
+
+function createNormalisedDescription(appDescription, appName, sameDeveloperAppNames) {
+    sameDeveloperAppNames = sameDeveloperAppNames || [];
+
     if (!appDescription) {
         return new Description([]);
     }
@@ -329,8 +357,12 @@ function createNormalisedDescription(appDescription) {
         });
 
     lineGroupings = attachHeaderlessListsToPreviousLineGrouping(lineGroupings);
-    //lineGroupings = splitSentences(lineGroupings);
-    return createDescriptionModel(lineGroupings);
+
+    var normalisedAppName = normaliseAppName(appName);
+    sameDeveloperAppNames = normaliseSameDeveloperAppNames(normalisedAppName, sameDeveloperAppNames);
+
+    var description = createDescriptionModel(lineGroupings, sameDeveloperAppNames, appName, normalisedAppName);
+    return description;
 }
 
 exports.createNormalisedDescription = createNormalisedDescription;

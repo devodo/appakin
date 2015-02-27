@@ -229,25 +229,40 @@ var normaliseDescription = function(appId, next) {
             return next(err);
         }
 
-        var normalisedDescription = descriptionNormaliser.createNormalisedDescription(app.description);
+        appStoreAdminRepo.getAppStoreSameDeveloperApps(app.id, function(err, sameDeveloperAppNames) {
+            if (err) {
+                return next(err);
+            }
 
-        normalisedDescription.forEachActiveParagraph(function(paragraph) {
-            paragraph.forEachSentence(true, function(sentence) {
-                delete sentence.tokens;
+            sameDeveloperAppNames = sameDeveloperAppNames.map(function(x) { return x.name; });
+
+            var normalisedDescription = descriptionNormaliser.createNormalisedDescription(
+                app.description,
+                app.name,
+                sameDeveloperAppNames
+            );
+
+            normalisedDescription.forEachActiveParagraph(function(paragraph) {
+                paragraph.forEachSentence(true, function(sentence) {
+                    delete sentence.tokens;
+                });
             });
+
+            var result = {
+                string: normalisedDescription.getResult(),
+                tree: normalisedDescription
+            };
+
+            return next(null, result);
         });
 
-        var result = {
-            string: normalisedDescription.getResult(),
-            tree: normalisedDescription
-        };
+        //var normalisedDescription = descriptionNormaliser.createNormalisedDescription(app.description);
 
-        return next(null, result);
     });
 };
 
 var testCleaningDescriptions = function(next) {
-    appStoreAdminRepo.getAppStoreAppBatch(0, 3000, function(err, apps) {
+    appStoreAdminRepo.getAppStoreEnglishAppBatch(0, 3000, function(err, apps) {
         if (err) {
             return next(err);
         }
@@ -260,29 +275,44 @@ var testCleaningDescriptions = function(next) {
         async.eachSeries(
             apps,
             function(app, callback) {
-                var normalisedDescription = descriptionNormaliser.createNormalisedDescription(app.description);
+                appStoreAdminRepo.getAppStoreSameDeveloperApps(app.id, function(err, sameDeveloperAppNames) {
+                    if (err) {
+                        return next(err);
+                    }
 
-                //descriptionProcessors.removeSentencesWithEmailAddresses(normalisedDescription);
-                //descriptionProcessors.removeSentencesWithUrls(normalisedDescription);
-                //descriptionProcessors.removeCopyrightParagraphs(normalisedDescription);
-                descriptionProcessors.removeTermsAndConditionsParagraphs(normalisedDescription);
-                //descriptionProcessors.removeListSentences(normalisedDescription);
-                //descriptionProcessors.removeLongSentences(normalisedDescription);
-                //descriptionProcessors.removeSentencesWithManyTrademarkSymbols(normalisedDescription);
+                    sameDeveloperAppNames = sameDeveloperAppNames.map(function(x) { return x.name; });
 
-                var result = normalisedDescription.getRemovedResult();
+                    // TODO exclude app names that are too similar to the current one.
+                    var normalisedDescription = descriptionNormaliser.createNormalisedDescription(
+                        app.description,
+                        app.name,
+                        sameDeveloperAppNames
+                    );
 
-                if (result) {
-                    results.apps.push({
-                        id: app.id,
-                        //name: app.name,
-                        removed: result
-                    });
+                    //descriptionProcessors.removeSentencesWithEmailAddresses(normalisedDescription);
+                    //descriptionProcessors.removeSentencesWithUrls(normalisedDescription);
+                    //descriptionProcessors.removeCopyrightParagraphs(normalisedDescription);
+                    //descriptionProcessors.removeTermsAndConditionsParagraphs(normalisedDescription);
+                    //descriptionProcessors.removeListSentences(normalisedDescription);
+                    //descriptionProcessors.removeLongSentences(normalisedDescription);
+                    //descriptionProcessors.removeSentencesWithManyTrademarkSymbols(normalisedDescription);
+                    descriptionProcessors.removeListsOfAppsBySameDeveloperByMatchingAppNames(normalisedDescription);
 
-                    ++results.count;
-                }
+                    var result = normalisedDescription.getRemovedResult();
 
-                callback();
+                    if (result) {
+                        results.apps.push({
+                            id: app.id,
+                            name: app.name,
+                            sameDeveloperAppNames: sameDeveloperAppNames,
+                            removed: result
+                        });
+
+                        ++results.count;
+                    }
+
+                    callback();
+                });
             },
             function(err) {
                 if (err) {

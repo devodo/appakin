@@ -1,7 +1,10 @@
 'use strict';
 
-function Description(paragraphs) {
+function Description(paragraphs, sameDeveloperAppNames, appName, normalisedAppName) {
     this.paragraphs = paragraphs || [];
+    this.sameDeveloperAppNames = sameDeveloperAppNames || [];
+    this.appName = appName;
+    this.normalisedAppName = normalisedAppName;
 }
 
 Description.prototype.forEachActiveParagraph = function(callback) {
