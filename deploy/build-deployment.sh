@@ -48,7 +48,7 @@ gzip ./output/appakin-deploy.tar
 echo 'finished building deployment output'
 echo 'uploading file'
 
-scp -i ../../appakin-azure.key ./output/appakin-deploy.tar.gz $1@appakin.cloudapp.net:
+scp -i ../../appakin-azure.key ./output/appakin-deploy.tar.gz $1@dapap.cloudapp.net:
 
 echo 'finished uploading file'
 

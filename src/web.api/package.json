@@ -23,6 +23,7 @@
     "line-reader": "^0.2.4",
     "morgan": "~1.0.0",
     "natural": "^0.1.28",
+    "nlp_compromise": "^0.3.1",
     "node-svm": "^1.3.0",
     "node-uuid": "^1.4.1",
     "node.extend": "^1.1.2",
@@ -42,8 +43,8 @@
     "validator": "^3.22.0",
     "winston": "^0.8.3",
     "wrench": "^1.5.8",
-    "yargs": "^1.3.3",
-    "xregexp": "^2.0.0"
+    "xregexp": "^2.0.0",
+    "yargs": "^1.3.3"
   },
   "devDependencies": {},
   "engines": {

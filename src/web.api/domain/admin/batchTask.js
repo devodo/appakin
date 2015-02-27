@@ -122,7 +122,7 @@ var rebuildAll = function(next) {
 };
 
 var analyseAmbiguity = function(next) {
-    log.debug("Starting amiguity analysis");
+    log.debug("Starting ambiguity analysis");
 
     ambiguityAnalyser.analyse(function(err) {
         next(err);

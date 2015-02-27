@@ -1,6 +1,12 @@
 'use strict';
 
-var proc = require('../../../domain/analysis/appDescriptionProcessor');
+var proc = require('../../../domain/analysis/descriptionNormaliser');
+
+var nlpCompromise = require('nlp_compromise');
+
+
+
+
 
 exports.group = {
     setUp: function (callback) {
@@ -21,32 +27,31 @@ exports.group = {
     testSingleParagraphDescription: function (test) {
         var appDescription = '   This is a description.      This is the second line.    ';
         var description = proc.createNormalisedDescription(appDescription);
-        test.strictEqual(description.getResult(), 'This is a description. This is the second line. ');
+        test.strictEqual(description.getResult(), 'This is a description. This is the second line.\n\n');
         test.done();
     },
 
     testDivider: function (test) {
         var appDescription = 'This is a description.\n******\nThis is the second line.';
         var description = proc.createNormalisedDescription(appDescription);
-        test.strictEqual(description.getResult(), 'This is a description. This is the second line. ');
+        test.strictEqual(description.getResult(), 'This is a description.\n\nThis is the second line.\n\n');
         test.done();
     },
 
     testBulletList: function (test) {
         var appDescription = 'This is a description.\n* bullet one\n*  bullet two';
         var description = proc.createNormalisedDescription(appDescription);
-        test.strictEqual(description.getResult(), 'This is a description. * bullet one * bullet two ');
+        test.strictEqual(description.getResult(), 'This is a description.\n* bullet one\n* bullet two\n\n');
         test.done();
     },
 
     testFoo: function (test) {
-        // /([.?!])\s*(?=[A-Z])/
+        var result = nlpCompromise.tokenize('This is a sentence. This is another.');
 
-        var sentenceRegex = /([.?!])\s+(?=[A-Z])/g;
+        var parsedSentences = sentence_parser('How are you!?! That iss great.');
 
-        var result = 'foo. Bar'.match(sentenceRegex);
-
-        test.strictEqual(result, 'foo');
+        test.strictEqual(result[0].tokens.length, 4);
+        test.strictEqual(parsedSentences.length, 2);
         test.done();
     }
 };

@@ -1,6 +1,7 @@
 'use strict';
 
-var dm = require('../../../domain/analysis/descriptionModel');
+var Description = require('../../../domain/analysis/model/description').Description;
+var Paragraph = require('../../../domain/analysis/model/paragraph').Paragraph;
 
 exports.group = {
     setUp: function (callback) {
@@ -13,10 +14,10 @@ exports.group = {
 
     testForEachActiveParagraph: function (test) {
         var paragraphs = [
-            dm.CreateParagraph([dm.CreateLine('foo')], false)
+            new Paragraph([])
         ];
 
-        var description = dm.CreateDescription(paragraphs);
+        var description = new Description(paragraphs);
         var resultParagraphs = [];
 
         description.forEachActiveParagraph(function(paragraph) {
@@ -29,11 +30,11 @@ exports.group = {
 
     testForEachActiveParagraphWhenParagraphIsRemoved: function (test) {
         var paragraphs = [
-            dm.CreateParagraph([dm.CreateLine('foo')], false)
+            new Paragraph([])
         ];
 
         paragraphs[0].isRemoved = true;
-        var description = dm.CreateDescription(paragraphs);
+        var description = new Description(paragraphs);
         var resultParagraphs = [];
 
         description.forEachActiveParagraph(function(paragraph) {
@@ -41,29 +42,6 @@ exports.group = {
         });
 
         test.strictEqual(resultParagraphs.length, 0);
-        test.done();
-    },
-
-    testGetResult: function (test) {
-        var paragraphs = [
-            dm.CreateParagraph([dm.CreateLine('foo')], false)
-        ];
-
-        var description = dm.CreateDescription(paragraphs);
-
-        test.strictEqual(description.getResult(), 'foo ');
-        test.done();
-    },
-
-    testGetResultWhenParagraphIsNotActive: function (test) {
-        var paragraphs = [
-            dm.CreateParagraph([dm.CreateLine('foo')], false)
-        ];
-
-        paragraphs[0].isRemoved = true;
-        var description = dm.CreateDescription(paragraphs);
-
-        test.strictEqual(description.getResult(), '');
         test.done();
     }
 };

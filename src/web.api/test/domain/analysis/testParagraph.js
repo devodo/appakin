@@ -1,6 +1,8 @@
 'use strict';
 
-var dm = require('../../../domain/analysis/descriptionModel');
+var Paragraph = require('../../../domain/analysis/model/paragraph').Paragraph;
+var SentenceGroup = require('../../../domain/analysis/model/sentenceGroup').SentenceGroup;
+var Sentence = require('../../../domain/analysis/model/sentence').Sentence;
 
 exports.group = {
     setUp: function (callback) {
@@ -11,112 +13,105 @@ exports.group = {
         callback();
     },
 
-    testForEachLine: function (test) {
-        var paragraph = new dm.CreateParagraph([
-            dm.CreateLine('aaa'),
-            dm.CreateLine('bbb', true, '-')
-        ], false);
+    testForEachSentence: function (test) {
+        var paragraph = new Paragraph([
+            new SentenceGroup([
+                new Sentence('aaa'),
+                new Sentence('bbb')
+            ])
+        ]);
 
-        var resultLines = [];
+        var resultSentences = [];
 
-        paragraph.forEachLine(true, function(line) {
-            resultLines.push(line);
+        paragraph.forEachSentence(true, function(line) {
+            resultSentences.push(line);
         });
 
-        test.equal(resultLines.length, 2);
+        test.equal(resultSentences.length, 2);
         test.done();
     },
 
-    testForEachLineWhenIgnoringListItems: function (test) {
-        var paragraph = new dm.CreateParagraph([
-            dm.CreateLine('aaa'),
-            dm.CreateLine('bbb', true, '-')
-        ], false);
+    //testForEachActiveElement: function (test) {
+    //    var lines = [
+    //        new Line('aaa'),
+    //        new Line('bbb')
+    //    ];
+    //
+    //    lines[0].markAsRemoved();
+    //
+    //    var paragraph = new Paragraph(lines);
+    //    var resultLines = [];
+    //
+    //    paragraph.forEachActiveElement(true, function(line) {
+    //        resultLines.push(line);
+    //    });
+    //
+    //    test.equal(resultLines.length, 1);
+    //    test.done();
+    //},
 
-        var resultLines = [];
+    testGetElement: function (test) {
+        var paragraph = new Paragraph([
+            new SentenceGroup([
+                new Sentence('aaa'),
+                new Sentence('bbb')
+            ])
+        ]);
 
-        paragraph.forEachLine(false, function(line) {
-            resultLines.push(line);
-        });
-
-        test.equal(resultLines.length, 1);
-        test.done();
-    },
-
-    testForEachActiveLine: function (test) {
-        var lines = [
-            dm.CreateLine('aaa'),
-            dm.CreateLine('bbb', true, '-')
-        ];
-
-        lines[0].markAsRemoved();
-
-        var paragraph = new dm.CreateParagraph(lines, false);
-        var resultLines = [];
-
-        paragraph.forEachActiveLine(true, function(line) {
-            resultLines.push(line);
-        });
-
-        test.equal(resultLines.length, 1);
-        test.done();
-    },
-
-    testForEachActiveLineWhenIgnoringListItems: function (test) {
-        var lines = [
-            dm.CreateLine('aaa'),
-            dm.CreateLine('bbb', true, '-')
-        ];
-
-        lines[0].markAsRemoved();
-
-        var paragraph = new dm.CreateParagraph(lines, false);
-        var resultLines = [];
-
-        paragraph.forEachActiveLine(false, function(line) {
-            resultLines.push(line);
-        });
-
-        test.equal(resultLines.length, 0);
-        test.done();
-    },
-
-    testGetLine: function (test) {
-        var lines = [
-            dm.CreateLine('aaa'),
-            dm.CreateLine('bbb', true, '-')
-        ];
-
-        var paragraph = new dm.CreateParagraph(lines, false);
-
-        test.notStrictEqual(paragraph.getLine(0), null);
-        test.notStrictEqual(paragraph.getLine(1), null);
-        test.strictEqual(paragraph.getLine(2), null);
+        test.notStrictEqual(paragraph.getElement(0), null);
+        test.strictEqual(paragraph.getElement(1), null);
         test.done();
     },
 
     testGetResult: function (test) {
-        var lines = [
-            dm.CreateLine('aaa'),
-            dm.CreateLine('bbb', true, '-')
-        ];
+        var paragraph = new Paragraph([
+            new SentenceGroup([
+                new Sentence('aaa'),
+                new Sentence('bbb')
+            ])
+        ]);
 
-        var paragraph = new dm.CreateParagraph(lines, false);
-
-        test.strictEqual(paragraph.getResult(), 'aaa - bbb ');
+        test.strictEqual(paragraph.getResult(), 'aaa bbb\n\n');
         test.done();
     },
 
     testGetResultWhenParagraphIsRemoved: function (test) {
-        var lines = [
-            dm.CreateLine('aaa'),
-            dm.CreateLine('bbb', true, '-')
-        ];
+        var paragraph = new Paragraph([
+            new SentenceGroup([
+                new Sentence('aaa'),
+                new Sentence('bbb')
+            ])
+        ]);
 
-        var paragraph = new dm.CreateParagraph(lines, false);
         paragraph.isRemoved = true;
 
         test.strictEqual(paragraph.getResult(), '');
+        test.done();
+    },
+
+    testGetRemovedResult: function (test) {
+        var paragraph = new Paragraph([
+            new SentenceGroup([
+                new Sentence('aaa'),
+                new Sentence('bbb')
+            ])
+        ]);
+
+        test.strictEqual(paragraph.getRemovedResult(), '');
+        test.done();
+    },
+
+    testGetRemovedResultWhenParagraphIsRemoved: function (test) {
+        var paragraph = new Paragraph([
+            new SentenceGroup([
+                new Sentence('aaa'),
+                new Sentence('bbb')
+            ])
+        ]);
+
+        paragraph.isRemoved = true;
+
+        test.strictEqual(paragraph.getRemovedResult(), 'aaa bbb\n\n');
         test.done();
     }
 };

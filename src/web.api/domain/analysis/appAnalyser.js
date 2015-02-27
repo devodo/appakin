@@ -2,6 +2,8 @@
 
 var async = require('async');
 var appStoreAdminRepo = require('../../repos/appStoreAdminRepo');
+var descriptionNormaliser = require('./descriptionNormaliser');
+var descriptionProcessors = require('./descriptionProcessors');
 var log = require('../../logger');
 var LanguageDetect = require('languagedetect');
 var lngDetector = new LanguageDetect();
@@ -221,4 +223,77 @@ var analyse = function(batchSize, forceAll, next) {
     processBatch(0);
 };
 
+var normaliseDescription = function(appId, next) {
+    appStoreAdminRepo.getAppStoreApp(appId, function(err, app) {
+        if (err) {
+            return next(err);
+        }
+
+        var normalisedDescription = descriptionNormaliser.createNormalisedDescription(app.description);
+
+        normalisedDescription.forEachActiveParagraph(function(paragraph) {
+            paragraph.forEachSentence(true, function(sentence) {
+                delete sentence.tokens;
+            });
+        });
+
+        var result = {
+            string: normalisedDescription.getResult(),
+            tree: normalisedDescription
+        };
+
+        return next(null, result);
+    });
+};
+
+var testCleaningDescriptions = function(next) {
+    appStoreAdminRepo.getAppStoreAppBatch(0, 3000, function(err, apps) {
+        if (err) {
+            return next(err);
+        }
+
+        var results = {
+            count: 0,
+            apps: []
+        };
+
+        async.eachSeries(
+            apps,
+            function(app, callback) {
+                var normalisedDescription = descriptionNormaliser.createNormalisedDescription(app.description);
+
+                //descriptionProcessors.removeSentencesWithEmailAddresses(normalisedDescription);
+                //descriptionProcessors.removeSentencesWithUrls(normalisedDescription);
+                //descriptionProcessors.removeCopyrightParagraphs(normalisedDescription);
+                descriptionProcessors.removeTermsAndConditionsParagraphs(normalisedDescription);
+                //descriptionProcessors.removeListSentences(normalisedDescription);
+                //descriptionProcessors.removeLongSentences(normalisedDescription);
+                //descriptionProcessors.removeSentencesWithManyTrademarkSymbols(normalisedDescription);
+
+                var result = normalisedDescription.getRemovedResult();
+
+                if (result) {
+                    results.apps.push({
+                        id: app.id,
+                        //name: app.name,
+                        removed: result
+                    });
+
+                    ++results.count;
+                }
+
+                callback();
+            },
+            function(err) {
+                if (err) {
+                    next(err);
+                } else {
+                    next(null, results);
+                }
+            });
+    });
+};
+
 exports.analyse = analyse;
+exports.normaliseDescription = normaliseDescription;
+exports.testCleaningDescriptions = testCleaningDescriptions;

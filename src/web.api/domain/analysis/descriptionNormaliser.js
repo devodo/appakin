@@ -1,11 +1,16 @@
 'use strict';
 
 var XRegExp = require('xregexp').XRegExp;
-var dm = require('./descriptionModel');
+var Description = require('./model/description').Description;
+var Sentence = require('./model/sentence').Sentence;
+var SentenceGroup = require('./model/sentenceGroup').SentenceGroup;
+var List = require('./model/list').List;
+var ListItem = require('./model/listItem').ListItem;
+var Paragraph = require('./model/paragraph').Paragraph;
 
 var lineStartsWithNonAlphaNumRegex = new XRegExp('^([^\\p{L}\\p{N}\\s"]+)');
 var bulletMatchRegex = new XRegExp('^(([^\\p{L}\\p{N}"]+)\\s*\\b)');
-var numberBulletMatchRegex = /^((?:[[(]?\s*)((?:[1-9]?[0-9]|[a-zA-Z])\.?)(?:\s*?[\s)\].-])\s*)/;
+var numberBulletMatchRegex = /^((?:[[(]?\s*)((?:[1-9]?[0-9]|[a-zA-Z])\.?)(?:\s*?[\s)\],.-])\s*)/;
 var escapeRegExpRegex = /([.*+?^=!:${}()|\[\]\/\\])/g;
 
 var escapeRegExp = function(string) {
@@ -197,46 +202,86 @@ function createDescriptionModel(lineGroupings) {
     // Create the description model.
 
     var paragraphs = [];
+    var list, sentenceGroup, listItem, line, elements, currentList;
 
     for (var i = 0; i < lineGroupings.length; ++i) {
-        var lines = [];
-        var containsList = false;
+        elements = [];
+        currentList = [];
 
         for (var j = 0; j < lineGroupings[i].length; ++j) {
-            var line = lineGroupings[i][j];
+            line = lineGroupings[i][j];
 
-            lines.push(dm.CreateLine(
-                line.isList ? line.listContent : line.content,
-                line.isList,
-                line.isList ? line.bullet : null
-            ));
+            if (line.isList) {
+                listItem = createListItem(line.listContent, line.bullet)
+                currentList.push(listItem);
+            } else {
+                if (currentList.length > 0) {
+                    list = new List(currentList);
+                    elements.push(list);
+                    currentList = [];
+                }
 
-            containsList = containsList || line.isList;
+                sentenceGroup = createSentenceGroup(line.content);
+                elements.push(sentenceGroup);
+            }
         }
 
-        paragraphs.push(dm.CreateParagraph(lines, containsList));
+        if (currentList.length > 0) {
+            list = new List(currentList);
+            elements.push(list);
+        }
+
+        paragraphs.push(new Paragraph(elements));
     }
 
-    return dm.CreateDescription(paragraphs);
+    return new Description(paragraphs);
 }
 
-function splitSentences(lineGroupings) {
-    // Split non-list item lines into separate lines.
+function createListItem(content, bullet) {
+    var sentenceGroup = createSentenceGroup(content);
+    return new ListItem(sentenceGroup, bullet);
+}
 
-    for (var i = 0; i < lineGroupings.length; ++i) {
-        var lines = [];
-
-        for (var j = 0; j < lineGroupings[i].length; ++j) {
-
-            // TODO
-
-            lines.push(lineGroupings[i][j]);
+function sentence_parser(text) {
+    var abbrev, abbrevs, clean, i, sentences, tmp;
+    tmp = text.split(/(\S.+?[.\?!])(?=\s+|$|")/g);
+    sentences = [];
+    abbrevs = ["jr", "mr", "mrs", "ms", "dr", "prof", "sr", "sen", "corp", "calif", "rep", "gov", "atty", "supt", "det", "rev", "col", "gen", "lt", "cmdr", "adm", "capt", "sgt", "cpl", "maj", "dept", "univ", "assn", "bros", "inc", "ltd", "co", "corp", "arc", "al", "ave", "blvd", "cl", "ct", "cres", "exp", "rd", "st", "dist", "mt", "ft", "fy", "hwy", "la", "pd", "pl", "plz", "tce", "Ala", "Ariz", "Ark", "Cal", "Calif", "Col", "Colo", "Conn", "Del", "Fed", "Fla", "Ga", "Ida", "Id", "Ill", "Ind", "Ia", "Kan", "Kans", "Ken", "Ky", "La", "Me", "Md", "Mass", "Mich", "Minn", "Miss", "Mo", "Mont", "Neb", "Nebr", "Nev", "Mex", "Okla", "Ok", "Ore", "Penna", "Penn", "Pa", "Dak", "Tenn", "Tex", "Ut", "Vt", "Va", "Wash", "Wis", "Wisc", "Wy", "Wyo", "USAFA", "Alta", "Ont", "QuÔøΩ", "Sask", "Yuk", "jan", "feb", "mar", "apr", "jun", "jul", "aug", "sep", "oct", "nov", "dec", "sept", "vs", "etc", "esp", "llb", "md", "bl", "phd", "ma", "ba", "miss", "misses", "mister", "sir", "esq", "mstr", "lit", "fl", "ex", "eg", "sep", "sept"];
+    abbrev = new RegExp("(^| )(" + abbrevs.join("|") + ")[.] ?$", "i");
+    for (i in tmp) {
+        if (tmp[i]) {
+            tmp[i] = tmp[i].replace(/^\s+|\s+$/g, "");
+            if (tmp[i].match(abbrev) || tmp[i].match(/[ |\.][A-Z]\.?$/)) {
+                tmp[parseInt(i) + 1] = tmp[i] + " " + tmp[parseInt(i) + 1];
+            } else {
+                sentences.push(tmp[i]);
+                tmp[i] = "";
+            }
         }
+    }
+    // console.log(tmp)
+    clean = [];
+    for (i in sentences) {
+        sentences[i] = sentences[i].replace(/^\s+|\s+$/g, "");
+        if (sentences[i]) {
+            clean.push(sentences[i]);
+        }
+    }
+    if (clean.length == 0) {
+        return [text]
+    }
+    return clean;
+}
 
-        lineGroupings[i] = lines;
+function createSentenceGroup(line) {
+    var sentences = [];
+    var parsedSentences = sentence_parser(line);
+
+    for (var i = 0; i < parsedSentences.length; ++i) {
+        sentences.push(new Sentence(parsedSentences[i]));
     }
 
-    return lineGroupings;
+    return new SentenceGroup(sentences);
 }
 
 function attachHeaderlessListsToPreviousLineGrouping(lineGroupings) {
@@ -262,7 +307,7 @@ function attachHeaderlessListsToPreviousLineGrouping(lineGroupings) {
 
 function createNormalisedDescription(appDescription) {
     if (!appDescription) {
-        return dm.CreateDescription([]);
+        return new Description([]);
     }
 
     var lines = appDescription
@@ -284,7 +329,7 @@ function createNormalisedDescription(appDescription) {
         });
 
     lineGroupings = attachHeaderlessListsToPreviousLineGrouping(lineGroupings);
-    lineGroupings = splitSentences(lineGroupings);
+    //lineGroupings = splitSentences(lineGroupings);
     return createDescriptionModel(lineGroupings);
 }
 
