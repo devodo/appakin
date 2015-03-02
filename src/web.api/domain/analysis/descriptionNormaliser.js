@@ -1,13 +1,14 @@
 'use strict';
 
 var XRegExp = require('xregexp').XRegExp;
-var similarityTest = require('./similarityTest');
+var similarity = require('./similarity');
 var Description = require('./model/description').Description;
 var Sentence = require('./model/sentence').Sentence;
 var SentenceGroup = require('./model/sentenceGroup').SentenceGroup;
 var List = require('./model/list').List;
 var ListItem = require('./model/listItem').ListItem;
 var Paragraph = require('./model/paragraph').Paragraph;
+var managedAppNameList = require('./model/managedAppNameList');
 
 var lineStartsWithNonAlphaNumRegex = new XRegExp('^([^\\p{L}\\p{N}\\s"]+)');
 var bulletMatchRegex = new XRegExp('^(([^\\p{L}\\p{N}"]+)\\s*\\b)');
@@ -153,6 +154,7 @@ function identifyBulletLists(lineGrouping) {
                     previousLine.isList = true;
                     previousLine.bullet = previousLine.bulletCandidate.trim();
                     previousLine.listContent = previousLine.content.substring(previousLine.bulletCandidate.length);
+                    previousLine.isListStart = true;
                 }
 
                 line.isList = true;
@@ -187,6 +189,7 @@ function identifyOrderedBulletLists(lineGrouping) {
                     previousLine.isList = true;
                     previousLine.bullet = previousLine.orderedCandidate.trim();
                     previousLine.listContent = previousLine.content.substring(previousLine.orderedCandidate.length);
+                    previousLine.isListStart = true;
                 }
 
                 line.isList = true;
@@ -199,7 +202,7 @@ function identifyOrderedBulletLists(lineGrouping) {
     return lineGrouping;
 }
 
-function createDescriptionModel(lineGroupings, sameDeveloperAppNames, appName, normalisedAppName) {
+function createDescriptionModel(lineGroupings, appName, developerName, sameDeveloperAppNames) {
     // Create the description model.
 
     var paragraphs = [];
@@ -213,6 +216,12 @@ function createDescriptionModel(lineGroupings, sameDeveloperAppNames, appName, n
             line = lineGroupings[i][j];
 
             if (line.isList) {
+                if (line.isListStart && currentList.length > 0) {
+                    list = new List(currentList);
+                    elements.push(list);
+                    currentList = [];
+                }
+
                 listItem = createListItem(line.listContent, line.bullet)
                 currentList.push(listItem);
             } else {
@@ -235,7 +244,8 @@ function createDescriptionModel(lineGroupings, sameDeveloperAppNames, appName, n
         paragraphs.push(new Paragraph(elements));
     }
 
-    return new Description(paragraphs, sameDeveloperAppNames, appName, normalisedAppName);
+    var manAppNameList = managedAppNameList.createManagedAppNameList(appName, developerName, sameDeveloperAppNames);
+    return new Description(paragraphs, manAppNameList);
 }
 
 function createListItem(content, bullet) {
@@ -306,15 +316,17 @@ function attachHeaderlessListsToPreviousLineGrouping(lineGroupings) {
     return fixedLineGroupings;
 }
 
-function normaliseSameDeveloperAppNames(appName, sameDeveloperAppNames) {
+function normaliseSameDeveloperAppNames(appName, sameDeveloperAppNames, developerName) {
     var result = [];
 
     for (var i = 0; i < sameDeveloperAppNames.length; ++i) {
         var appNameToTest = sameDeveloperAppNames[i];
-        appNameToTest = normaliseAppName(appNameToTest);
+        appNameToTest = normaliseAppName(appNameToTest, developerName);
 
-        if (similarityTest.isSimilar(appName, appNameToTest)) {
-            result.push('REMOVED>> ' + appNameToTest);
+        if (similarity.similar(appName, appNameToTest)) {
+            result.push(
+                //'REMOVED>> ' +
+                appNameToTest);
             continue;
         }
 
@@ -326,12 +338,23 @@ function normaliseSameDeveloperAppNames(appName, sameDeveloperAppNames) {
 
 var normaliseAppNameRegex = /(.*?)((:\s+|\s+\-|\s+\u2013|\s+\u2014).*)/;
 
-function normaliseAppName(appName) {
+function normaliseAppName(appName, developerName) {
+    var filteredAppName = appName.replace(new RegExp(developerName, 'i'), '');
+
+    if (filteredAppName.length > 5) {
+        // only use the new app name if it's long enough.
+        appName = filteredAppName.trim();
+
+        if (appName.indexOf('by', appName.length - 2) !== -1) {
+            appName = appName.substring(0, appName.length - 2).trim();
+        }
+    }
+
     var matches = normaliseAppNameRegex.exec(appName);
     return matches ? matches[1] : appName;
 }
 
-function createNormalisedDescription(appDescription, appName, sameDeveloperAppNames) {
+function createNormalisedDescription(appDescription, appName, developerName, sameDeveloperAppNames) {
     sameDeveloperAppNames = sameDeveloperAppNames || [];
 
     if (!appDescription) {
@@ -358,11 +381,10 @@ function createNormalisedDescription(appDescription, appName, sameDeveloperAppNa
 
     lineGroupings = attachHeaderlessListsToPreviousLineGrouping(lineGroupings);
 
-    var normalisedAppName = normaliseAppName(appName);
-    sameDeveloperAppNames = normaliseSameDeveloperAppNames(normalisedAppName, sameDeveloperAppNames);
+    //var normalisedAppName = normaliseAppName(appName, developerName);
+    //sameDeveloperAppNames = normaliseSameDeveloperAppNames(normalisedAppName, sameDeveloperAppNames, developerName);
 
-    var description = createDescriptionModel(lineGroupings, sameDeveloperAppNames, appName, normalisedAppName);
-    return description;
+    return createDescriptionModel(lineGroupings, appName, developerName, sameDeveloperAppNames);
 }
 
 exports.createNormalisedDescription = createNormalisedDescription;

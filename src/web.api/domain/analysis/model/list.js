@@ -1,14 +1,16 @@
 'use strict';
 
+var RemovalReason = require('./removalReason').RemovalReason;
+
 function List(listItems) {
     this.listItems = listItems || [];
     this.isRemoved = false;
-    this.removalReason = null;
+    this.removalReason = new RemovalReason();
 }
 
 List.prototype.markAsRemoved = function(reason) {
     this.isRemoved = true;
-    this.removalReason = reason;
+    this.removalReason.add(reason);
 };
 
 List.prototype.getListItemCount = function() {
@@ -98,7 +100,21 @@ List.prototype.getRemovedResult = function(force) {
         result += this.listItems[i].getRemovedResult(this.isRemoved || force);
     }
 
-    return (this.removalReason ? '<<' + this.removalReason + '>> ' : '') + result;
+    return this.removalReason.getInlineText() + result;
+};
+
+List.prototype.getHtmlResult = function() {
+    var content = '';
+
+    for (var i = 0; i < this.listItems.length; ++i) {
+        content += this.listItems[i].getHtmlResult();
+    }
+
+    if (this.isRemoved) {
+        return '<span class="removed"' + this.removalReason.getAttributeText() + '>' + content + '</span>';
+    } else {
+        return content;
+    }
 };
 
 exports.List = List;

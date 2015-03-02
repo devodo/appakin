@@ -239,6 +239,7 @@ var normaliseDescription = function(appId, next) {
             var normalisedDescription = descriptionNormaliser.createNormalisedDescription(
                 app.description,
                 app.name,
+                app.devName,
                 sameDeveloperAppNames
             );
 
@@ -250,14 +251,45 @@ var normaliseDescription = function(appId, next) {
 
             var result = {
                 string: normalisedDescription.getResult(),
+                html: normalisedDescription.getHtmlResult(),
                 tree: normalisedDescription
             };
 
             return next(null, result);
         });
+    });
+};
 
-        //var normalisedDescription = descriptionNormaliser.createNormalisedDescription(app.description);
+var cleanDescription = function(appId, appName, appDescription, appDevName, next) {
+    appStoreAdminRepo.getAppStoreSameDeveloperApps(appId, function(err, sameDeveloperAppNames) {
+        if (err) {
+            return next(err);
+        }
 
+        sameDeveloperAppNames = sameDeveloperAppNames.map(function(x) { return x.name; });
+
+        var normalisedDescription = descriptionNormaliser.createNormalisedDescription(
+            appDescription,
+            appName,
+            appDevName,
+            sameDeveloperAppNames
+        );
+
+        descriptionProcessors.removeSentencesWithEmailAddresses(normalisedDescription);
+        descriptionProcessors.removeSentencesWithUrls(normalisedDescription);
+        //descriptionProcessors.removeCopyrightParagraphs(normalisedDescription);
+        //descriptionProcessors.removeTermsAndConditionsParagraphs(normalisedDescription);
+        //descriptionProcessors.removeListSentences(normalisedDescription);
+        //descriptionProcessors.removeLongSentences(normalisedDescription);
+        //descriptionProcessors.removeSentencesWithManyTrademarkSymbols(normalisedDescription);
+        //descriptionProcessors.removeListsOfAppsBySameDeveloperByMatchingAppNames(normalisedDescription);
+        //descriptionProcessors.removeLongLists(normalisedDescription);
+
+        var result = {
+            html: normalisedDescription.getHtmlResult()
+        };
+
+        return next(null, result);
     });
 };
 
@@ -286,26 +318,31 @@ var testCleaningDescriptions = function(next) {
                     var normalisedDescription = descriptionNormaliser.createNormalisedDescription(
                         app.description,
                         app.name,
+                        app.devName,
                         sameDeveloperAppNames
                     );
 
-                    //descriptionProcessors.removeSentencesWithEmailAddresses(normalisedDescription);
-                    //descriptionProcessors.removeSentencesWithUrls(normalisedDescription);
+                    descriptionProcessors.removeSentencesWithEmailAddresses(normalisedDescription);
+                    descriptionProcessors.removeSentencesWithUrls(normalisedDescription);
                     //descriptionProcessors.removeCopyrightParagraphs(normalisedDescription);
                     //descriptionProcessors.removeTermsAndConditionsParagraphs(normalisedDescription);
                     //descriptionProcessors.removeListSentences(normalisedDescription);
                     //descriptionProcessors.removeLongSentences(normalisedDescription);
                     //descriptionProcessors.removeSentencesWithManyTrademarkSymbols(normalisedDescription);
-                    descriptionProcessors.removeListsOfAppsBySameDeveloperByMatchingAppNames(normalisedDescription);
+                    //descriptionProcessors.removeListsOfAppsBySameDeveloperByMatchingAppNames(normalisedDescription);
+                    //descriptionProcessors.removeLongLists(normalisedDescription);
 
                     var result = normalisedDescription.getRemovedResult();
 
                     if (result) {
                         results.apps.push({
                             id: app.id,
-                            name: app.name,
-                            sameDeveloperAppNames: sameDeveloperAppNames,
-                            removed: result
+                            name: normalisedDescription.appName,
+                            normalisedName: normalisedDescription.normalisedAppName,
+                            developerName: normalisedDescription.developerName,
+                            //sameDeveloperAppNames: normalisedDescription.sameDeveloperAppNames,
+                            removed: result,
+                            removedHtml: normalisedDescription.getHtmlResult()
                         });
 
                         ++results.count;
@@ -325,5 +362,6 @@ var testCleaningDescriptions = function(next) {
 };
 
 exports.analyse = analyse;
+exports.cleanDescription = cleanDescription;
 exports.normaliseDescription = normaliseDescription;
 exports.testCleaningDescriptions = testCleaningDescriptions;

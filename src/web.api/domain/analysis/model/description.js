@@ -1,10 +1,13 @@
 'use strict';
 
-function Description(paragraphs, sameDeveloperAppNames, appName, normalisedAppName) {
+function Description(paragraphs, managedAppNameList) {
     this.paragraphs = paragraphs || [];
-    this.sameDeveloperAppNames = sameDeveloperAppNames || [];
-    this.appName = appName;
-    this.normalisedAppName = normalisedAppName;
+    this.managedAppNameList = managedAppNameList;
+
+    //this.sameDeveloperAppNames = sameDeveloperAppNames || [];
+    //this.appName = appName;
+    //this.normalisedAppName = normalisedAppName;
+    //this.developerName = developerName;
 }
 
 Description.prototype.forEachActiveParagraph = function(callback) {
@@ -40,6 +43,20 @@ Description.prototype.getRemovedResult = function() {
 
     for (var i = 0; i < this.paragraphs.length; ++i) {
         var paragraphContent = this.paragraphs[i].getRemovedResult();
+
+        if (paragraphContent) {
+            result += paragraphContent;
+        }
+    }
+
+    return result;
+};
+
+Description.prototype.getHtmlResult = function() {
+    var result = '';
+
+    for (var i = 0; i < this.paragraphs.length; ++i) {
+        var paragraphContent = this.paragraphs[i].getHtmlResult();
 
         if (paragraphContent) {
             result += paragraphContent;

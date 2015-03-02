@@ -1,6 +1,7 @@
 'use strict';
 
 var List = require('./list').List;
+var RemovalReason = require('./removalReason').RemovalReason;
 
 // ----------------------
 // Paragraph class
@@ -9,12 +10,12 @@ var List = require('./list').List;
 function Paragraph(elements) {
     this.elements = elements || [];
     this.isRemoved = false;
-    this.removalReason = null;
+    this.removalReason = new RemovalReason();
 }
 
 Paragraph.prototype.markAsRemoved = function(reason) {
     this.isRemoved = true;
-    this.removalReason = reason;
+    this.removalReason.add(reason);
 };
 
 Paragraph.prototype.getSentenceCount = function() {
@@ -113,7 +114,22 @@ Paragraph.prototype.getRemovedResult = function() {
         result += element.getRemovedResult(this.isRemoved);
     }
 
-    return result ? (this.removalReason ? '<<' + this.removalReason + '>> ' : '') + result + '\n' : result;
+    return result ? this.removalReason.getInlineText() + result + '\n' : result;
+};
+
+Paragraph.prototype.getHtmlResult = function() {
+    var content = '';
+
+    for (var i = 0; i < this.elements.length; ++i) {
+        var element = this.elements[i];
+        content += element.getHtmlResult();
+    }
+
+    if (this.isRemoved) {
+        return '<span class="removed"' + this.removalReason.getAttributeText() + '>' + content + '</span>\n';
+    } else {
+        return content + '\n';
+    }
 };
 
 exports.Paragraph = Paragraph;

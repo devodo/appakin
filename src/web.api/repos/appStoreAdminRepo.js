@@ -930,7 +930,7 @@ var getSeedSearches = function(client, seedCategoryId, next) {
 
 var getAppStoreApp = function(client, appId, next) {
     var queryStr =
-        "SELECT app_id, name, description\n" +
+        "SELECT app_id, name, description, dev_name\n" +
         "FROM appstore_app\n" +
         "WHERE app_id = $1;";
 
@@ -947,7 +947,8 @@ var getAppStoreApp = function(client, appId, next) {
         var app = {
             id: item.app_id,
             name: item.name,
-            description: item.description
+            description: item.description,
+            devName: item.dev_name
         };
 
         next(null, app);

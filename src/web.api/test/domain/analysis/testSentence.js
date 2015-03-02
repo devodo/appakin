@@ -37,6 +37,26 @@ exports.group = {
         test.done();
     },
 
+    testGetHtmlResult: function (test) {
+        var sentence = new Sentence('foo bar');
+        test.equal(sentence.getHtmlResult(), 'foo bar');
+        test.done();
+    },
+
+    testGetHtmlResultWhenSentenceIsRemoved: function (test) {
+        var sentence = new Sentence('foo bar');
+        sentence.markAsRemoved();
+        test.equal(sentence.getHtmlResult(), '<span class="removed">foo bar</span>');
+        test.done();
+    },
+
+    testGetHtmlResultWhenSentenceIsRemovedAndReasonGiven: function (test) {
+        var sentence = new Sentence('foo bar');
+        sentence.markAsRemoved('aaa');
+        test.equal(sentence.getHtmlResult(), '<span class="removed" title="aaa">foo bar</span>');
+        test.done();
+    },
+
     testConditionallyMarkAsRemovedWhenNoMatch: function (test) {
         var sentence = new Sentence('cat in a hat');
         sentence.conditionallyMarkAsRemoved(/dog/);

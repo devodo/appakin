@@ -64,6 +64,12 @@ SentenceGroup.prototype.getRemovedResult = function(force) {
     });
 };
 
+SentenceGroup.prototype.getHtmlResult = function() {
+    return getResultImpl(this.sentences, function(sentence) {
+        return sentence.getHtmlResult();
+    });
+};
+
 function getResultImpl(sentences, getSentenceResultCallback) {
     var result = '';
 

@@ -35,7 +35,7 @@ exports.init = function init(app) {
             }
 
             res.json(app);
-        })
+        });
     });
 
     app.get('/admin/app/cleantest', function (req, res) {

@@ -1,6 +1,5 @@
 'use strict';
 
-var similarityTest = require('./similarityTest');
 var List = require('./model/list').List;
 
 // --------------------------------
@@ -58,7 +57,7 @@ function removeTermsAndConditionsParagraphs(description) {
 
 // --------------------------------
 
-var urlRegex = /www\.|http:/;
+var urlRegex = /\bwww\.|\bhttps?:\/|twitter\.com\/|youtube\.com\/|facebook\.com\//;
 
 function removeSentencesWithUrls(description) {
     description.forEachActiveParagraph(function(paragraph) {
@@ -85,14 +84,14 @@ function removeSentencesWithEmailAddresses(description) {
 function removeListSentences(description) {
     description.forEachActiveParagraph(function(paragraph) {
         paragraph.forEachActiveSentence(true, function(sentence) {
-            var tokenCount = sentence.tokens.length;
+            var tokenCount = sentence.getTokenCount();
 
             // Don't process short sentences.
             if (tokenCount < 10) {
                 return;
             }
 
-            var capitalisedTokenCount = sentence.tokens.filter(function(x) { return x.capitalised; }).length;
+            var capitalisedTokenCount = sentence.getTokens().filter(function(x) { return x.capitalised; }).length;
             var commaCount = (sentence.content.match(/,/g) || []).length;
 
             var capitalisedTokenRatio = (capitalisedTokenCount * 1.0) / tokenCount;
@@ -122,7 +121,7 @@ function removeListSentences(description) {
 function removeLongSentences(description) {
     description.forEachActiveParagraph(function(paragraph) {
         paragraph.forEachActiveSentence(true, function(sentence) {
-            if (sentence.tokens.length > 80) {
+            if (sentence.getTokenCount() > 80) {
                 sentence.markAsRemoved('long');
             }
         });
@@ -147,10 +146,23 @@ function removeSentencesWithManyTrademarkSymbols(description) {
 
 // --------------------------------
 
-function removeListsOfAppsBySameDeveloperByMatchingAppNames(description) {
-    //if (description.appName.length)
+function removeLongLists(description) {
     description.forEachActiveParagraph(function(paragraph) {
-       paragraph.forEachActiveList(function(list) {
+        paragraph.forEachActiveList(function(list) {
+            var listItemCount = list.getListItemCount();
+
+            if (listItemCount > 30) {
+                list.markAsRemoved('list too long');
+            }
+        });
+    });
+}
+
+// --------------------------------
+
+function removeListsOfAppsBySameDeveloperByMatchingAppNames(description) {
+    description.forEachActiveParagraph(function(paragraph) {
+        paragraph.forEachActiveList(function(list) {
            var listItemCount = list.getListItemCount();
 
            // ignore short lists
@@ -162,36 +174,34 @@ function removeListsOfAppsBySameDeveloperByMatchingAppNames(description) {
 
            list.forEachListItem(function(listItem) {
                // ignore lists with multi-sentence list items.
+
                if (listItem.getSentenceCount() > 1) {
+                   appNameMatchCount = 0;
                    return true;
                }
 
                var firstSentence = listItem.getSentence(0);
 
                // ignore list items that are too long.
-               if (!firstSentence  || firstSentence.getLength() > 5) {
+               if (!firstSentence  || firstSentence.getTokenCount() > 8) {
                    return;
                }
 
-               for (var i = 0; i < description.sameDeveloperAppNames.length; ++i) {
-                   var appNameToTest = description.sameDeveloperAppNames[i];
-
-                   if (similarityTest.isSimilar(firstSentence.content, appNameToTest)) {
-                       ++appNameMatchCount;
-                       return;
-                   }
+               if (description.managedAppNameList.matches(firstSentence)) {
+                   ++appNameMatchCount;
                }
            });
 
-           if (appNameMatchCount > 0) {
-               list.markAsRemoved('by same developer')
-           }
-
-           //var matchRatio = (appNameMatchCount * 1.0) / listItemCount;
-           //if (matchRatio >= 0.7) {
-           //    list.markAsRemoved('by same developer');
+           //if (appNameMatchCount > 0) {
+           //    list.markAsRemoved('by same developer - ' + listItemCount + ' ' +
+           //             appNameMatchCount + ' ' + (appNameMatchCount * 1.0) / listItemCount);
            //}
-       });
+
+           var matchRatio = (appNameMatchCount * 1.0) / listItemCount;
+           if (matchRatio >= 0.7) {
+               list.markAsRemoved('by same developer');
+           }
+        });
     });
 }
 
@@ -205,6 +215,13 @@ exports.removeListSentences = removeListSentences;
 exports.removeLongSentences = removeLongSentences;
 exports.removeSentencesWithManyTrademarkSymbols = removeSentencesWithManyTrademarkSymbols;
 exports.removeListsOfAppsBySameDeveloperByMatchingAppNames = removeListsOfAppsBySameDeveloperByMatchingAppNames;
+exports.removeLongLists = removeLongLists;
+
+// Editor's Choice
+
+// Twitter: @FeetanInc
+
+// looks like header
 
 //"** DON'T MISS OUR OTHER EXCITING GAMES! **
 // by same developer
