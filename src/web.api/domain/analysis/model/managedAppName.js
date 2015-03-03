@@ -1,6 +1,6 @@
 'use strict';
 
-var natural = require('natural');
+var log = require('../../../logger');
 var similarity = require('../similarity');
 var tokenisation = require('../tokenisation');
 var patternMatching = require('../patternMatching');
@@ -18,8 +18,10 @@ function ManagedAppName(originalAppName, compactAppName, noDeveloperCompactAppNa
 }
 
 ManagedAppName.prototype.isSimilarTo = function(other) {
-    return similarity.similar(this.compactAppName, other.compactAppName) ||
-           similarity.similar(this.noDeveloperCompactAppName, other.noDeveloperCompactAppName);
+    return similarity.similar(this.originalAppName, other.originalAppName);
+
+    //return similarity.similar(this.compactAppName, other.compactAppName) ||
+    //       similarity.similar(this.noDeveloperCompactAppName, other.noDeveloperCompactAppName);
 };
 
 ManagedAppName.prototype.matches = function(sentence, matchOnWholeSentence) {
@@ -29,6 +31,8 @@ ManagedAppName.prototype.matches = function(sentence, matchOnWholeSentence) {
     var sentenceForComparison = tokenisation.createStringFromTokens(
         sentence.getTokens(),
         matchOnWholeSentence ? null : sentenceForComparisonLetterCount);
+
+    log.warn('match 1: [' + sentenceForComparison + '] [' + this.compactAppNameRemade + ']');
 
     if (similarity.similar(sentenceForComparison, this.compactAppNameRemade)) {
         return true;
@@ -41,6 +45,8 @@ ManagedAppName.prototype.matches = function(sentence, matchOnWholeSentence) {
             sentence.getTokens(),
             sentenceForComparisonLetterCount);
     }
+
+    //log.warn('match 2: [' + sentenceForComparison + '] [' + this.noDeveloperCompactAppNameRemade + ']');
 
     if (similarity.similar(sentenceForComparison, this.noDeveloperCompactAppNameRemade)) {
         return true;

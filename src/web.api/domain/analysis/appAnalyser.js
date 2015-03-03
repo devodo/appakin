@@ -281,6 +281,7 @@ var cleanDescription = function(appId, appName, appDescription, appDevName, next
         // MIDDLE
         descriptionProcessors.removeSentencesWithEmailAddresses(normalisedDescription);
         descriptionProcessors.removeSentencesWithUrls(normalisedDescription);
+        descriptionProcessors.removeSentencesWithTwitterNames(normalisedDescription);
         descriptionProcessors.removeCopyrightParagraphs(normalisedDescription);
         descriptionProcessors.removeTermsAndConditionsParagraphs(normalisedDescription);
         descriptionProcessors.removeListSentences(normalisedDescription);
@@ -289,10 +290,13 @@ var cleanDescription = function(appId, appName, appDescription, appDevName, next
         descriptionProcessors.removeListsOfAppsBySameDeveloperByMatchingAppNames(normalisedDescription);
         descriptionProcessors.removeLongLists(normalisedDescription);
         descriptionProcessors.removeParagraphsThatStartWithNameOfAppBySameDeveloper(normalisedDescription);
-        descriptionProcessors.removeSentencesWithTwitterNames(normalisedDescription);
 
         // END
+        descriptionProcessors.removeListsInLatterPartOfDescriptionThatAreAlreadyMostlyRemoved(normalisedDescription);
         descriptionProcessors.removeParagraphsInLatterPartOfDescriptionThatAreAlreadyMostlyRemoved(normalisedDescription);
+        descriptionProcessors.removeHeaderSentencesBeforeAlreadyRemovedContent(normalisedDescription);
+        descriptionProcessors.removeHeaderSentencesBeforeAlreadyRemovedLists(normalisedDescription);
+        descriptionProcessors.removeParagraphsInLatterPartOfDescriptionThatHaveRemovedContentAroundThem(normalisedDescription);
 
         var result = {
             html: normalisedDescription.getHtmlResult()

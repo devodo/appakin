@@ -177,10 +177,10 @@ exports.group = {
             new SentenceGroup([sentenceA, sentenceB])
         ]);
 
-        var paragraphTokenCount = paragraph.setStatistics(10, 2);
-        test.strictEqual(paragraphTokenCount, 4);
-        test.strictEqual(sentenceA.tokenPercentageRelativeToParagraph, 75);
-        test.strictEqual(sentenceB.tokenPercentageRelativeToParagraph, 25);
+        var paragraphLength = paragraph.setStatistics(100, 20);
+        test.strictEqual(paragraphLength, 10);
+        test.strictEqual(sentenceA.lengthPercentageRelativeToParagraph, 70);
+        test.strictEqual(sentenceB.lengthPercentageRelativeToParagraph, 30);
         test.strictEqual(paragraph.locationPercentageRelativeToDescription, 20);
         test.done();
     }

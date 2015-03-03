@@ -28,6 +28,11 @@ exports.group = {
         test.strictEqual(similarity.similar('Barbie', 'Vienna'), false, 14);
         test.strictEqual(similarity.similar('Barbie', 'Bot Garage'), false, 15);
         test.strictEqual(similarity.similar('Barbie', 'Barbie Color, Sparkle and Style!'), false, 16);
+        test.strictEqual(similarity.similar('Delicious – Emily’s Wonder Wedding HD', 'Delicious – Emily’s Honeymoon Cruise HD'), false, 17);
+
+        // can't get this one to work.
+        //test.strictEqual(similarity.similar('Delicious - Emily\'s Childhood Memories', 'Delicious – Emily’s Honeymoon Cruise HD'), false, 17);
+
         test.done();
     },
 

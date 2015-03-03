@@ -2,6 +2,7 @@
 
 var List = require('./model/list').List;
 var Sentence = require('./model/sentence').Sentence;
+var SentenceGroup = require('./model/sentenceGroup').SentenceGroup;
 var patternMatching = require('./patternMatching');
 var log = require('../../logger');
 
@@ -14,18 +15,18 @@ var STRONG = 2;
 // --------------------------------
 
 function setStatistics(description) {
-    var descriptionTokenCount = 0;
+    var descriptionLength = 0;
 
     description.forEachParagraph(function(paragraph) {
         paragraph.forEachSentence(true, function(sentence) {
-             descriptionTokenCount += sentence.getTokenCount();
+             descriptionLength += sentence.getLength();
         });
     });
 
-    var runningTokenCount = 0;
+    var runningLength = 0;
 
     description.forEachParagraph(function(paragraph) {
-        runningTokenCount += paragraph.setStatistics(descriptionTokenCount, runningTokenCount);
+        runningLength += paragraph.setStatistics(descriptionLength, runningLength);
     });
 }
 
@@ -84,7 +85,7 @@ function removeTermsAndConditionsParagraphs(description) {
 
 // --------------------------------
 
-var urlRegex = /\bwww\.|\bhttps?:\/|twitter\.com\/|youtube\.com\/|facebook\.com\/|\w\.com\//i;
+var urlRegex = /\bwww\.|\bhttps?:\/|twitter\.com\/|youtube\.com\/|facebook\.com\/|\w\.com\/|\w\.com\b/i;
 
 function removeSentencesWithUrls(description) {
     description.forEachActiveParagraph(function(paragraph) {
@@ -169,8 +170,6 @@ function removeLongSentences(description) {
 
 // --------------------------------
 
-// mmmmmm
-
 function removeSentencesWithManyTrademarkSymbols(description) {
     description.forEachActiveParagraph(function(paragraph) {
         paragraph.forEachActiveSentence(true, function(sentence) {
@@ -214,7 +213,7 @@ function removeListsOfAppsBySameDeveloperByMatchingAppNames(description) {
            list.forEachListItem(function(listItem) {
                // ignore lists with multi-sentence list items.
 
-               if (listItem.getSentenceCount() > 1) {
+               if (listItem.getSentenceCount() > 3) {
                    appNameMatchCount = 0;
                    return true;
                }
@@ -226,7 +225,10 @@ function removeListsOfAppsBySameDeveloperByMatchingAppNames(description) {
                    return;
                }
 
+               log.warn('listItem: ' + firstSentence.content);
+
                if (description.managedAppNameList.matches(firstSentence)) {
+                   log.warn('match!!!');
                    ++appNameMatchCount;
                }
            });
@@ -243,12 +245,14 @@ function removeListsOfAppsBySameDeveloperByMatchingAppNames(description) {
 
 // --------------------------------
 
+// TODO sentence title could be more than one sentence, which could detect by upper case.
+
 function removeParagraphsThatStartWithNameOfAppBySameDeveloper(description) {
     description.forEachActiveParagraph(function(paragraph) {
         var firstSentence = paragraph.getFirstSentence();
         var sentenceTitle = patternMatching.getTextTitle(firstSentence.content);
 
-        if (sentenceTitle) {
+        if (sentenceTitle && sentenceTitle.length < 80) {
             var sentence = new Sentence(sentenceTitle);
 
             if (description.managedAppNameList.matches(sentence, true)) {
@@ -260,21 +264,104 @@ function removeParagraphsThatStartWithNameOfAppBySameDeveloper(description) {
 
 // --------------------------------
 
+function removeListsInLatterPartOfDescriptionThatAreAlreadyMostlyRemoved(description) {
+    description.forEachActiveParagraph(function(paragraph) {
+        if (!paragraph.isInLatterPartOfDescription()) {
+            return;
+        }
+
+        paragraph.forEachActiveList(function(list) {
+            var listPercentage = 0;
+            var activePercentage = 0;
+
+            list.forEachSentence(function(sentence) {
+                var percentage = sentence.getTokenCount();
+
+                if (!sentence.isRemoved) {
+                    activePercentage += percentage;
+                }
+
+                listPercentage += percentage;
+            });
+
+            listPercentage = (100.0 / listPercentage) * activePercentage;
+
+            if (listPercentage < 45) {
+                list.markAsRemoved('list is near end and already mostly removed', WEAK);
+            }
+        });
+    });
+}
+
 function removeParagraphsInLatterPartOfDescriptionThatAreAlreadyMostlyRemoved(description) {
     description.forEachActiveParagraph(function(paragraph) {
-        if (paragraph.locationPercentageRelativeToDescription < 66) {
+        if (!paragraph.isInLatterPartOfDescription()) {
             return;
         }
 
         var activePercentage = 0;
 
         paragraph.forEachActiveSentence(true, function(sentence) {
-            activePercentage += sentence.tokenPercentageRelativeToParagraph;
+            activePercentage += sentence.lengthPercentageRelativeToParagraph;
         });
 
         if (activePercentage < 45) {
-            paragraph.markAsRemoved('already mostly removed', WEAK);
+            paragraph.markAsRemoved('paragraph is near end and already mostly removed', WEAK);
         }
+    });
+}
+
+function removeParagraphsInLatterPartOfDescriptionThatHaveRemovedContentAroundThem(description) {
+    var removeParagraphs = false;
+
+    description.forEachParagraph(function(paragraph) {
+        if (!paragraph.isInLatterPartOfDescription()) {
+            return;
+        }
+
+        if (!removeParagraphs && paragraph.isRemoved) {
+            removeParagraphs = true;
+        }
+
+        if (removeParagraphs && !paragraph.isRemoved) {
+            paragraph.markAsRemoved('paragraph is near end and has removed content around it', WEAK);
+        }
+    });
+}
+
+// --------------------------------
+
+function removeHeaderSentencesBeforeAlreadyRemovedContent(description) {
+    var previousHeaderParagraph = null;
+
+    description.forEachParagraph(function(paragraph) {
+        if (paragraph.isRemoved && previousHeaderParagraph) {
+            previousHeaderParagraph.markAsRemoved('header for already removed paragraph', NORMAL);
+        }
+
+        if (paragraph.getIsPossibleHeading()) {
+            previousHeaderParagraph = paragraph;
+        } else {
+            previousHeaderParagraph = null;
+        }
+    });
+}
+
+function removeHeaderSentencesBeforeAlreadyRemovedLists(description) {
+    var previousHeaderSentence = null;
+
+    description.forEachActiveParagraph(function(paragraph) {
+        paragraph.forEachElement(function(element) {
+            if (element instanceof List && element.isRemoved && previousHeaderSentence) {
+                previousHeaderSentence.markAsRemoved('header for already removed list', NORMAL);
+            }
+
+            if (element instanceof SentenceGroup && element.getIsPossibleHeading()) {
+                previousHeaderSentence = element.getFirstSentence();
+            } else {
+                previousHeaderSentence = null;
+            }
+        })
     });
 }
 
@@ -292,17 +379,21 @@ exports.removeSentencesWithManyTrademarkSymbols = removeSentencesWithManyTradema
 exports.removeListsOfAppsBySameDeveloperByMatchingAppNames = removeListsOfAppsBySameDeveloperByMatchingAppNames;
 exports.removeLongLists = removeLongLists;
 exports.removeParagraphsThatStartWithNameOfAppBySameDeveloper = removeParagraphsThatStartWithNameOfAppBySameDeveloper;
+exports.removeListsInLatterPartOfDescriptionThatAreAlreadyMostlyRemoved = removeListsInLatterPartOfDescriptionThatAreAlreadyMostlyRemoved;
 exports.removeParagraphsInLatterPartOfDescriptionThatAreAlreadyMostlyRemoved = removeParagraphsInLatterPartOfDescriptionThatAreAlreadyMostlyRemoved;
+exports.removeHeaderSentencesBeforeAlreadyRemovedContent = removeHeaderSentencesBeforeAlreadyRemovedContent;
+exports.removeHeaderSentencesBeforeAlreadyRemovedLists = removeHeaderSentencesBeforeAlreadyRemovedLists;
+exports.removeParagraphsInLatterPartOfDescriptionThatHaveRemovedContentAroundThem = removeParagraphsInLatterPartOfDescriptionThatHaveRemovedContentAroundThem;
 
 // Editor's Choice
 
-// looks like header
 
 //"** DON'T MISS OUR OTHER EXCITING GAMES! **
 // by same developer
 
 //Please also check out our other great Apps for kids:
 //Try other awesome games by Cat Studio
+//More apps from GameHouse:
 
 //More Great iPad apps from Playrix:
 

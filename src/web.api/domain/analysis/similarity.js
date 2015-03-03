@@ -10,7 +10,7 @@ function similar(stringA, stringB) {
         return false;
     }
 
-    return natural.JaroWinklerDistance(stringA, stringB) > 0.8;
+    return natural.JaroWinklerDistance(stringA.toLowerCase(), stringB.toLowerCase()) > 0.9;
 }
 
 exports.similar = similar;

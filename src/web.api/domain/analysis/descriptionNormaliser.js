@@ -1,19 +1,11 @@
 'use strict';
 
 var XRegExp = require('xregexp').XRegExp;
+var patternMatching = require('./patternMatching');
 var modelFactory = require('./model/modelFactory');
 var Description = require('./model/description').Description;
 var Sentence = require('./model/sentence').Sentence;
 var List = require('./model/list').List;
-
-var lineStartsWithNonAlphaNumRegex = new XRegExp('^([^\\p{L}\\p{N}\\s"]+)');
-var bulletMatchRegex = new XRegExp('^(([^\\p{L}\\p{N}"]+)\\s*\\b)');
-var numberBulletMatchRegex = /^((?:[[(]?\s*)((?:[1-9]?[0-9]|[a-zA-Z])\.?)(?:\s*?[\s)\],.-])\s*)/;
-var escapeRegExpRegex = /([.*+?^=!:${}()|\[\]\/\\])/g;
-
-var escapeRegExp = function(string) {
-    return string.replace(escapeRegExpRegex, '\\$1');
-};
 
 function nextChar(c) {
     return String.fromCharCode(c.charCodeAt(0) + 1);
@@ -27,67 +19,41 @@ var getNextOrderValue = function(char) {
     }
 };
 
-var isUniform = function(string) {
-    // true if string consists of same character repeated.
-
-    if (!string) {
-        return false;
-    }
-
-    for (var i = 1; i < string.length; ++i) {
-        if (string[i] !== string[0]) {
-            return false;
-        }
-    }
-
-    return true;
-};
-
-function normaliseWhitespace(text) {
-    if (!text) {
-        return '';
-    }
-
-    return text
-        .replace(/\s{2,}/g, ' ') // replace runs of whitespace with single space
-        .replace(/[^\S ]/g, ' ') // replace single char non-space whitespace runs with single space
-        .trim();
-}
-
-function removeDividersAndEmphasisMarkers(text) {
+function removeDividersAndEmphasisMarkers(line) {
     // detect nonalphanum at start of line.
 
-    var startMatch = text.match(lineStartsWithNonAlphaNumRegex);
+    var startMatch = patternMatching.getInitialNonAlphaNumericSubstring(line.content);
     if (startMatch) {
-        if (startMatch[1] === text) {
+        if (startMatch === line.content) {
             // match is on entire paragraph, so it's a divider.
-            text = '';
-        } else if (isUniform(startMatch[1])) {
-            //log.debug('all same char: ' + text);
+            line.content = '';
+        } else if (patternMatching.isAllSameCharacter(startMatch)) {
+            //log.debug('all same char: ' + line.content);
 
-            var endMatch = text.match(new XRegExp('(' + escapeRegExp(startMatch[1][0]) + '+)$'));
+            var endMatch = line.content.match(new XRegExp('(' + patternMatching.escapeForInclusionInRegex(startMatch[0]) + '+)$'));
             if (endMatch) {
                 // nonalphanum string occurs at end as well as start of paragraph; mark it as emphasised.
+                line.isEmphasized = true;
 
-                //log.debug('repeated: ' + text);
+                //log.debug('repeated: ' + line.content);
 
                 // remove those characters.
-                text = text.substring(startMatch[1].length, text.length - endMatch[1].length).trim();
+                line.content = line.content.substring(startMatch.length, line.content.length - endMatch[1].length).trim();
             }
         } else {
-            if (text.indexOf(startMatch[1], text.length - startMatch[1].length) !== -1) {
+            if (line.content.indexOf(startMatch, line.content.length - startMatch.length) !== -1) {
                 // the pattern of nonalphanum chars at the start of the paragraph
                 // is mirrored at the end of the paragraph.
 
-                //log.debug('same: ' + text);
+                //log.debug('same: ' + line.content);
 
                 // remove those characters.
-                text = text.substring(startMatch[1].length, text.length - startMatch[1].length).trim();
+                line.content = line.content.substring(startMatch.length, line.content.length - startMatch.length).trim();
             }
         }
     }
 
-    return text;
+    return line;
 }
 
 function formLineGroupings(lines) {
@@ -119,16 +85,16 @@ function formLineGroupings(lines) {
 }
 
 function markPossibleListItem(line) {
-    var bulletMatch = line.content.match(bulletMatchRegex);
+    var bulletMatch = patternMatching.matchBullet(line.content);
     if (bulletMatch) {
-        line.bulletCandidate = bulletMatch[1];
-        line.bulletCandidateCore = bulletMatch[2];
+        line.bulletCandidate = bulletMatch.bulletCandidate;
+        line.bulletCandidateCore = bulletMatch.bulletCandidateCore;
     }
 
-    var numberMatch = line.content.match(numberBulletMatchRegex);
+    var numberMatch = patternMatching.matchNumberBullet(line.content);
     if (numberMatch) {
-        line.orderedCandidate = numberMatch[1];
-        line.orderedCandidateCore = numberMatch[2].toLowerCase();
+        line.orderedCandidate = numberMatch.orderedCandidate;
+        line.orderedCandidateCore = numberMatch.orderedCandidateCore;
     }
 
     return line;
@@ -172,12 +138,6 @@ function identifyOrderedBulletLists(lineGrouping) {
         if (line.orderedCandidate && i > 0) {
             var previousLine = lineGrouping[i - 1];
 
-            //if (previousLine.orderedCandidate) {
-            //    log.debug('previous: ' + previousLine.orderedCandidateCore
-            //        + ' previous++: ' + getNextOrderValue(previousLine.orderedCandidateCore)
-            //    + ' this: ' + line.orderedCandidateCore);
-            //}
-
             if (previousLine.orderedCandidate &&
                 getNextOrderValue(previousLine.orderedCandidateCore) === line.orderedCandidateCore) {
 
@@ -219,26 +179,6 @@ function attachHeaderlessListsToPreviousLineGrouping(lineGroupings) {
     return fixedLineGroupings;
 }
 
-//function normaliseSameDeveloperAppNames(appName, sameDeveloperAppNames, developerName) {
-//    var result = [];
-//
-//    for (var i = 0; i < sameDeveloperAppNames.length; ++i) {
-//        var appNameToTest = sameDeveloperAppNames[i];
-//        appNameToTest = normaliseAppName(appNameToTest, developerName);
-//
-//        if (similarity.similar(appName, appNameToTest)) {
-//            result.push(
-//                //'REMOVED>> ' +
-//                appNameToTest);
-//            continue;
-//        }
-//
-//        result.push(appNameToTest)
-//    }
-//
-//    return result;
-//}
-
 function createNormalisedDescription(appDescription, appName, developerName, sameDeveloperAppNames) {
     sameDeveloperAppNames = sameDeveloperAppNames || [];
 
@@ -247,11 +187,12 @@ function createNormalisedDescription(appDescription, appName, developerName, sam
     }
 
     var lines = appDescription
-        .split('\n') // split into paragraphs
-        .map(function (val) {
-            val = normaliseWhitespace(val);
-            val = removeDividersAndEmphasisMarkers(val);
-            return { content: val };
+        .split('\n')
+        .map(function (text) {
+            text = patternMatching.normaliseWhitespace(text);
+            var line = { content: text };
+            line = removeDividersAndEmphasisMarkers(line);
+            return line;
         });
 
     var lineGroupings = formLineGroupings(lines);

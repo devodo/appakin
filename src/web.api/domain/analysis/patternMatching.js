@@ -133,6 +133,116 @@ function removeDeveloperName(appName, developerName) {
 
 // ------------------------------
 
+var matchBulletRegex = new XRegExp('^(([^\\p{L}\\p{N}"]+?)\\s*)(?:\\b|\\()');
+
+function matchBullet(text) {
+    var bulletMatch = text.match(matchBulletRegex);
+    if (bulletMatch) {
+        return {
+            bulletCandidate: bulletMatch[1],
+            bulletCandidateCore: bulletMatch[2]
+        };
+    } else {
+        return null;
+    }
+}
+
+// ------------------------------
+
+var matchNumberBulletRegex = /^((?:[[(]?\s*)((?:[1-9]?[0-9]|[a-zA-Z])\.?)(?:\s*?[\s)\],.-])\s*)/;
+
+function matchNumberBullet(text) {
+    var numberBulletMatch = text.match(matchNumberBulletRegex);
+    if (numberBulletMatch) {
+        return {
+            orderedCandidate: numberBulletMatch[1],
+            orderedCandidateCore: numberBulletMatch[2].toLowerCase()
+        };
+    } else {
+        return null;
+    }
+}
+
+// ------------------------------
+
+var getInitialNonAlphaNumericSubstringRegex = new XRegExp('^([^\\p{L}\\p{N}\\s"]+)');
+
+function getInitialNonAlphaNumericSubstring(text) {
+    var match = text.match(getInitialNonAlphaNumericSubstringRegex);
+    return match ? match[1] : null;
+}
+
+// ------------------------------
+
+var isAllSameCharacter = function(text) {
+    // true if string consists of same character repeated.
+
+    if (!text) {
+        return false;
+    }
+
+    for (var i = 1; i < text.length; ++i) {
+        if (text[i] !== text[0]) {
+            return false;
+        }
+    }
+
+    return true;
+};
+
+// ------------------------------
+
+var replaceWhitespaceRunsRegex = /\s{2,}/g;
+var replaceSingleCharNonSpaceWhitespaceRunsRegex = /[^\S ]/g;
+
+function normaliseWhitespace(text) {
+    if (!text) {
+        return '';
+    }
+
+    return text
+        .replace(replaceWhitespaceRunsRegex, ' ')
+        .replace(replaceSingleCharNonSpaceWhitespaceRunsRegex, ' ')
+        .trim();
+}
+
+// ------------------------------
+
+function isPossibleHeading(text) {
+    if (text.length < 3 || text.length > 200) {
+        return false;
+    }
+
+    var lastChar = text[text.length - 1];
+
+    if (lastChar === '.') {
+        return false;
+    }
+
+    if (lastChar === ':' || lastChar === '-' || lastChar === '\u2013' || lastChar === '\u2014' || lastChar === '\u2015' || lastChar === '\u2016') {
+        return true;
+    }
+
+    var noWhitespaceText = text.replace(/\s+/g, '');
+    var capitalLetterCount = 0;
+
+    for (var i = 0; i < noWhitespaceText.length; ++i) {
+        var charCode = noWhitespaceText.charCodeAt(i);
+        if (charCode >= 65 && charCode <= 90) {
+            ++capitalLetterCount;
+        }
+    }
+
+    var capitalLetterPercentage = (100.00 / noWhitespaceText.length) * capitalLetterCount;
+    if (capitalLetterPercentage >= 80) {
+        return true;
+    }
+
+    return false;
+}
+
+// ------------------------------
+
 exports.getTextTitle = getTextTitle;
 exports.hasSomeAlphaNumericContent = hasSomeAlphaNumericContent;
 exports.escapeForInclusionInRegex = escapeForInclusionInRegex;
@@ -140,3 +250,9 @@ exports.removeEndParentheses = removeEndParentheses;
 exports.removeCompanyNameSuffix = removeCompanyNameSuffix;
 exports.removeAppTypeSuffix = removeAppTypeSuffix;
 exports.removeDeveloperName = removeDeveloperName;
+exports.matchBullet = matchBullet;
+exports.matchNumberBullet = matchNumberBullet;
+exports.getInitialNonAlphaNumericSubstring = getInitialNonAlphaNumericSubstring;
+exports.isAllSameCharacter = isAllSameCharacter;
+exports.normaliseWhitespace = normaliseWhitespace;
+exports.isPossibleHeading = isPossibleHeading;

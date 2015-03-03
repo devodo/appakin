@@ -14,20 +14,28 @@ function Paragraph(elements) {
     this.locationPercentageRelativeToDescription = null;
 }
 
-Paragraph.prototype.setStatistics = function(descriptionTokenCount, priorTokenCount) {
-    var paragraphTokenCount = 0;
+Paragraph.prototype.getIsPossibleHeading = function() {
+    return this.elements.length === 1 && this.elements[0].getIsPossibleHeading();
+};
+
+Paragraph.prototype.setStatistics = function(descriptionLength, priorLength) {
+    var paragraphLength = 0;
 
     this.forEachSentence(true, function(sentence) {
-        paragraphTokenCount += sentence.getTokenCount();
+        paragraphLength += sentence.getLength();
     });
 
     this.forEachSentence(true, function(sentence) {
-        sentence.setTokenPercentageRelativeToParagraph(paragraphTokenCount);
+        sentence.setLengthPercentageRelativeToParagraph(paragraphLength);
     });
 
-    this.locationPercentageRelativeToDescription = descriptionTokenCount === 0 ? 0 : (100.0 / descriptionTokenCount) * priorTokenCount;
+    this.locationPercentageRelativeToDescription = descriptionLength === 0 ? 0 : (100.0 / descriptionLength) * priorLength;
 
-    return paragraphTokenCount;
+    return paragraphLength;
+};
+
+Paragraph.prototype.isInLatterPartOfDescription = function() {
+    return this.locationPercentageRelativeToDescription > 50;
 };
 
 Paragraph.prototype.markAsRemoved = function(reason, soundness) {
@@ -64,6 +72,16 @@ Paragraph.prototype.getFirstSentence = function() {
     }
 
     return firstElement.getFirstSentence();
+};
+
+Paragraph.prototype.forEachElement = function(callback) {
+    for (var i = 0; i < this.elements.length; ++i) {
+        var element = this.elements[i];
+        var result = callback(element);
+        if (result) {
+            break;
+        }
+    }
 };
 
 Paragraph.prototype.forEachSentence = function(includeLists, callback) {

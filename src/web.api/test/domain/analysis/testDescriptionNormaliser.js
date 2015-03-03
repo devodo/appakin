@@ -39,9 +39,9 @@ exports.group = {
     },
 
     testBulletList: function (test) {
-        var appDescription = 'This is a description.\n* bullet one\n*  bullet two';
+        var appDescription = 'This is a description.\n* bullet one\n*  (old) bullet two';
         var description = proc.createNormalisedDescription(appDescription, 'appname', 'devname', []);
-        test.strictEqual(description.getResult(), 'This is a description.\n* bullet one\n* bullet two\n\n');
+        test.strictEqual(description.getResult(), 'This is a description.\n* bullet one\n* (old) bullet two\n\n');
         test.done();
     },
 

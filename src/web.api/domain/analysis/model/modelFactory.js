@@ -62,11 +62,18 @@ function createListItem(content, bullet) {
 }
 
 function createSentenceGroup(line) {
-    var sentences = [];
     var parsedSentences = nlpCompromise.sentences(line);
+    var isPossibleHeading = parsedSentences.length === 1 && (patternMatching.isPossibleHeading(parsedSentences[0]) || line.isEmphasized);
+    var sentences = [];
 
     for (var i = 0; i < parsedSentences.length; ++i) {
-        sentences.push(new Sentence(parsedSentences[i]));
+        var parsedSentence = parsedSentences[i];
+        var sentence = new Sentence(parsedSentence);
+        sentences.push(sentence);
+    }
+
+    if (isPossibleHeading) {
+        sentences[0].markAsPossibleHeading();
     }
 
     return new SentenceGroup(sentences);

@@ -8,13 +8,14 @@ function Sentence(content) {
     this._tokens = null; // lazy loaded.
     this.isRemoved = false;
     this.removalReason = new RemovalReason();
-    this.tokenPercentageRelativeToParagraph = null;
+    this.lengthPercentageRelativeToParagraph = null;
+    this.isPossibleHeading = false;
 }
 
-Sentence.prototype.setTokenPercentageRelativeToParagraph = function(paragraphTokenCount) {
-    var sentenceTokenCount = this.getTokenCount();
-    var totalTokenCount = Math.max(paragraphTokenCount, sentenceTokenCount);
-    this.tokenPercentageRelativeToParagraph = totalTokenCount === 0 ? 0 : (100.0 / totalTokenCount) * sentenceTokenCount;
+Sentence.prototype.setLengthPercentageRelativeToParagraph = function(paragraphLength) {
+    var sentenceLength = this.getLength();
+    var totalLength = Math.max(paragraphLength, sentenceLength);
+    this.lengthPercentageRelativeToParagraph = totalLength === 0 ? 0 : (100.0 / totalLength) * sentenceLength;
 };
 
 Sentence.prototype.markAsRemoved = function(reason, soundness) {
@@ -29,6 +30,10 @@ Sentence.prototype.conditionallyMarkAsRemoved = function(regex, reason, soundnes
         this.isRemoved = true;
         this.removalReason.add(reason, soundness);
     }
+};
+
+Sentence.prototype.markAsPossibleHeading = function() {
+    this.isPossibleHeading = true;
 };
 
 Sentence.prototype.getLength = function() {

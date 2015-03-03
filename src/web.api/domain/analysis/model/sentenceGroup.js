@@ -4,6 +4,10 @@ function SentenceGroup(sentences) {
     this.sentences = sentences || [];
 }
 
+SentenceGroup.prototype.getIsPossibleHeading = function() {
+    return this.sentences.length === 1 && this.sentences[0].isPossibleHeading;
+};
+
 SentenceGroup.prototype.getSentenceCount = function() {
     return this.sentences.length;
 };

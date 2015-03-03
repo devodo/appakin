@@ -81,22 +81,22 @@ exports.group = {
 
     testSetTokenPercentageRelativeToParagraph: function (test) {
         var sentence = new Sentence('cat in a hat');
-        sentence.setTokenPercentageRelativeToParagraph(10);
-        test.strictEqual(sentence.tokenPercentageRelativeToParagraph, 40);
+        sentence.setLengthPercentageRelativeToParagraph(20);
+        test.strictEqual(sentence.lengthPercentageRelativeToParagraph, 60);
         test.done();
     },
 
     testSetTokenPercentageRelativeToParagraphWhenNoTokens: function (test) {
         var sentence = new Sentence('');
-        sentence.setTokenPercentageRelativeToParagraph(10);
-        test.strictEqual(sentence.tokenPercentageRelativeToParagraph, 0);
+        sentence.setLengthPercentageRelativeToParagraph(10);
+        test.strictEqual(sentence.lengthPercentageRelativeToParagraph, 0);
         test.done();
     },
 
     testSetTokenPercentageRelativeToParagraphWhenSentenceTokenCountGreaterThanParagraphTokenCount: function (test) {
         var sentence = new Sentence('cat in a hat');
-        sentence.setTokenPercentageRelativeToParagraph(2);
-        test.strictEqual(sentence.tokenPercentageRelativeToParagraph, 100);
+        sentence.setLengthPercentageRelativeToParagraph(2);
+        test.strictEqual(sentence.lengthPercentageRelativeToParagraph, 100);
         test.done();
     }
 };

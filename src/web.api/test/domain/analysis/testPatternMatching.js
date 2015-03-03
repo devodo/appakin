@@ -11,6 +11,7 @@ exports.group = {
         callback();
     },
 
+    // TODO this would only work if testing against non-titled version of app name.
     testGetTextTitle: function (test) {
         doTestGetTextTitle('foo', '', test);
         doTestGetTextTitle('foo bat bar', '', test);
@@ -20,6 +21,8 @@ exports.group = {
         doTestGetTextTitle('foo bat: bar', 'foo bat', test);
         doTestGetTextTitle('foo bat - bar', 'foo bat', test);
         doTestGetTextTitle('foo bat -bar', 'foo bat', test);
+        doTestGetTextTitle('"foo - bat" - bar', 'foo - bat', test);
+        doTestGetTextTitle('\'foo: bat\' - bar', 'foo: bat', test);
         doTestGetTextTitle('Little Fox Music Box – Kids songs – Sing along', 'Little Fox Music Box', test);
         test.done();
     },
@@ -128,8 +131,107 @@ exports.group = {
         doTestRemoveDeveloperName('Scholastic First Discovery: The Forest for iPad', 'Scholastic', 'First Discovery: The Forest for iPad', test);
         doTestRemoveDeveloperName('THE TORTOISE AND THE HARE. ITBOOK STORY-TOY. HD', 'itbook', 'THE TORTOISE AND THE HARE', test);
         test.done();
+    },
+
+    testMatchBullet: function (test) {
+        doTestMatchBulletForMatch('- foo', '- ', '-', test);
+        doTestMatchBulletForMatch('-->  foo bar', '-->  ', '-->', test);
+        doTestMatchBulletForMatch('- (new) foo', '- ', '-', test);
+        doTestMatchBulletForNoMatch('foo', test);
+        test.done();
+    },
+
+    testMatchNumberBullet: function (test) {
+        doTestMatchNumberBulletForMatch('(1) foo bar', '(1) ', '1', test);
+        doTestMatchNumberBulletForMatch('(A) foo bar', '(A) ', 'a', test);
+        doTestMatchNumberBulletForNoMatch('foo bar', test);
+        test.done();
+    },
+
+    testGetInitialNonAlphaNumericSubstring: function (test) {
+        doTestGetInitialNonAlphaNumericSubstring('foo', null, test);
+        doTestGetInitialNonAlphaNumericSubstring('--  foo', '--', test);
+        doTestGetInitialNonAlphaNumericSubstring('* foo', '*', test);
+        test.done();
+    },
+
+    testIsAllSameCharacter: function (test) {
+        doTestIsAllSameCharacter('', false, test);
+        doTestIsAllSameCharacter('foo', false, test);
+        doTestIsAllSameCharacter('fffff', true, test);
+        doTestIsAllSameCharacter('r', true, test);
+        test.done();
+    },
+
+    testNormaliseWhitespace: function (test) {
+        doTestNormaliseWhitespace('', '', test);
+        doTestNormaliseWhitespace('   fo    ba      ', 'fo ba', test);
+        test.done();
+    },
+
+    testIsPossibleHeading: function (test) {
+        doTestIsPossibleHeading('', false, test);
+        doTestIsPossibleHeading('FO', false, test);
+        doTestIsPossibleHeading('BOOM.', false, test);
+        doTestIsPossibleHeading('Boom!', false, test);
+        doTestIsPossibleHeading('Bounce this:', true, test);
+        doTestIsPossibleHeading('BOOM!', true, test);
+        doTestIsPossibleHeading('BOOM', true, test);
+        doTestIsPossibleHeading('These apps:', true, test);
+        doTestIsPossibleHeading('BOOMa', true, test);
+        doTestIsPossibleHeading('BO Ma', false, test);
+        doTestIsPossibleHeading('BO MLa', true, test);
+        test.done();
     }
 };
+
+function doTestIsPossibleHeading(text, expected, test) {
+    test.strictEqual(patternMatching.isPossibleHeading(text), expected, text);
+}
+
+function doTestNormaliseWhitespace(text, expected, test) {
+    test.strictEqual(patternMatching.normaliseWhitespace(text), expected, test);
+}
+
+function doTestIsAllSameCharacter(text, expected, test) {
+    test.strictEqual(patternMatching.isAllSameCharacter(text), expected, text);
+}
+
+function doTestGetInitialNonAlphaNumericSubstring(text, expected, test) {
+    test.strictEqual(patternMatching.getInitialNonAlphaNumericSubstring(text), expected, text);
+}
+
+function doTestMatchNumberBulletForMatch(text, expectedNumberBulletCandidate, expectedNumberBulletCandidateCore, test) {
+    var result = patternMatching.matchNumberBullet(text);
+    if (result === null) {
+        test.ok(false, text);
+        return;
+    }
+
+    test.strictEqual(result.orderedCandidate, expectedNumberBulletCandidate, text);
+    test.strictEqual(result.orderedCandidateCore, expectedNumberBulletCandidateCore, text);
+}
+
+function doTestMatchNumberBulletForNoMatch(text, test) {
+    var result = patternMatching.matchNumberBullet(text);
+    test.strictEqual(result, null, text);
+}
+
+function doTestMatchBulletForMatch(text, expectedBulletCandidate, expectedBulletCandidateCore, test) {
+    var result = patternMatching.matchBullet(text);
+    if (result === null) {
+        test.ok(false, text);
+        return;
+    }
+
+    test.strictEqual(result.bulletCandidate, expectedBulletCandidate, text);
+    test.strictEqual(result.bulletCandidateCore, expectedBulletCandidateCore, text);
+}
+
+function doTestMatchBulletForNoMatch(text, test) {
+    var result = patternMatching.matchBullet(text);
+    test.strictEqual(result, null, text);
+}
 
 function doTestGetTextTitle(input, expected, test) {
     test.strictEqual(patternMatching.getTextTitle(input), expected, input);

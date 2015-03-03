@@ -2,10 +2,6 @@
 
 var managedAppName = require('../../../domain/analysis/model/managedAppName');
 var Sentence = require('../../../domain/analysis/model/sentence').Sentence;
-var normaliseDeveloperName = managedAppName.normaliseDeveloperName;
-var removeDeveloperName = managedAppName.removeDeveloperName;
-var removeAppTypeSuffix = managedAppName.removeAppTypeSuffix;
-var removeParenthesesAtEnd = managedAppName.removeParenthesesAtEnd;
 var createManagedAppName = managedAppName.createManagedAppName;
 
 exports.group = {
@@ -15,6 +11,12 @@ exports.group = {
 
     tearDown: function (callback) {
         callback();
+    },
+
+    testCreateManagedAppName2: function (test) {
+        doTestCreateManagedAppName('Cut the Rope by Zymba (Free)', 'Zymba', 'cut the rope by zymba', 'cut the rope', test);
+        doTestCreateManagedAppName('Cut the Rope - Interesting - That', 'Zymba', 'cut the rope', 'cut the rope', test);
+        test.done();
     },
 
     testCreateManagedAppName: function (test) {
@@ -88,3 +90,9 @@ exports.group = {
     }
     // TODO add more matches tests.
 };
+
+function doTestCreateManagedAppName(appName, developerName, expectedCompactAppNameRemade, expectedNoDeveloperCompactAppNameRemade, test) {
+    var result = createManagedAppName(appName, developerName);
+    test.strictEqual(result.compactAppNameRemade, expectedCompactAppNameRemade, 'Compact name for ' + appName + '/' + developerName);
+    test.strictEqual(result.noDeveloperCompactAppNameRemade, expectedNoDeveloperCompactAppNameRemade, 'Compact Dev name for ' + appName + '/' + developerName);
+}

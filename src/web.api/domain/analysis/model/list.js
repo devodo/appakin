@@ -8,6 +8,10 @@ function List(listItems) {
     this.removalReason = new RemovalReason();
 }
 
+List.prototype.getIsPossibleHeading = function() {
+    return false;
+};
+
 List.prototype.markAsRemoved = function(reason, soundness) {
     this.isRemoved = true;
     this.removalReason.add(reason, soundness);

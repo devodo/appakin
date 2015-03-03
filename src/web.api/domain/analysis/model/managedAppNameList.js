@@ -1,9 +1,11 @@
 'use strict';
 
 var managedAppName = require('./managedAppName');
+var log = require('../../../logger');
 
 function ManagedAppNameList(managedAppNames) {
     this.managedAppNames = managedAppNames;
+    log.warn('managed app names count: ' + this.managedAppNames.length);
 }
 
 ManagedAppNameList.prototype.matches = function(sentence, matchOnWholeSentence) {
@@ -28,8 +30,13 @@ function createManagedAppNameList(appName, developerName, relatedAppNames) {
         if (!relatedManagedAppName.isSimilarTo(appNameResult)) {
             // Only include related app names that are sufficiently different to appname.
             relatedManagedAppNames.push(relatedManagedAppName);
+        } else {
+            log.warn('ignoring app name ['+ relatedAppName + '] compared to [' + appName + ']');
         }
     }
+
+    log.warn('RELATED APP NAMES' + relatedAppNames.join('==='));
+    log.warn('RELATED MANAGED APP NAMES' + relatedManagedAppNames.map(function(x) {return x.originalAppName}).join('==='));
 
     return new ManagedAppNameList(relatedManagedAppNames);
 }
