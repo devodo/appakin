@@ -1,5 +1,8 @@
 'use strict';
 
+var patternMatching = require('../patternMatching');
+var Sentence = require('./sentence').Sentence;
+
 function SentenceGroup(sentences) {
     this.sentences = sentences || [];
 }
@@ -14,6 +17,19 @@ SentenceGroup.prototype.getSentenceCount = function() {
 
 SentenceGroup.prototype.getFirstSentence = function() {
     return this.getSentence(0);
+};
+
+// TODO could detect uppercase type of title sentence.
+// TODO could detect quotes type of title sentence.
+SentenceGroup.prototype.getTitleSentence = function() {
+    var result = this.sentences.slice(0, 2).map(function(x) { return x.content; }).join(' ');
+    result = patternMatching.removeExtraTextFromStart(result);
+
+    if (result && this.sentences[0].getLength() < 80) {
+        return new Sentence(result);
+    }
+
+    return null;
 };
 
 SentenceGroup.prototype.getSentence = function(index) {

@@ -89,5 +89,29 @@ exports.group = {
 
         test.strictEqual(resultSentences.length, 1);
         test.done();
+    },
+
+    testGetTitleSentence: function (test) {
+        var sentenceGroup = new SentenceGroup([
+            new Sentence('foo'),
+            new Sentence('bar')
+        ]);
+
+        var result = sentenceGroup.getTitleSentence();
+        test.notStrictEqual(result, null);
+        test.strictEqual(result.content, 'foo bar');
+        test.done();
+    },
+
+    testGetTitleSentenceWhenExtraContentAtStart: function (test) {
+        var sentenceGroup = new SentenceGroup([
+            new Sentence('(NEW) foo'),
+            new Sentence('bar')
+        ]);
+
+        var result = sentenceGroup.getTitleSentence();
+        test.notStrictEqual(result, null);
+        test.strictEqual(result.content, 'foo bar');
+        test.done();
     }
 };

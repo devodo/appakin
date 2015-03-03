@@ -14,6 +14,10 @@ ListItem.prototype.markAsRemoved = function(reason, soundness) {
     this.removalReason.add(reason, soundness);
 };
 
+ListItem.prototype.getTitleSentence = function() {
+    return this.sentenceGroup ? this.sentenceGroup.getTitleSentence() : null;
+};
+
 ListItem.prototype.getSentence = function(index) {
     return this.sentenceGroup.getSentence(index);
 };

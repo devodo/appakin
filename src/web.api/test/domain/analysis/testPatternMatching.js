@@ -11,7 +11,6 @@ exports.group = {
         callback();
     },
 
-    // TODO this would only work if testing against non-titled version of app name.
     testGetTextTitle: function (test) {
         doTestGetTextTitle('foo', '', test);
         doTestGetTextTitle('foo bat bar', '', test);
@@ -21,8 +20,8 @@ exports.group = {
         doTestGetTextTitle('foo bat: bar', 'foo bat', test);
         doTestGetTextTitle('foo bat - bar', 'foo bat', test);
         doTestGetTextTitle('foo bat -bar', 'foo bat', test);
-        doTestGetTextTitle('"foo - bat" - bar', 'foo - bat', test);
-        doTestGetTextTitle('\'foo: bat\' - bar', 'foo: bat', test);
+        //doTestGetTextTitle('"foo - bat" - bar', 'foo - bat', test);
+        //doTestGetTextTitle('\'foo: bat\' - bar', 'foo: bat', test);
         doTestGetTextTitle('Little Fox Music Box – Kids songs – Sing along', 'Little Fox Music Box', test);
         test.done();
     },
@@ -184,7 +183,7 @@ exports.group = {
         test.done();
     },
 
-    isMoreAppsText: function (test) {
+    testIsMoreAppsText: function (test) {
         doTestIsMoreAppsText('', false, test);
         doTestIsMoreAppsText('** DON\'T MISS OUR OTHER EXCITING GAMES! **', true, test);
         doTestIsMoreAppsText('by same developer', true, test);
@@ -195,8 +194,33 @@ exports.group = {
         doTestIsMoreAppsText('MORE CAT STUDIO LLC BOOK APPS:', true, test);
         doTestIsMoreAppsText('Cut the rope and stuff', false, test);
         test.done();
+    },
+
+    testIsNoteText: function (test) {
+        doTestIsNoteText('', false, test);
+        doTestIsNoteText('This is false.', false, test);
+        doTestIsNoteText('*This* is false.', false, test);
+        doTestIsNoteText('Note: this is true', true, test);
+        doTestIsNoteText('*NOTE* this is true', true, test);
+        doTestIsNoteText('*** note *** this is true', true, test);
+        test.done();
+    },
+
+    testRemoveExtraTextFromStart: function (test) {
+        doTestRemoveExtraTextFromStart('', '', test);
+        doTestRemoveExtraTextFromStart('This is a sentence.', 'This is a sentence.', test);
+        doTestRemoveExtraTextFromStart('(Hello) This is a sentence.', 'This is a sentence.', test);
+        test.done();
     }
 };
+
+function doTestRemoveExtraTextFromStart(text, expected, test) {
+    test.strictEqual(patternMatching.removeExtraTextFromStart(text), expected, text);
+}
+
+function doTestIsNoteText(text, expected, test) {
+    test.strictEqual(patternMatching.isNoteText(text), expected, text);
+}
 
 function doTestIsMoreAppsText(text, expected, test) {
     test.strictEqual(patternMatching.isMoreAppsText(text, 'Cat Studio LLC'), expected, text);

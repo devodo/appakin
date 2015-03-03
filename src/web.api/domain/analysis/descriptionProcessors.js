@@ -211,29 +211,21 @@ function removeListsOfAppsBySameDeveloperByMatchingAppNames(description) {
            var appNameMatchCount = 0;
 
            list.forEachListItem(function(listItem) {
-               // ignore lists with multi-sentence list items.
+               // ignore lists with long multi-sentence list items.
 
                if (listItem.getSentenceCount() > 3) {
                    appNameMatchCount = 0;
                    return true;
                }
 
-               var firstSentence = listItem.getSentence(0);
+               var titleSentence = listItem.getTitleSentence();
 
-               // ignore list items that are too long.
-               if (!firstSentence  || firstSentence.getTokenCount() > 35) {
-                   return;
-               }
-
-               log.warn('listItem: ' + firstSentence.content);
-
-               if (description.managedAppNameList.matches(firstSentence)) {
-                   log.warn('match!!!');
+               if (description.managedAppNameList.matches(titleSentence)) {
                    ++appNameMatchCount;
                }
            });
 
-            log.warn('listItemCount: ' + listItemCount + ' appNameMatchCount: ' + appNameMatchCount);
+            //log.warn('listItemCount: ' + listItemCount + ' appNameMatchCount: ' + appNameMatchCount);
 
            var matchPercentage = (100.0 / listItemCount) * appNameMatchCount;
            if (matchPercentage >= 50) {
@@ -245,18 +237,24 @@ function removeListsOfAppsBySameDeveloperByMatchingAppNames(description) {
 
 // --------------------------------
 
-// TODO sentence title could be more than one sentence, which could detect by upper case.
-
 function removeParagraphsThatStartWithNameOfAppBySameDeveloper(description) {
     description.forEachActiveParagraph(function(paragraph) {
-        var firstSentence = paragraph.getFirstSentence();
-        var sentenceTitle = patternMatching.getTextTitle(firstSentence.content);
+        var firstElement = paragraph.getElement(0);
 
-        if (sentenceTitle && sentenceTitle.length < 80) {
-            var sentence = new Sentence(sentenceTitle);
+        if (firstElement && firstElement instanceof SentenceGroup && firstElement.getSentenceCount() <= 2) {
+            var titleSentence = firstElement.getTitleSentence();
 
-            if (description.managedAppNameList.matches(sentence, true)) {
-                paragraph.markAsRemoved('by same developer (paragraph)', STRONG);
+            //var firstSentence = firstElement.getFirstSentence();
+            //var sentenceTitle = firstElement.getSentenceGroupTitle();
+
+            //var firstSentence = firstElement.getFirstSentence();
+            //var sentenceTitle = patternMatching.getTextTitleForAppNameSimilarityTest(firstSentence.content);
+                     // patternMatching.getTextTitle(firstSentence.content);
+
+            if (titleSentence) {
+                if (description.managedAppNameList.matches(titleSentence, true)) {
+                    paragraph.markAsRemoved('by same developer (paragraph)', STRONG);
+                }
             }
         }
     });
@@ -391,6 +389,20 @@ function removeHeadersAndListsForRelatedApps(description) {
 
 // --------------------------------
 
+function removeNoteSentences(description) {
+    description.forEachActiveParagraph(function(paragraph) {
+        paragraph.forEachActiveSentence(false, function(sentence) {
+            if (patternMatching.isNoteText(sentence.content)) {
+                sentence.markAsRemoved('note sentence', NORMAL);
+            }
+        });
+    });
+};
+
+// --------------------------------
+
+// *NOTE* This game is compatible with iOS 7 and above
+
 exports.setStatistics = setStatistics;
 exports.removeCopyrightParagraphs = removeCopyrightParagraphs;
 exports.removeSentencesWithUrls = removeSentencesWithUrls;
@@ -409,3 +421,4 @@ exports.removeHeaderSentencesBeforeAlreadyRemovedContent = removeHeaderSentences
 exports.removeHeaderSentencesBeforeAlreadyRemovedLists = removeHeaderSentencesBeforeAlreadyRemovedLists;
 exports.removeParagraphsInLatterPartOfDescriptionThatHaveRemovedContentAroundThem = removeParagraphsInLatterPartOfDescriptionThatHaveRemovedContentAroundThem;
 exports.removeHeadersAndListsForRelatedApps = removeHeadersAndListsForRelatedApps;
+exports.removeNoteSentences = removeNoteSentences;

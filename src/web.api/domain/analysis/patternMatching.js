@@ -276,6 +276,30 @@ function isMoreAppsText(text, developerName) {
 
 // ------------------------------
 
+var isNoteTextRegex = /^[\W]*\s*note\b\s*\W/i;
+
+function isNoteText(text) {
+    return isNoteTextRegex.test(text);
+}
+
+// ------------------------------
+
+var removeExtraTextFromStartRegex = new XRegExp('^\\([^\\)]+\\)\\s*', 'i');
+
+function removeExtraTextFromStart(text) {
+    var result = text.replace(removeExtraTextFromStartRegex, '').trim();
+    return result === '' ? text : result;
+}
+
+// ------------------------------
+
+function getTextTitleForAppNameSimilarityTest(text) {
+    var result = removeExtraTextFromStart(text);
+    return result;
+}
+
+// ------------------------------
+
 exports.getTextTitle = getTextTitle;
 exports.hasSomeAlphaNumericContent = hasSomeAlphaNumericContent;
 exports.escapeForInclusionInRegex = escapeForInclusionInRegex;
@@ -290,3 +314,6 @@ exports.isAllSameCharacter = isAllSameCharacter;
 exports.normaliseWhitespace = normaliseWhitespace;
 exports.isPossibleHeading = isPossibleHeading;
 exports.isMoreAppsText = isMoreAppsText;
+exports.isNoteText = isNoteText;
+exports.removeExtraTextFromStart = removeExtraTextFromStart;
+exports.getTextTitleForAppNameSimilarityTest = getTextTitleForAppNameSimilarityTest;

@@ -25,14 +25,13 @@ ManagedAppName.prototype.isSimilarTo = function(other) {
 };
 
 ManagedAppName.prototype.matches = function(sentence, matchOnWholeSentence) {
-    //var sentenceForComparisonTokenCount = this.compactAppNameTokens.length;
     var sentenceForComparisonLetterCount = this.compactAppNameRemade.length;
 
     var sentenceForComparison = tokenisation.createStringFromTokens(
         sentence.getTokens(),
         matchOnWholeSentence ? null : sentenceForComparisonLetterCount);
 
-    log.warn('match 1: [' + sentenceForComparison + '] [' + this.compactAppNameRemade + ']');
+    //log.warn('match 1: [' + sentenceForComparison + '] [' + this.compactAppNameRemade + ']');
 
     if (similarity.similar(sentenceForComparison, this.compactAppNameRemade)) {
         return true;
