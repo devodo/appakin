@@ -55,7 +55,7 @@ exports.group = {
 
     testIsSimilarTo: function (test) {
         var a = createManagedAppName('Cut the Rope', 'Zymba');
-        var b = createManagedAppName('Cat the Ripe', 'Zymba');
+        var b = createManagedAppName('Cat the Rope', 'Zymba');
         test.strictEqual(a.isSimilarTo(b), true);
         test.done();
     },
@@ -69,7 +69,7 @@ exports.group = {
     // TODO more isSimilarTo tests.
 
     testMatches: function (test) {
-        var sentence = new Sentence('Cuts the Ripe is our latest app that you might like!');
+        var sentence = new Sentence('Cuts the Rope is our latest app that you might like!');
         var managedAppName = createManagedAppName('Cut the Rope', 'Zymba');
         test.strictEqual(managedAppName.matches(sentence), true);
         test.done();

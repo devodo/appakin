@@ -182,8 +182,25 @@ exports.group = {
         doTestIsPossibleHeading('BO Ma', false, test);
         doTestIsPossibleHeading('BO MLa', true, test);
         test.done();
+    },
+
+    isMoreAppsText: function (test) {
+        doTestIsMoreAppsText('', false, test);
+        doTestIsMoreAppsText('** DON\'T MISS OUR OTHER EXCITING GAMES! **', true, test);
+        doTestIsMoreAppsText('by same developer', true, test);
+        doTestIsMoreAppsText('Please also check out our other great Apps for kids:', true, test);
+        doTestIsMoreAppsText('Try other awesome games by Cat Studio', true, test);
+        doTestIsMoreAppsText('More apps from Cat Studio:', true, test);
+        doTestIsMoreAppsText('More Great iPad apps from Cat Studio:', true, test);
+        doTestIsMoreAppsText('MORE CAT STUDIO LLC BOOK APPS:', true, test);
+        doTestIsMoreAppsText('Cut the rope and stuff', false, test);
+        test.done();
     }
 };
+
+function doTestIsMoreAppsText(text, expected, test) {
+    test.strictEqual(patternMatching.isMoreAppsText(text, 'Cat Studio LLC'), expected, text);
+}
 
 function doTestIsPossibleHeading(text, expected, test) {
     test.strictEqual(patternMatching.isPossibleHeading(text), expected, text);

@@ -3,8 +3,9 @@
 var managedAppName = require('./managedAppName');
 var log = require('../../../logger');
 
-function ManagedAppNameList(managedAppNames) {
+function ManagedAppNameList(managedAppNames, developerName) {
     this.managedAppNames = managedAppNames;
+    this.developerName = developerName;
     log.warn('managed app names count: ' + this.managedAppNames.length);
 }
 
@@ -38,7 +39,7 @@ function createManagedAppNameList(appName, developerName, relatedAppNames) {
     log.warn('RELATED APP NAMES' + relatedAppNames.join('==='));
     log.warn('RELATED MANAGED APP NAMES' + relatedManagedAppNames.map(function(x) {return x.originalAppName}).join('==='));
 
-    return new ManagedAppNameList(relatedManagedAppNames);
+    return new ManagedAppNameList(relatedManagedAppNames, developerName);
 }
 
 exports.createManagedAppNameList = createManagedAppNameList;

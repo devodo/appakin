@@ -243,6 +243,39 @@ function isPossibleHeading(text) {
 
 // ------------------------------
 
+function isMoreAppsText(text, developerName) {
+    if (text.length > 200) {
+        return false;
+    }
+
+    developerName = removeCompanyNameSuffix(developerName);
+    var escapedDeveloperName = escapeForInclusionInRegex(developerName);
+
+    if (text.match(new RegExp('\\b(more|other)\\b.+\\b(games?|apps?)\\b.+\\b(from|by)\\b', 'i'))) {
+        return true;
+    }
+
+    if (text.match(/\bby\b.+\bsame\b.+\bdeveloper\b/i)) {
+        return true;
+    }
+
+    if (text.match(/\b(our|try)\b.+\bother\b.+\b(games?|apps?)\b/i)) {
+        return true;
+    }
+
+    if (text.match(new RegExp('\\b(more|other)\\b.+\\b(from|by)\\b.+\\b' + escapedDeveloperName, 'i'))) {
+        return true;
+    }
+
+    if (text.match(new RegExp('\\b(more|other)\\b.+\\b' + escapedDeveloperName + '\\b.+\\b(games?|apps?)\\b', 'i'))) {
+        return true;
+    }
+
+    return false;
+}
+
+// ------------------------------
+
 exports.getTextTitle = getTextTitle;
 exports.hasSomeAlphaNumericContent = hasSomeAlphaNumericContent;
 exports.escapeForInclusionInRegex = escapeForInclusionInRegex;
@@ -256,3 +289,4 @@ exports.getInitialNonAlphaNumericSubstring = getInitialNonAlphaNumericSubstring;
 exports.isAllSameCharacter = isAllSameCharacter;
 exports.normaliseWhitespace = normaliseWhitespace;
 exports.isPossibleHeading = isPossibleHeading;
+exports.isMoreAppsText = isMoreAppsText;

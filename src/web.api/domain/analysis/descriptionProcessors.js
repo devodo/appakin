@@ -367,6 +367,30 @@ function removeHeaderSentencesBeforeAlreadyRemovedLists(description) {
 
 // --------------------------------
 
+function removeHeadersAndListsForRelatedApps(description) {
+    description.forEachActiveParagraph(function(paragraph) {
+        if (paragraph.getElementCount() < 2) {
+            return;
+        }
+
+        if (!(paragraph.getElement(0) instanceof SentenceGroup && paragraph.getElement(1) instanceof List)) {
+            return;
+        }
+
+        var sentenceGroup = paragraph.getElement(0);
+        var list = paragraph.getElement(1);
+
+        var firstSentence = sentenceGroup.getFirstSentence();
+        if (!patternMatching.isMoreAppsText(firstSentence.content, description.managedAppNameList.developerName)) {
+            return;
+        }
+
+        list.markAsRemoved('preceded by more apps sentence', STRONG);
+    });
+}
+
+// --------------------------------
+
 exports.setStatistics = setStatistics;
 exports.removeCopyrightParagraphs = removeCopyrightParagraphs;
 exports.removeSentencesWithUrls = removeSentencesWithUrls;
@@ -384,17 +408,4 @@ exports.removeParagraphsInLatterPartOfDescriptionThatAreAlreadyMostlyRemoved = r
 exports.removeHeaderSentencesBeforeAlreadyRemovedContent = removeHeaderSentencesBeforeAlreadyRemovedContent;
 exports.removeHeaderSentencesBeforeAlreadyRemovedLists = removeHeaderSentencesBeforeAlreadyRemovedLists;
 exports.removeParagraphsInLatterPartOfDescriptionThatHaveRemovedContentAroundThem = removeParagraphsInLatterPartOfDescriptionThatHaveRemovedContentAroundThem;
-
-// Editor's Choice
-
-
-//"** DON'T MISS OUR OTHER EXCITING GAMES! **
-// by same developer
-
-//Please also check out our other great Apps for kids:
-//Try other awesome games by Cat Studio
-//More apps from GameHouse:
-
-//More Great iPad apps from Playrix:
-
-// MORE LITTLE GOLDEN BOOK APPS:\n- Barbie Princess and the Popstar\n- The Poky Little Puppy\n- The Little Red Hen\n\nMORE APPS FROM RANDOM HOUSE CHILDREN’S BOOKS:\n- Pat the Bunny\n- Princess Baby\n- Wild About Books\n- How Rocket Learned to Read\n\n",
+exports.removeHeadersAndListsForRelatedApps = removeHeadersAndListsForRelatedApps;
