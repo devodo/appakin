@@ -3,9 +3,11 @@ var log = require('../logger');
 var urlUtil = require('../domain/urlUtil');
 var appStoreRepo = require('../repos/appStoreRepo');
 var featuredRepo = require('../repos/featuredRepo');
+var catViewProvider = require('../domain/viewProvider/categoryViewProvider');
 
 var PAGE_SIZE = 20;
 var MAX_CAT_PAGES = 10;
+var MAX_RELATED = 5;
 
 exports.init = function init(app) {
 
@@ -54,10 +56,12 @@ exports.init = function init(app) {
             }
 
             var skip = (pageNum - 1) * PAGE_SIZE;
-            appStoreRepo.getCategoryApps(category.id, filters, skip, PAGE_SIZE, function (err, apps) {
+            appStoreRepo.getCategoryApps(category.id, filters, skip, PAGE_SIZE, function (err, result) {
                 if (err) {
                     return next(err);
                 }
+
+                var apps = result.apps;
 
                 apps.forEach(function (app) {
                     app.id = app.extId.replace(/\-/g, '');
@@ -67,6 +71,7 @@ exports.init = function init(app) {
 
                 category.url = categoryUrl;
                 category.page = pageNum;
+                category.totalPages = Math.min(MAX_CAT_PAGES, Math.ceil(result.total / PAGE_SIZE));
                 category.apps = apps;
 
                 featuredRepo.getFeaturedApps(category.id, 2, 5, filters, function (err, fApps) {
@@ -92,6 +97,55 @@ exports.init = function init(app) {
                     delete category.extId;
                     res.json(category);
                 });
+            });
+        });
+    });
+
+    app.get('/ios/related_categories/:encodedId/:slug?', function (req, res, next) {
+        var encodedId = req.params.encodedId;
+        if (!encodedId)
+        {
+            return res.status(400).json({error: 'Bad query string'});
+        }
+
+        var extId = urlUtil.decodeId(encodedId);
+
+        if (!extId) {
+            return res.status(400).json({error: 'Bad category id'});
+        }
+
+        var filters = {
+            isIphone: req.query.is_iphone === 'true',
+            isIpad: req.query.is_ipad === 'true',
+            isFree: req.query.is_free === 'true'
+        };
+
+        appStoreRepo.getRelatedCategoriesByExtId(extId, 0, MAX_RELATED, function (err, categories) {
+            if (err) { return next(err); }
+
+            var categoryIds = categories.map(function(category) {
+                return category.id;
+            });
+
+            catViewProvider.getCategoryChartAppsMap(categoryIds, filters, function(err, categoryAppsMap) {
+                if (err) { return next(err); }
+
+                var relatedCategories = categories.map(function(category) {
+                    var categoryChart = categoryAppsMap[category.id];
+
+                    if (!categoryChart) {
+                        return log.error("No related category chart found for category id: " + category.id);
+                    }
+
+                    return {
+                        id: category.extId.replace(/\-/g, ''),
+                        name: category.name,
+                        url: urlUtil.makeUrl(category.extId, category.name),
+                        chart: categoryChart.apps
+                    };
+                });
+
+                res.json(relatedCategories);
             });
         });
     });

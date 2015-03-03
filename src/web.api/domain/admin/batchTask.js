@@ -12,6 +12,9 @@ var log = require('../../logger');
 
 var APP_BATCH_SIZE = 1000;
 var MAX_NGRAM_DEPTH = 6;
+var CAT_POSITION_FACTOR = 0.3;
+var RELATED_CAT_POSITION_FACTOR = 0.3;
+var MAX_RELATED = 100;
 
 var rebuildClusterIndex = function(next) {
     log.info("Rebuilding cluster index");
@@ -58,6 +61,16 @@ var resetAppPopularity = function(next) {
     appStoreAdminRepo.resetAppPopularities(next);
 };
 
+var resetRelatedCategories = function(next) {
+    log.info("Resetting related categories");
+    appStoreAdminRepo.resetRelatedCategories(CAT_POSITION_FACTOR, RELATED_CAT_POSITION_FACTOR, MAX_RELATED, next);
+};
+
+var resetRelatedCategory = function(categoryId, next) {
+    log.info("Resetting related category");
+    appStoreAdminRepo.resetRelatedCategory(categoryId, CAT_POSITION_FACTOR, RELATED_CAT_POSITION_FACTOR, MAX_RELATED, next);
+};
+
 var rebuildCategories = function(next) {
     rebuildClusterIndex(function(err) {
         if (err) { return next(err); }
@@ -66,7 +79,11 @@ var rebuildCategories = function(next) {
             if (err) { return next(err); }
 
             rebuildCategoryIndex(function(err) {
-                next(err);
+                if (err) { return next(err); }
+
+                resetRelatedCategories(function(err) {
+                    next(err);
+                });
             });
         });
     });
@@ -89,7 +106,11 @@ var rebuildSeedCategory = function(seedCategoryId, next) {
                 categoryIndexer.rebuildCategory(seedCategoryMap.categoryId, function(err) {
                     if (err) { return next(err); }
 
-                    next();
+                    resetRelatedCategory(seedCategoryMap.categoryId, function(err) {
+                        if (err) { return next(err); }
+
+                        next();
+                    });
                 });
             });
         });
@@ -136,6 +157,8 @@ exports.rebuildAutoIndex = rebuildAutoIndex;
 exports.rebuildAppIndex = rebuildAppIndex;
 exports.rebuildCategoryIndex = rebuildCategoryIndex;
 exports.resetAppPopularity = resetAppPopularity;
+exports.resetRelatedCategories = resetRelatedCategories;
+exports.resetRelatedCategory = resetRelatedCategory;
 
 exports.rebuildSeedCategory = rebuildSeedCategory;
 

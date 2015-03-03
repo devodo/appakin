@@ -1193,6 +1193,57 @@ exports.resetAppPopularities = function(next) {
     });
 };
 
+var resetRelatedCategories = function(client, positionFactor, relatedPositionFactor, maxRelated, next) {
+    var queryStr = "select reset_related_categories($1, $2, $3);";
+
+    client.query(queryStr, [positionFactor, relatedPositionFactor, maxRelated], function (err, result) {
+        if (err) { return next(err); }
+
+        next(null, result);
+    });
+};
+
+exports.resetRelatedCategories = function(positionFactor, relatedPositionFactor, maxRelated, next) {
+    connection.open(function(err, conn) {
+        if (err) { return next(err); }
+
+        resetRelatedCategories(conn.client, positionFactor, relatedPositionFactor, maxRelated, function(err, result) {
+            conn.close(err, function(err) {
+                next(err, result);
+            });
+        });
+    });
+};
+
+var resetRelatedCategory = function(client, categoryId, positionFactor, relatedPositionFactor, maxRelated, next) {
+    var queryStr = "select reset_related_category($1, $2, $3, $4);";
+
+    var queryParams = [
+        categoryId,
+        positionFactor,
+        relatedPositionFactor,
+        maxRelated
+    ];
+
+    client.query(queryStr, queryParams, function (err, result) {
+        if (err) { return next(err); }
+
+        next(null, result);
+    });
+};
+
+exports.resetRelatedCategory = function(categoryId, positionFactor, relatedPositionFactor, maxRelated, next) {
+    connection.open(function(err, conn) {
+        if (err) { return next(err); }
+
+        resetRelatedCategory(conn.client, categoryId, positionFactor, relatedPositionFactor, maxRelated, function(err, result) {
+            conn.close(err, function(err) {
+                next(err, result);
+            });
+        });
+    });
+};
+
 var insertCategoryAppExclude = function(client, categoryExtId, appExtId, next) {
     var insertStr =
         "INSERT INTO category_app_exclude(category_id, app_id, date_created)\n" +

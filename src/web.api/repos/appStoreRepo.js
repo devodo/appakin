@@ -148,7 +148,8 @@ var getCategoryByExtId = function (client, extId, next) {
 var getCategoryApps = function(client, categoryId, filters, skip, take, next) {
     var queryStr =
         "SELECT a.ext_id, a.name, a.artwork_small_url, a.price, a.is_iphone, a.is_ipad,\n" +
-        "substring(a.description from 0 for 300) as short_description, ca.position\n" +
+        "substring(a.description from 0 for 300) as short_description, ca.position,\n" +
+        "count(1) OVER() as total\n" +
         "FROM appstore_app a\n" +
         "JOIN category_app ca ON a.app_id = ca.app_id\n" +
         "WHERE ca.category_id = $1\n" +
@@ -165,6 +166,13 @@ var getCategoryApps = function(client, categoryId, filters, skip, take, next) {
             return next(err);
         }
 
+        if (result.rows.length === 0) {
+            return {
+                total: 0,
+                apps: []
+            };
+        }
+
         var apps = result.rows.map(function(item) {
             return {
                 extId: item.ext_id,
@@ -178,7 +186,12 @@ var getCategoryApps = function(client, categoryId, filters, skip, take, next) {
             };
         });
 
-        next(null, apps);
+        var pageResult = {
+            total: result.rows[0].total,
+            apps: apps
+        };
+
+        next(null, pageResult);
     });
 };
 
@@ -684,9 +697,9 @@ exports.getCategoryApps = function(categoryId, filters, skip, take, next) {
             return next(err);
         }
 
-        getCategoryApps(conn.client, categoryId, filters, skip, take, function(err, apps) {
+        getCategoryApps(conn.client, categoryId, filters, skip, take, function(err, result) {
             conn.close(err, function(err) {
-                next(err, apps);
+                next(err, result);
             });
         });
     });
@@ -743,6 +756,51 @@ exports.getAppCategories = function(appId, skip, take, next) {
         getAppCategories(conn.client, appId, skip, take, function(err, results) {
             conn.close(err, function(err) {
                 next(err, results);
+            });
+        });
+    });
+};
+
+var getRelatedCategoriesByExtId = function(client, extId, skip, take, next) {
+    var queryStr =
+        "select c.id, c.ext_id, c.name, c.description\n" +
+        "from category c\n" +
+        "join (\n" +
+        "select related_category_id\n" +
+        "from related_category\n" +
+        "where category_id = (select id from category where ext_id = $1)\n" +
+        "order by position\n" +
+        "LIMIT $2 OFFSET $3\n" +
+        ") rc on c.id = rc.related_category_id\n" +
+        "where c.date_deleted is null;";
+
+    var queryParams = [extId, take, skip];
+
+    client.query(queryStr, queryParams, function (err, result) {
+        if (err) { return next(err); }
+
+        var cats = result.rows.map(function(item) {
+            return {
+                id: item.id,
+                extId: item.ext_id,
+                name: item.name,
+                description: item.description
+            };
+        });
+
+        next(null, cats);
+    });
+};
+
+exports.getRelatedCategoriesByExtId = function(extId, skip, take, next) {
+    connection.open(function(err, conn) {
+        if (err) {
+            return next(err);
+        }
+
+        getRelatedCategoriesByExtId(conn.client, extId, skip, take, function(err, categories) {
+            conn.close(err, function(err) {
+                next(err, categories);
             });
         });
     });

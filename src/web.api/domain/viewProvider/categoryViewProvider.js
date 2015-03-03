@@ -61,7 +61,7 @@ var getCategory = function(categoryId, next) {
     });
 };
 
-var getCategoryCharts = function(categoryIds, filters, next) {
+var getCategoryChartAppsMap = function(categoryIds, filters, next) {
     if (categoryIds.length === 0) {
         return next(null, Object.create(null));
     }
@@ -78,7 +78,7 @@ var getCategoryCharts = function(categoryIds, filters, next) {
                 return categoryChartCache.deleteKeys(err.keys, function(err) {
                     if (err) { return next(err); }
 
-                    getCategoryCharts(categoryIds, filters, next);
+                    getCategoryChartAppsMap(categoryIds, filters, next);
                 });
             }
         }
@@ -184,7 +184,7 @@ var searchCategories = function(queryStr, pageNum, filters, next) {
             return category.categoryId;
         });
 
-        getCategoryCharts(categoryIds, filters, function(err, categoryAppsMap) {
+        getCategoryChartAppsMap(categoryIds, filters, function(err, categoryAppsMap) {
             if (err) { return next(err); }
 
             searchResult.categories.forEach(function(category) {
@@ -214,7 +214,7 @@ var searchApps = function(queryStr, pageNum, categoryId, filters, next) {
             return next("No category found id: " + categoryId);
         }
 
-        getCategoryCharts([category.id], filters, function(err, categoryAppsMap) {
+        getCategoryChartAppsMap([category.id], filters, function(err, categoryAppsMap) {
             if (err) { return next(err); }
 
             var categoryChart = categoryAppsMap[category.id];
@@ -237,8 +237,10 @@ var searchApps = function(queryStr, pageNum, categoryId, filters, next) {
     });
 };
 
+
 exports.searchCategories = searchCategories;
 exports.searchApps = searchApps;
+exports.getCategoryChartAppsMap = getCategoryChartAppsMap;
 
 
 

@@ -113,7 +113,20 @@ exports.init = function init(app) {
             log.info("Completed reset app popularity batch task in: " + prettyHrtime(end));
         });
 
-        res.json({ "status": "Rebuild reset app popularity task started" });
+        res.json({ "status": "Reset app popularity task started" });
+    });
+
+    app.post('/admin/task/reset_related_categories', function (req, res, next) {
+        log.info("Starting reset related categories batch task");
+        var start = process.hrtime();
+        batchTask.resetRelatedCategories(function(err) {
+            if (err) { return next(err); }
+
+            var end = process.hrtime(start);
+            log.info("Completed reset related categories batch task in: " + prettyHrtime(end));
+        });
+
+        res.json({ "status": "Reset related categories task started" });
     });
 
     app.post('/admin/task/analyse_ambiguity', function (req, res, next) {
