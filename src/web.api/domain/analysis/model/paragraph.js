@@ -11,11 +11,28 @@ function Paragraph(elements) {
     this.elements = elements || [];
     this.isRemoved = false;
     this.removalReason = new RemovalReason();
+    this.locationPercentageRelativeToDescription = null;
 }
 
-Paragraph.prototype.markAsRemoved = function(reason) {
+Paragraph.prototype.setStatistics = function(descriptionTokenCount, priorTokenCount) {
+    var paragraphTokenCount = 0;
+
+    this.forEachSentence(true, function(sentence) {
+        paragraphTokenCount += sentence.getTokenCount();
+    });
+
+    this.forEachSentence(true, function(sentence) {
+        sentence.setTokenPercentageRelativeToParagraph(paragraphTokenCount);
+    });
+
+    this.locationPercentageRelativeToDescription = descriptionTokenCount === 0 ? 0 : (100.0 / descriptionTokenCount) * priorTokenCount;
+
+    return paragraphTokenCount;
+};
+
+Paragraph.prototype.markAsRemoved = function(reason, soundness) {
     this.isRemoved = true;
-    this.removalReason.add(reason);
+    this.removalReason.add(reason, soundness);
 };
 
 Paragraph.prototype.getSentenceCount = function() {
@@ -38,6 +55,15 @@ Paragraph.prototype.getElement = function(index) {
     }
 
     return this.elements[index];
+};
+
+Paragraph.prototype.getFirstSentence = function() {
+    var firstElement = this.getElement(0);
+    if (!firstElement) {
+        return null;
+    }
+
+    return firstElement.getFirstSentence();
 };
 
 Paragraph.prototype.forEachSentence = function(includeLists, callback) {

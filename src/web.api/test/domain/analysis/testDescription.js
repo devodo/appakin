@@ -43,5 +43,22 @@ exports.group = {
 
         test.strictEqual(resultParagraphs.length, 0);
         test.done();
+    },
+
+    testForEachParagraphWhenParagraphIsRemoved: function (test) {
+        var paragraphs = [
+            new Paragraph([])
+        ];
+
+        paragraphs[0].isRemoved = true;
+        var description = new Description(paragraphs);
+        var resultParagraphs = [];
+
+        description.forEachParagraph(function(paragraph) {
+            resultParagraphs.push(paragraph);
+        });
+
+        test.strictEqual(resultParagraphs.length, 1);
+        test.done();
     }
 };

@@ -9,9 +9,9 @@ function ListItem(sentenceGroup, bullet) {
     this.removalReason = new RemovalReason();
 }
 
-ListItem.prototype.markAsRemoved = function(reason) {
+ListItem.prototype.markAsRemoved = function(reason, soundness) {
     this.isRemoved = true;
-    this.removalReason.add(reason);
+    this.removalReason.add(reason, soundness);
 };
 
 ListItem.prototype.getSentence = function(index) {

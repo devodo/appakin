@@ -29,24 +29,23 @@ exports.group = {
         test.done();
     },
 
+    testTokeniseOnTM: function (test) {
+        var result = tokenisation.tokenise('"Monkey see, monkey™ do."');
+        test.strictEqual(result.length, 4);
+        test.done();
+    },
+
     testCreateStringFromTokens: function (test) {
-        var tokens = tokenisation.tokenise('Cat in a Hat.');
-        var result = tokenisation.createStringFromTokens(tokens, 10);
-        test.strictEqual(result, "cat in a hat");
-        test.done();
-    },
-
-    testCreateStringFromTokensWhenNoTokenCountGiven: function (test) {
-        var tokens = tokenisation.tokenise('Cat in a Hat.');
-        var result = tokenisation.createStringFromTokens(tokens);
-        test.strictEqual(result, "cat in a hat");
-        test.done();
-    },
-
-    testCreateStringFromTokensWhenTokenCountIsRestricted: function (test) {
-        var tokens = tokenisation.tokenise('Cat in a Hat.');
-        var result = tokenisation.createStringFromTokens(tokens, 2);
-        test.strictEqual(result, "cat in");
+        doTestCreateStringFromTokens('Cat in a Hat.', null, 'cat in a hat', test);
+        doTestCreateStringFromTokens('Cat in a Hat.', 2, 'cat', test);
+        doTestCreateStringFromTokens('Cat in a Hat.', 5, 'cat in', test);
+        doTestCreateStringFromTokens('Cat in a Hat.', 7, 'cat in a', test);
+        doTestCreateStringFromTokens('Cat in a Hat.', 300, 'cat in a hat', test);
         test.done();
     }
 };
+
+function doTestCreateStringFromTokens(text, minLength, expected, test) {
+    var tokens = tokenisation.tokenise(text);
+    test.strictEqual(tokenisation.createStringFromTokens(tokens, minLength), expected);
+}

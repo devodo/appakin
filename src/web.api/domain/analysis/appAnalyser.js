@@ -275,15 +275,24 @@ var cleanDescription = function(appId, appName, appDescription, appDevName, next
             sameDeveloperAppNames
         );
 
+        // START
+        descriptionProcessors.setStatistics(normalisedDescription);
+
+        // MIDDLE
         descriptionProcessors.removeSentencesWithEmailAddresses(normalisedDescription);
         descriptionProcessors.removeSentencesWithUrls(normalisedDescription);
-        //descriptionProcessors.removeCopyrightParagraphs(normalisedDescription);
-        //descriptionProcessors.removeTermsAndConditionsParagraphs(normalisedDescription);
-        //descriptionProcessors.removeListSentences(normalisedDescription);
-        //descriptionProcessors.removeLongSentences(normalisedDescription);
-        //descriptionProcessors.removeSentencesWithManyTrademarkSymbols(normalisedDescription);
-        //descriptionProcessors.removeListsOfAppsBySameDeveloperByMatchingAppNames(normalisedDescription);
-        //descriptionProcessors.removeLongLists(normalisedDescription);
+        descriptionProcessors.removeCopyrightParagraphs(normalisedDescription);
+        descriptionProcessors.removeTermsAndConditionsParagraphs(normalisedDescription);
+        descriptionProcessors.removeListSentences(normalisedDescription);
+        descriptionProcessors.removeLongSentences(normalisedDescription);
+        descriptionProcessors.removeSentencesWithManyTrademarkSymbols(normalisedDescription);
+        descriptionProcessors.removeListsOfAppsBySameDeveloperByMatchingAppNames(normalisedDescription);
+        descriptionProcessors.removeLongLists(normalisedDescription);
+        descriptionProcessors.removeParagraphsThatStartWithNameOfAppBySameDeveloper(normalisedDescription);
+        descriptionProcessors.removeSentencesWithTwitterNames(normalisedDescription);
+
+        // END
+        descriptionProcessors.removeParagraphsInLatterPartOfDescriptionThatAreAlreadyMostlyRemoved(normalisedDescription);
 
         var result = {
             html: normalisedDescription.getHtmlResult()

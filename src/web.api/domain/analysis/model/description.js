@@ -3,12 +3,18 @@
 function Description(paragraphs, managedAppNameList) {
     this.paragraphs = paragraphs || [];
     this.managedAppNameList = managedAppNameList;
-
-    //this.sameDeveloperAppNames = sameDeveloperAppNames || [];
-    //this.appName = appName;
-    //this.normalisedAppName = normalisedAppName;
-    //this.developerName = developerName;
 }
+
+Description.prototype.forEachParagraph = function(callback) {
+    for (var i = 0; i < this.paragraphs.length; ++i) {
+        var paragraph = this.paragraphs[i];
+
+        var result = callback(paragraph, i);
+        if (result) {
+            break;
+        }
+    }
+};
 
 Description.prototype.forEachActiveParagraph = function(callback) {
     for (var i = 0; i < this.paragraphs.length; ++i) {

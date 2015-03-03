@@ -1,8 +1,7 @@
 'use strict';
 
 var nlpCompromise = require('nlp_compromise');
-
-var isAlphaNumRegex = new RegExp('^\\w+$');
+var patternMatching = require('./patternMatching');
 
 function tokenise(input) {
     var sentences = nlpCompromise.tokenize(input);
@@ -13,7 +12,7 @@ function tokenise(input) {
 
         for (var j = 0; j < sentence.tokens.length; ++j) {
             var token = sentence.tokens[j];
-            if (isAlphaNumRegex.test(token.normalised)) {
+            if (patternMatching.hasSomeAlphaNumericContent(token.normalised)) {
                 tokens.push(token);
             }
         }
@@ -22,9 +21,23 @@ function tokenise(input) {
     return tokens;
 }
 
-function createStringFromTokens(tokens, maxTokensToUse) {
-    tokens = !maxTokensToUse ? tokens : tokens.slice(0, maxTokensToUse);
-    return tokens.map(function(x) { return x.normalised; }).join(' ');
+function createStringFromTokens(tokens, minLength) {
+    if (!minLength) {
+        return tokens.map(function(x) { return x.normalised; }).join(' ');
+    }
+
+    var result = '';
+
+    for (var i = 0; i < tokens.length; ++i) {
+        var token = tokens[i];
+        result += (i === 0 ? '' : ' ') + token.normalised;
+
+        if (result.length >= minLength) {
+            break;
+        }
+    }
+
+    return result;
 }
 
 exports.tokenise = tokenise;

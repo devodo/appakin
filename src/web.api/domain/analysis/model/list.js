@@ -8,23 +8,13 @@ function List(listItems) {
     this.removalReason = new RemovalReason();
 }
 
-List.prototype.markAsRemoved = function(reason) {
+List.prototype.markAsRemoved = function(reason, soundness) {
     this.isRemoved = true;
-    this.removalReason.add(reason);
+    this.removalReason.add(reason, soundness);
 };
 
 List.prototype.getListItemCount = function() {
     return this.listItems.length;
-}
-
-List.prototype.getSentenceCount = function() {
-    var sentenceCount = 0;
-
-    for (var i = 0; i < this.listItems.length; ++i) {
-        sentenceCount += this.listItems[i].getSentenceCount();
-    }
-
-    return sentenceCount;
 };
 
 List.prototype.forEachListItem = function(callback) {
@@ -41,6 +31,24 @@ List.prototype.forEachListItem = function(callback) {
     }
 
     return loopTerminated;
+};
+
+List.prototype.getSentenceCount = function() {
+    var sentenceCount = 0;
+
+    for (var i = 0; i < this.listItems.length; ++i) {
+        sentenceCount += this.listItems[i].getSentenceCount();
+    }
+
+    return sentenceCount;
+};
+
+List.prototype.getFirstSentence = function() {
+    if (!this.listItems) {
+        return null;
+    }
+
+    return this.listItems[0].getSentence(0);
 };
 
 List.prototype.forEachSentence = function(callback) {

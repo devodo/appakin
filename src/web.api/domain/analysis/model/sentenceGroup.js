@@ -8,6 +8,10 @@ SentenceGroup.prototype.getSentenceCount = function() {
     return this.sentences.length;
 };
 
+SentenceGroup.prototype.getFirstSentence = function() {
+    return this.getSentence(0);
+};
+
 SentenceGroup.prototype.getSentence = function(index) {
     if (index >= this.sentences.length) {
         return null;

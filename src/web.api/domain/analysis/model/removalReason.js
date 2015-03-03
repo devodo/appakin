@@ -2,10 +2,12 @@
 
 function RemovalReason() {
     this.removalReason = null;
+    this.soundness = 0;
 }
 
-RemovalReason.prototype.add = function(reason) {
+RemovalReason.prototype.add = function(reason, soundness) {
     this.removalReason = this.removalReason ? this.removalReason + ', ' + reason : reason;
+    this.soundness = Math.max(this.soundness, soundness);
 };
 
 RemovalReason.prototype.getAttributeText = function() {

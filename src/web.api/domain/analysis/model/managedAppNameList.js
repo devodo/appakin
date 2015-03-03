@@ -6,9 +6,9 @@ function ManagedAppNameList(managedAppNames) {
     this.managedAppNames = managedAppNames;
 }
 
-ManagedAppNameList.prototype.matches = function(sentence) {
+ManagedAppNameList.prototype.matches = function(sentence, matchOnWholeSentence) {
     for (var i = 0; i < this.managedAppNames.length; ++i) {
-        if (this.managedAppNames[i].matches(sentence)) {
+        if (this.managedAppNames[i].matches(sentence, matchOnWholeSentence)) {
             return true;
         }
     }

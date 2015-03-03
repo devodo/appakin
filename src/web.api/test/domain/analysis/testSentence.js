@@ -77,5 +77,26 @@ exports.group = {
         sentence.conditionallyMarkAsRemoved(/cat/);
         test.equal(sentence.getResult(), '');
         test.done();
+    },
+
+    testSetTokenPercentageRelativeToParagraph: function (test) {
+        var sentence = new Sentence('cat in a hat');
+        sentence.setTokenPercentageRelativeToParagraph(10);
+        test.strictEqual(sentence.tokenPercentageRelativeToParagraph, 40);
+        test.done();
+    },
+
+    testSetTokenPercentageRelativeToParagraphWhenNoTokens: function (test) {
+        var sentence = new Sentence('');
+        sentence.setTokenPercentageRelativeToParagraph(10);
+        test.strictEqual(sentence.tokenPercentageRelativeToParagraph, 0);
+        test.done();
+    },
+
+    testSetTokenPercentageRelativeToParagraphWhenSentenceTokenCountGreaterThanParagraphTokenCount: function (test) {
+        var sentence = new Sentence('cat in a hat');
+        sentence.setTokenPercentageRelativeToParagraph(2);
+        test.strictEqual(sentence.tokenPercentageRelativeToParagraph, 100);
+        test.done();
     }
 };

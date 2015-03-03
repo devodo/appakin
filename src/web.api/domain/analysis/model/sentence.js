@@ -1,26 +1,33 @@
 'use strict';
 
-var nlpCompromise = require('nlp_compromise');
 var RemovalReason = require('./removalReason').RemovalReason;
+var tokenisation = require('../tokenisation');
 
 function Sentence(content) {
     this.content = content || '';
     this._tokens = null; // lazy loaded.
     this.isRemoved = false;
     this.removalReason = new RemovalReason();
+    this.tokenPercentageRelativeToParagraph = null;
 }
 
-Sentence.prototype.markAsRemoved = function(reason) {
+Sentence.prototype.setTokenPercentageRelativeToParagraph = function(paragraphTokenCount) {
+    var sentenceTokenCount = this.getTokenCount();
+    var totalTokenCount = Math.max(paragraphTokenCount, sentenceTokenCount);
+    this.tokenPercentageRelativeToParagraph = totalTokenCount === 0 ? 0 : (100.0 / totalTokenCount) * sentenceTokenCount;
+}
+
+Sentence.prototype.markAsRemoved = function(reason, soundness) {
     this.isRemoved = true;
-    this.removalReason.add(reason);
+    this.removalReason.add(reason, soundness);
 };
 
-Sentence.prototype.conditionallyMarkAsRemoved = function(regex, reason) {
+Sentence.prototype.conditionallyMarkAsRemoved = function(regex, reason, soundness) {
     var testResult = regex.test(this.content);
 
     if (testResult) {
         this.isRemoved = true;
-        this.removalReason.add(reason);
+        this.removalReason.add(reason, soundness);
     }
 };
 
@@ -29,12 +36,12 @@ Sentence.prototype.getLength = function() {
 };
 
 Sentence.prototype.getTokenCount = function() {
-    return this.tokens.length;
+    return this.getTokens().length;
 };
 
 Sentence.prototype.getTokens = function() {
     if (this._tokens === null) {
-        this._tokens = nlpCompromise.tokenize(this.content)[0].tokens;
+        this._tokens = tokenisation.tokenise(this.content);
     }
 
     return this._tokens;

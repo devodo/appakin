@@ -1,14 +1,10 @@
 'use strict';
 
 var XRegExp = require('xregexp').XRegExp;
-var similarity = require('./similarity');
+var modelFactory = require('./model/modelFactory');
 var Description = require('./model/description').Description;
 var Sentence = require('./model/sentence').Sentence;
-var SentenceGroup = require('./model/sentenceGroup').SentenceGroup;
 var List = require('./model/list').List;
-var ListItem = require('./model/listItem').ListItem;
-var Paragraph = require('./model/paragraph').Paragraph;
-var managedAppNameList = require('./model/managedAppNameList');
 
 var lineStartsWithNonAlphaNumRegex = new XRegExp('^([^\\p{L}\\p{N}\\s"]+)');
 var bulletMatchRegex = new XRegExp('^(([^\\p{L}\\p{N}"]+)\\s*\\b)');
@@ -202,99 +198,6 @@ function identifyOrderedBulletLists(lineGrouping) {
     return lineGrouping;
 }
 
-function createDescriptionModel(lineGroupings, appName, developerName, sameDeveloperAppNames) {
-    // Create the description model.
-
-    var paragraphs = [];
-    var list, sentenceGroup, listItem, line, elements, currentList;
-
-    for (var i = 0; i < lineGroupings.length; ++i) {
-        elements = [];
-        currentList = [];
-
-        for (var j = 0; j < lineGroupings[i].length; ++j) {
-            line = lineGroupings[i][j];
-
-            if (line.isList) {
-                if (line.isListStart && currentList.length > 0) {
-                    list = new List(currentList);
-                    elements.push(list);
-                    currentList = [];
-                }
-
-                listItem = createListItem(line.listContent, line.bullet)
-                currentList.push(listItem);
-            } else {
-                if (currentList.length > 0) {
-                    list = new List(currentList);
-                    elements.push(list);
-                    currentList = [];
-                }
-
-                sentenceGroup = createSentenceGroup(line.content);
-                elements.push(sentenceGroup);
-            }
-        }
-
-        if (currentList.length > 0) {
-            list = new List(currentList);
-            elements.push(list);
-        }
-
-        paragraphs.push(new Paragraph(elements));
-    }
-
-    var manAppNameList = managedAppNameList.createManagedAppNameList(appName, developerName, sameDeveloperAppNames);
-    return new Description(paragraphs, manAppNameList);
-}
-
-function createListItem(content, bullet) {
-    var sentenceGroup = createSentenceGroup(content);
-    return new ListItem(sentenceGroup, bullet);
-}
-
-function sentence_parser(text) {
-    var abbrev, abbrevs, clean, i, sentences, tmp;
-    tmp = text.split(/(\S.+?[.\?!])(?=\s+|$|")/g);
-    sentences = [];
-    abbrevs = ["jr", "mr", "mrs", "ms", "dr", "prof", "sr", "sen", "corp", "calif", "rep", "gov", "atty", "supt", "det", "rev", "col", "gen", "lt", "cmdr", "adm", "capt", "sgt", "cpl", "maj", "dept", "univ", "assn", "bros", "inc", "ltd", "co", "corp", "arc", "al", "ave", "blvd", "cl", "ct", "cres", "exp", "rd", "st", "dist", "mt", "ft", "fy", "hwy", "la", "pd", "pl", "plz", "tce", "Ala", "Ariz", "Ark", "Cal", "Calif", "Col", "Colo", "Conn", "Del", "Fed", "Fla", "Ga", "Ida", "Id", "Ill", "Ind", "Ia", "Kan", "Kans", "Ken", "Ky", "La", "Me", "Md", "Mass", "Mich", "Minn", "Miss", "Mo", "Mont", "Neb", "Nebr", "Nev", "Mex", "Okla", "Ok", "Ore", "Penna", "Penn", "Pa", "Dak", "Tenn", "Tex", "Ut", "Vt", "Va", "Wash", "Wis", "Wisc", "Wy", "Wyo", "USAFA", "Alta", "Ont", "QuÔøΩ", "Sask", "Yuk", "jan", "feb", "mar", "apr", "jun", "jul", "aug", "sep", "oct", "nov", "dec", "sept", "vs", "etc", "esp", "llb", "md", "bl", "phd", "ma", "ba", "miss", "misses", "mister", "sir", "esq", "mstr", "lit", "fl", "ex", "eg", "sep", "sept"];
-    abbrev = new RegExp("(^| )(" + abbrevs.join("|") + ")[.] ?$", "i");
-    for (i in tmp) {
-        if (tmp[i]) {
-            tmp[i] = tmp[i].replace(/^\s+|\s+$/g, "");
-            if (tmp[i].match(abbrev) || tmp[i].match(/[ |\.][A-Z]\.?$/)) {
-                tmp[parseInt(i) + 1] = tmp[i] + " " + tmp[parseInt(i) + 1];
-            } else {
-                sentences.push(tmp[i]);
-                tmp[i] = "";
-            }
-        }
-    }
-    // console.log(tmp)
-    clean = [];
-    for (i in sentences) {
-        sentences[i] = sentences[i].replace(/^\s+|\s+$/g, "");
-        if (sentences[i]) {
-            clean.push(sentences[i]);
-        }
-    }
-    if (clean.length == 0) {
-        return [text]
-    }
-    return clean;
-}
-
-function createSentenceGroup(line) {
-    var sentences = [];
-    var parsedSentences = sentence_parser(line);
-
-    for (var i = 0; i < parsedSentences.length; ++i) {
-        sentences.push(new Sentence(parsedSentences[i]));
-    }
-
-    return new SentenceGroup(sentences);
-}
-
 function attachHeaderlessListsToPreviousLineGrouping(lineGroupings) {
     var fixedLineGroupings = [];
     var endsInList = false;
@@ -316,43 +219,25 @@ function attachHeaderlessListsToPreviousLineGrouping(lineGroupings) {
     return fixedLineGroupings;
 }
 
-function normaliseSameDeveloperAppNames(appName, sameDeveloperAppNames, developerName) {
-    var result = [];
-
-    for (var i = 0; i < sameDeveloperAppNames.length; ++i) {
-        var appNameToTest = sameDeveloperAppNames[i];
-        appNameToTest = normaliseAppName(appNameToTest, developerName);
-
-        if (similarity.similar(appName, appNameToTest)) {
-            result.push(
-                //'REMOVED>> ' +
-                appNameToTest);
-            continue;
-        }
-
-        result.push(appNameToTest)
-    }
-
-    return result;
-}
-
-var normaliseAppNameRegex = /(.*?)((:\s+|\s+\-|\s+\u2013|\s+\u2014).*)/;
-
-function normaliseAppName(appName, developerName) {
-    var filteredAppName = appName.replace(new RegExp(developerName, 'i'), '');
-
-    if (filteredAppName.length > 5) {
-        // only use the new app name if it's long enough.
-        appName = filteredAppName.trim();
-
-        if (appName.indexOf('by', appName.length - 2) !== -1) {
-            appName = appName.substring(0, appName.length - 2).trim();
-        }
-    }
-
-    var matches = normaliseAppNameRegex.exec(appName);
-    return matches ? matches[1] : appName;
-}
+//function normaliseSameDeveloperAppNames(appName, sameDeveloperAppNames, developerName) {
+//    var result = [];
+//
+//    for (var i = 0; i < sameDeveloperAppNames.length; ++i) {
+//        var appNameToTest = sameDeveloperAppNames[i];
+//        appNameToTest = normaliseAppName(appNameToTest, developerName);
+//
+//        if (similarity.similar(appName, appNameToTest)) {
+//            result.push(
+//                //'REMOVED>> ' +
+//                appNameToTest);
+//            continue;
+//        }
+//
+//        result.push(appNameToTest)
+//    }
+//
+//    return result;
+//}
 
 function createNormalisedDescription(appDescription, appName, developerName, sameDeveloperAppNames) {
     sameDeveloperAppNames = sameDeveloperAppNames || [];
@@ -381,10 +266,7 @@ function createNormalisedDescription(appDescription, appName, developerName, sam
 
     lineGroupings = attachHeaderlessListsToPreviousLineGrouping(lineGroupings);
 
-    //var normalisedAppName = normaliseAppName(appName, developerName);
-    //sameDeveloperAppNames = normaliseSameDeveloperAppNames(normalisedAppName, sameDeveloperAppNames, developerName);
-
-    return createDescriptionModel(lineGroupings, appName, developerName, sameDeveloperAppNames);
+    return modelFactory.createDescription(lineGroupings, appName, developerName, sameDeveloperAppNames);
 }
 
 exports.createNormalisedDescription = createNormalisedDescription;

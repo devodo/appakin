@@ -167,5 +167,21 @@ exports.group = {
 
         test.strictEqual(paragraph.getRemovedResult(), 'aaa bbb\n\n');
         test.done();
+    },
+
+    testSetStatistics: function (test) {
+        var sentenceA = new Sentence('aaa b c');
+        var sentenceB = new Sentence('bbb');
+
+        var paragraph = new Paragraph([
+            new SentenceGroup([sentenceA, sentenceB])
+        ]);
+
+        var paragraphTokenCount = paragraph.setStatistics(10, 2);
+        test.strictEqual(paragraphTokenCount, 4);
+        test.strictEqual(sentenceA.tokenPercentageRelativeToParagraph, 75);
+        test.strictEqual(sentenceB.tokenPercentageRelativeToParagraph, 25);
+        test.strictEqual(paragraph.locationPercentageRelativeToDescription, 20);
+        test.done();
     }
 };
