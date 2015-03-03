@@ -252,7 +252,7 @@ function removeParagraphsThatStartWithNameOfAppBySameDeveloper(description) {
             var sentence = new Sentence(sentenceTitle);
 
             if (description.managedAppNameList.matches(sentence, true)) {
-                paragraph.markAsRemoved('by same developer (paragraph)', STRONG)
+                paragraph.markAsRemoved('by same developer (paragraph)', STRONG);
             }
         }
     });

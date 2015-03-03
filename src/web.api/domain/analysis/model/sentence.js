@@ -15,7 +15,7 @@ Sentence.prototype.setTokenPercentageRelativeToParagraph = function(paragraphTok
     var sentenceTokenCount = this.getTokenCount();
     var totalTokenCount = Math.max(paragraphTokenCount, sentenceTokenCount);
     this.tokenPercentageRelativeToParagraph = totalTokenCount === 0 ? 0 : (100.0 / totalTokenCount) * sentenceTokenCount;
-}
+};
 
 Sentence.prototype.markAsRemoved = function(reason, soundness) {
     this.isRemoved = true;

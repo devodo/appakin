@@ -46,6 +46,6 @@ exports.init = function init(app) {
             }
 
             res.json(results);
-        })
-    })
+        });
+    });
 };
