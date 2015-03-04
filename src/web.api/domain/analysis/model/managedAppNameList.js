@@ -6,7 +6,7 @@ var log = require('../../../logger');
 function ManagedAppNameList(managedAppNames, developerName) {
     this.managedAppNames = managedAppNames;
     this.developerName = developerName;
-    log.warn('managed app names count: ' + this.managedAppNames.length);
+    //log.warn('managed app names count: ' + this.managedAppNames.length);
 }
 
 ManagedAppNameList.prototype.matches = function(sentence, matchOnWholeSentence) {
@@ -36,8 +36,8 @@ function createManagedAppNameList(appName, developerName, relatedAppNames) {
         }
     }
 
-    log.warn('RELATED APP NAMES' + relatedAppNames.join('==='));
-    log.warn('RELATED MANAGED APP NAMES' + relatedManagedAppNames.map(function(x) {return x.originalAppName}).join('==='));
+    //log.warn('RELATED APP NAMES' + relatedAppNames.join('==='));
+    //log.warn('RELATED MANAGED APP NAMES' + relatedManagedAppNames.map(function(x) {return x.originalAppName}).join('==='));
 
     return new ManagedAppNameList(relatedManagedAppNames, developerName);
 }

@@ -85,7 +85,7 @@ function removeTermsAndConditionsParagraphs(description) {
 
 // --------------------------------
 
-var urlRegex = /\bwww\.|\bhttps?:\/|twitter\.com\/|youtube\.com\/|facebook\.com\/|\w\.com\/|\w\.com\b/i;
+var urlRegex = /\bwww\.|\bhttps?:\/|twitter\.com\/|youtube\.com\/|facebook\.com\/|\w\.com\//i;
 
 function removeSentencesWithUrls(description) {
     description.forEachActiveParagraph(function(paragraph) {
@@ -438,7 +438,7 @@ function removeParagraphsOfRelatedAppsThatAreIndividualSentenceGroups(descriptio
         }
 
         var percentageMayStartWithAppName = (100.0 / elementCount) * mayStartWithAppNameCount;
-        if (percentageMayStartWithAppName < 0.5) {
+        if (percentageMayStartWithAppName < 50) {
             return;
         }
 
@@ -453,7 +453,7 @@ function removeParagraphsOfRelatedAppsThatAreIndividualSentenceGroups(descriptio
         });
 
         var percentageStartWithAppName = (100.0 / elementCount) * appNameMatchCount;
-        if (percentageStartWithAppName >= 0.5) {
+        if (percentageStartWithAppName >= 50) {
             paragraph.markAsRemoved('related app names (sentence group starts)', STRONG);
         }
     });
@@ -461,10 +461,37 @@ function removeParagraphsOfRelatedAppsThatAreIndividualSentenceGroups(descriptio
 
 // --------------------------------
 
+/*
+identify sentences with multiple commas (
+
+
+find runs of capitalized or number-start tokens, using 'and/or' and commas to separate the runs.
+if find three or more, try matching to app names.
+
+ */
 function removeSentencesOfRelatedApps(description) {
     description.forEachActiveParagraph(function(paragraph) {
         paragraph.forEachActiveSentence(false, function(sentence) {
-            sentence.conditionallyMarkAsRemoved(/\bmakers of\b/i, 'sentence of related apps', WEAK);
+            var possibleAppNames = patternMatching.getPossibleAppNames(sentence.content);
+            if (possibleAppNames.length < 3) {
+                return;
+            }
+
+            var appNameMatchCount = 0;
+
+            for (var i = 0; i < possibleAppNames.length; ++i) {
+                var possibleAppName = possibleAppNames[i];
+                var possibleAppNameSentence = new Sentence(possibleAppName);
+
+                if (description.managedAppNameList.matches(possibleAppNameSentence)) {
+                    ++appNameMatchCount;
+                }
+            }
+
+            var percentageMatch = (100.0 / possibleAppNames.length) * appNameMatchCount;
+            if (percentageMatch >= 50) {
+                sentence.markAsRemoved('related app names in sentence', STRONG);
+            }
         });
     });
 }

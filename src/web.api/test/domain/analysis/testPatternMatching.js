@@ -250,8 +250,29 @@ exports.group = {
         doTestMayStartWithAppName('"This App" - some great description', true, test);
         doTestMayStartWithAppName('"This App" some great description', true, test);
         test.done();
+    },
+
+    testGetPossibleAppNames: function (test) {
+        //doTestGetPossibleAppNames('This is foo.', [], test);
+        //doTestGetPossibleAppNames('This is App Name.', ['app name'], test);
+        //doTestGetPossibleAppNames('This is App name foo.', ['app name'], test);
+        //doTestGetPossibleAppNames('This is App name Foo.', ['app name foo'], test);
+        //doTestGetPossibleAppNames('This is App name, Bar 3D Bat.', ['app name', 'bar 3d bat'], test);
+        //doTestGetPossibleAppNames('Check out our other apps: App name, Bar 3D Bat and FoosBall.', ['app name', 'bar 3d bat', 'foosball'], test);
+        doTestGetPossibleAppNames('Check out our other apps: App name, Bar 3D Bat & FoosBall.', ['app name', 'bar 3d bat', 'foosball'], test);
+        test.done();
     }
 };
+
+function doTestGetPossibleAppNames(text, expected, test) {
+    var result = patternMatching.getPossibleAppNames(text);
+    test.notStrictEqual(result, null);
+    test.strictEqual(result.length, expected.length, result);
+
+    for (var i = 0; i < expected.length; ++i) {
+        test.strictEqual(result[i], expected[i], i);
+    }
+}
 
 function doTestMayStartWithAppName(text, expected, test) {
     test.strictEqual(patternMatching.mayStartWithAppName(text), expected, text);

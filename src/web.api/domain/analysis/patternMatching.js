@@ -404,6 +404,95 @@ function isMajorityCapitalized(text) {
 
 // ------------------------------
 
+function getPossibleAppNames(text) {
+    var tokens = tokenizeTextIncludingNonAlphanumericTokens(text);
+    var tokenGroups = [];
+    var tokenGroup = [];
+
+    for (var i = 1; i < tokens.length; ++i) {
+        var token = tokens[i];
+
+        if (tokenStartsGroup(token) && tokenGroup.length) {
+            if (tokenGroup.length > 1) {
+                tokenGroups.push(tokenGroup);
+            }
+
+            tokenGroup = [];
+        }
+
+        if (tokenStartsWithUppercaseLetterOrNumber(token)) {
+            token.nameToken = true;
+            tokenGroup.push(token);
+        } else if (!tokenIsBreakWord(token) && hasSomeAlphaNumericContent(token.normalised)) {
+            // push up to one token that does not start with uppercase letter or number.
+
+            if (tokenGroup.length > 0 && tokenGroup[tokenGroup.length - 1].nameToken) {
+                tokenGroup.push(token);
+            }
+        }
+
+        if ((tokenEndsGroup(token) || i === (tokens.length - 1)) && tokenGroup.length) {
+            // TODO think about this.
+
+            if (tokenGroup.length > 1 || tokenGroups.length > 0) {
+                tokenGroups.push(tokenGroup);
+            }
+
+            tokenGroup = [];
+        }
+    }
+
+    var appNames = [];
+
+    for (i = 0; i < tokenGroups.length; ++i) {
+        tokenGroup = tokenGroups[i];
+
+        var appName = tokenGroup.map(function(x) { return x.normalised; }).join(' ');
+        appNames.push(appName);
+    }
+
+    return appNames;
+}
+
+function tokenStartsGroup(token) {
+    var firstChar = token.text.length ? token.text[0] : '';
+    return firstChar === ',' || firstChar === ';' || firstChar === ':';
+}
+
+function tokenIsBreakWord(token) {
+    return token.normalised === 'and' || token.text === '&';
+}
+
+function tokenEndsGroup(token) {
+    if (tokenIsBreakWord(token)) {
+        return true;
+    }
+
+    var lastChar = token.text.length ? token.text[token.text.length - 1] : '';
+    return lastChar === ',' || lastChar === ';' || lastChar === ':';
+}
+
+function tokenStartsWithUppercaseLetterOrNumber(token) {
+    return /^[A-Z0-9]/.test(token.text);
+}
+
+function tokenizeTextIncludingNonAlphanumericTokens(text) {
+    var sentences = nlpCompromise.tokenize(text);
+    var tokens = [];
+
+    for (var i = 0; i < sentences.length; ++i) {
+        var sentence = sentences[i];
+
+        for (var j = 0; j < sentence.tokens.length; ++j) {
+            tokens.push(sentence.tokens[j]);
+        }
+    }
+
+    return tokens;
+}
+
+// ------------------------------
+
 exports.getTextTitle = getTextTitle;
 exports.hasSomeAlphaNumericContent = hasSomeAlphaNumericContent;
 exports.escapeForInclusionInRegex = escapeForInclusionInRegex;
@@ -424,3 +513,4 @@ exports.getTextTitleForAppNameSimilarityTest = getTextTitleForAppNameSimilarityT
 exports.matchBareBullet = matchBareBullet;
 exports.isInUpperCase = isInUpperCase;
 exports.mayStartWithAppName = mayStartWithAppName;
+exports.getPossibleAppNames = getPossibleAppNames;

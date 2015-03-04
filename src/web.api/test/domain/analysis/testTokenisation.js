@@ -35,6 +35,12 @@ exports.group = {
         test.done();
     },
 
+    testTokeniseOnTM2: function (test) {
+        var result = tokenisation.tokenise('"Monkey see , monkey™ do."');
+        test.strictEqual(result.length, 4);
+        test.done();
+    },
+
     testCreateStringFromTokens: function (test) {
         doTestCreateStringFromTokens('Cat in a Hat.', null, 'cat in a hat', test);
         doTestCreateStringFromTokens('Cat in a Hat.', 2, 'cat', test);
