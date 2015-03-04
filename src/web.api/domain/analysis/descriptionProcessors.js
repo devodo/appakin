@@ -220,7 +220,7 @@ function removeListsOfAppsBySameDeveloperByMatchingAppNames(description) {
 
                var titleSentence = listItem.getTitleSentence();
 
-               if (description.managedAppNameList.matches(titleSentence)) {
+               if (titleSentence && description.managedAppNameList.matches(titleSentence)) {
                    ++appNameMatchCount;
                }
            });
@@ -251,10 +251,8 @@ function removeParagraphsThatStartWithNameOfAppBySameDeveloper(description) {
             //var sentenceTitle = patternMatching.getTextTitleForAppNameSimilarityTest(firstSentence.content);
                      // patternMatching.getTextTitle(firstSentence.content);
 
-            if (titleSentence) {
-                if (description.managedAppNameList.matches(titleSentence, true)) {
-                    paragraph.markAsRemoved('by same developer (paragraph)', STRONG);
-                }
+            if (titleSentence && description.managedAppNameList.matches(titleSentence, true)) {
+                paragraph.markAsRemoved('by same developer (paragraph)', STRONG);
             }
         }
     });
@@ -389,13 +387,13 @@ function removeHeadersAndListsForRelatedApps(description) {
 
 // --------------------------------
 
-function removeNoteSentences(description) {
+function removeNoteParagraphs(description) {
     description.forEachActiveParagraph(function(paragraph) {
-        paragraph.forEachActiveSentence(false, function(sentence) {
-            if (patternMatching.isNoteText(sentence.content)) {
-                sentence.markAsRemoved('note sentence', NORMAL);
-            }
-        });
+        var firstSentence = paragraph.getFirstSentence();
+
+        if (patternMatching.isNoteText(firstSentence.content)) {
+            paragraph.markAsRemoved('note paragraph', NORMAL);
+        }
     });
 };
 
@@ -421,4 +419,4 @@ exports.removeHeaderSentencesBeforeAlreadyRemovedContent = removeHeaderSentences
 exports.removeHeaderSentencesBeforeAlreadyRemovedLists = removeHeaderSentencesBeforeAlreadyRemovedLists;
 exports.removeParagraphsInLatterPartOfDescriptionThatHaveRemovedContentAroundThem = removeParagraphsInLatterPartOfDescriptionThatHaveRemovedContentAroundThem;
 exports.removeHeadersAndListsForRelatedApps = removeHeadersAndListsForRelatedApps;
-exports.removeNoteSentences = removeNoteSentences;
+exports.removeNoteParagraphs = removeNoteParagraphs;

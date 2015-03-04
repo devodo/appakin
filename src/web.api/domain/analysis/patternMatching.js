@@ -276,7 +276,7 @@ function isMoreAppsText(text, developerName) {
 
 // ------------------------------
 
-var isNoteTextRegex = /^[\W]*\s*note\b\s*\W/i;
+var isNoteTextRegex = /^[\W]*\s*(please\s+)?note\b\s*\W/i;
 
 function isNoteText(text) {
     return isNoteTextRegex.test(text);
