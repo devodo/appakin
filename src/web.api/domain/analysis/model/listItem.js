@@ -48,7 +48,7 @@ ListItem.prototype.getResult = function() {
         return '';
     }
 
-    return this.bullet + ' ' + sentencesResult;
+    return getBulletText(this.bullet) + sentencesResult;
 };
 
 ListItem.prototype.getRemovedResult = function(force) {
@@ -57,17 +57,21 @@ ListItem.prototype.getRemovedResult = function(force) {
         return '';
     }
 
-    return this.removalReason.getInlineText() + this.bullet + ' ' + sentencesResult;
+    return this.removalReason.getInlineText() + getBulletText(this.bullet) + sentencesResult;
 };
 
 ListItem.prototype.getHtmlResult = function() {
     var content = this.sentenceGroup.getHtmlResult();
 
     if (this.isRemoved) {
-        return '<span class="removed"' + this.removalReason.getAttributeText() + '>' + this.bullet + ' ' + content + '</span>';
+        return '<span class="removed"' + this.removalReason.getAttributeText() + '>' + getBulletText(this.bullet) + content + '</span>';
     } else {
-        return this.bullet + ' ' + content;
+        return getBulletText(this.bullet) + content;
     }
 };
+
+function getBulletText(bullet) {
+    return bullet ? bullet + ' ' : '';
+}
 
 exports.ListItem = ListItem;

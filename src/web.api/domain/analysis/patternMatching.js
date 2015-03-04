@@ -1,11 +1,21 @@
 'use strict';
 
 var XRegExp = require('xregexp').XRegExp;
+var nlpCompromise = require('nlp_compromise');
+var tokenisation = require('./tokenisation');
 
 // ------------------------------
 
 var removeNonAlphaNumericPrefixRegex = /^[^\w]*/;
 var removeNonAlphaNumericSuffixRegex = /[^\w]*$/;
+
+function isAsciiUpperCase(charCode) {
+    return charCode >= 65 && charCode <= 90;
+}
+
+function isAsciiLowerCase(charCode) {
+    return charCode >= 97 && charCode <= 122;
+}
 
 // ------------------------------
 
@@ -133,6 +143,25 @@ function removeDeveloperName(appName, developerName) {
 
 // ------------------------------
 
+var matchBareBulletRegex = /[:\.\u2013\u2014\u2015\u2016-]$/i;
+
+function matchBareBullet(text) {
+    text = text.trim();
+
+    var parsedSentences = nlpCompromise.sentences(text);
+    if (parsedSentences.length > 1) {
+        return false;
+    }
+
+    if (text === '' || text.length > 70) {
+        return false;
+    }
+
+    return !matchBareBulletRegex.test(text);
+}
+
+// ------------------------------
+
 var matchBulletRegex = new XRegExp('^(([^\\p{L}\\p{N}"]+?)\\s*)(?:\\b|\\()');
 
 function matchBullet(text) {
@@ -149,7 +178,7 @@ function matchBullet(text) {
 
 // ------------------------------
 
-var matchNumberBulletRegex = /^((?:[[(]?\s*)((?:[1-9]?[0-9]|[a-zA-Z])\.?)(?:\s*?[\s)\],.-])\s*)/;
+var matchNumberBulletRegex = /^((?:[[(]?\s*)([1-9]?[0-9]|[a-zA-Z])\.?(?:\s*?[\s)\],.-])\s*)/;
 
 function matchNumberBullet(text) {
     var numberBulletMatch = text.match(matchNumberBulletRegex);
@@ -213,6 +242,10 @@ function isPossibleHeading(text) {
         return false;
     }
 
+    if (isInUpperCase(text)) {
+        return true;
+    }
+
     var lastChar = text[text.length - 1];
 
     if (lastChar === '.') {
@@ -220,21 +253,6 @@ function isPossibleHeading(text) {
     }
 
     if (lastChar === ':' || lastChar === '-' || lastChar === '\u2013' || lastChar === '\u2014' || lastChar === '\u2015' || lastChar === '\u2016') {
-        return true;
-    }
-
-    var noWhitespaceText = text.replace(/\s+/g, '');
-    var capitalLetterCount = 0;
-
-    for (var i = 0; i < noWhitespaceText.length; ++i) {
-        var charCode = noWhitespaceText.charCodeAt(i);
-        if (charCode >= 65 && charCode <= 90) {
-            ++capitalLetterCount;
-        }
-    }
-
-    var capitalLetterPercentage = (100.00 / noWhitespaceText.length) * capitalLetterCount;
-    if (capitalLetterPercentage >= 80) {
         return true;
     }
 
@@ -276,7 +294,7 @@ function isMoreAppsText(text, developerName) {
 
 // ------------------------------
 
-var isNoteTextRegex = /^[\W]*\s*(please\s+)?note\b\s*\W/i;
+var isNoteTextRegex = /^[\W]*\s*((please\s+)?note|important|requirements|minimum requirements)\b\s*\W/i;
 
 function isNoteText(text) {
     return isNoteTextRegex.test(text);
@@ -300,6 +318,92 @@ function getTextTitleForAppNameSimilarityTest(text) {
 
 // ------------------------------
 
+function isInUpperCase(text) {
+    var textLength = text.length;
+    var lowerCaseCount = 0;
+    var upperCaseCount = 0;
+
+    for (var i = 0; i < textLength; ++i) {
+        var charCode = text.charCodeAt(i);
+
+        if (isAsciiUpperCase(charCode)) {
+            ++upperCaseCount;
+        } else if (isAsciiLowerCase(charCode)) {
+            ++lowerCaseCount;
+        }
+    }
+
+    if (upperCaseCount <= 1) {
+        return false;
+    }
+
+    var totalCount = lowerCaseCount + upperCaseCount;
+
+    var percentageUpperCase = (100.0 / totalCount) * upperCaseCount;
+    return percentageUpperCase >= (totalCount < 10 ? 80 : (totalCount < 20 ? 90 : 95));
+}
+
+// ------------------------------
+
+function mayStartWithAppName(text) {
+    text = text.replace(/^[^\w"'\u0096\u8216\u8220]]/);
+    text = removeExtraTextFromStart(text);
+    text = text.replace(/^[^\w"'\u0096\u8216\u8220]]/);
+
+    if (text === '') {
+        return false;
+    }
+
+    var textTitle = null;
+
+    switch (text[0]) {
+        case '\'':
+            textTitle = getAppNameSubstring(text, '\'');
+            break;
+        case '"':
+            textTitle = getAppNameSubstring(text, '"');
+            break;
+        case '\u0096':
+            textTitle = getAppNameSubstring(text, '\u0180');
+            break;
+        case '\u8216':
+            textTitle = getAppNameSubstring(text, '\u8217');
+            break;
+        case '\u8220':
+            textTitle = getAppNameSubstring(text, '\u8221');
+            break;
+    }
+
+    if (textTitle === null) {
+        textTitle = getTextTitle(text);
+    }
+
+    return isMajorityCapitalized(textTitle ? textTitle : text); // TODO checking text may not be a good idea.
+}
+
+function getAppNameSubstring(text, stopChar) {
+    var index = text.indexOf(stopChar, 2);
+    return index === -1 ? null : text.substring(1, index - 1);
+}
+
+function isMajorityCapitalized(text) {
+    var tokens = tokenisation.tokenise(text);
+    var totalTokens = tokens.length;
+    var capitalisedTokensCount = 0;
+
+    for (var i = 0; i < totalTokens; ++i) {
+        var token = tokens[i];
+        if (token.capitalised) {
+            ++capitalisedTokensCount;
+        }
+    }
+
+    var percentageTokensCapitalized = (100.0 / totalTokens) * capitalisedTokensCount;
+    return percentageTokensCapitalized >= 50;
+}
+
+// ------------------------------
+
 exports.getTextTitle = getTextTitle;
 exports.hasSomeAlphaNumericContent = hasSomeAlphaNumericContent;
 exports.escapeForInclusionInRegex = escapeForInclusionInRegex;
@@ -317,3 +421,6 @@ exports.isMoreAppsText = isMoreAppsText;
 exports.isNoteText = isNoteText;
 exports.removeExtraTextFromStart = removeExtraTextFromStart;
 exports.getTextTitleForAppNameSimilarityTest = getTextTitleForAppNameSimilarityTest;
+exports.matchBareBullet = matchBareBullet;
+exports.isInUpperCase = isInUpperCase;
+exports.mayStartWithAppName = mayStartWithAppName;

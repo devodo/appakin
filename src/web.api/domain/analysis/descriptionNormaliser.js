@@ -89,15 +89,51 @@ function markPossibleListItem(line) {
     if (bulletMatch) {
         line.bulletCandidate = bulletMatch.bulletCandidate;
         line.bulletCandidateCore = bulletMatch.bulletCandidateCore;
+        return line;
     }
 
     var numberMatch = patternMatching.matchNumberBullet(line.content);
     if (numberMatch) {
         line.orderedCandidate = numberMatch.orderedCandidate;
         line.orderedCandidateCore = numberMatch.orderedCandidateCore;
+        return line;
+    }
+
+    var bareBulletMatch = patternMatching.matchBareBullet(line.content);
+    if (bareBulletMatch) {
+        line.bareBulletCandidate = true;
+        return line;
     }
 
     return line;
+}
+
+function identifyBareBulletLists(lineGrouping) {
+    // mark up bare bullet lists
+
+    for (var i = 0; i < lineGrouping.length; ++i) {
+        var line = lineGrouping[i];
+
+        if (line.bareBulletCandidate && i > 0) {
+            var previousLine = lineGrouping[i - 1];
+
+            if (previousLine.bareBulletCandidate) {
+
+                if (!previousLine.isList) {
+                    previousLine.isList = true;
+                    previousLine.bullet = '';
+                    previousLine.listContent = previousLine.content;
+                    previousLine.isListStart = true;
+                }
+
+                line.isList = true;
+                line.bullet = '';
+                line.listContent = line.content;
+            }
+        }
+    }
+
+    return lineGrouping;
 }
 
 function identifyBulletLists(lineGrouping) {
@@ -109,8 +145,7 @@ function identifyBulletLists(lineGrouping) {
         if (line.bulletCandidate && i > 0) {
             var previousLine = lineGrouping[i - 1];
 
-            if (previousLine.bulletCandidate &&
-                line.bulletCandidateCore === previousLine.bulletCandidateCore) {
+            if (previousLine.bulletCandidate && line.bulletCandidateCore === previousLine.bulletCandidateCore) {
 
                 if (!previousLine.isList) {
                     previousLine.isList = true;
@@ -202,6 +237,7 @@ function createNormalisedDescription(appDescription, appName, developerName, sam
             lineGrouping = lineGrouping.map(function(line) { return markPossibleListItem(line); });
             lineGrouping = identifyBulletLists(lineGrouping);
             lineGrouping = identifyOrderedBulletLists(lineGrouping);
+            lineGrouping = identifyBareBulletLists(lineGrouping);
             return lineGrouping;
         });
 

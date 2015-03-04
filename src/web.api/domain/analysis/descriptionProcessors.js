@@ -189,7 +189,7 @@ function removeLongLists(description) {
         paragraph.forEachActiveList(function(list) {
             var listItemCount = list.getListItemCount();
 
-            if (listItemCount > 30) {
+            if (listItemCount > 20 || (listItemCount > 12 && paragraph.isInLatterPartOfDescription())) {
                 list.markAsRemoved('list too long', NORMAL);
             }
         });
@@ -395,11 +395,81 @@ function removeNoteParagraphs(description) {
             paragraph.markAsRemoved('note paragraph', NORMAL);
         }
     });
-};
+}
 
 // --------------------------------
 
-// *NOTE* This game is compatible with iOS 7 and above
+var removeTechnicalDetailsRegex = /minimum\s+requirements?/i;
+
+function removeTechnicalDetailSentences(description) {
+    description.forEachActiveParagraph(function(paragraph) {
+        paragraph.forEachSentence(false, function(sentence) {
+            if (removeTechnicalDetailsRegex.test(sentence.content)) {
+                if (sentence.isPossibleHeading) {
+                    paragraph.markAsRemoved('technical details (heading)', NORMAL);
+                } else {
+                    sentence.markAsRemoved('technical details', NORMAL);
+                }
+            }
+        });
+    });
+}
+
+// --------------------------------
+
+// TODO could look for paragraph like 'Try other awesome games by Cat Studio' to signal that the below is possible.
+// TODO could restrict this to latter part of description.
+function removeParagraphsOfRelatedAppsThatAreIndividualSentenceGroups(description) {
+    description.forEachActiveParagraph(function(paragraph) {
+        var elementCount = 0;
+        var mayStartWithAppNameCount = 0;
+
+        paragraph.forEachActiveSentenceGroup(function(sentenceGroup) {
+            ++elementCount;
+            var firstSentence = sentenceGroup.getFirstSentence();
+
+            if (patternMatching.mayStartWithAppName(firstSentence.content)) {
+                ++mayStartWithAppNameCount;
+            }
+        });
+
+        if (elementCount <= 3) {
+            return;
+        }
+
+        var percentageMayStartWithAppName = (100.0 / elementCount) * mayStartWithAppNameCount;
+        if (percentageMayStartWithAppName < 0.5) {
+            return;
+        }
+
+        var appNameMatchCount = 0;
+
+        paragraph.forEachActiveSentenceGroup(function(sentenceGroup) {
+            var firstSentence = sentenceGroup.getFirstSentence();
+
+            if (firstSentence && description.managedAppNameList.matches(firstSentence)) {
+                ++appNameMatchCount;
+            }
+        });
+
+        var percentageStartWithAppName = (100.0 / elementCount) * appNameMatchCount;
+        if (percentageStartWithAppName >= 0.5) {
+            paragraph.markAsRemoved('related app names (sentence group starts)', STRONG);
+        }
+    });
+}
+
+// --------------------------------
+
+function removeSentencesOfRelatedApps(description) {
+    description.forEachActiveParagraph(function(paragraph) {
+        paragraph.forEachActiveSentence(false, function(sentence) {
+            sentence.conditionallyMarkAsRemoved(/\bmakers of\b/i, 'sentence of related apps', WEAK);
+        });
+    });
+}
+
+// --------------------------------
 
 exports.setStatistics = setStatistics;
 exports.removeCopyrightParagraphs = removeCopyrightParagraphs;
@@ -420,3 +490,6 @@ exports.removeHeaderSentencesBeforeAlreadyRemovedLists = removeHeaderSentencesBe
 exports.removeParagraphsInLatterPartOfDescriptionThatHaveRemovedContentAroundThem = removeParagraphsInLatterPartOfDescriptionThatHaveRemovedContentAroundThem;
 exports.removeHeadersAndListsForRelatedApps = removeHeadersAndListsForRelatedApps;
 exports.removeNoteParagraphs = removeNoteParagraphs;
+exports.removeTechnicalDetailSentences = removeTechnicalDetailSentences;
+exports.removeParagraphsOfRelatedAppsThatAreIndividualSentenceGroups = removeParagraphsOfRelatedAppsThatAreIndividualSentenceGroups;
+exports.removeSentencesOfRelatedApps = removeSentencesOfRelatedApps;

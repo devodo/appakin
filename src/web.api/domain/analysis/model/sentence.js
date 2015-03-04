@@ -3,13 +3,13 @@
 var RemovalReason = require('./removalReason').RemovalReason;
 var tokenisation = require('../tokenisation');
 
-function Sentence(content) {
+function Sentence(content, isPossibleHeading) {
     this.content = content || '';
     this._tokens = null; // lazy loaded.
     this.isRemoved = false;
     this.removalReason = new RemovalReason();
     this.lengthPercentageRelativeToParagraph = null;
-    this.isPossibleHeading = false;
+    this.isPossibleHeading = isPossibleHeading;
 }
 
 Sentence.prototype.setLengthPercentageRelativeToParagraph = function(paragraphLength) {
@@ -30,10 +30,6 @@ Sentence.prototype.conditionallyMarkAsRemoved = function(regex, reason, soundnes
         this.isRemoved = true;
         this.removalReason.add(reason, soundness);
     }
-};
-
-Sentence.prototype.markAsPossibleHeading = function() {
-    this.isPossibleHeading = true;
 };
 
 Sentence.prototype.getLength = function() {

@@ -292,6 +292,9 @@ var cleanDescription = function(appId, appName, appDescription, appDevName, next
         descriptionProcessors.removeParagraphsThatStartWithNameOfAppBySameDeveloper(normalisedDescription);
         descriptionProcessors.removeHeadersAndListsForRelatedApps(normalisedDescription);
         descriptionProcessors.removeNoteParagraphs(normalisedDescription);
+        descriptionProcessors.removeTechnicalDetailSentences(normalisedDescription);
+        descriptionProcessors.removeParagraphsOfRelatedAppsThatAreIndividualSentenceGroups(normalisedDescription);
+        descriptionProcessors.removeSentencesOfRelatedApps(normalisedDescription);
 
         // END
         descriptionProcessors.removeListsInLatterPartOfDescriptionThatAreAlreadyMostlyRemoved(normalisedDescription);

@@ -141,6 +141,7 @@ exports.group = {
     },
 
     testMatchNumberBullet: function (test) {
+        doTestMatchNumberBulletForMatch('23. foo bar', '23. ', '23', test);
         doTestMatchNumberBulletForMatch('(1) foo bar', '(1) ', '1', test);
         doTestMatchNumberBulletForMatch('(A) foo bar', '(A) ', 'a', test);
         doTestMatchNumberBulletForNoMatch('foo bar', test);
@@ -171,7 +172,7 @@ exports.group = {
     testIsPossibleHeading: function (test) {
         doTestIsPossibleHeading('', false, test);
         doTestIsPossibleHeading('FO', false, test);
-        doTestIsPossibleHeading('BOOM.', false, test);
+        doTestIsPossibleHeading('BOOM.', true, test);
         doTestIsPossibleHeading('Boom!', false, test);
         doTestIsPossibleHeading('Bounce this:', true, test);
         doTestIsPossibleHeading('BOOM!', true, test);
@@ -211,8 +212,58 @@ exports.group = {
         doTestRemoveExtraTextFromStart('This is a sentence.', 'This is a sentence.', test);
         doTestRemoveExtraTextFromStart('(Hello) This is a sentence.', 'This is a sentence.', test);
         test.done();
+    },
+
+    testMatchBareBullet: function (test) {
+        doTestMatchBareBullet('', false, test);
+        doTestMatchBareBullet('This is bare', true, test);
+        doTestMatchBareBullet('This is not bare.', false, test);
+        doTestMatchBareBullet('This is not bare:', false, test);
+        doTestMatchBareBullet('This is not bare -', false, test);
+        doTestMatchBareBullet('This is. Not bare', false, test);
+        doTestMatchBareBullet('This is.bare', true, test);
+        doTestMatchBareBullet('St. Louis', true, test);
+        doTestMatchBareBullet('This is bare but this sentence is too long so it should not trigger it at all', false, test);
+        test.done();
+    },
+
+    testIsInUpperCase: function (test) {
+        doTestIsInUpperCase('', false, test);
+        doTestIsInUpperCase('This.', false, test);
+        doTestIsInUpperCase('APPle', false, test);
+        doTestIsInUpperCase('AZ', true, test);
+        doTestIsInUpperCase('A', false, test);
+        doTestIsInUpperCase('az', false, test);
+        doTestIsInUpperCase('APPLE', true, test);
+        doTestIsInUpperCase('==== APPLE ====', true, test);
+        doTestIsInUpperCase('BIG SENTENCE a WAY TO', true, test);
+        test.done();
+    },
+
+    testMayStartWithAppName: function (test) {
+        doTestMayStartWithAppName('', false, test);
+        doTestMayStartWithAppName('This is not an app name.', false, test);
+        doTestMayStartWithAppName('This Is an App Name.', true, test);
+        doTestMayStartWithAppName('"This App": some great description', true, test);
+        doTestMayStartWithAppName('*** "This App": some great description', true, test);
+        doTestMayStartWithAppName('(New) ++ "This App": some great description', true, test);
+        doTestMayStartWithAppName('"This App" - some great description', true, test);
+        doTestMayStartWithAppName('"This App" some great description', true, test);
+        test.done();
     }
 };
+
+function doTestMayStartWithAppName(text, expected, test) {
+    test.strictEqual(patternMatching.mayStartWithAppName(text), expected, text);
+}
+
+function doTestIsInUpperCase(text, expected, test) {
+    test.strictEqual(patternMatching.isInUpperCase(text), expected, text);
+}
+
+function doTestMatchBareBullet(text, expected, test) {
+    test.strictEqual(patternMatching.matchBareBullet(text), expected, text);
+}
 
 function doTestRemoveExtraTextFromStart(text, expected, test) {
     test.strictEqual(patternMatching.removeExtraTextFromStart(text), expected, text);

@@ -2,6 +2,7 @@
 
 var List = require('./list').List;
 var RemovalReason = require('./removalReason').RemovalReason;
+var SentenceGroup = require('./sentenceGroup').SentenceGroup;
 
 // ----------------------
 // Paragraph class
@@ -127,6 +128,23 @@ Paragraph.prototype.forEachActiveList = function(callback) {
         var element = this.elements[i];
 
         if (element instanceof List && !element.isRemoved) {
+            var result = callback(element);
+            if (result) {
+                break;
+            }
+        }
+    }
+};
+
+Paragraph.prototype.forEachActiveSentenceGroup = function(callback) {
+    if (this.isRemoved) {
+        return;
+    }
+
+    for (var i = 0; i < this.elements.length; ++i) {
+        var element = this.elements[i];
+
+        if (element instanceof SentenceGroup && !element.isRemoved) {
             var result = callback(element);
             if (result) {
                 break;
