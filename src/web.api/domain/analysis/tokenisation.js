@@ -2,6 +2,7 @@
 
 var nlpCompromise = require('nlp_compromise');
 var patternMatching = require('./patternMatching');
+var XRegExp = require('xregexp').XRegExp;
 
 function tokenise(input) {
     var sentences = nlpCompromise.tokenize(input);
@@ -39,6 +40,8 @@ function createStringFromTokens(tokens, minLength) {
 
     return result;
 }
+
+// --------------------------------------
 
 exports.tokenise = tokenise;
 exports.createStringFromTokens = createStringFromTokens;

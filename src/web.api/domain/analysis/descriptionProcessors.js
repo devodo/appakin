@@ -121,6 +121,18 @@ function removeSentencesWithEmailAddresses(description) {
 
 // --------------------------------
 
+var removeByMakersOfSentencesRegex = /\b(by|from)\b\s+(?:\bthe\b\s+)?\b(?:makers?|creators?)\b\s+\bof\b/i;
+
+function removeByMakersOfSentences(description) {
+    description.forEachActiveParagraph(function(paragraph) {
+        paragraph.forEachSentence(true, function(sentence) {
+            sentence.conditionallyMarkAsRemoved(removeByMakersOfSentencesRegex, 'by makers of', NORMAL);
+        });
+    });
+}
+
+// --------------------------------
+
 function removeListSentences(description) {
     description.forEachActiveParagraph(function(paragraph) {
         paragraph.forEachActiveSentence(true, function(sentence) {
@@ -147,6 +159,8 @@ function removeListSentences(description) {
                 sentence.markAsRemoved('long with many commas', STRONG);
                 return;
             }
+
+            // TODO could change this so that commas ratio only starts being calculated from first comma in sentence?
 
             // Remove sentences with many commas and capitalised words.
             if (capitalisedTokenRatio >= 0.25 && commaRatio >= 0.4) {
@@ -225,8 +239,6 @@ function removeListsOfAppsBySameDeveloperByMatchingAppNames(description) {
                }
            });
 
-            //log.warn('listItemCount: ' + listItemCount + ' appNameMatchCount: ' + appNameMatchCount);
-
            var matchPercentage = (100.0 / listItemCount) * appNameMatchCount;
            if (matchPercentage >= 50) {
                list.markAsRemoved('by same developer (list)', STRONG);
@@ -243,13 +255,6 @@ function removeParagraphsThatStartWithNameOfAppBySameDeveloper(description) {
 
         if (firstElement && firstElement instanceof SentenceGroup && firstElement.getSentenceCount() <= 2) {
             var titleSentence = firstElement.getTitleSentence();
-
-            //var firstSentence = firstElement.getFirstSentence();
-            //var sentenceTitle = firstElement.getSentenceGroupTitle();
-
-            //var firstSentence = firstElement.getFirstSentence();
-            //var sentenceTitle = patternMatching.getTextTitleForAppNameSimilarityTest(firstSentence.content);
-                     // patternMatching.getTextTitle(firstSentence.content);
 
             if (titleSentence && description.managedAppNameList.matches(titleSentence, true)) {
                 paragraph.markAsRemoved('by same developer (paragraph)', STRONG);
@@ -419,6 +424,7 @@ function removeTechnicalDetailSentences(description) {
 
 // TODO could look for paragraph like 'Try other awesome games by Cat Studio' to signal that the below is possible.
 // TODO could restrict this to latter part of description.
+
 function removeParagraphsOfRelatedAppsThatAreIndividualSentenceGroups(description) {
     description.forEachActiveParagraph(function(paragraph) {
         var elementCount = 0;
@@ -461,14 +467,6 @@ function removeParagraphsOfRelatedAppsThatAreIndividualSentenceGroups(descriptio
 
 // --------------------------------
 
-/*
-identify sentences with multiple commas (
-
-
-find runs of capitalized or number-start tokens, using 'and/or' and commas to separate the runs.
-if find three or more, try matching to app names.
-
- */
 function removeSentencesOfRelatedApps(description) {
     description.forEachActiveParagraph(function(paragraph) {
         paragraph.forEachActiveSentence(false, function(sentence) {
@@ -520,3 +518,4 @@ exports.removeNoteParagraphs = removeNoteParagraphs;
 exports.removeTechnicalDetailSentences = removeTechnicalDetailSentences;
 exports.removeParagraphsOfRelatedAppsThatAreIndividualSentenceGroups = removeParagraphsOfRelatedAppsThatAreIndividualSentenceGroups;
 exports.removeSentencesOfRelatedApps = removeSentencesOfRelatedApps;
+exports.removeByMakersOfSentences = removeByMakersOfSentences;

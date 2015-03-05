@@ -31,9 +31,9 @@ function createManagedAppNameList(appName, developerName, relatedAppNames) {
         if (!relatedManagedAppName.isSimilarTo(appNameResult)) {
             // Only include related app names that are sufficiently different to appname.
             relatedManagedAppNames.push(relatedManagedAppName);
-        } else {
-            log.warn('ignoring app name ['+ relatedAppName + '] compared to [' + appName + ']');
-        }
+        } //else {
+          //  log.warn('ignoring app name ['+ relatedAppName + '] compared to [' + appName + ']');
+        //}
     }
 
     //log.warn('RELATED APP NAMES' + relatedAppNames.join('==='));

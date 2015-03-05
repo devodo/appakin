@@ -9,8 +9,6 @@ var LanguageDetect = require('languagedetect');
 var lngDetector = new LanguageDetect();
 var crypto = require('crypto');
 var XRegExp = require('xregexp').XRegExp;
-var natural = require('natural'),
-    tokenizer = new natural.WordTokenizer();
 
 var SpellCheck = require('spellcheck'),
     base = __dirname + (process.platform === 'win32' ? '\\' : '/'),
@@ -18,10 +16,6 @@ var SpellCheck = require('spellcheck'),
 
 var invalidTermsRegex = new XRegExp('[\\p{Z}\\p{S}\\p{P}]');
 var englishWordRegex = /^[a-z]+$/;
-
-function isNumeric(n) {
-    return !isNaN(parseFloat(n)) && isFinite(n);
-}
 
 var setDescIsEnglishStatus = function(appAnalysis) {
     appAnalysis.desc_is_english =
@@ -275,33 +269,7 @@ var cleanDescription = function(appId, appName, appDescription, appDevName, next
             sameDeveloperAppNames
         );
 
-        // START
-        descriptionProcessors.setStatistics(normalisedDescription);
-
-        // MIDDLE
-        descriptionProcessors.removeSentencesWithEmailAddresses(normalisedDescription);
-        descriptionProcessors.removeSentencesWithUrls(normalisedDescription);
-        descriptionProcessors.removeSentencesWithTwitterNames(normalisedDescription);
-        descriptionProcessors.removeCopyrightParagraphs(normalisedDescription);
-        descriptionProcessors.removeTermsAndConditionsParagraphs(normalisedDescription);
-        descriptionProcessors.removeListSentences(normalisedDescription);
-        descriptionProcessors.removeLongSentences(normalisedDescription);
-        descriptionProcessors.removeSentencesWithManyTrademarkSymbols(normalisedDescription);
-        descriptionProcessors.removeListsOfAppsBySameDeveloperByMatchingAppNames(normalisedDescription);
-        descriptionProcessors.removeLongLists(normalisedDescription);
-        descriptionProcessors.removeParagraphsThatStartWithNameOfAppBySameDeveloper(normalisedDescription);
-        descriptionProcessors.removeHeadersAndListsForRelatedApps(normalisedDescription);
-        descriptionProcessors.removeNoteParagraphs(normalisedDescription);
-        descriptionProcessors.removeTechnicalDetailSentences(normalisedDescription);
-        descriptionProcessors.removeParagraphsOfRelatedAppsThatAreIndividualSentenceGroups(normalisedDescription);
-        descriptionProcessors.removeSentencesOfRelatedApps(normalisedDescription);
-
-        // END
-        descriptionProcessors.removeListsInLatterPartOfDescriptionThatAreAlreadyMostlyRemoved(normalisedDescription);
-        descriptionProcessors.removeParagraphsInLatterPartOfDescriptionThatAreAlreadyMostlyRemoved(normalisedDescription);
-        descriptionProcessors.removeHeaderSentencesBeforeAlreadyRemovedContent(normalisedDescription);
-        descriptionProcessors.removeHeaderSentencesBeforeAlreadyRemovedLists(normalisedDescription);
-        descriptionProcessors.removeParagraphsInLatterPartOfDescriptionThatHaveRemovedContentAroundThem(normalisedDescription);
+        processDescription(normalisedDescription);
 
         var result = {
             html: normalisedDescription.getHtmlResult()
@@ -312,7 +280,7 @@ var cleanDescription = function(appId, appName, appDescription, appDevName, next
 };
 
 var testCleaningDescriptions = function(next) {
-    appStoreAdminRepo.getAppStoreEnglishAppBatch(0, 3000, function(err, apps) {
+    appStoreAdminRepo.getAppStoreEnglishAppBatch(0, 1000, function(err, apps) {
         if (err) {
             return next(err);
         }
@@ -340,15 +308,7 @@ var testCleaningDescriptions = function(next) {
                         sameDeveloperAppNames
                     );
 
-                    descriptionProcessors.removeSentencesWithEmailAddresses(normalisedDescription);
-                    descriptionProcessors.removeSentencesWithUrls(normalisedDescription);
-                    //descriptionProcessors.removeCopyrightParagraphs(normalisedDescription);
-                    //descriptionProcessors.removeTermsAndConditionsParagraphs(normalisedDescription);
-                    //descriptionProcessors.removeListSentences(normalisedDescription);
-                    //descriptionProcessors.removeLongSentences(normalisedDescription);
-                    //descriptionProcessors.removeSentencesWithManyTrademarkSymbols(normalisedDescription);
-                    //descriptionProcessors.removeListsOfAppsBySameDeveloperByMatchingAppNames(normalisedDescription);
-                    //descriptionProcessors.removeLongLists(normalisedDescription);
+                    processDescription(normalisedDescription);
 
                     var result = normalisedDescription.getRemovedResult();
 
@@ -378,6 +338,37 @@ var testCleaningDescriptions = function(next) {
             });
     });
 };
+
+function processDescription(normalisedDescription) {
+    // START
+    descriptionProcessors.setStatistics(normalisedDescription);
+
+    // MIDDLE
+    descriptionProcessors.removeSentencesWithEmailAddresses(normalisedDescription);
+    descriptionProcessors.removeSentencesWithUrls(normalisedDescription);
+    descriptionProcessors.removeSentencesWithTwitterNames(normalisedDescription);
+    descriptionProcessors.removeCopyrightParagraphs(normalisedDescription);
+    descriptionProcessors.removeTermsAndConditionsParagraphs(normalisedDescription);
+    //descriptionProcessors.removeListSentences(normalisedDescription);
+    descriptionProcessors.removeLongSentences(normalisedDescription);
+    descriptionProcessors.removeSentencesWithManyTrademarkSymbols(normalisedDescription);
+    descriptionProcessors.removeListsOfAppsBySameDeveloperByMatchingAppNames(normalisedDescription);
+    descriptionProcessors.removeLongLists(normalisedDescription);
+    descriptionProcessors.removeParagraphsThatStartWithNameOfAppBySameDeveloper(normalisedDescription);
+    descriptionProcessors.removeHeadersAndListsForRelatedApps(normalisedDescription);
+    descriptionProcessors.removeNoteParagraphs(normalisedDescription);
+    descriptionProcessors.removeTechnicalDetailSentences(normalisedDescription);
+    descriptionProcessors.removeParagraphsOfRelatedAppsThatAreIndividualSentenceGroups(normalisedDescription);
+    descriptionProcessors.removeSentencesOfRelatedApps(normalisedDescription);
+    descriptionProcessors.removeByMakersOfSentences(normalisedDescription);
+
+    // END
+    descriptionProcessors.removeListsInLatterPartOfDescriptionThatAreAlreadyMostlyRemoved(normalisedDescription);
+    descriptionProcessors.removeParagraphsInLatterPartOfDescriptionThatAreAlreadyMostlyRemoved(normalisedDescription);
+    descriptionProcessors.removeHeaderSentencesBeforeAlreadyRemovedContent(normalisedDescription);
+    descriptionProcessors.removeHeaderSentencesBeforeAlreadyRemovedLists(normalisedDescription);
+    descriptionProcessors.removeParagraphsInLatterPartOfDescriptionThatHaveRemovedContentAroundThem(normalisedDescription);
+}
 
 exports.analyse = analyse;
 exports.cleanDescription = cleanDescription;
