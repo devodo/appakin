@@ -92,7 +92,6 @@ var processApp = function(app, forceAll, processAppCallback) {
 
     if (!forceAll && md5sum && md5sum === app.desc_md5_checksum) {
         // description/language codes have not changed so no processing required.
-
         processAppCallback();
     } else {
         // Need to analyse the description.
@@ -129,6 +128,21 @@ var processApp = function(app, forceAll, processAppCallback) {
 
             var descIsDefinitelyNotEnglish = appAnalysis.desc_english_score < 0.1;
 
+            var cleanDescriptionCallback = function() {
+                if (!appAnalysis.desc_is_english) {
+                    upsertAppAnalysis(appAnalysis, processAppCallback);
+                } else {
+                    cleanDescription(app.app_id, app.name, app.description, app.dev_name, true, function(err, result) {
+                        if (err) {
+                            processAppCallback(err);
+                        }
+
+                        appAnalysis.desc_cleaned = result.string;
+                        upsertAppAnalysis(appAnalysis, processAppCallback);
+                    });
+                }
+            };
+
             if (descIsDefinitelyEnglish || descIsDefinitelyNotEnglish) {
                 // No need to determine valid term and english terms values.
 
@@ -136,8 +150,7 @@ var processApp = function(app, forceAll, processAppCallback) {
                 appAnalysis.desc_english_term_count = -1;
 
                 setDescIsEnglishStatus(appAnalysis);
-                //cleanDescription(app, appAnalysis);
-                upsertAppAnalysis(appAnalysis, processAppCallback);
+                cleanDescriptionCallback();
             } else {
                 // Determine valid term and english terms values.
 
@@ -172,8 +185,7 @@ var processApp = function(app, forceAll, processAppCallback) {
                             processAppCallback(err);
                         } else {
                             setDescIsEnglishStatus(appAnalysis);
-                            //cleanDescription(app, appAnalysis);
-                            upsertAppAnalysis(appAnalysis, processAppCallback);
+                            cleanDescriptionCallback();
                         }
                     });
             }
@@ -184,6 +196,8 @@ var processApp = function(app, forceAll, processAppCallback) {
 };
 
 var analyse = function(batchSize, forceAll, next) {
+    log.warn('started analysis of 1000');
+
     var processBatch = function(lastId) {
         log.debug("Adding batch from id: " + lastId);
 
@@ -254,7 +268,7 @@ var normaliseDescription = function(appId, next) {
     });
 };
 
-var cleanDescription = function(appId, appName, appDescription, appDevName, next) {
+var cleanDescription = function(appId, appName, appDescription, appDevName, onlyStringResult, next) {
     appStoreAdminRepo.getAppStoreSameDeveloperApps(appId, function(err, sameDeveloperAppNames) {
         if (err) {
             return next(err);
@@ -272,7 +286,8 @@ var cleanDescription = function(appId, appName, appDescription, appDevName, next
         processDescription(normalisedDescription);
 
         var result = {
-            html: normalisedDescription.getHtmlResult()
+            string: normalisedDescription.getResult(),
+            html: onlyStringResult ? null : normalisedDescription.getHtmlResult()
         };
 
         return next(null, result);
@@ -318,7 +333,6 @@ var testCleaningDescriptions = function(next) {
                             name: normalisedDescription.appName,
                             normalisedName: normalisedDescription.normalisedAppName,
                             developerName: normalisedDescription.developerName,
-                            //sameDeveloperAppNames: normalisedDescription.sameDeveloperAppNames,
                             removed: result,
                             removedHtml: normalisedDescription.getHtmlResult()
                         });
@@ -349,7 +363,6 @@ function processDescription(normalisedDescription) {
     descriptionProcessors.removeSentencesWithTwitterNames(normalisedDescription);
     descriptionProcessors.removeCopyrightParagraphs(normalisedDescription);
     descriptionProcessors.removeTermsAndConditionsParagraphs(normalisedDescription);
-    //descriptionProcessors.removeListSentences(normalisedDescription);
     descriptionProcessors.removeLongSentences(normalisedDescription);
     descriptionProcessors.removeSentencesWithManyTrademarkSymbols(normalisedDescription);
     descriptionProcessors.removeListsOfAppsBySameDeveloperByMatchingAppNames(normalisedDescription);

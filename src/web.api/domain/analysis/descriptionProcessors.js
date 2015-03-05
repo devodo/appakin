@@ -92,9 +92,6 @@ function removeSentencesWithUrls(description) {
     description.forEachActiveParagraph(function(paragraph) {
         paragraph.forEachSentence(true, function(sentence) {
             var match = sentence.content.match(urlRegex);
-            if (match) {
-                log.warn(sentence.content + ': ' + match);
-            }
 
             if (match && !match[2]) {
                 sentence.markAsRemoved('url', NORMAL);
@@ -128,6 +125,8 @@ function removeSentencesWithEmailAddresses(description) {
 }
 
 // --------------------------------
+
+// possible: 'Also check out'
 
 var removeByMakersOfSentencesRegex = /\b(by|from)\b\s+(?:\bthe\b\s+)?\b(?:makers?|creators?)\b\s+\bof\b/i;
 
