@@ -26,14 +26,14 @@ function createManagedAppNameList(appName, developerName, relatedAppNames) {
 
     for (var i = 0; i < relatedAppNames.length; ++i) {
         var relatedAppName = relatedAppNames[i];
+
         var relatedManagedAppName = managedAppName.createManagedAppName(relatedAppName, developerName);
+        relatedManagedAppName.adjustNormalisedNamesBasedOnOriginalAppName(appNameResult);
 
         if (!relatedManagedAppName.isSimilarTo(appNameResult)) {
             // Only include related app names that are sufficiently different to appname.
             relatedManagedAppNames.push(relatedManagedAppName);
-        } //else {
-          //  log.warn('ignoring app name ['+ relatedAppName + '] compared to [' + appName + ']');
-        //}
+        }
     }
 
     //log.warn('RELATED APP NAMES' + relatedAppNames.join('==='));

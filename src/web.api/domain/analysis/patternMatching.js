@@ -143,7 +143,7 @@ function removeDeveloperName(appName, developerName) {
 
 // ------------------------------
 
-var matchBareBulletRegex = /[:\u2013\u2014\u2015\u2016-]$/i;
+var matchBareBulletRegex = /[:\.!?\u2013\u2014\u2015\u2016-]$/i;
 
 function matchBareBullet(text) {
     text = text.trim();

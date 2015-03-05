@@ -126,17 +126,23 @@ function removeSentencesWithEmailAddresses(description) {
 
 // --------------------------------
 
-// possible: 'Also check out'
+// possible: 'Try other awesome games by Cat Studio'
 
 var removeByMakersOfSentencesRegex = /\b(by|from)\b\s+(?:\bthe\b\s+)?\b(?:makers?|creators?)\b\s+\bof\b/i;
+var checkOutOtherGamesRegex = /^.*(\bcheck\b.+\bout\b|\btry\b).+\bother\b.+\b(games?|apps?)\b/i;
 
 function removeByMakersOfSentences(description) {
     description.forEachActiveParagraph(function(paragraph) {
         paragraph.forEachSentence(true, function(sentence) {
+
             sentence.conditionallyMarkAsRemoved(removeByMakersOfSentencesRegex, 'by makers of', NORMAL);
+            sentence.conditionallyMarkAsRemoved(checkOutOtherGamesRegex, 'check out other games', NORMAL);
         });
     });
 }
+
+
+
 
 // --------------------------------
 
@@ -457,6 +463,7 @@ function removeTechnicalDetailSentences(description) {
 // --------------------------------
 
 // TODO could look for paragraph like 'Try other awesome games by Cat Studio' to signal that the below is possible.
+//      OTHER GAMEVIL GAMES
 // TODO could restrict this to latter part of description.
 
 function removeParagraphsOfRelatedAppsThatAreIndividualSentenceGroups(description) {
@@ -491,6 +498,9 @@ function removeParagraphsOfRelatedAppsThatAreIndividualSentenceGroups(descriptio
                 ++appNameMatchCount;
             }
         });
+
+        //var tt = description.managedAppNameList.managedAppNames.map(function(x) { return x.originalAppName; }).join(']-[');
+        //log.warn('   appNameMatchCount:' + appNameMatchCount + ' nonames:' + description.managedAppNameList.managedAppNames.length + ' ' + tt);
 
         var percentageStartWithAppName = (100.0 / elementCount) * appNameMatchCount;
         if (percentageStartWithAppName >= 50) {

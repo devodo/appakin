@@ -18,10 +18,28 @@ function ManagedAppName(originalAppName, compactAppName, noDeveloperCompactAppNa
 }
 
 ManagedAppName.prototype.isSimilarTo = function(other) {
-    return similarity.similar(this.originalAppName, other.originalAppName);
+    var result= similarity.similar(this.originalAppName, other.originalAppName);
 
     //return similarity.similar(this.compactAppName, other.compactAppName) ||
     //       similarity.similar(this.noDeveloperCompactAppName, other.noDeveloperCompactAppName);
+
+    return result;
+};
+
+ManagedAppName.prototype.adjustNormalisedNamesBasedOnOriginalAppName = function(originalManagedAppName) {
+    if (this.compactAppNameRemade === originalManagedAppName.compactAppNameRemade) {
+        //similarity.similar(this.compactAppNameRemade, originalManagedAppName.compactAppNameRemade)) {
+        this.compactAppName = '';
+        this.compactAppNameTokens = [];
+        this.compactAppNameRemade = '';
+    }
+
+    if (this.noDeveloperCompactAppNameRemade === originalManagedAppName.noDeveloperCompactAppNameRemade) {
+        //similarity.similar(this.noDeveloperCompactAppNameRemade, originalManagedAppName.noDeveloperCompactAppNameRemade)) {
+        this.noDeveloperCompactAppName = '';
+        this.noDeveloperCompactAppNameTokens = [];
+        this.noDeveloperCompactAppNameRemade = '';
+    }
 };
 
 ManagedAppName.prototype.matches = function(sentence, matchOnWholeSentence) {
@@ -33,7 +51,7 @@ ManagedAppName.prototype.matches = function(sentence, matchOnWholeSentence) {
 
     //log.warn('match 1: [' + sentenceForComparison + '] [' + this.compactAppNameRemade + ']');
 
-    if (similarity.similar(sentenceForComparison, this.compactAppNameRemade)) {
+    if (this.compactAppNameRemade && similarity.similar(sentenceForComparison, this.compactAppNameRemade)) {
         return true;
     }
 
@@ -47,7 +65,7 @@ ManagedAppName.prototype.matches = function(sentence, matchOnWholeSentence) {
 
     //log.warn('match 2: [' + sentenceForComparison + '] [' + this.noDeveloperCompactAppNameRemade + ']');
 
-    if (similarity.similar(sentenceForComparison, this.noDeveloperCompactAppNameRemade)) {
+    if (this.noDeveloperCompactAppNameRemade && similarity.similar(sentenceForComparison, this.noDeveloperCompactAppNameRemade)) {
         return true;
     }
 

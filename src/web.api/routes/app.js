@@ -94,7 +94,7 @@ function getAppByExtId(extId, req, res, highlightDescription) {
             delete app.isGameCenterEnabled;
 
             if (highlightDescription) {
-                appAnalyser.cleanDescription(appId, app.name, app.description, app.devName, function (err, cleanResult) {
+                appAnalyser.cleanDescription(appId, app.name, app.description, app.devName, false, function (err, cleanResult) {
                     if (err) {
                         log.error('Error cleaning description: ' + err);
                         return res.status(500).json({error: 'Error cleaning description'});
