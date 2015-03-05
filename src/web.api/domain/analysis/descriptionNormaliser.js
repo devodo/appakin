@@ -99,11 +99,11 @@ function markPossibleListItem(line) {
         return line;
     }
 
-    var bareBulletMatch = patternMatching.matchBareBullet(line.content);
-    if (bareBulletMatch) {
-        line.bareBulletCandidate = true;
-        return line;
-    }
+    //var bareBulletMatch = patternMatching.matchBareBullet(line.content);
+    //if (bareBulletMatch) {
+    //    line.bareBulletCandidate = true;
+    //    return line;
+    //}
 
     return line;
 }
@@ -193,6 +193,43 @@ function identifyOrderedBulletLists(lineGrouping) {
     return lineGrouping;
 }
 
+function attachSingleElementLists(lineGroupings) {
+    var currentLineGrouping = null;
+    var resultLineGroupings = [];
+
+    for (var i = 0; i < lineGroupings.length; ++i) {
+        var lineGrouping = lineGroupings[i];
+
+        if (lineGrouping.length > 0) {
+            var firstLine = lineGrouping[0];
+
+            if (currentLineGrouping && currentLineGrouping.length > 0 &&
+                (
+                   (firstLine.bareBulletCandidate && currentLineGrouping[0].bareBulletCandidate) ||
+                   (firstLine.bulletCandidate && currentLineGrouping[0].bulletCandidate) ||
+                   (firstLine.orderedCandidate && currentLineGrouping[0].orderedCandidate)
+                )) {
+                for (var j = 0; j < lineGrouping.length; ++j) {
+                    currentLineGrouping.push(lineGrouping[j]);
+                }
+            } else {
+                if (currentLineGrouping) {
+                    resultLineGroupings.push(currentLineGrouping);
+                    currentLineGrouping = null;
+                }
+
+                currentLineGrouping = lineGrouping;
+            }
+        }
+    }
+
+    if (currentLineGrouping) {
+        resultLineGroupings.push(currentLineGrouping);
+    }
+
+    return resultLineGroupings;
+}
+
 function attachHeaderlessListsToPreviousLineGrouping(lineGroupings) {
     var fixedLineGroupings = [];
     var endsInList = false;
@@ -234,7 +271,13 @@ function createNormalisedDescription(appDescription, appName, developerName, sam
 
     lineGroupings = lineGroupings
         .map(function (lineGrouping) {
-            lineGrouping = lineGrouping.map(function(line) { return markPossibleListItem(line); });
+            return lineGrouping.map(function(line) { return markPossibleListItem(line); });
+        });
+
+    //lineGroupings = attachSingleElementLists(lineGroupings);
+
+    lineGroupings = lineGroupings
+        .map(function (lineGrouping) {
             lineGrouping = identifyBulletLists(lineGrouping);
             lineGrouping = identifyOrderedBulletLists(lineGrouping);
             lineGrouping = identifyBareBulletLists(lineGrouping);

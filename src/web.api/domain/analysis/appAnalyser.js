@@ -361,6 +361,7 @@ function processDescription(normalisedDescription) {
     descriptionProcessors.removeParagraphsOfRelatedAppsThatAreIndividualSentenceGroups(normalisedDescription);
     descriptionProcessors.removeSentencesOfRelatedApps(normalisedDescription);
     descriptionProcessors.removeByMakersOfSentences(normalisedDescription);
+    descriptionProcessors.removeHeaderSentencesBeforeAlreadyRemovedContentAtStartOfParagraph(normalisedDescription);
 
     // END
     descriptionProcessors.removeListsInLatterPartOfDescriptionThatAreAlreadyMostlyRemoved(normalisedDescription);

@@ -25,7 +25,7 @@ SentenceGroup.prototype.getTitleSentence = function() {
     var result = this.sentences.slice(0, 2).map(function(x) { return x.content; }).join(' ');
     result = patternMatching.removeExtraTextFromStart(result);
 
-    if (result && this.sentences[0].getLength() < 80) {
+    if (result && this.sentences[0].getLength() < 300) {
         return new Sentence(result);
     }
 

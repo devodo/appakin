@@ -85,12 +85,20 @@ function removeTermsAndConditionsParagraphs(description) {
 
 // --------------------------------
 
-var urlRegex = /\bwww\.|\bhttps?:\/|twitter\.com\/|youtube\.com\/|facebook\.com\/|\w\.com\//i;
+var urlRegex = /(\bwww\.|\bhttps?:\/|twitter\.com\/|youtube\.com\/|facebook\.com\/|\w\.com\/)[a-zA-Z0-9.\/_-]*($|\)?[\W]*$)?/i;
 
+// but don't remove if at end of sentence.
 function removeSentencesWithUrls(description) {
     description.forEachActiveParagraph(function(paragraph) {
         paragraph.forEachSentence(true, function(sentence) {
-            sentence.conditionallyMarkAsRemoved(urlRegex, 'url', NORMAL);
+            var match = sentence.content.match(urlRegex);
+            if (match) {
+                log.warn(sentence.content + ': ' + match);
+            }
+
+            if (match && !match[2]) {
+                sentence.markAsRemoved('url', NORMAL);
+            }
         });
     });
 }
@@ -256,7 +264,7 @@ function removeParagraphsThatStartWithNameOfAppBySameDeveloper(description) {
         if (firstElement && firstElement instanceof SentenceGroup && firstElement.getSentenceCount() <= 2) {
             var titleSentence = firstElement.getTitleSentence();
 
-            if (titleSentence && description.managedAppNameList.matches(titleSentence, true)) {
+            if (titleSentence && description.managedAppNameList.matches(titleSentence, false)) {
                 paragraph.markAsRemoved('by same developer (paragraph)', STRONG);
             }
         }
@@ -320,7 +328,7 @@ function removeParagraphsInLatterPartOfDescriptionThatHaveRemovedContentAroundTh
             return;
         }
 
-        if (!removeParagraphs && paragraph.isRemoved) {
+        if (!removeParagraphs && paragraph.isRemoved && paragraph.removalReason.soundness !== WEAK) {
             removeParagraphs = true;
         }
 
@@ -331,6 +339,33 @@ function removeParagraphsInLatterPartOfDescriptionThatHaveRemovedContentAroundTh
 }
 
 // --------------------------------
+
+function removeHeaderSentencesBeforeAlreadyRemovedContentAtStartOfParagraph(description) {
+    description.forEachActiveParagraph(function(paragraph) {
+        if (paragraph.getElementCount() < 2) {
+            return;
+        }
+
+        var firstElement = paragraph.getElement(0);
+        if (!(firstElement instanceof SentenceGroup)) {
+            return;
+        }
+
+        if (firstElement.getSentenceCount() > 1) {
+            return;
+        }
+
+        var firstSentence = firstElement.getFirstSentence();
+        var secondElement = paragraph.getElement(1);
+
+        if (patternMatching.isPossibleHeading(firstSentence.content)) {
+            if ((secondElement instanceof SentenceGroup && secondElement.getFirstSentence().isRemoved) ||
+                (secondElement instanceof List && secondElement.isRemoved)) {
+                firstSentence.markAsRemoved('header for already removed 2nd element', NORMAL);
+            }
+        }
+    });
+}
 
 function removeHeaderSentencesBeforeAlreadyRemovedContent(description) {
     var previousHeaderParagraph = null;
@@ -397,7 +432,7 @@ function removeNoteParagraphs(description) {
         var firstSentence = paragraph.getFirstSentence();
 
         if (patternMatching.isNoteText(firstSentence.content)) {
-            paragraph.markAsRemoved('note paragraph', NORMAL);
+            paragraph.markAsRemoved('note paragraph', WEAK); // TODO change to WEAK
         }
     });
 }
@@ -469,7 +504,7 @@ function removeParagraphsOfRelatedAppsThatAreIndividualSentenceGroups(descriptio
 
 function removeSentencesOfRelatedApps(description) {
     description.forEachActiveParagraph(function(paragraph) {
-        paragraph.forEachActiveSentence(false, function(sentence) {
+        paragraph.forEachActiveSentence(true, function(sentence) {
             var possibleAppNames = patternMatching.getPossibleAppNames(sentence.content);
             if (possibleAppNames.length < 3) {
                 return;
@@ -519,3 +554,4 @@ exports.removeTechnicalDetailSentences = removeTechnicalDetailSentences;
 exports.removeParagraphsOfRelatedAppsThatAreIndividualSentenceGroups = removeParagraphsOfRelatedAppsThatAreIndividualSentenceGroups;
 exports.removeSentencesOfRelatedApps = removeSentencesOfRelatedApps;
 exports.removeByMakersOfSentences = removeByMakersOfSentences;
+exports.removeHeaderSentencesBeforeAlreadyRemovedContentAtStartOfParagraph = removeHeaderSentencesBeforeAlreadyRemovedContentAtStartOfParagraph;

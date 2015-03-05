@@ -217,13 +217,12 @@ exports.group = {
     testMatchBareBullet: function (test) {
         doTestMatchBareBullet('', false, test);
         doTestMatchBareBullet('This is bare', true, test);
-        doTestMatchBareBullet('This is not bare.', false, test);
+        doTestMatchBareBullet('This is not bare.', true, test);
         doTestMatchBareBullet('This is not bare:', false, test);
         doTestMatchBareBullet('This is not bare -', false, test);
         doTestMatchBareBullet('This is. Not bare', false, test);
         doTestMatchBareBullet('This is.bare', true, test);
         doTestMatchBareBullet('St. Louis', true, test);
-        doTestMatchBareBullet('This is bare but this sentence is too long so it should not trigger it at all', false, test);
         test.done();
     },
 
