@@ -71,7 +71,7 @@ exports.init = function init(app) {
 
                 category.url = categoryUrl;
                 category.page = pageNum;
-                category.totalPages = Math.min(MAX_CAT_PAGES, Math.ceil(result.total / PAGE_SIZE));
+                category.totalItems = result.total;
                 category.apps = apps;
 
                 featuredRepo.getFeaturedApps(category.id, 2, 5, filters, function (err, fApps) {
