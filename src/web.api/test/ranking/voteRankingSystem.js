@@ -1,14 +1,14 @@
 'use strict';
 
-var NUM_ITEMS = 1000;
+var NUM_ITEMS = 100;
 var NUM_USERS = 100;
 var VOTE_PROBABILITY = 0.1;
 var INIT_ITEM_SCORE = 0.5;
-var PERCENT_GOOD_USER = 1.0;
+var PERCENT_GOOD_USER = 0.9;
 var PERCENT_NEUTRAL_USER = 0.0;
-var SCORE_SCALING_POWER = 0.5;
 var DELTA_EPSILON = 0.000001;
-var RANDOM_WEIGHT = 0.1;
+
+var INIT_DAMPER = 1;
 
 var users = [];
 var items = [];
@@ -47,7 +47,7 @@ function initUsers() {
             name: 'user:' + i,
             score: 0,
             reputation: 1.0,
-            quality: Math.max(Math.random(), 0.5),
+            quality: Math.random() * 0.0 + 1.0,
             isNeutral: isNeutral,
             isGood: isGood,
             votes: votes
@@ -115,18 +115,8 @@ function placeVotesByTypeWithNoise() {
 
 function resetUserReputation() {
     users.forEach(function(user) {
-        user.reputation = Math.random();
+        user.reputation = 1.0;
     });
-}
-
-function scaleScore(score) {
-    var scaledScore = Math.pow(Math.abs(score), SCORE_SCALING_POWER);
-
-    if (score < 0) {
-        scaledScore *= -1;
-    }
-
-    return scaledScore;
 }
 
 function calculateItemScores() {
@@ -144,9 +134,9 @@ function calculateItemScores() {
             }
 
             if (vote.dir === 1) {
-                items[i].upvoteWeight += user.reputation;
+                items[i].upvoteWeight += (user.reputation);
             } else {
-                items[i].downvoteWeight += user.reputation;
+                items[i].downvoteWeight += (user.reputation);
             }
         }
     });
@@ -154,11 +144,8 @@ function calculateItemScores() {
     var scoreDelta = 0;
 
     items.forEach(function(item) {
-        var score = 0;
-
-        if (item.upvoteWeight > 0) {
-            score = item.upvoteWeight / (item.upvoteWeight + item.downvoteWeight);
-        }
+        var score = (item.upvoteWeight + INIT_DAMPER) /
+            (item.upvoteWeight + item.downvoteWeight + INIT_DAMPER + INIT_DAMPER);
 
         scoreDelta += Math.abs(item.score - score);
         item.score = score;
@@ -167,7 +154,7 @@ function calculateItemScores() {
     return scoreDelta;
 }
 
-function calculateUserRepuations() {
+function calculateUserReputations() {
     var reputationDelta = 0;
 
     users.forEach(function(user) {
@@ -205,92 +192,15 @@ function calculateUserRepuations() {
 
         reputationDelta += Math.abs(user.reputation - reputation);
         user.reputation = reputation;
-        user.score = (user.up - user.down) * reputation;
+
+        if (reputation > 0) {
+            user.score = (user.up - user.down) * reputation;
+        } else {
+            user.score = user.up - user.down;
+        }
     });
 
     return reputationDelta;
-}
-
-function calculateScoresOld(useRandomWeight) {
-    items.forEach(function(item) {
-        item.score = INIT_ITEM_SCORE;
-        item.upvoteWeight = 0;
-        item.downvoteWeight = 0;
-    });
-
-    users.forEach(function(user) {
-        for (var i = 0; i < NUM_ITEMS; i++) {
-            var vote = user.votes[i];
-
-            if (vote.dir === 0) {
-                continue;
-            }
-
-            var randomWeight = 0;
-
-            if (useRandomWeight) {
-                randomWeight = Math.random() * RANDOM_WEIGHT;
-            }
-
-            if (vote.dir === 1) {
-                items[i].upvoteWeight += (user.reputation + randomWeight);
-            } else {
-                items[i].downvoteWeight += (user.reputation + randomWeight);
-            }
-        }
-    });
-
-    items.forEach(function(item) {
-        item.score = item.upvoteWeight / (item.upvoteWeight + item.downvoteWeight);
-    });
-
-    var totalDelta = 0.0;
-    var totalReputation = 0.0;
-
-    users.forEach(function(user) {
-        user.score = 0;
-        user.up = 0;
-        user.down = 0;
-
-        for (var i = 0; i < NUM_ITEMS; i++) {
-            var vote = user.votes[i];
-
-            if (vote.dir === 0) {
-                continue;
-            }
-
-            var deltaScore = (items[i].score - vote.score) * vote.dir;
-
-            if (deltaScore >= 0) {
-                user.up += deltaScore;
-            } else {
-                user.down += (deltaScore * -1);
-            }
-        }
-
-        var reputation = 0;
-
-        if (user.up === 0) {
-            reputation = 0;
-        } else {
-            reputation = user.up / (user.up + user.down);
-        }
-
-        reputation = (reputation - 0.5) * 2;
-
-        if (reputation < 0) {
-            reputation = 0;
-        }
-
-        totalReputation += reputation;
-        totalDelta += Math.abs(user.reputation - reputation);
-        user.reputation = reputation;
-        user.score = (user.up - user.down) * reputation;
-    });
-
-    console.log(totalReputation);
-
-    return totalDelta;
 }
 
 function calculateScoreError() {
@@ -350,13 +260,13 @@ function calculateScoreError() {
 function scoreConverge() {
     var epochs = 1;
     var scoreDelta = calculateItemScores();
-    var reputationDelta = calculateUserRepuations();
+    var reputationDelta = calculateUserReputations();
 
     while (scoreDelta > DELTA_EPSILON && reputationDelta > DELTA_EPSILON && epochs < 1000) {
         epochs++;
 
         scoreDelta = calculateItemScores();
-        reputationDelta = calculateUserRepuations();
+        reputationDelta = calculateUserReputations();
 
         if (epochs % 10 === 0) {
             console.log("Epoch: " + epochs);
@@ -508,17 +418,7 @@ stdin.on( 'data', function( key ){
     // write the key to stdout all normal like
     process.stdout.write( key );
 
-    if (key === 'v') {
-        placeVotesByQuality();
-        resetUserReputation();
-        var delta = calculateScoresOld();
-        print();
-        console.log('Delta: ' + delta);
-    } else if (key === 'i') {
-        var newDelta = calculateScoresOld();
-        print();
-        console.log('Delta: ' + newDelta);
-    } else if (key === 'a') {
+    if (key === 'a') {
         placeVotesByTypeWithNoise();
         //resetUserReputation();
         var epochs = scoreConverge();
