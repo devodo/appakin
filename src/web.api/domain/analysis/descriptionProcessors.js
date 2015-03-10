@@ -402,7 +402,7 @@ function removeHeaderSentencesBeforeAlreadyRemovedLists(description) {
             } else {
                 previousHeaderSentence = null;
             }
-        })
+        });
     });
 }
 
