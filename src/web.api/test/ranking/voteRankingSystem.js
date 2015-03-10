@@ -2,20 +2,18 @@
 
 var NUM_ITEMS = 100;
 var NUM_USERS = 100;
-var VOTE_PROBABILITY = 0.1;
+var VOTE_PROBABILITY = 0.05;
 var INIT_ITEM_SCORE = 0.5;
-var PERCENT_GOOD_USER = 0.9;
+var PERCENT_GOOD_USER = 1.0;
 var PERCENT_NEUTRAL_USER = 0.0;
 var DELTA_EPSILON = 0.000001;
+var VOTE_COST = 0.0;
 
 var INIT_DAMPER = 1;
 
 var users = [];
 var items = [];
 
-function getRandomInt(min, max) {
-    return Math.floor(Math.random() * (max - min)) + min;
-}
 
 function getRandomBool(probability) {
     return Math.random() < probability;
@@ -32,6 +30,9 @@ function initItems() {
 }
 
 function initUsers() {
+    var goodCount = 0;
+    var badCount = 0;
+
     for (var i = 0; i < NUM_USERS; i++) {
         var votes = [];
         for (var j = 0; j < NUM_ITEMS; j++) {
@@ -43,16 +44,27 @@ function initUsers() {
         var isNeutral = getRandomBool(PERCENT_NEUTRAL_USER);
         var isGood = getRandomBool(PERCENT_GOOD_USER);
 
+        if (!isNeutral) {
+            if (isGood) {
+                goodCount++;
+            } else {
+                badCount++;
+            }
+        }
+
         users.push({
             name: 'user:' + i,
             score: 0,
             reputation: 1.0,
-            quality: Math.random() * 0.0 + 1.0,
+            quality: Math.random() * 1.0 + 0.0,
             isNeutral: isNeutral,
             isGood: isGood,
             votes: votes
         });
     }
+
+    console.log('Good: ' + goodCount);
+    console.log('Bad: ' + badCount);
 }
 
 function placeVotesByQuality() {
@@ -86,10 +98,6 @@ function placeVotesByTypeWithNoise() {
         for (var i = 0; i < NUM_ITEMS; i++) {
             var vote = user.votes[i];
 
-            if (vote.dir !== 0) {
-                continue;
-            }
-
             if (getRandomBool(VOTE_PROBABILITY)) {
                 var isUpVote;
 
@@ -106,8 +114,42 @@ function placeVotesByTypeWithNoise() {
                     }
                 }
 
+                var scoreCarry = 0;
+                if (vote.dir !== 0) {
+                    if ((vote.dir === 1 && isUpVote) || (vote.dir === -1 && !isUpVote)) {
+                        continue;
+                    }
+
+                    var upvoteWeight = items[i].upvoteWeight;
+                    var downvoteWeight = items[i].downvoteWeight;
+
+                    if (vote.dir === 1) {
+                        upvoteWeight -= user.reputation;
+                    } else {
+                        downvoteWeight -= user.reputation;
+                    }
+
+                    var itemScore = (upvoteWeight + INIT_DAMPER) /
+                        (upvoteWeight + downvoteWeight + INIT_DAMPER);
+
+                    var scoreDiff = (items[i].score - vote.score) * vote.dir;
+
+                    // Remove user influence from score carry
+                    scoreCarry = (scoreDiff - VOTE_COST);
+
+                    console.log('Old vote score: ' + vote.score);
+                    console.log('Old vote dir: ' + vote.dir);
+                    console.log('Score carry: ' + scoreCarry);
+                }
+
                 vote.dir = isUpVote ? 1 : -1;
-                vote.score = items[i].score;
+                vote.score = items[i].score + (scoreCarry * vote.dir * -1);
+
+                console.log('Item score: ' + items[i].score);
+                console.log('Item quality: ' + items[i].quality);
+                console.log('New vote score: ' + vote.score);
+                console.log('New vote dir: ' + vote.dir);
+                console.log('-------------------------');
             }
         }
     });
@@ -115,7 +157,13 @@ function placeVotesByTypeWithNoise() {
 
 function resetUserReputation() {
     users.forEach(function(user) {
-        user.reputation = 1.0;
+        user.reputation = 0.5;
+    });
+}
+
+function resetRandomUserReputation() {
+    users.forEach(function(user) {
+        user.reputation = Math.random();
     });
 }
 
@@ -134,9 +182,9 @@ function calculateItemScores() {
             }
 
             if (vote.dir === 1) {
-                items[i].upvoteWeight += (user.reputation);
+                items[i].upvoteWeight += user.reputation;
             } else {
-                items[i].downvoteWeight += (user.reputation);
+                items[i].downvoteWeight += user.reputation;
             }
         }
     });
@@ -168,6 +216,20 @@ function calculateUserReputations() {
             if (vote.dir === 0) {
                 continue;
             }
+
+            var item = items[i];
+
+            var upvoteWeight = item.upvoteWeight;
+            var downvoteWeight = item.downvoteWeight;
+
+            if (vote.dir === 1) {
+                upvoteWeight -= user.reputation;
+            } else {
+                downvoteWeight -= user.reputation;
+            }
+
+            var itemScore = (upvoteWeight + INIT_DAMPER) /
+                (upvoteWeight + downvoteWeight + INIT_DAMPER);
 
             var scoreDiff = (items[i].score - vote.score) * vote.dir;
 
