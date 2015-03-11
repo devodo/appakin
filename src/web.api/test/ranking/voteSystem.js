@@ -1,20 +1,43 @@
 'use strict';
 
 var NUM_ITEMS = 100;
-var NUM_USERS = 1000;
+var NUM_USERS = 100;
+var INIT_REPUTATION = 1 / NUM_USERS;
 var VOTE_PROBABILITY = 0.05;
-var INIT_ITEM_SCORE = 100;
-var PERCENT_GOOD_USER = 0.9;
-var PERCENT_NEUTRAL_USER = 0.5;
-var REPUTATION_GROWTH = 0.2;
-var SCORE_SCALING_POWER = 0.5;
+var INIT_ITEM_SCORE = 0;
+var PERCENT_GOOD_USER = 1.0;
+var PERCENT_NOISE_USER = 0.0;
+var DELTA_EPSILON = 0.000001;
+var VOTE_COST = 0.0;
+
+var INIT_DAMPER = 1;
 
 var users = [];
 var items = [];
 
-function getRandomInt(min, max) {
-    return Math.floor(Math.random() * (max - min)) + min;
-}
+var User = function(name, quality, isGood, isNoise) {
+    this.name = name;
+    this.quality = quality;
+    this.isGood = isGood;
+    this.isNoise = isNoise;
+    this.votes = [];
+    this.voteCount = 0;
+    this.reputation = INIT_REPUTATION;
+    this.score = 0;
+
+    for (var j = 0; j < NUM_ITEMS; j++) {
+        this.votes[j] = {
+            dir: 0
+        };
+    }
+};
+
+var Item = function(name, quality) {
+    this.name = name;
+    this.quality = quality;
+    this.score = INIT_ITEM_SCORE;
+};
+
 
 function getRandomBool(probability) {
     return Math.random() < probability;
@@ -22,137 +45,139 @@ function getRandomBool(probability) {
 
 function initItems() {
     for (var i = 0; i < NUM_ITEMS; i++) {
-        items.push({
-            name: 'app:' + i,
-            quality: Math.random(),
-            score: INIT_ITEM_SCORE
-        });
+        items.push(
+            new Item('app:' + i, Math.random()));
     }
 }
 
 function initUsers() {
-    for (var i = 0; i < NUM_USERS; i++) {
-        var votes = [];
-        for (var j = 0; j < NUM_ITEMS; j++) {
-            votes[j] = {
-                dir: 0
-            };
-        }
+    var goodCount = 0;
+    var badCount = 0;
+    var noiseCount = 0;
 
-        var isNeutral = getRandomBool(PERCENT_NEUTRAL_USER);
+    for (var i = 0; i < NUM_USERS; i++) {
+        var quality = Math.random() * 0.5 + 0.5;
         var isGood = getRandomBool(PERCENT_GOOD_USER);
 
-        users.push({
-            name: 'user:' + i,
-            score: 0,
-            reputation: 0.5,
-            quality: Math.random(),
-            isNeutral: isNeutral,
-            isGood: isGood,
-            votes: votes
-        });
+        var isNoise = getRandomBool(PERCENT_NOISE_USER);
+
+        if (isNoise) {
+            quality = 0.5;
+            isGood = true;
+            noiseCount++;
+        } else {
+            if (isGood) {
+                goodCount++;
+            } else {
+                badCount++;
+            }
+        }
+
+        var user = new User('user:' + i, quality, isGood, isNoise);
+        users.push(user);
     }
+
+    console.log('Good: ' + goodCount);
+    console.log('Bad: ' + badCount);
+    console.log('Noise: ' + noiseCount);
 }
 
-function placeVotesByQuality() {
-    users.forEach(function(user) {
-        for (var i = 0; i < NUM_ITEMS; i++) {
-            var vote = user.votes[i];
+User.prototype.getVoteWeight = function() {
+    return this.reputation / this.voteCount;
+};
 
-            if (vote.dir !== 0) {
-                continue;
-            }
+User.prototype.getItemScore = function(itemIndex) {
+    var self = this;
 
-            if (getRandomBool(VOTE_PROBABILITY)) {
-                var goodApp = getRandomBool(items[i].quality);
-                var smartUser = getRandomBool(user.quality);
+    var vote = self.votes[itemIndex];
+    var item = items[itemIndex];
 
-                if (!smartUser && getRandomBool(0.5)) {
-                    goodApp = !goodApp;
-                }
+    //if (!vote) {
+        return item.score;
+    //}
 
-                vote.dir = goodApp ? 1 : -1;
+    var upvoteWeight = item.upvoteWeight;
+    var downvoteWeight = item.downvoteWeight;
 
-                vote.score = items[i].score;
-            }
-        }
-    });
-}
+    if (vote.dir === 1) {
+        upvoteWeight -= self.reputation;
+    } else {
+        downvoteWeight -= self.reputation;
+    }
 
-function placeVotesByType() {
-    users.forEach(function(user) {
-        for (var i = 0; i < NUM_ITEMS; i++) {
-            var vote = user.votes[i];
+    var itemScore = (upvoteWeight + INIT_DAMPER) /
+        (upvoteWeight + downvoteWeight + INIT_DAMPER);
 
-            if (vote.dir !== 0) {
-                continue;
-            }
+    return itemScore;
+};
 
-            if (getRandomBool(VOTE_PROBABILITY)) {
-                var isUpVote;
+User.prototype.placeVotes = function() {
+    var self = this;
+    for (var i = 0; i < NUM_ITEMS; i++) {
+        var item = items[i];
+        var vote = self.votes[i];
 
-                if ((!user.isNeutral && user.isGood) || (user.isNeutral && getRandomBool(user.quality))) {
-                    isUpVote = getRandomBool(items[i].quality);
+        if (getRandomBool(VOTE_PROBABILITY)) {
+            var itemScore = self.getItemScore(i);
+
+            var isUpVote;
+
+            if (self.isNoise) {
+                isUpVote = getRandomBool(0.5);
+            } else {
+                var diff = item.quality - itemScore;
+                var shouldUpVote = diff > 0;
+
+                if (self.isGood && getRandomBool(self.quality)) {
+                    isUpVote = shouldUpVote;
                 } else {
-                    isUpVote = getRandomBool(1.0 - items[i].quality);
+                    isUpVote = !shouldUpVote;
                 }
-
-                vote.dir = isUpVote ? 1 : -1;
-                vote.score = items[i].score;
             }
-        }
-    });
-}
 
-function placeVotesByTypeWithNoise() {
-    users.forEach(function(user) {
-        for (var i = 0; i < NUM_ITEMS; i++) {
-            var vote = user.votes[i];
-
+            var scoreCarry = 0;
             if (vote.dir !== 0) {
-                continue;
-            }
-
-            if (getRandomBool(VOTE_PROBABILITY)) {
-                var isUpVote;
-
-                if (user.isNeutral) {
-                    isUpVote = getRandomBool(0.5);
-                } else if (user.isGood) {
-                    isUpVote = getRandomBool(items[i].quality);
-                } else {
-                    isUpVote = getRandomBool(1.0 - items[i].quality);
+                if ((vote.dir === 1 && isUpVote) || (vote.dir === -1 && !isUpVote)) {
+                    continue;
                 }
 
-                vote.dir = isUpVote ? 1 : -1;
-                vote.score = items[i].score;
+                var scoreDiff = (itemScore - vote.score) * vote.dir;
+                scoreCarry = (scoreDiff - VOTE_COST);
+
+                console.log('Old vote score: ' + vote.score);
+                console.log('Old vote dir: ' + vote.dir);
+                console.log('Score carry: ' + scoreCarry);
+            } else {
+                self.voteCount++;
             }
+
+            vote.dir = isUpVote ? 1 : -1;
+            vote.score = items[i].score + (scoreCarry * vote.dir * -1);
+
+            console.log('Item score: ' + itemScore);
+            console.log('Item quality: ' + item.quality);
+            console.log('New vote score: ' + vote.score);
+            console.log('New vote dir: ' + vote.dir);
+            console.log('-------------------------');
         }
-    });
-}
+    }
+};
 
 function resetUserReputation() {
     users.forEach(function(user) {
-        user.reputation = 1.0;
+        user.reputation = INIT_REPUTATION;
     });
 }
 
-function scaleScore(score) {
-    var scaledScore = Math.pow(Math.abs(score), SCORE_SCALING_POWER);
-
-    if (score < 0) {
-        scaledScore *= -1;
-    }
-
-    return scaledScore;
-}
-
-function calculateScores(usePercent) {
+function calculateItemScores() {
     items.forEach(function(item) {
-        item.score = INIT_ITEM_SCORE;
+        item.upvoteWeight = 0;
+        item.downvoteWeight = 0;
     });
 
     users.forEach(function(user) {
+        var voteWeight = user.getVoteWeight();
+
         for (var i = 0; i < NUM_ITEMS; i++) {
             var vote = user.votes[i];
 
@@ -160,12 +185,37 @@ function calculateScores(usePercent) {
                 continue;
             }
 
-            items[i].score += (vote.dir * user.reputation);
+            if (vote.dir === 1) {
+                items[i].upvoteWeight += voteWeight;
+            } else {
+                items[i].downvoteWeight += voteWeight;
+            }
         }
     });
+
+    var scoreDelta = 0;
+
+    items.forEach(function(item) {
+        var score = 0;
+        if (item.upvoteWeight > 0) {
+            score = item.upvoteWeight / (item.upvoteWeight + item.downvoteWeight);
+        }
+
+        scoreDelta += Math.abs(item.score - score);
+        item.score = score;
+    });
+
+    return scoreDelta;
+}
+
+function calculateUserReputations() {
+    var reputationDelta = 0;
+    var totalScore = 0;
 
     users.forEach(function(user) {
         user.score = 0;
+        user.up = 0;
+        user.down = 0;
 
         for (var i = 0; i < NUM_ITEMS; i++) {
             var vote = user.votes[i];
@@ -174,56 +224,36 @@ function calculateScores(usePercent) {
                 continue;
             }
 
-            var deltaScore = scaleScore(items[i].score) - scaleScore(vote.score);
-            user.score += (deltaScore * vote.dir);
-        }
-    });
+            var itemScore = user.getItemScore(i);
+            var scoreDiff = (itemScore - vote.score) * vote.dir;
+            user.score += scoreDiff;
 
-    var totalUsers = NUM_USERS;
-    var totalDelta = 0;
-    var maxScore = 0;
-    users.forEach(function(user) {
-        if (user.score <= 0) {
-            totalDelta += Math.abs(user.reputation);
-            user.reputation = 0;
-            totalUsers--;
-            return;
-        }
-
-        if (user.score > maxScore) {
-            maxScore = user.score;
-        }
-    });
-
-    users.forEach(function(user) {
-        if (user.score <= 0) {
-            return;
-        }
-
-        // Must ignore users with score below 0
-        // so user resets have no impact
-        var percentileCount = -1;
-        for (var i = 0; i < NUM_USERS; i++) {
-            if (users[i].score >= user.score) {
-                percentileCount++;
+            if (scoreDiff >= 0) {
+                user.up += scoreDiff;
+            } else {
+                user.down += scoreDiff;
             }
         }
 
-        var reputation;
+        user.down *= -1;
 
-        if (usePercent) {
-            //reputation = user.score / maxScore;
-            reputation = (1 - Math.exp(user.score * -REPUTATION_GROWTH));
-            console.log(reputation);
-        } else {
-            reputation = 1.0 - (percentileCount/totalUsers);
+        if (user.score > 0) {
+            totalScore += user.score;
+        }
+    });
+
+    users.forEach(function(user) {
+        var reputation = 0;
+
+        if (user.score > 0) {
+            reputation = user.score / totalScore;
         }
 
-        totalDelta += Math.abs(user.reputation - reputation);
+        reputationDelta += Math.abs(user.reputation - reputation);
         user.reputation = reputation;
     });
 
-    return totalDelta;
+    return reputationDelta;
 }
 
 function calculateScoreError() {
@@ -257,7 +287,7 @@ function calculateScoreError() {
 
     var scoreError = 0;
     itemsCopy.forEach(function(item, i) {
-        var diff = 10 * Math.abs(testCopy[i].quality - item.quality);
+        var diff = testCopy[i].quality - item.quality;
         scoreError += (diff * diff);
     });
 
@@ -269,7 +299,7 @@ function calculateScoreError() {
 
     var voteError = 0;
     itemsCopy.forEach(function(item, i) {
-        var diff = 10 * Math.abs(testCopy[i].quality - item.quality);
+        var diff = testCopy[i].quality - item.quality;
         voteError += (diff * diff);
     });
 
@@ -280,18 +310,24 @@ function calculateScoreError() {
     };
 }
 
-function scoreConverge(usePercent) {
+function scoreConverge() {
     var epochs = 1;
-    var aDelta = calculateScores(usePercent);
-    while (aDelta > 0 && epochs < 2000) {
+    var scoreDelta = calculateItemScores();
+    var reputationDelta = calculateUserReputations();
+
+    while (scoreDelta > DELTA_EPSILON && reputationDelta > DELTA_EPSILON && epochs < 1000) {
         epochs++;
-        aDelta = calculateScores(usePercent);
+
+        scoreDelta = calculateItemScores();
+        reputationDelta = calculateUserReputations();
+
         if (epochs % 10 === 0) {
             console.log("Epoch: " + epochs);
         }
 
         if (epochs > 500) {
-            console.log("Delta: " + aDelta);
+            console.log("Score delta: " + scoreDelta);
+            console.log("Reputation delta: " + reputationDelta);
         }
     }
 
@@ -306,12 +342,20 @@ function printUsers() {
     });
 }
 
-function printUsersSorted(num) {
+function printUsersSorted(num, isAsc) {
     console.log('users-----------------------');
 
-    var sortedUser = users.slice(0).sort(function (a, b) {
+    var sortFunc = function (a, b) {
         return b.score - a.score;
-    });
+    };
+
+    if (isAsc) {
+        sortFunc = function (a, b) {
+            return a.score - b.score;
+        };
+    }
+
+    var sortedUser = users.slice(0).sort(sortFunc);
 
     sortedUser.slice(0, num).forEach(function(user) {
         var voteQuality = 0;
@@ -326,7 +370,7 @@ function printUsersSorted(num) {
 
         console.log('name: ' + user.name);
         console.log('score: ' + user.score);
-        console.log('is neutral: ' + user.isNeutral);
+        console.log('is noise: ' + user.isNoise);
         console.log('is good: ' + user.isGood);
         console.log('user quality: ' + user.quality);
         console.log('vote quality: ' + voteQuality);
@@ -335,7 +379,7 @@ function printUsersSorted(num) {
     });
 }
 
-function printItemsSorted(num) {
+function printItemsSorted(num, isAsc) {
     console.log('items-----------------------');
     var sortedItems = [];
 
@@ -358,9 +402,17 @@ function printItemsSorted(num) {
         });
     }
 
-    sortedItems.sort(function (a, b) {
+    var sortFunc = function (a, b) {
         return b.item.score - a.item.score;
-    });
+    };
+
+    if (isAsc) {
+        sortFunc = function (a, b) {
+            return a.item.score - b.item.score;
+        };
+    }
+
+    sortedItems.sort(sortFunc);
 
     sortedItems.slice(0, num).forEach(function(item) {
         console.log('name: ' + item.item.name);
@@ -397,8 +449,6 @@ function print() {
 initItems();
 initUsers();
 
-var usePercent = false;
-
 
 var stdin = process.stdin;
 
@@ -421,33 +471,25 @@ stdin.on( 'data', function( key ){
     // write the key to stdout all normal like
     process.stdout.write( key );
 
-    if (key === 'v') {
-        placeVotesByQuality();
-        resetUserReputation();
-        var delta = calculateScores(usePercent);
-        print();
-        console.log('Delta: ' + delta);
-    } else if (key === 'i') {
-        var newDelta = calculateScores(usePercent);
-        print();
-        console.log('Delta: ' + newDelta);
-    } else if (key === 'a') {
-        placeVotesByTypeWithNoise();
-        resetUserReputation();
-        var epochs = scoreConverge(usePercent);
+    if (key === 'a') {
+        users.forEach(function(user) {
+            user.placeVotes();
+        });
+
+        //resetUserReputation();
+        var epochs = scoreConverge();
         console.log('Epochs: ' + epochs);
     } else if (key === 'p') {
-        printUsersSorted(10);
+        print();
+    } else if (key === 'u') {
+        printUsersSorted(100);
     } else if (key === 'l') {
-        printItemsSorted(10);
+        printItemsSorted(100);
     } else if (key === 'x') {
         resetUserReputation();
-        console.log('Epochs: ' + scoreConverge(usePercent));
+        console.log('Epochs: ' + scoreConverge());
     } else if (key === 'e') {
         printErrors();
-    } else if (key === 't') {
-        usePercent = !usePercent;
-        console.log('Use percent: ' + usePercent);
     }
 });
 
