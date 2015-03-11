@@ -4,19 +4,19 @@ var NUM_ITEMS = 100;
 var NUM_USERS = 100;
 var INIT_REPUTATION = 1 / NUM_USERS;
 var VOTE_PROBABILITY = 0.05;
-var INIT_ITEM_SCORE = 0;
 var PERCENT_GOOD_USER = 1.0;
 var PERCENT_NOISE_USER = 0.0;
 var DELTA_EPSILON = 0.000001;
 var VOTE_COST = 0.0;
 
-var INIT_DAMPER = 1;
+var ITEM_INIT_VOTE_WEIGHT = INIT_REPUTATION * 10 / NUM_ITEMS;
 
 var users = [];
 var items = [];
 
-var User = function(name, quality, isGood, isNoise) {
-    this.name = name;
+var User = function(index, quality, isGood, isNoise) {
+    this.index = index;
+    this.name = 'user:' + index;
     this.quality = quality;
     this.isGood = isGood;
     this.isNoise = isNoise;
@@ -26,18 +26,30 @@ var User = function(name, quality, isGood, isNoise) {
     this.score = 0;
 
     for (var j = 0; j < NUM_ITEMS; j++) {
-        this.votes[j] = {
-            dir: 0
-        };
+        this.votes[j] = null;
     }
 };
 
-var Item = function(name, quality) {
-    this.name = name;
+var Item = function(index, quality) {
+    this.index = index;
+    this.name = 'app:' + index;
     this.quality = quality;
-    this.score = INIT_ITEM_SCORE;
+    this.upvoteWeight = ITEM_INIT_VOTE_WEIGHT;
+    this.downvoteWeight = ITEM_INIT_VOTE_WEIGHT;
+    this.score = this.upvoteWeight / (this.upvoteWeight + this.downvoteWeight);
+
+    this.votes = [];
+    this.voteCount = 0;
+
+    for (var j = 0; j < NUM_USERS; j++) {
+        this.votes[j] = null;
+    }
 };
 
+var Vote = function(item, user) {
+    this.item = item;
+    this.user = user;
+};
 
 function getRandomBool(probability) {
     return Math.random() < probability;
@@ -46,7 +58,7 @@ function getRandomBool(probability) {
 function initItems() {
     for (var i = 0; i < NUM_ITEMS; i++) {
         items.push(
-            new Item('app:' + i, Math.random()));
+            new Item(i, Math.random()));
     }
 }
 
@@ -56,7 +68,7 @@ function initUsers() {
     var noiseCount = 0;
 
     for (var i = 0; i < NUM_USERS; i++) {
-        var quality = Math.random() * 0.5 + 0.5;
+        var quality = Math.random() * 1.0 + 0.0;
         var isGood = getRandomBool(PERCENT_GOOD_USER);
 
         var isNoise = getRandomBool(PERCENT_NOISE_USER);
@@ -73,7 +85,7 @@ function initUsers() {
             }
         }
 
-        var user = new User('user:' + i, quality, isGood, isNoise);
+        var user = new User(i, quality, isGood, isNoise);
         users.push(user);
     }
 
@@ -82,33 +94,141 @@ function initUsers() {
     console.log('Noise: ' + noiseCount);
 }
 
+Vote.prototype.getScoreExcludingVote = function() {
+    var self = this;
+
+    return self.item.getScoreExcludingVote(self);
+};
+
 User.prototype.getVoteWeight = function() {
     return this.reputation / this.voteCount;
 };
 
-User.prototype.getItemScore = function(itemIndex) {
+User.prototype.addVote = function(vote) {
     var self = this;
 
-    var vote = self.votes[itemIndex];
-    var item = items[itemIndex];
-
-    //if (!vote) {
-        return item.score;
-    //}
-
-    var upvoteWeight = item.upvoteWeight;
-    var downvoteWeight = item.downvoteWeight;
-
-    if (vote.dir === 1) {
-        upvoteWeight -= self.reputation;
-    } else {
-        downvoteWeight -= self.reputation;
+    if (self.votes[vote.item.index]) {
+        throw "Vote already added";
     }
 
-    var itemScore = (upvoteWeight + INIT_DAMPER) /
-        (upvoteWeight + downvoteWeight + INIT_DAMPER);
+    self.voteCount++;
+    self.votes[vote.item.index] = vote;
+};
 
-    return itemScore;
+Item.prototype.addVote = function(vote) {
+    var self = this;
+
+    if (self.votes[vote.user.index]) {
+        throw "Vote already added";
+    }
+
+    var voteWeight = vote.user.getVoteWeight();
+
+    if (vote.dir === 1) {
+        self.upvoteWeight += voteWeight;
+    } else {
+        self.downvoteWeight += voteWeight;
+    }
+
+    self.score = self.upvoteWeight / (self.upvoteWeight + self.downvoteWeight);
+
+    self.voteCount++;
+    self.votes[vote.user.index] = vote;
+};
+
+Item.prototype.removeVote = function(vote) {
+    var self = this;
+
+    if (!self.votes[vote.user.index]) {
+        throw "Error attempt to remove vote that does not exist";
+    }
+
+    var voteWeight = vote.user.getVoteWeight();
+
+    if (vote.dir === 1) {
+        self.upvoteWeight -= voteWeight;
+    } else {
+        self.downvoteWeight -= voteWeight;
+    }
+
+    self.score = self.upvoteWeight / (self.upvoteWeight + self.downvoteWeight);
+    self.votes[vote.user.index] = null;
+};
+
+Item.prototype.getScoreExcludingVote = function(vote) {
+    var self = this;
+
+    if (!vote) {
+        return self.score;
+    }
+
+    var voteWeight = vote.user.getVoteWeight();
+    var upvoteWeight = self.upvoteWeight;
+    var downvoteWeight = self.downvoteWeight;
+
+    if (vote.dir === 1) {
+        upvoteWeight -= voteWeight;
+    } else {
+        downvoteWeight -= voteWeight;
+    }
+
+    return upvoteWeight / (upvoteWeight + downvoteWeight);
+};
+
+Item.prototype.recalculateScore = function() {
+    var self = this;
+
+    self.upvoteWeight = ITEM_INIT_VOTE_WEIGHT;
+    self.downvoteWeight = ITEM_INIT_VOTE_WEIGHT;
+
+    for (var i = 0; i < NUM_USERS; i++) {
+        var vote = self.votes[i];
+
+        if (!vote) {
+            continue;
+        }
+
+        var voteWeight = vote.user.getVoteWeight();
+
+        if (vote.dir === 1) {
+            self.upvoteWeight += voteWeight;
+        } else {
+            self.downvoteWeight += voteWeight;
+        }
+    }
+
+    var score = self.upvoteWeight / (self.upvoteWeight + self.downvoteWeight);
+    var scoreDelta = Math.abs(self.score - score);
+    self.score = score;
+
+    return scoreDelta;
+};
+
+User.prototype.recalculateScore = function() {
+    var self = this;
+
+    self.score = 0;
+    self.up = 0;
+    self.down = 0;
+
+    for (var i = 0; i < NUM_ITEMS; i++) {
+        var vote = self.votes[i];
+
+        if (!vote) {
+            continue;
+        }
+
+        var scoreDiff = (vote.item.score - vote.score) * vote.dir;
+        self.score += scoreDiff;
+
+        if (scoreDiff >= 0) {
+            self.up += scoreDiff;
+        } else {
+            self.down -= scoreDiff;
+        }
+    }
+
+    return self.score;
 };
 
 User.prototype.placeVotes = function() {
@@ -116,16 +236,15 @@ User.prototype.placeVotes = function() {
     for (var i = 0; i < NUM_ITEMS; i++) {
         var item = items[i];
         var vote = self.votes[i];
+        var originalItemScore = item.score;
 
         if (getRandomBool(VOTE_PROBABILITY)) {
-            var itemScore = self.getItemScore(i);
-
             var isUpVote;
 
             if (self.isNoise) {
                 isUpVote = getRandomBool(0.5);
             } else {
-                var diff = item.quality - itemScore;
+                var diff = item.quality - item.score;
                 var shouldUpVote = diff > 0;
 
                 if (self.isGood && getRandomBool(self.quality)) {
@@ -136,25 +255,29 @@ User.prototype.placeVotes = function() {
             }
 
             var scoreCarry = 0;
-            if (vote.dir !== 0) {
+            if (vote) {
                 if ((vote.dir === 1 && isUpVote) || (vote.dir === -1 && !isUpVote)) {
                     continue;
                 }
 
-                var scoreDiff = (itemScore - vote.score) * vote.dir;
+                var scoreDiff = (item.score - vote.score) * vote.dir;
                 scoreCarry = (scoreDiff - VOTE_COST);
+                item.removeVote(vote);
 
                 console.log('Old vote score: ' + vote.score);
                 console.log('Old vote dir: ' + vote.dir);
                 console.log('Score carry: ' + scoreCarry);
             } else {
-                self.voteCount++;
+                vote = new Vote(item, self);
+                self.addVote(vote);
             }
 
             vote.dir = isUpVote ? 1 : -1;
-            vote.score = items[i].score + (scoreCarry * vote.dir * -1);
+            item.addVote(vote);
+            vote.score = item.score + (scoreCarry * vote.dir * -1);
 
-            console.log('Item score: ' + itemScore);
+            console.log('Original item score: ' + originalItemScore);
+            console.log('New item score: ' + item.score);
             console.log('Item quality: ' + item.quality);
             console.log('New vote score: ' + vote.score);
             console.log('New vote dir: ' + vote.dir);
@@ -170,39 +293,10 @@ function resetUserReputation() {
 }
 
 function calculateItemScores() {
-    items.forEach(function(item) {
-        item.upvoteWeight = 0;
-        item.downvoteWeight = 0;
-    });
-
-    users.forEach(function(user) {
-        var voteWeight = user.getVoteWeight();
-
-        for (var i = 0; i < NUM_ITEMS; i++) {
-            var vote = user.votes[i];
-
-            if (vote.dir === 0) {
-                continue;
-            }
-
-            if (vote.dir === 1) {
-                items[i].upvoteWeight += voteWeight;
-            } else {
-                items[i].downvoteWeight += voteWeight;
-            }
-        }
-    });
-
     var scoreDelta = 0;
 
     items.forEach(function(item) {
-        var score = 0;
-        if (item.upvoteWeight > 0) {
-            score = item.upvoteWeight / (item.upvoteWeight + item.downvoteWeight);
-        }
-
-        scoreDelta += Math.abs(item.score - score);
-        item.score = score;
+        scoreDelta += item.recalculateScore();
     });
 
     return scoreDelta;
@@ -213,32 +307,10 @@ function calculateUserReputations() {
     var totalScore = 0;
 
     users.forEach(function(user) {
-        user.score = 0;
-        user.up = 0;
-        user.down = 0;
+        var score = user.recalculateScore();
 
-        for (var i = 0; i < NUM_ITEMS; i++) {
-            var vote = user.votes[i];
-
-            if (vote.dir === 0) {
-                continue;
-            }
-
-            var itemScore = user.getItemScore(i);
-            var scoreDiff = (itemScore - vote.score) * vote.dir;
-            user.score += scoreDiff;
-
-            if (scoreDiff >= 0) {
-                user.up += scoreDiff;
-            } else {
-                user.down += scoreDiff;
-            }
-        }
-
-        user.down *= -1;
-
-        if (user.score > 0) {
-            totalScore += user.score;
+        if (score > 0) {
+            totalScore += score;
         }
     });
 
@@ -265,6 +337,10 @@ function calculateScoreError() {
         var downvotes = 0;
 
         for (var j = 0; j < NUM_USERS; j++) {
+            if (!users[j].votes[i]) {
+                continue;
+            }
+
             if (users[j].votes[i].dir === 1) {
                 upvotes++;
             } else if (users[j].votes[i].dir === -1) {
@@ -361,7 +437,7 @@ function printUsersSorted(num, isAsc) {
         var voteQuality = 0;
 
         for (var i = 0; i < NUM_ITEMS; i++) {
-            if (user.votes[i].dir === 0) {
+            if (!user.votes[i]) {
                 continue;
             }
 
@@ -388,6 +464,10 @@ function printItemsSorted(num, isAsc) {
         var downvotes = 0;
 
         for (var j = 0; j < NUM_USERS; j++) {
+            if (!users[j].votes[i]) {
+                continue;
+            }
+
             if (users[j].votes[i].dir === 1) {
                 upvotes++;
             } else if (users[j].votes[i].dir === -1) {
