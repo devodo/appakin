@@ -3,11 +3,12 @@
 var NUM_ITEMS = 100;
 var NUM_USERS = 100;
 var INIT_REPUTATION = 1 / NUM_USERS;
-var VOTE_PROBABILITY = 0.05;
-var PERCENT_GOOD_USER = 1.0;
-var PERCENT_NOISE_USER = 0.0;
+var VOTE_PROBABILITY = 0.1;
+var PERCENT_GOOD_USER = 0.9;
+var PERCENT_NOISE_USER = 0.2;
 var DELTA_EPSILON = 0.000001;
 var VOTE_COST = 0.0;
+var VOTE_BONUS = 0.01;
 
 var ITEM_INIT_VOTE_WEIGHT = INIT_REPUTATION * 10 / NUM_ITEMS;
 
@@ -68,7 +69,7 @@ function initUsers() {
     var noiseCount = 0;
 
     for (var i = 0; i < NUM_USERS; i++) {
-        var quality = Math.random() * 1.0 + 0.0;
+        var quality = Math.random() * 0.0 + 1.0;
         var isGood = getRandomBool(PERCENT_GOOD_USER);
 
         var isNoise = getRandomBool(PERCENT_NOISE_USER);
@@ -101,7 +102,8 @@ Vote.prototype.getScoreExcludingVote = function() {
 };
 
 User.prototype.getVoteWeight = function() {
-    return this.reputation / this.voteCount;
+    return this.reputation;
+    //return this.reputation / this.voteCount;
 };
 
 User.prototype.addVote = function(vote) {
@@ -245,6 +247,16 @@ User.prototype.placeVotes = function() {
                 isUpVote = getRandomBool(0.5);
             } else {
                 var diff = item.quality - item.score;
+
+                var certainty = Math.pow(Math.abs(diff), (1 - self.quality));
+                console.log('User quality: ' + self.quality);
+                console.log('Certainty: ' + certainty);
+
+                // Don't place/change vote if certainty is low
+                //if (!getRandomBool(certainty)) {
+                //    continue;
+                //}
+
                 var shouldUpVote = diff > 0;
 
                 if (self.isGood && getRandomBool(self.quality)) {
@@ -270,18 +282,35 @@ User.prototype.placeVotes = function() {
             } else {
                 vote = new Vote(item, self);
                 self.addVote(vote);
+                scoreCarry = VOTE_BONUS;
             }
 
             vote.dir = isUpVote ? 1 : -1;
             item.addVote(vote);
             vote.score = item.score + (scoreCarry * vote.dir * -1);
 
+            console.log('Item name: ' + item.name);
             console.log('Original item score: ' + originalItemScore);
             console.log('New item score: ' + item.score);
             console.log('Item quality: ' + item.quality);
             console.log('New vote score: ' + vote.score);
             console.log('New vote dir: ' + vote.dir);
             console.log('-------------------------');
+
+            // Will fail because a user vote weight changes if the user places a vote
+            // on another item.
+            /*
+            var checkScore = item.score;
+            var scoreDelta = item.recalculateScore();
+
+            if (scoreDelta > 0) {
+                throw "Score delta: " + scoreDelta;
+            }
+
+            if (checkScore !== item.score) {
+                throw "Score changed from " + checkScore + "to " + item.score;
+            }
+            */
         }
     }
 };
