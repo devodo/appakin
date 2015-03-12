@@ -1,9 +1,9 @@
 'use strict';
 
 var NUM_ITEMS = 100;
-var NUM_USERS = 100;
-var INIT_REPUTATION = 1 / NUM_USERS;
-var VOTE_PROBABILITY = 0.01;
+var NUM_USERS = 1000;
+var INIT_REPUTATION = 0.000001;
+var VOTE_PROBABILITY = 0.05;
 var PERCENT_GOOD_USER = 1.0;
 var PERCENT_NOISE_USER = 0.0;
 var DELTA_EPSILON = 0.000001;
@@ -11,7 +11,7 @@ var VOTE_COST = 0.0;
 var VOTE_BONUS = 0.0;
 var VOTE_COUNT_SCALE = 1.0;
 
-var ITEM_INIT_VOTE_WEIGHT = INIT_REPUTATION * NUM_USERS / 100;
+var ITEM_INIT_VOTE_WEIGHT = 10 / NUM_USERS;
 
 var users = [];
 var items = [];
@@ -72,7 +72,7 @@ function initUsers() {
     var noiseCount = 0;
 
     for (var i = 0; i < NUM_USERS; i++) {
-        var quality = Math.random() * 0.5 + 0.4;
+        var quality = Math.random() * 0.5 + 0.5;
         var isGood = getRandomBool(PERCENT_GOOD_USER);
 
         var isNoise = getRandomBool(PERCENT_NOISE_USER);
@@ -106,7 +106,6 @@ Vote.prototype.getScoreExcludingVote = function() {
 
 User.prototype.getVoteWeight = function() {
     return this.reputation;
-    //return this.reputation / this.voteCount;
 };
 
 User.prototype.addVote = function(vote) {
@@ -157,6 +156,7 @@ Item.prototype.removeVote = function(vote) {
     }
 
     self.score = self.upvoteWeight / (self.upvoteWeight + self.downvoteWeight);
+
     self.votes[vote.user.index] = null;
     self.voteCount--;
 };
@@ -262,7 +262,7 @@ User.prototype.placeVotes = function() {
             if (self.isNoise) {
                 isUpVote = getRandomBool(0.5);
             } else {
-                var certainty = Math.pow(Math.abs(diff), (1 - self.quality));
+                var certainty = Math.pow(Math.abs(diff), 1.0);
                 console.log('User quality: ' + self.quality);
                 console.log('Certainty: ' + certainty);
 
@@ -273,7 +273,7 @@ User.prototype.placeVotes = function() {
 
                 var shouldUpVote = diff > 0;
 
-                if (self.isGood && getRandomBool(self.quality)) {
+                if (self.isGood && getRandomBool(self.quality + certainty)) {
                     isUpVote = shouldUpVote;
                 } else {
                     isUpVote = !shouldUpVote;
@@ -286,9 +286,16 @@ User.prototype.placeVotes = function() {
                     continue;
                 }
 
-                var itemScoreExcludingVote = item.getScoreExcludingVote(vote);
-                var scoreDiff = (itemScoreExcludingVote - vote.score) * vote.dir;
+                var scoreDiff = (item.score - vote.score) * vote.dir;
                 scoreCarry = (scoreDiff - VOTE_COST);
+
+                // item score = 5
+                // place vote
+                // item score = 5
+                // vote score = 5
+
+
+                //sc = 1
 
                 //if (scoreCarry < 0 && Math.abs(scoreCarry) < Math.abs(diff)) {
                 //    continue;
@@ -306,8 +313,9 @@ User.prototype.placeVotes = function() {
             }
 
             vote.dir = isUpVote ? 1 : -1;
-            item.addVote(vote);
             vote.score = item.score + (scoreCarry * vote.dir * -1);
+            item.addVote(vote);
+
 
             console.log('Item name: ' + item.name);
             console.log('Original item score: ' + originalItemScore);
@@ -612,6 +620,29 @@ stdin.on( 'data', function( key ){
         printErrors();
     }
 });
+
+/*
+Issues:
+1.
+Users could collude and all vote at the same time in the same direction.
+They will all get the same vote score and when the system recalculates the item score
+it will move in the direction given by the users and they will all benefit.
+
+2.
+When a user toggles a vote the item score will change in the direction of the toggle and
+the user benefits. Potentially a user can keep on toggling their votes after each score refresh.
+
+3. Concurrency
+
+Solutions:
+We could update the item score in real-time after each vote. The effect of this is users will see
+how much their vote changes the score but a transparent system might be desirable.
+Unfortunately updating the item score in real-time appears to make the system unstable.
+
+Do not allow users to change their votes for an amount of time great enough to allow other
+users to counter vote and return the item score to the correct position.
+Assumes there are a lot of voters and they are precise enough.
+ */
 
 
 
