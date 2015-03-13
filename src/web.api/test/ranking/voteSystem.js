@@ -1,7 +1,7 @@
 'use strict';
 
 var NUM_ITEMS = 100;
-var NUM_USERS = 1000;
+var NUM_USERS = 100;
 var INIT_REPUTATION = 0.000001;
 var VOTE_PROBABILITY = 0.05;
 var PERCENT_GOOD_USER = 1.0;
@@ -72,7 +72,7 @@ function initUsers() {
     var noiseCount = 0;
 
     for (var i = 0; i < NUM_USERS; i++) {
-        var quality = Math.random() * 0.5 + 0.5;
+        var quality = Math.random() * 0.5 + 0.4;
         var isGood = getRandomBool(PERCENT_GOOD_USER);
 
         var isNoise = getRandomBool(PERCENT_NOISE_USER);
