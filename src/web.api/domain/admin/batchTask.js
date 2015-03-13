@@ -23,6 +23,13 @@ var rebuildClusterIndex = function(next) {
     });
 };
 
+var clusterIndexChangedApps = function(modifiedSinceDate, next) {
+    log.info("Indexing changed apps for cluster index");
+    clusterIndexer.indexChangedApps(modifiedSinceDate, function(err) {
+        next(err);
+    });
+};
+
 var rebuildAutoIndex = function(next) {
     log.info("Rebuilding auto index");
     autoIndexer.rebuild(APP_BATCH_SIZE, MAX_NGRAM_DEPTH, function(err) {
@@ -153,6 +160,7 @@ var analyseAmbiguity = function(next) {
 exports.rebuildAll = rebuildAll;
 exports.rebuildAllSeedCategories = rebuildAllSeedCategories;
 exports.rebuildClusterIndex = rebuildClusterIndex;
+exports.clusterIndexChangedApps = clusterIndexChangedApps;
 exports.rebuildAutoIndex = rebuildAutoIndex;
 exports.rebuildAppIndex = rebuildAppIndex;
 exports.rebuildCategoryIndex = rebuildCategoryIndex;

@@ -9,7 +9,7 @@ exports.init = function init(app) {
         log.info("Starting rebuild all batch task");
         var start = process.hrtime();
         batchTask.rebuildAll(function(err) {
-            if (err) { return next(err); }
+            if (err) { return log.error(err); }
 
             var end = process.hrtime(start);
             log.info("Completed rebuild all batch task in: " + prettyHrtime(end));
@@ -22,7 +22,7 @@ exports.init = function init(app) {
         log.info("Starting rebuild seed categories batch task");
         var start = process.hrtime();
         batchTask.rebuildAllSeedCategories(function(err) {
-            if (err) { return next(err); }
+            if (err) { return log.error(err); }
 
             var end = process.hrtime(start);
             log.info("Completed rebuild seed categories batch task in: " + prettyHrtime(end));
@@ -42,7 +42,7 @@ exports.init = function init(app) {
 
         var start = process.hrtime();
         batchTask.rebuildSeedCategory(seedCategoryId, function(err) {
-            if (err) { return next(err); }
+            if (err) { return log.error(err); }
 
             var end = process.hrtime(start);
             log.info("Completed rebuild of seed category: " + seedCategoryId + " in: " + prettyHrtime(end));
@@ -55,7 +55,7 @@ exports.init = function init(app) {
         log.info("Starting rebuild cluster index batch task");
         var start = process.hrtime();
         batchTask.rebuildClusterIndex(function(err) {
-            if (err) { return next(err); }
+            if (err) { return log.error(err); }
 
             var end = process.hrtime(start);
             log.info("Completed rebuild cluster index batch task in: " + prettyHrtime(end));
@@ -64,11 +64,27 @@ exports.init = function init(app) {
         res.json({ "status": "Rebuild cluster index task started" });
     });
 
+    app.post('/admin/task/cluster_index_changed_apps', function (req, res, next) {
+        log.info("Starting cluster index changed apps batch task");
+
+        var modifiedSinceDate = new Date(Date.parse(req.body.fromDate));
+
+        var start = process.hrtime();
+        batchTask.clusterIndexChangedApps(modifiedSinceDate, function(err) {
+            if (err) { return log.error(err); }
+
+            var end = process.hrtime(start);
+            log.info("Completed cluster index changed apps batch task in: " + prettyHrtime(end));
+        });
+
+        res.json({ "status": "Cluster index changed apps task started" });
+    });
+
     app.post('/admin/task/rebuild_auto_index', function (req, res, next) {
         log.info("Starting rebuild auto index batch task");
         var start = process.hrtime();
         batchTask.rebuildAutoIndex(function(err) {
-            if (err) { return next(err); }
+            if (err) { return log.error(err); }
 
             var end = process.hrtime(start);
             log.info("Completed rebuild auto index batch task in: " + prettyHrtime(end));
@@ -81,7 +97,7 @@ exports.init = function init(app) {
         log.info("Starting rebuild app index batch task");
         var start = process.hrtime();
         batchTask.rebuildAppIndex(function(err) {
-            if (err) { return next(err); }
+            if (err) { return log.error(err); }
 
             var end = process.hrtime(start);
             log.info("Completed rebuild app index batch task in: " + prettyHrtime(end));
@@ -94,7 +110,7 @@ exports.init = function init(app) {
         log.info("Starting rebuild category index batch task");
         var start = process.hrtime();
         batchTask.rebuildCategoryIndex(function(err) {
-            if (err) { return next(err); }
+            if (err) { return log.error(err); }
 
             var end = process.hrtime(start);
             log.info("Completed rebuild category index batch task in: " + prettyHrtime(end));
@@ -107,7 +123,7 @@ exports.init = function init(app) {
         log.info("Starting reset app popularity batch task");
         var start = process.hrtime();
         batchTask.resetAppPopularity(function(err) {
-            if (err) { return next(err); }
+            if (err) { return log.error(err); }
 
             var end = process.hrtime(start);
             log.info("Completed reset app popularity batch task in: " + prettyHrtime(end));
@@ -120,7 +136,7 @@ exports.init = function init(app) {
         log.info("Starting reset related categories batch task");
         var start = process.hrtime();
         batchTask.resetRelatedCategories(function(err) {
-            if (err) { return next(err); }
+            if (err) { return log.error(err); }
 
             var end = process.hrtime(start);
             log.info("Completed reset related categories batch task in: " + prettyHrtime(end));
@@ -133,7 +149,7 @@ exports.init = function init(app) {
         log.info("Starting analyse ambiguity batch task");
         var start = process.hrtime();
         batchTask.analyseAmbiguity(function(err) {
-            if (err) { return next(err); }
+            if (err) { return log.error(err); }
 
             var end = process.hrtime(start);
             log.info("Completed analyse ambiguity batch task in: " + prettyHrtime(end));

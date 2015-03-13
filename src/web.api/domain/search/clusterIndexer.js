@@ -83,6 +83,38 @@ var indexApp = function(appId, forceIsEnglish, next) {
     });
 };
 
+var indexChangedApps = function(modifiedSinceDate, next) {
+    log.debug("Indexing changed apps since: " + modifiedSinceDate);
+
+    appStoreRepo.getModifiedClusterIndexApps(modifiedSinceDate, function(err, apps) {
+        if (err) { return next(err); }
+
+        log.debug("Number of apps changed: " + apps.length);
+
+        if (apps.length === 0) {
+            return next(null, 0);
+        }
+
+        var solrApps = apps.map(function(app) {
+            return createSolrDoc(app);
+        });
+
+        solrCore.client.add(solrApps, function(err){
+            if(err) { return next(err); }
+
+            solrCore.commit(function(err) {
+                if (err) { return next(err); }
+
+                solrCore.optimise(function(err) {
+                    if (err) { return next(err); }
+
+                    next(null, apps.length);
+                });
+            });
+        });
+    });
+};
+
 var rebuild = function(batchSize, next) {
     log.debug("Creating temp core");
     solrCore.createTempCore(function(err, tempCore) {
@@ -117,5 +149,6 @@ var rebuildApp = function(appId, next) {
 
 exports.rebuild = rebuild;
 exports.indexApp = indexApp;
+exports.indexChangedApps = indexChangedApps;
 
 

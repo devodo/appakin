@@ -506,6 +506,42 @@ var getClusterIndexApp = function(client, appId, next) {
     });
 };
 
+var getModifiedClusterIndexApps = function(client, modifiedSinceDate, next) {
+    var queryStr =
+        "SELECT a.app_id, a.ext_id, a.name, a.description, a.genres," +
+        "a.screenshot_urls, a.ipad_screenshot_urls, a.dev_id, " +
+        "ap.popularity, aa.desc_is_english\n" +
+        "FROM appstore_app a\n" +
+        "LEFT JOIN app_analysis aa\n" +
+        "ON a.app_id = aa.app_id\n" +
+        "LEFT JOIN app_popularity ap\n" +
+        "ON a.app_id = ap.app_id\n" +
+        "WHERE a.date_modified > $1\n" +
+        "AND a.date_deleted is null\n" +
+        "ORDER BY a.app_id;";
+
+    client.query(queryStr, [modifiedSinceDate], function (err, result) {
+        if (err) { return next(err); }
+
+        var items = result.rows.map(function(item) {
+            return {
+                id: item.app_id,
+                extId: item.ext_id,
+                name: item.name,
+                devId: item.dev_id,
+                description: item.description,
+                genres: item.genres,
+                screenShotUrls: item.screenshot_urls,
+                iPadScreenShotUrls: item.ipad_screenshot_urls,
+                popularity: item.popularity,
+                isEnglish: item.desc_is_english
+            };
+        });
+
+        next(null, items);
+    });
+};
+
 var getCategoryAppsIndexBatch = function(client, lastId, limit, next) {
     var queryStr =
         "SELECT a.app_id, a.ext_id, a.name, a.description, a.store_url, a.supported_devices,\n" +
@@ -861,6 +897,17 @@ exports.getClusterIndexApp = function(appId, next) {
 };
 
 
+exports.getModifiedClusterIndexApps = function(modifiedSinceDate, next) {
+    connection.open(function(err, conn) {
+        if (err) { return next(err); }
+
+        getModifiedClusterIndexApps(conn.client, modifiedSinceDate, function(err, apps) {
+            conn.close(err, function(err) {
+                next(err, apps);
+            });
+        });
+    });
+};
 
 exports.getCategoryAppsIndexBatch = function(lastId, limit, next) {
     connection.open(function(err, conn) {
