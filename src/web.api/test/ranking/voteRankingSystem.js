@@ -92,7 +92,6 @@ function placeVotesByQuality() {
     });
 }
 
-
 function placeVotesByTypeWithNoise() {
     users.forEach(function(user) {
         for (var i = 0; i < NUM_ITEMS; i++) {

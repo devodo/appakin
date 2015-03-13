@@ -210,6 +210,8 @@ Item.prototype.recalculateScore = function() {
     return scoreDelta;
 };
 
+// See fooplot for useful graphs
+//http://fooplot.com/#W3sidHlwZSI6MCwiZXEiOiIoeCsyMCleMC41KigyKigoeC8oeCsyMCkpLTAuNSkpIiwiY29sb3IiOiIjMDAwMDAwIn0seyJ0eXBlIjowLCJlcSI6Iih4LTIwKV4wLjUiLCJjb2xvciI6IiNEOTFBMUEifSx7InR5cGUiOjAsImVxIjoiKDIwLXgpXjAuNSIsImNvbG9yIjoiIzVCRjcwMCJ9LHsidHlwZSI6MCwiZXEiOiIoMjApXjAuNSooMiooKDIwLygyMCt4KSktMC41KSkiLCJjb2xvciI6IiMxMDEwRTYifSx7InR5cGUiOjAsImVxIjoiKHgpXjAuNSooMiooKHgvKHgrMjApKS0wLjUpKSIsImNvbG9yIjoiI0U4OEEyNSJ9LHsidHlwZSI6MTAwMCwid2luZG93IjpbIi0zLjMzMDc2OTIzMDc2OTIzMSIsIjk3LjY2OTIzMDc2OTIzMDc3IiwiLTMuNTAyNSIsIjcuNDk3NTAwMDAwMDAwMDAwNSJdfV0-
 User.prototype.recalculateStats = function() {
     var self = this;
 
