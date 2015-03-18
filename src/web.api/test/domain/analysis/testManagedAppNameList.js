@@ -21,6 +21,14 @@ exports.group = {
         test.done();
     },
 
+    testCreateManagedAppNameListWhenAppNameIsNull: function (test) {
+        var managedAppNameList = createManagedAppNameList(null, 'Zymba',
+            ['Cut the Rope', 'Cut the Rope HD', 'Make a Wave']);
+
+        test.strictEqual(managedAppNameList.managedAppNames.length, 0);
+        test.done();
+    },
+
     testCreateManagedAppNameListWhenNoOverlap: function (test) {
         var managedAppNameList = createManagedAppNameList('Cut the Rope', 'Zymba', ['Hold on', 'Make a Wave']);
         test.strictEqual(managedAppNameList.managedAppNames.length, 2);

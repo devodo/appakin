@@ -87,6 +87,10 @@ function createCompactAppName(appName) {
 }
 
 function createNoDeveloperCompactAppName(compactAppName, developerName) {
+    if (!developerName) {
+        return compactAppName;
+    }
+
     var newAppName = patternMatching.removeDeveloperName(compactAppName, developerName);
     newAppName = patternMatching.removeAppTypeSuffix(newAppName);
     return newAppName;

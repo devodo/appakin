@@ -20,6 +20,10 @@ ManagedAppNameList.prototype.matches = function(sentence, matchOnWholeSentence) 
 };
 
 function createManagedAppNameList(appName, developerName, relatedAppNames) {
+    if (!appName) {
+        return new ManagedAppNameList([], developerName);
+    }
+
     relatedAppNames = relatedAppNames || [];
     var appNameResult = managedAppName.createManagedAppName(appName, developerName);
     var relatedManagedAppNames = [];

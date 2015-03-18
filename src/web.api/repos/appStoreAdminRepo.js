@@ -961,7 +961,7 @@ var getAppStoreSameDeveloperApps = function(client, appId, next) {
     var queryStr =
         "SELECT name\n" +
         "FROM appstore_app\n" +
-        "WHERE app_id != $1 AND dev_id = (SELECT dev_id FROM appstore_app WHERE app_id = $1);";
+        "WHERE app_id != $1 AND dev_id = (SELECT dev_id FROM appstore_app WHERE app_id = $1) AND name IS NOT NULL;";
 
     client.query(queryStr, [appId], function (err, result) {
         if (err) {

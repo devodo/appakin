@@ -214,17 +214,17 @@ exports.group = {
         test.done();
     },
 
-    testMatchBareBullet: function (test) {
-        doTestMatchBareBullet('', false, test);
-        doTestMatchBareBullet('This is bare', true, test);
-        doTestMatchBareBullet('This is not bare.', true, test);
-        doTestMatchBareBullet('This is not bare:', false, test);
-        doTestMatchBareBullet('This is not bare -', false, test);
-        doTestMatchBareBullet('This is. Not bare', false, test);
-        doTestMatchBareBullet('This is.bare', true, test);
-        doTestMatchBareBullet('St. Louis', true, test);
-        test.done();
-    },
+    //testMatchBareBullet: function (test) {
+    //    doTestMatchBareBullet('', false, test);
+    //    doTestMatchBareBullet('This is bare', true, test);
+    //    doTestMatchBareBullet('This is not bare.', true, test);
+    //    doTestMatchBareBullet('This is not bare:', false, test);
+    //    doTestMatchBareBullet('This is not bare -', false, test);
+    //    doTestMatchBareBullet('This is. Not bare', false, test);
+    //    doTestMatchBareBullet('This is.bare', true, test);
+    //    doTestMatchBareBullet('St. Louis', true, test);
+    //    test.done();
+    //},
 
     testIsInUpperCase: function (test) {
         doTestIsInUpperCase('', false, test);
