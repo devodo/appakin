@@ -443,11 +443,12 @@ function getPossibleAppNames(text) {
     }
 
     var appNames = [];
+    var mapFunction = function(x) { return x.normalised; };
 
     for (i = 0; i < tokenGroups.length; ++i) {
         tokenGroup = tokenGroups[i];
 
-        var appName = tokenGroup.map(function(x) { return x.normalised; }).join(' ');
+        var appName = tokenGroup.map(mapFunction).join(' ');
         appNames.push(appName);
     }
 
