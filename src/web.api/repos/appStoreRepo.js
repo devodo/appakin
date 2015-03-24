@@ -336,12 +336,14 @@ var getAppCategories = function(client, appId, skip, take, next) {
 
 var getAppIndexBatch = function(client, lastId, limit, next) {
     var queryStr =
-        "SELECT a.app_id, a.ext_id, a.name, a.description, a.store_url, a.supported_devices,\n" +
+        "SELECT a.app_id, a.ext_id, a.name, COALESCE(aa.desc_cleaned, a.description) as description, a.store_url, a.supported_devices,\n" +
         "a.artwork_small_url, a.price, a.is_iphone, a.is_ipad, a.dev_name,\n" +
         "a.user_rating_current, a.rating_count_current, a.user_rating, a.rating_count,\n" +
         "ap.popularity\n" +
         "FROM appstore_app a\n" +
         "LEFT JOIN app_popularity ap on a.app_id = ap.app_id\n" +
+        "LEFT JOIN app_analysis aa\n" +
+        "ON a.app_id = aa.app_id\n" +
         "WHERE a.app_id > $1\n" +
         "AND a.name is not null\n" +
         "AND a.date_deleted is null\n" +
@@ -384,12 +386,14 @@ var getAppIndexBatch = function(client, lastId, limit, next) {
 
 var getAppIndexApp = function(client, appId, next) {
     var queryStr =
-        "SELECT a.app_id, a.ext_id, a.name, a.description, a.store_url, a.supported_devices,\n" +
+        "SELECT a.app_id, a.ext_id, a.name, COALESCE(aa.desc_cleaned, a.description) as description, a.store_url, a.supported_devices,\n" +
         "a.artwork_small_url, a.price, a.is_iphone, a.is_ipad, a.dev_name,\n" +
         "a.user_rating_current, a.rating_count_current, a.user_rating, a.rating_count,\n" +
         "ap.popularity\n" +
         "FROM appstore_app a\n" +
         "LEFT JOIN app_popularity ap on a.app_id = ap.app_id\n" +
+        "LEFT JOIN app_analysis aa\n" +
+        "ON a.app_id = aa.app_id\n" +
         "WHERE a.app_id = $1\n" +
         "AND a.name is not null\n" +
         "AND a.date_deleted is null;";
@@ -426,7 +430,7 @@ var getAppIndexApp = function(client, appId, next) {
 
 var getClusterIndexBatch = function(client, lastId, limit, next) {
     var queryStr =
-        "SELECT a.app_id, a.ext_id, a.name, a.description, a.genres," +
+        "SELECT a.app_id, a.ext_id, a.name, COALESCE(aa.desc_cleaned, a.description) as description, a.genres," +
         "a.screenshot_urls, a.ipad_screenshot_urls, a.dev_id, " +
         "ap.popularity, aa.desc_is_english\n" +
         "FROM appstore_app a\n" +
@@ -470,7 +474,7 @@ var getClusterIndexBatch = function(client, lastId, limit, next) {
 
 var getClusterIndexApp = function(client, appId, next) {
     var queryStr =
-        "SELECT a.app_id, a.ext_id, a.name, a.description, a.genres," +
+        "SELECT a.app_id, a.ext_id, a.name, COALESCE(aa.desc_cleaned, a.description) as description, a.genres," +
         "a.screenshot_urls, a.ipad_screenshot_urls, a.dev_id, " +
         "ap.popularity, aa.desc_is_english\n" +
         "FROM appstore_app a\n" +
@@ -508,7 +512,7 @@ var getClusterIndexApp = function(client, appId, next) {
 
 var getModifiedClusterIndexApps = function(client, modifiedSinceDate, next) {
     var queryStr =
-        "SELECT a.app_id, a.ext_id, a.name, a.description, a.genres," +
+        "SELECT a.app_id, a.ext_id, a.name, COALESCE(aa.desc_cleaned, a.description) as description, a.genres," +
         "a.screenshot_urls, a.ipad_screenshot_urls, a.dev_id, " +
         "ap.popularity, aa.desc_is_english\n" +
         "FROM appstore_app a\n" +
@@ -544,11 +548,13 @@ var getModifiedClusterIndexApps = function(client, modifiedSinceDate, next) {
 
 var getCategoryAppsIndexBatch = function(client, lastId, limit, next) {
     var queryStr =
-        "SELECT a.app_id, a.ext_id, a.name, a.description, a.store_url, a.supported_devices,\n" +
+        "SELECT a.app_id, a.ext_id, a.name, COALESCE(aa.desc_cleaned, a.description) as description, a.store_url, a.supported_devices,\n" +
         "a.artwork_small_url, a.price, ap.popularity\n" +
         "FROM appstore_app a\n" +
         "JOIN category_app ca on a.app_id = ca.app_id\n" +
         "LEFT JOIN app_popularity ap on a.app_id = ap.app_id\n" +
+        "LEFT JOIN app_analysis aa\n" +
+        "ON a.app_id = aa.app_id\n" +
         "WHERE a.app_id > $1\n" +
         "AND a.name is not null\n" +
         "ORDER BY a.app_id\n" +
@@ -642,7 +648,7 @@ var getCategoryAppDescriptions = function(client, categoryId, limit, next) {
 
 var getCategoryAppsForIndex = function(client, categoryId, next) {
     var queryStr =
-        "SELECT a.app_id, a.ext_id, a.name, a.description, a.store_url, a.supported_devices,\n" +
+        "SELECT a.app_id, a.ext_id, a.name, COALESCE(aa.desc_cleaned, a.description) as description, a.store_url, a.supported_devices,\n" +
         "a.artwork_small_url, a.price, a.is_iphone, a.is_ipad, a.dev_name,\n" +
         "a.user_rating_current, a.rating_count_current, a.user_rating, a.rating_count,\n" +
         "ap.popularity, ca.position\n" +
@@ -650,6 +656,7 @@ var getCategoryAppsForIndex = function(client, categoryId, next) {
         "JOIN category_app ca on a.app_id = ca.app_id\n" +
         "LEFT JOIN app_popularity ap on a.app_id = ap.app_id\n" +
         "LEFT JOIN category_app_exclude ca_e on ca.category_id = ca_e.category_id AND ca.app_id = ca_e.app_id\n" +
+        "LEFT JOIN app_analysis aa on a.app_id = aa.app_id\n" +
         "WHERE ca.category_id = $1\n" +
         "AND ca_e.id IS NULL\n" +
         "ORDER BY ca.position;";
