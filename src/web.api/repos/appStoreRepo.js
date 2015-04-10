@@ -947,6 +947,53 @@ exports.getPopularCategoriesByGenre = function(genre, skip, take, next) {
     });
 };
 
+var getActiveAppStoreGenres = function(client, next) {
+    var queryStr =
+        "select ac.name, ac.url_name as id, ac2.url_name as parent_id\n" +
+        "from appstore_category ac\n" +
+        "left join appstore_category ac2 on ac.parent_id = ac2.id\n" +
+        "join (\n" +
+        "select distinct appstore_category_id\n" +
+        "from category_genre\n" +
+        ") t\n" +
+        "on ac.id = t.appstore_category_id\n" +
+        "order by parent_id desc, name";
+
+    client.query(queryStr, function (err, result) {
+        if (err) { return next(err); }
+
+        var genres = result.rows.map(function(item) {
+
+            var genre = {
+                id: item.id,
+                name: item.name
+            };
+
+            if (item.parent_id) {
+                genre.parentId = item.parent_id;
+            }
+
+            return genre;
+        });
+
+        next(null, genres);
+    });
+};
+
+exports.getActiveAppStoreGenres = function(next) {
+    connection.open(function(err, conn) {
+        if (err) {
+            return next(err);
+        }
+
+        getActiveAppStoreGenres(conn.client, function(err, genres) {
+            conn.close(err, function(err) {
+                next(err, genres);
+            });
+        });
+    });
+};
+
 exports.getAppIndexBatch = function(lastId, limit, next) {
     connection.open(function(err, conn) {
         if (err) {

@@ -4,6 +4,8 @@ var urlUtil = require('../domain/urlUtil');
 var appStoreRepo = require('../repos/appStoreRepo');
 var featuredRepo = require('../repos/featuredRepo');
 var catViewProvider = require('../domain/viewProvider/categoryViewProvider');
+var redisCacheFactory = require("../domain/cache/redisCache");
+var appStoreCache = redisCacheFactory.createRedisCache(redisCacheFactory.dbPartitions.appstore);
 
 var PAGE_SIZE = 20;
 var MAX_CAT_PAGES = 10;
@@ -232,6 +234,40 @@ exports.init = function init(app) {
 
                 res.json(result);
             });
+        });
+    });
+
+    var genresCacheKey = 'appstore_active_genres';
+    var genresCacheExpirySeconds = 60 * 60 * 24;
+    var getAppStoreGenres = function(next) {
+        appStoreCache.getObject(genresCacheKey, function(err, cacheResult) {
+            if (err) {
+                log.error(err, "Error getting active app store genres from redis cache");
+            }
+
+            if (cacheResult) {
+                next(null, cacheResult);
+            } else {
+                appStoreRepo.getActiveAppStoreGenres(function(err, genres) {
+                    if (err) { return next(err); }
+
+                    appStoreCache.setEx(genresCacheKey, genres, genresCacheExpirySeconds, function (err) {
+                        if (err) {
+                            log.error(err);
+                        }
+                    });
+
+                    return next(null, genres);
+                });
+            }
+        });
+    };
+
+    app.get('/ios/appstore_genres', function (req, res, next) {
+        getAppStoreGenres(function(err, genres) {
+            if (err) { return next(err); }
+
+            res.json(genres);
         });
     });
 };

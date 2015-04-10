@@ -349,6 +349,7 @@ exports.dbPartitions = {
     category: 2,
     search: 4,
     featured: 8,
+    appstore: 10,
     out: 12
 };
 
