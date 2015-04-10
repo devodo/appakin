@@ -8,6 +8,8 @@ var catViewProvider = require('../domain/viewProvider/categoryViewProvider');
 var PAGE_SIZE = 20;
 var MAX_CAT_PAGES = 10;
 var MAX_RELATED = 5;
+var POPULAR_PAGE_SIZE = 10;
+var POPULAR_MAX_PAGES = 10;
 
 exports.init = function init(app) {
 
@@ -146,6 +148,89 @@ exports.init = function init(app) {
                 });
 
                 res.json(relatedCategories);
+            });
+        });
+    });
+
+    app.get('/ios/popular_categories/:genre', function (req, res, next) {
+        var genre = req.params.genre;
+        if (!genre || genre.trim() === '')
+        {
+            return res.status(400).json({error: 'Genre parameter is required'});
+        }
+
+        var pageNum = req.query.p ? parseInt(req.query.p, 10) : 1;
+        if (isNaN(pageNum) || pageNum < 1) {
+            return res.status(400).json({error: 'Bad page number'});
+        }
+
+        if (pageNum > POPULAR_MAX_PAGES) {
+            return res.status(404).json({error: 'Not found'});
+        }
+
+        var filters = {
+            isIphone: req.query.is_iphone === 'true',
+            isIpad: req.query.is_ipad === 'true',
+            isFree: req.query.is_free === 'true'
+        };
+
+        var skip = (pageNum - 1) * POPULAR_PAGE_SIZE;
+
+        var getCategoriesFunc;
+
+        if (genre === 'all') {
+            getCategoriesFunc = function(next) {
+                appStoreRepo.getPopularCategories(skip, POPULAR_PAGE_SIZE, function(err, categories) {
+                    if (err) { return next(err); }
+
+                    next(null, {
+                        total: POPULAR_PAGE_SIZE * POPULAR_MAX_PAGES,
+                        categories: categories
+                    });
+                });
+            };
+        } else {
+            getCategoriesFunc = function(next) {
+                appStoreRepo.getPopularCategoriesByGenre(genre, skip, POPULAR_PAGE_SIZE, next);
+            };
+        }
+
+        getCategoriesFunc(function (err, pageResult) {
+            if (err) { return next(err); }
+
+            if (pageResult.categories.length === 0) {
+                return res.status(404).json({error: 'Not found'});
+            }
+
+            var categoryIds = pageResult.categories.map(function(category) {
+                return category.id;
+            });
+
+            catViewProvider.getCategoryChartAppsMap(categoryIds, filters, function(err, categoryAppsMap) {
+                if (err) { return next(err); }
+
+                var categories = pageResult.categories.map(function(category) {
+                    var categoryChart = categoryAppsMap[category.id];
+
+                    if (!categoryChart) {
+                        return log.error("No related category chart found for category id: " + category.id);
+                    }
+
+                    return {
+                        id: category.extId.replace(/\-/g, ''),
+                        name: category.name,
+                        url: urlUtil.makeUrl(category.extId, category.name),
+                        chart: categoryChart.apps
+                    };
+                });
+
+                var result = {
+                    pageNum: pageNum,
+                    totalPages: Math.min(POPULAR_MAX_PAGES, Math.ceil(pageResult.total / POPULAR_PAGE_SIZE)),
+                    categories: categories
+                };
+
+                res.json(result);
             });
         });
     });

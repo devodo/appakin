@@ -849,6 +849,104 @@ exports.getRelatedCategoriesByExtId = function(extId, skip, take, next) {
     });
 };
 
+
+var getPopularCategories = function(client, skip, take, next) {
+    var queryStr =
+        "select c.id, c.ext_id, c.name, cp.popularity\n" +
+        "from category c\n" +
+        "join category_popularity cp on c.id = cp.category_id\n" +
+        "where c.date_deleted is null\n" +
+        "order by cp.popularity desc\n" +
+        "offset $1 limit $2;";
+
+    var queryParams = [skip, take];
+
+    client.query(queryStr, queryParams, function (err, result) {
+        if (err) { return next(err); }
+
+        var cats = result.rows.map(function(item) {
+            return {
+                id: item.id,
+                extId: item.ext_id,
+                name: item.name,
+                total: item.total
+            };
+        });
+
+        next(null, cats);
+    });
+};
+
+exports.getPopularCategories = function(skip, take, next) {
+    connection.open(function(err, conn) {
+        if (err) {
+            return next(err);
+        }
+
+        getPopularCategories(conn.client, skip, take, function(err, categories) {
+            conn.close(err, function(err) {
+                next(err, categories);
+            });
+        });
+    });
+};
+
+var getPopularCategoriesByGenre = function(client, genre, skip, take, next) {
+    var queryStr =
+        "select c.id, c.ext_id, c.name, count(1) OVER() as total\n" +
+        "from category_genre cg\n" +
+        "join appstore_category ac on cg.appstore_category_id = ac.id\n" +
+        "join category c on cg.category_id = c.id\n" +
+        "join category_popularity cp on c.id = cp.category_id\n" +
+        "where ac.url_name = $1\n" +
+        "and c.date_deleted is null\n" +
+        "order by cp.popularity * cg.percent desc\n" +
+        "offset $2 limit $3;";
+
+    var queryParams = [genre, skip, take];
+
+    client.query(queryStr, queryParams, function (err, result) {
+        if (err) { return next(err); }
+
+        if (result.rows.length === 0) {
+            return next(null, {
+                total: 0,
+                categories: []
+            });
+        }
+
+        var cats = result.rows.map(function(item) {
+            return {
+                id: item.id,
+                extId: item.ext_id,
+                name: item.name,
+                total: item.total
+            };
+        });
+
+        var pageResult = {
+            total: result.rows[0].total,
+            categories: cats
+        };
+
+        next(null, pageResult);
+    });
+};
+
+exports.getPopularCategoriesByGenre = function(genre, skip, take, next) {
+    connection.open(function(err, conn) {
+        if (err) {
+            return next(err);
+        }
+
+        getPopularCategoriesByGenre(conn.client, genre, skip, take, function(err, pageResult) {
+            conn.close(err, function(err) {
+                next(err, pageResult);
+            });
+        });
+    });
+};
+
 exports.getAppIndexBatch = function(lastId, limit, next) {
     connection.open(function(err, conn) {
         if (err) {
