@@ -505,7 +505,27 @@ var insertCategoryPopularity = function(client, categoryPopularity, next) {
     });
 };
 
-var resetCategoryPopularities = function(conn, appStoreBatchId, next) {
+var resetCategoryGenres = function(client, next) {
+    var queryStr = "select reset_category_genre();";
+
+    client.query(queryStr, function (err, result) {
+        if (err) { return next(err); }
+
+        next();
+    });
+};
+
+var resetCategoryPopularities = function(client, next) {
+    var queryStr = "select reset_category_popularity();";
+
+    client.query(queryStr, function (err, result) {
+        if (err) { return next(err); }
+
+        next();
+    });
+};
+
+var resetCategoryPopularitiesOld = function(conn, appStoreBatchId, next) {
     conn.beginTran(function(err) {
         if (err) { return next(err); }
 
@@ -1169,13 +1189,27 @@ exports.getMissingAppStoreSourceApps = function(next) {
     });
 };
 
-exports.resetCategoryPopularities = function(appStoreBatchId, next) {
+exports.resetCategoryGenres = function(next) {
     connection.open(function(err, conn) {
         if (err) {
             return next(err);
         }
 
-        resetCategoryPopularities(conn, appStoreBatchId, function(err, results) {
+        resetCategoryGenres(conn, function(err, results) {
+            conn.close(err, function(err) {
+                next(err, results);
+            });
+        });
+    });
+};
+
+exports.resetCategoryPopularities = function(next) {
+    connection.open(function(err, conn) {
+        if (err) {
+            return next(err);
+        }
+
+        resetCategoryPopularities(conn, function(err, results) {
             conn.close(err, function(err) {
                 next(err, results);
             });

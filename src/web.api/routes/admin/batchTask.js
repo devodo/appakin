@@ -132,6 +132,32 @@ exports.init = function init(app) {
         res.json({ "status": "Reset app popularity task started" });
     });
 
+    app.post('/admin/task/reset_category_popularity', function (req, res, next) {
+        log.info("Starting reset category popularity batch task");
+        var start = process.hrtime();
+        batchTask.resetCategoryPopularity(function(err) {
+            if (err) { return log.error(err); }
+
+            var end = process.hrtime(start);
+            log.info("Completed reset category popularity batch task in: " + prettyHrtime(end));
+        });
+
+        res.json({ "status": "Reset category popularity task started" });
+    });
+
+    app.post('/admin/task/reset_category_genres', function (req, res, next) {
+        log.info("Starting reset category genres batch task");
+        var start = process.hrtime();
+        batchTask.resetCategoryGenres(function(err) {
+            if (err) { return log.error(err); }
+
+            var end = process.hrtime(start);
+            log.info("Completed reset category genres batch task in: " + prettyHrtime(end));
+        });
+
+        res.json({ "status": "Reset category genres task started" });
+    });
+
     app.post('/admin/task/reset_related_categories', function (req, res, next) {
         log.info("Starting reset related categories batch task");
         var start = process.hrtime();
