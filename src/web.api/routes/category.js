@@ -191,6 +191,17 @@ exports.init = function init(app) {
                     });
                 });
             };
+        } else if (genre === 'apps') {
+            getCategoriesFunc = function(next) {
+                appStoreRepo.getAppsCategories(skip, POPULAR_PAGE_SIZE, function(err, categories) {
+                    if (err) { return next(err); }
+
+                    next(null, {
+                        total: POPULAR_PAGE_SIZE * POPULAR_MAX_PAGES,
+                        categories: categories
+                    });
+                });
+            };
         } else {
             getCategoriesFunc = function(next) {
                 appStoreRepo.getPopularCategoriesByGenre(genre, skip, POPULAR_PAGE_SIZE, next);

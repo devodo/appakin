@@ -891,6 +891,54 @@ exports.getPopularCategories = function(skip, take, next) {
     });
 };
 
+var getAppsCategories = function(client, skip, take, next) {
+    var queryStr =
+        "select c.id, c.ext_id, c.name, cp.popularity\n" +
+        "from category c\n" +
+        "join category_popularity cp on c.id = cp.category_id\n" +
+        "left join (\n" +
+        "select category_id\n" +
+        "from category_genre cg\n" +
+        "join appstore_category ac on cg.appstore_category_id = ac.id\n" +
+        "where ac.url_name = 'games'\n" +
+        ") t on c.id = t.category_id\n" +
+        "where t.category_id is null\n" +
+        "and c.date_deleted is null\n" +
+        "order by cp.popularity desc\n" +
+        "offset $1 limit $2;";
+
+    var queryParams = [skip, take];
+
+    client.query(queryStr, queryParams, function (err, result) {
+        if (err) { return next(err); }
+
+        var cats = result.rows.map(function(item) {
+            return {
+                id: item.id,
+                extId: item.ext_id,
+                name: item.name,
+                total: item.total
+            };
+        });
+
+        next(null, cats);
+    });
+};
+
+exports.getAppsCategories = function(skip, take, next) {
+    connection.open(function(err, conn) {
+        if (err) {
+            return next(err);
+        }
+
+        getAppsCategories(conn.client, skip, take, function(err, categories) {
+            conn.close(err, function(err) {
+                next(err, categories);
+            });
+        });
+    });
+};
+
 var getPopularCategoriesByGenre = function(client, genre, skip, take, next) {
     var queryStr =
         "select c.id, c.ext_id, c.name, count(1) OVER() as total\n" +
