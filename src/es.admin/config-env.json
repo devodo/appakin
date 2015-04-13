@@ -1,0 +1,30 @@
+{
+  "common": {
+    "server": {
+      "port": 3006
+    },
+    "log": {
+      "level": "info"
+    },
+    "db": {
+      "index": {
+        "host": "localhost",
+        "port": 5432,
+        "username": "appakin",
+        "password": "appakin",
+        "database": "appakin"
+      }
+    },
+    "es": {
+      "host": "localhost",
+      "port": "9200"
+    }
+  },
+  "development": {
+    "log": {
+      "level": "debug"
+    }
+  },
+  "production": {
+  }
+}
