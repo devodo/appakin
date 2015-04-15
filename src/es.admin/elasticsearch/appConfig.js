@@ -47,6 +47,20 @@ exports.settings = {
             "rule_stem" : {
                 "type" : "stemmer",
                 "name" : "porter2"
+            },
+            "index_common_grams": {
+                "type":         "common_grams",
+                "common_words": "_english_"
+            },
+            "search_common_grams": {
+                "type":         "common_grams",
+                "common_words": "_english_",
+                "query_mode":   true
+            },
+            "shingle_filter": {
+                "type": "shingle",
+                "min_shingle_size": 2,
+                "max_shingle_size": 5
             }
         },
         "analyzer": {
@@ -55,6 +69,7 @@ exports.settings = {
                 "filter": [
                     "index_delimiter",
                     "lowercase",
+                    "index_common_grams",
                     "no_stem",
                     "manual_stem",
                     "rule_stem"
@@ -70,13 +85,30 @@ exports.settings = {
                     "rule_stem"
                 ]
             },
+            "search_grams": {
+                "tokenizer": "standard",
+                "filter": [
+                    "search_delimiter",
+                    "lowercase",
+                    "search_common_grams",
+                    "no_stem",
+                    "manual_stem",
+                    "rule_stem"
+                ]
+            },
             "standard_text": {
                 "tokenizer": "standard",
                 "filter": [
                     "lowercase"
                 ]
+            },
+            "shingle_text": {
+                "tokenizer": "standard",
+                "filter": [
+                    "lowercase",
+                    "shingle_filter"
+                ]
             }
-
         },
         "similarity": {
             "bm25_no_length": {
@@ -113,7 +145,7 @@ exports.mappings = {
                 "type": "string",
                 "analyzer": "standard_text",
                 "similarity": "bm25_title",
-                "copy_to": ["name_stem", "all"],
+                "copy_to": ["name_stem", "all", "spell"],
                 "store": false
             },
             "name_stem": {
@@ -124,18 +156,11 @@ exports.mappings = {
                 "term_vector": "with_positions_offsets",
                 "store": true
             },
-            "cat_name": {
+            "name_alt": {
                 "type": "string",
                 "analyzer": "standard_text",
-                "similarity": "bm25_no_length",
-                "copy_to": ["cat_name_stem", "all"],
-                "store": false
-            },
-            "cat_name_stem": {
-                "type": "string",
-                "analyzer": "index_stem_text",
-                "search_analyzer": "search_stem_text",
-                "similarity": "bm25_no_length",
+                "similarity": "bm25_title",
+                "copy_to": "all",
                 "store": false
             },
             "desc": {
@@ -155,15 +180,17 @@ exports.mappings = {
                 "type": "string",
                 "index": "no",
                 "copy_to": "all",
+                "position_offset_gap": 100,
                 "store": false
             },
             "all": {
                 "type": "string",
                 "analyzer": "index_stem_text",
                 "search_analyzer": "search_stem_text",
+                "position_offset_gap": 100,
                 "store": false
             },
-            "boost": {"type": "double", "index": "not_analyzed"},
+            "boost": {"type": "float", "index": "not_analyzed"},
             "price": {"type": "integer", "index": "no", "store": false},
             "rating": {"type": "float", "index": "no", "store": false},
             "image_url": {"type": "string", "index": "no", "store": false},
@@ -171,13 +198,28 @@ exports.mappings = {
             "is_iphone": {"type": "boolean", "index": "not_analyzed", "store": false},
             "is_ipad": {"type": "boolean", "index": "not_analyzed", "store": false},
             "is_cat": {"type": "boolean", "index": "not_analyzed", "store": false},
+            "suggest" : {
+                "type": "completion",
+                "analyzer": "simple",
+                "search_analyzer": "simple",
+                "payloads": false,
+                "preserve_separators": true,
+                "preserve_position_increments": true
+            },
+            "spell" : {
+                "type": "string",
+                "analyzer": "shingle_text",
+                "store": false
+            },
             "categories": {
                 "type": "nested",
                 "include_in_parent": true,
                 "properties": {
                     "cat_id": {"type": "integer", "index": "not_analyzed"},
                     "position": {"type": "integer", "index": "not_analyzed"},
-                    "boost": {"type": "double", "index": "not_analyzed"}
+                    "app_boost": {"type": "float", "index": "not_analyzed"},
+                    "facet_boost": {"type": "float", "index": "not_analyzed"},
+                    "max_boost": {"type": "float", "index": "not_analyzed"}
                 }
             }
         }

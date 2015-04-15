@@ -80,9 +80,13 @@ exports.getAppIndexBatch = function(lastId, limit, next) {
 
 exports.getCategoryApps = function(next) {
     var queryStr =
-        "SELECT category_id, app_id, position\n" +
-        "FROM category_app\n" +
-        "order by app_id;";
+        "SELECT ca.category_id, ca.app_id, ca.position\n" +
+        "FROM category_app ca\n" +
+        "JOIN appstore_app a on ca.app_id = a.app_id\n" +
+        "JOIN category c on ca.category_id = c.id\n" +
+        "WHERE a.date_deleted is null\n" +
+        "AND c.date_deleted is null\n" +
+        "order by a.app_id, ca.position;";
 
     var queryFunc = function(conn, next) {
         conn.client.query(queryStr, function (err, result) {
@@ -90,9 +94,39 @@ exports.getCategoryApps = function(next) {
 
             var items = result.rows.map(function(item) {
                 return {
-                    categoryId: item.categoryId,
-                    appId: item.appId,
+                    categoryId: item.category_id,
+                    appId: item.app_id,
                     position: item.position
+                };
+            });
+
+            next(null, items);
+        });
+    };
+
+    executeQuery(queryFunc, function(err, result) {
+        next(err, result);
+    });
+};
+
+exports.getCategories = function(next) {
+    var queryStr =
+        "SELECT c.id, c.ext_id, c.name, cp.popularity\n" +
+        "FROM category c\n" +
+        "LEFT JOIN category_popularity cp on c.id = cp.category_id\n" +
+        "WHERE c.date_deleted is null\n" +
+        "order by c.id;";
+
+    var queryFunc = function(conn, next) {
+        conn.client.query(queryStr, function (err, result) {
+            if (err) { return next(err); }
+
+            var items = result.rows.map(function(item) {
+                return {
+                    id: item.id,
+                    extId: item.ext_id,
+                    name: item.name,
+                    popularity: item.popularity
                 };
             });
 

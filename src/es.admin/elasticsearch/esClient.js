@@ -28,7 +28,9 @@ exports.bulkInsert = function (index, docType, docs, next) {
 
 exports.optimize = function(index, next) {
     client.indices.optimize({
-        index: index
+        index: index,
+        max_num_segments: 1,
+        requestTimeout: Infinity
     }, function (err, resp) {
         next(err, resp);
     });
