@@ -102,6 +102,22 @@ exports.createIndex = function(index, settings, mappings, aliases, next) {
     });
 };
 
+exports.searchStoredTemplate = function(index, storedTemplate, params, next) {
+    var body = {
+        template: {
+            file: storedTemplate
+        },
+        "params": params
+    };
+
+    client.searchTemplate({
+        index: index,
+        body: body
+    }, function (err, resp) {
+        next(err, resp);
+    });
+};
+
 
 
 

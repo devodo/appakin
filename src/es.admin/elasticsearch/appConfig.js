@@ -1,5 +1,16 @@
 'use strict';
 
+exports.constants = {
+    appIndex: {
+        alias: "appakin_app",
+        docType: "app",
+        template: {
+            categoryFacetSearch: "category_facet_search",
+            categoryExpandSearch: "category_expand_search"
+        }
+    }
+};
+
 exports.settings = {
     "number_of_shards":   1,
     "number_of_replicas": 0,

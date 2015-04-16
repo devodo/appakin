@@ -8,8 +8,8 @@ var appRank = require('./../domain/appRank');
 var indexRepo = require('../repos/indexRepo');
 var unidecode = require('unidecode');
 
-var aliasName = "appakin_app";
-var docType = "app";
+var aliasName = appConfig.constants.appIndex.alias;
+var docType = appConfig.constants.appIndex.docType;
 
 var calculateFacetBoost = function(position, popularity) {
     /*
