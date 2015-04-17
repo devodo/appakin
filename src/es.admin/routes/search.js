@@ -66,6 +66,54 @@ exports.init = function init(app) {
         });
     });
 
+    app.get('/search/category', function (req, res, next) {
+        var startTime = process.hrtime();
+
+        var query = req.query.q;
+        if (!query || query.trim() === '') {
+            return res.status(400).json({error: 'Bad query parameter'});
+        }
+
+        var categoryIds = [];
+        req.query.categoryId.split(',').forEach(function(categoryValue) {
+            var categoryId = parseInt(categoryValue, 10);
+            if (isNaN(categoryId) || categoryId < 0) {
+                return res.status(400).json({error: 'Bad categoryId parameter'});
+            }
+
+            categoryIds.push(categoryId);
+        });
+
+        if (categoryIds.length === 0) {
+            return res.status(400).json({error: 'Must provide categoryId parameter'});
+        }
+
+        var appFrom = req.query.appFrom ? parseInt(req.query.appFrom, 10) : 0;
+        if (isNaN(appFrom) || appFrom < 0) {
+            return res.status(400).json({error: 'Bad appFrom parameter'});
+        }
+
+        var appSize = req.query.appSize ? parseInt(req.query.appSize, 10) : 5;
+        if (isNaN(appSize) || appSize < 0) {
+            return res.status(400).json({error: 'Bad appSize parameter'});
+        }
+
+        var filters = parseFilters(req);
+
+        appSearcher.searchCategory(query, categoryIds, appFrom, appSize, filters, function(err, result) {
+            if (err) { return next(err); }
+
+            var diffTime = process.hrtime(startTime);
+
+            var took = (diffTime[0] * 1e9 + diffTime[1]) / 1000000;
+
+            res.json({
+                took: took,
+                result: result
+            });
+        });
+    });
+
     app.get('/search/complete', function (req, res, next) {
         var startTime = process.hrtime();
 

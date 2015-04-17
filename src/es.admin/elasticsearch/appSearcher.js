@@ -32,6 +32,8 @@ var categoryFacetSearch = function(query, appFrom, appSize, catFrom, catSize, fi
     var bucketMergeTie = 0.1;
 
     var includeTopApps = appSize > 0;
+    var includeTopCats = catSize > 0;
+    var commaSeparator = includeTopApps && includeTopCats;
 
     var storedTemplate = appConfig.constants.appIndex.template.categoryFacetSearch;
     var params = {
@@ -39,6 +41,8 @@ var categoryFacetSearch = function(query, appFrom, appSize, catFrom, catSize, fi
         "size": appSize,
         "num_cats": catFrom + catSize,
         "top_apps": includeTopApps,
+        "top_cats": includeTopCats,
+        "comma_separator": commaSeparator,
         "query_string": query
     };
 
@@ -47,50 +51,52 @@ var categoryFacetSearch = function(query, appFrom, appSize, catFrom, catSize, fi
     esClient.searchStoredTemplate(indexAlias, storedTemplate, params, function(err, resp) {
         if (err) { return next(err); }
 
-        var categoriesMap = Object.create(null);
-        var categories = [];
+        var result = {};
 
-        resp.aggregations.categories.app_sum.buckets.forEach(function(bucket) {
-            var category = {
-                id: bucket.key,
-                score: bucket.app_scores_total.value
-            };
+        if (includeTopCats) {
+            var categoriesMap = Object.create(null);
+            var categories = [];
 
-            categoriesMap[bucket.key] = category;
-            categories.push(category);
-        });
-
-        resp.aggregations.name_exact.categories.max_app.buckets.forEach(function(bucket) {
-            var category = categoriesMap[bucket.key];
-            var bucketValue = bucket.app_score_max.value;
-
-            if (!category) {
-                category = {
+            resp.aggregations.categories.app_sum.buckets.forEach(function(bucket) {
+                var category = {
                     id: bucket.key,
-                    score: bucketValue
+                    score: bucket.app_scores_total.value
                 };
 
+                categoriesMap[bucket.key] = category;
                 categories.push(category);
-            } else {
-                category.score = Math.max(category.score, bucketValue) +
-                                 Math.min(category.score, bucketValue) * bucketMergeTie;
+            });
+
+            resp.aggregations.name_exact.categories.max_app.buckets.forEach(function(bucket) {
+                var category = categoriesMap[bucket.key];
+                var bucketValue = bucket.app_score_max.value;
+
+                if (!category) {
+                    category = {
+                        id: bucket.key,
+                        score: bucketValue
+                    };
+
+                    categories.push(category);
+                } else {
+                    category.score = Math.max(category.score, bucketValue) +
+                    Math.min(category.score, bucketValue) * bucketMergeTie;
+                }
+            });
+
+            categories.sort(function(a, b) {
+                return b.score - a.score;
+            });
+
+            if (catFrom !== 0 || categories.length > catSize) {
+                categories = categories.slice(catFrom, catFrom + catSize);
             }
-        });
 
-        categories.sort(function(a, b) {
-            return b.score - a.score;
-        });
-
-        if (catFrom !== 0 || categories.length > catSize) {
-            categories = categories.slice(catFrom, catFrom + catSize);
-        }
-
-        var result = {
-            category: {
+            result.category = {
                 total: resp.aggregations.categories.total_categories.value,
                 categories: categories
-            }
-        };
+            };
+        }
 
         if (includeTopApps){
             var apps = resp.aggregations.apps.top_app_hits.hits.hits.map(function(appHit) {
@@ -182,18 +188,25 @@ var searchMain = function(query, appFrom, appSize, catFrom, catSize, catAppFrom,
     categoryFacetSearch(query, appFrom, appSize, catFrom, catSize, filters, function(err, facetResult) {
         if (err) { return next(err); }
 
-        if (facetResult.category.categories.length === 0) {
+        var noResults = true;
 
-            if (facetResult.category.total > 0) {
-                return next(null, facetResult);
-            }
+        if (facetResult.category && facetResult.category.total > 0) {
+            noResults = false;
+        } else if (facetResult.app && facetResult.app.total > 0) {
+            noResults = false;
+        }
 
+        if (noResults) {
             return spellSuggest(query, 3, function(err, options) {
                 if (err) { return next(err); }
 
                 facetResult.suggestions = options;
                 next(null, facetResult);
             });
+        }
+
+        if (!facetResult.category) {
+            return next(null, facetResult);
         }
 
         var categoryIds = [];
@@ -226,6 +239,14 @@ var searchMain = function(query, appFrom, appSize, catFrom, catSize, catAppFrom,
     });
 };
 
+var searchCategory = function(query, categoryIds, appFrom, appSize, filters, next) {
+    categoryExpandSearch(query, categoryIds, appFrom, appSize, filters, function(err, expandCategories) {
+        if (err) { return next(err); }
+
+        next(null, expandCategories);
+    });
+};
+
 var searchComplete = function(query, size, next) {
     var body = {
         "auto": {
@@ -249,4 +270,5 @@ var searchComplete = function(query, size, next) {
 };
 
 exports.searchMain = searchMain;
+exports.searchCategory = searchCategory;
 exports.searchComplete = searchComplete;

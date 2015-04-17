@@ -100,7 +100,7 @@ exports.init = function init(app) {
             isFree: req.query.is_free === 'true'
         };
 
-        appSearcher.search(query, pageNum, filters, function(err, result) {
+        appSearcher.searchApps(query, pageNum, filters, function(err, result) {
             if (err) { return next(err); }
 
             res.json(result);

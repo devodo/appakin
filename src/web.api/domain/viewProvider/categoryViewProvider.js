@@ -223,67 +223,13 @@ var getMultiCacheObjects = function(cache, ids, createKeyFunc, repoLookupFunc, e
     });
 };
 
-var parseAppResults = function(appResults) {
-    var apps = appResults.apps.map(function(appResult) {
-        var app = {
-            id: appResult.field.ext_id,
-            name: appResult.field.name,
-            url: urlUtil.makeUrl(appResult.field.ext_id, appResult.field.name),
-            imageUrl: appResult.field.image_url,
-            price: appResult.field.price,
-            rating: appResult.field.rating
-        };
-
-        if (appResult.highlight) {
-            app.highlight = {};
-
-            if (appResult.highlight.name_stem) {
-                app.highlight.name = appResult.highlight.name_stem;
-            }
-
-            if (appResult.highlight.desc_stem) {
-                app.highlight.desc = appResult.highlight.desc_stem;
-            }
-        }
-
-        return app;
-    });
-
-    return apps;
-};
-
-var parseAppResultsMain = function(appResults) {
-    return {
-        total: appResults.total,
-        apps: parseAppResults(appResults)
-    };
-};
-
 var searchMain = function(queryStr, pageNum, filters, next) {
     appSearcher.search(queryStr, pageNum, filters, function(err, searchResult) {
-        if (err) {
-            return next(err);
-        }
+        if (err) { return next(err); }
 
-        var result = {
-            page: pageNum
-        };
-
-        if (searchResult.result.app) {
-            result.appResults = parseAppResultsMain(searchResult.result.app);
-        }
-
-        if (!searchResult.result.category) {
-            return next(null, result);
-        }
-
-        var categoryIds = searchResult.result.category.categories.map(function (categoryResult) {
+        var categoryIds = searchResult.category.categories.map(function (categoryResult) {
             return categoryResult.id;
         });
-
-        result.categoryResults = {
-            total: searchResult.result.category.total
-        };
 
         async.parallel([
                 function (callback) {
@@ -294,11 +240,9 @@ var searchMain = function(queryStr, pageNum, filters, next) {
                 }
             ],
             function (err, results) {
-                if (err) {
-                    return next(err);
-                }
+                if (err) { return next(err); }
 
-                result.categoryResults.categories = searchResult.result.category.categories.map(function (categoryResult, i) {
+                searchResult.category.categories.forEach(function (categoryResult, i) {
                     var category = results[1][i];
 
                     if (!category) {
@@ -311,17 +255,15 @@ var searchMain = function(queryStr, pageNum, filters, next) {
                         return next(new Error('Category chart missing: ' + categoryResult.id));
                     }
 
-                    category.id = category.extId;
-                    delete category.extId;
-                    delete category.description;
-
-                    category.chart = categoryChart;
-                    category.appResults = parseAppResultsMain(categoryResult.app);
+                    categoryResult.id = category.extId;
+                    categoryResult.name = category.name;
+                    categoryResult.url = category.url;
+                    categoryResult.chart = categoryChart.apps;
 
                     return category;
                 });
 
-                next(null, result);
+                next(null, searchResult);
             });
     });
 };
@@ -330,24 +272,12 @@ var searchCategories = function(queryStr, pageNum, filters, next) {
     appSearcher.searchCategories(queryStr, pageNum, filters, function(err, searchResult) {
         if (err) { return next(err); }
 
-        var result = {
-            page: pageNum,
-            total: searchResult.result.category.total,
-            suggestions: []
-        };
-
-        if (searchResult.result.suggestions) {
-            result.suggestions = searchResult.result.suggestions.map(function (suggestion) {
-                return suggestion.text;
-            });
-        }
-
-        var categoryIds = searchResult.result.category.categories.map(function (categoryResult) {
+        var categoryIds = searchResult.categories.map(function (categoryResult) {
             return categoryResult.id;
         });
 
         if (categoryIds.length === 0) {
-            return next(null, result);
+            return next(null, searchResult);
         }
 
         async.parallel([
@@ -363,7 +293,7 @@ var searchCategories = function(queryStr, pageNum, filters, next) {
                     return next(err);
                 }
 
-                result.categories = searchResult.result.category.categories.map(function (categoryResult, i) {
+                searchResult.categories.forEach(function (categoryResult, i) {
                     var category = results[1][i];
 
                     if (!category) {
@@ -376,18 +306,13 @@ var searchCategories = function(queryStr, pageNum, filters, next) {
                         return next(new Error('Category chart missing: ' + categoryResult.id));
                     }
 
-                    category.id = category.extId;
-                    delete category.extId;
-                    delete category.description;
-
-                    category.totalApps = categoryResult.app.total;
-                    category.apps = parseAppResults(categoryResult.app);
-                    category.chart = categoryChart.apps;
-
-                    return category;
+                    categoryResult.id = category.extId;
+                    categoryResult.name = category.name;
+                    categoryResult.url = category.url;
+                    categoryResult.chart = categoryChart.apps;
                 });
 
-                next(null, result);
+                next(null, searchResult);
             });
     });
 };
@@ -427,6 +352,7 @@ var searchApps = function(queryStr, pageNum, extCategoryId, filters, next) {
 
 
 exports.searchCategories = searchCategories;
+exports.searchMain = searchCategories;
 exports.searchApps = searchApps;
 exports.getCategoryChartAppsMap = null;
 exports.getCategoriesCharts = getCategoriesCharts;
