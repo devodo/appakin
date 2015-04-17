@@ -196,24 +196,23 @@ var getCategoryApps = function(client, categoryId, filters, skip, take, next) {
 };
 
 var getMultiCategoryApps = function(client, categoryIds, take, filters, next) {
-    var queryParams = [ take ];
-    var params = [];
-    categoryIds.forEach(function(categoryId, i) {
-        params.push('$'+ (i + 2));
-        queryParams.push(categoryId);
-    });
-
     var queryStr =
+        "select t.*\n" +
+        "FROM (SELECT unnest(ARRAY[" + categoryIds.join(',') + "]) as id) c\n" +
+        "JOIN LATERAL (\n" +
         "SELECT ca.category_id, a.ext_id, a.name, a.artwork_small_url, a.price,\n" +
-        "substring(a.description from 0 for 200) as short_description, ca.position\n" +
+        "substring(a.description from 0 for 2) as short_description, ca.position\n" +
         "FROM appstore_app a\n" +
         "JOIN category_app ca ON a.app_id = ca.app_id\n" +
-        "WHERE ca.category_id in (" + params.join(',') + ")\n" +
-        "AND ca.position <= $1\n" +
+        "WHERE ca.category_id = c.id\n" +
         (filters.isFree === true ? "AND a.is_free\n" : "") +
         (filters.isIphone === true ? "AND a.is_iphone\n" : "") +
         (filters.isIpad === true ? "AND a.is_ipad\n" : "") +
-        "ORDER BY ca.category_id, ca.position;";
+        "ORDER BY ca.category_id, ca.position\n" +
+        "limit $1\n" +
+        ") t on true;";
+
+    var queryParams = [ take ];
 
     client.query(queryStr, queryParams, function (err, result) {
         if (err) { return next(err); }
