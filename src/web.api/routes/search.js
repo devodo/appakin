@@ -2,7 +2,7 @@
 
 var autoSearcher = require('../domain/search/autoSearcher');
 var catViewProvider = require('../domain/viewProvider/categoryViewProvider');
-var appSearcher = require('../domain/search/appSearcher');
+var appSearcher = require('../domain/search/elasticSearch/appSearcher');
 
 var MAX_CAT_APP_PAGES = 8;
 
@@ -21,10 +21,10 @@ exports.init = function init(app) {
             return res.status(400).json({error: 'Bad query string'});
         }
 
-        autoSearcher.search(query, 1, function(err, result) {
+        appSearcher.searchComplete(query, function(err, result) {
             if (err) { return next(err); }
 
-            res.json(result.suggestions);
+            res.json(result);
         });
     });
 

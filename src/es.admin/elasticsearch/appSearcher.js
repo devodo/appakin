@@ -14,7 +14,21 @@ var parseAppHit = function(appHit) {
     };
 };
 
-var categoryFacetSearch = function(query, appFrom, appSize, catFrom, catSize, next) {
+var addFiltersToParams = function(paramsObject, filterFlags) {
+    if (filterFlags.isIphone) {
+        paramsObject.is_iphone = true;
+    }
+
+    if (filterFlags.isIpad) {
+        paramsObject.is_ipad = true;
+    }
+
+    if (filterFlags.isFree) {
+        paramsObject.is_free = true;
+    }
+};
+
+var categoryFacetSearch = function(query, appFrom, appSize, catFrom, catSize, filters, next) {
     var bucketMergeTie = 0.1;
 
     var includeTopApps = appSize > 0;
@@ -27,6 +41,8 @@ var categoryFacetSearch = function(query, appFrom, appSize, catFrom, catSize, ne
         "top_apps": includeTopApps,
         "query_string": query
     };
+
+    addFiltersToParams(params, filters);
 
     esClient.searchStoredTemplate(indexAlias, storedTemplate, params, function(err, resp) {
         if (err) { return next(err); }
@@ -91,7 +107,7 @@ var categoryFacetSearch = function(query, appFrom, appSize, catFrom, catSize, ne
     });
 };
 
-var categoryExpandSearch = function(query, categoryIds, appFrom, appSize, next) {
+var categoryExpandSearch = function(query, categoryIds, appFrom, appSize, filters, next) {
     var storedTemplate = appConfig.constants.appIndex.template.categoryExpandSearch;
     var params = {
         "from": appFrom,
@@ -99,6 +115,8 @@ var categoryExpandSearch = function(query, categoryIds, appFrom, appSize, next) 
         "cat_ids": categoryIds,
         "query_string": query
     };
+
+    addFiltersToParams(params, filters);
 
     esClient.searchStoredTemplate(indexAlias, storedTemplate, params, function(err, resp) {
         if (err) { return next(err); }
@@ -160,8 +178,8 @@ var spellSuggest = function(query, size, next) {
 };
 
 
-var searchMain = function(query, appFrom, appSize, catFrom, catSize, catAppFrom, catAppSize, next) {
-    categoryFacetSearch(query, appFrom, appSize, catFrom, catSize, function(err, facetResult) {
+var searchMain = function(query, appFrom, appSize, catFrom, catSize, catAppFrom, catAppSize, filters, next) {
+    categoryFacetSearch(query, appFrom, appSize, catFrom, catSize, filters, function(err, facetResult) {
         if (err) { return next(err); }
 
         if (facetResult.category.categories.length === 0) {
@@ -186,7 +204,7 @@ var searchMain = function(query, appFrom, appSize, catFrom, catSize, catAppFrom,
             categoryMap[category.id] = category;
         });
 
-        categoryExpandSearch(query, categoryIds, catAppFrom, catAppSize, function(err, expandCategories) {
+        categoryExpandSearch(query, categoryIds, catAppFrom, catAppSize, filters, function(err, expandCategories) {
             if (err) { return next(err); }
 
             try {
@@ -208,4 +226,27 @@ var searchMain = function(query, appFrom, appSize, catFrom, catSize, catAppFrom,
     });
 };
 
+var searchComplete = function(query, size, next) {
+    var body = {
+        "auto": {
+            "text": query,
+            "completion": {
+                "field": "suggest",
+                "size": size
+            }
+        }
+    };
+
+    esClient.suggest(indexAlias, body, function(err, resp) {
+        if (err) { return next(err); }
+
+        if (!resp.auto || resp.auto.length < 1) {
+            return next(new Error('Unexpected suggest response'));
+        }
+
+        next(null, resp.auto[0].options);
+    });
+};
+
 exports.searchMain = searchMain;
+exports.searchComplete = searchComplete;

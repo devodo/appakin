@@ -23,16 +23,6 @@ var getFilterMask = function(filters) {
     return filterMask;
 };
 
-var getCategoryChartCacheKeys = function(categoryIds, filters) {
-    var filterMask = getFilterMask(filters);
-
-    var cacheKeys = categoryIds.map(function(categoryId) {
-        return ('cat_chart-' + categoryId + filterMask);
-    });
-
-    return cacheKeys;
-};
-
 var getCategoryChartsRepo = function(categoryIds, filters, next) {
     appStoreRepo.getMultiCategoryApps(categoryIds, NUM_CHART_APPS, filters, function(err, apps) {
         if (err) { return next(err); }
@@ -266,7 +256,7 @@ var parseAppResultsMain = function(appResults) {
     return {
         total: appResults.total,
         apps: parseAppResults(appResults)
-    }
+    };
 };
 
 var searchMain = function(queryStr, pageNum, filters, next) {
@@ -392,8 +382,7 @@ var searchCategories = function(queryStr, pageNum, filters, next) {
 
                     category.totalApps = categoryResult.app.total;
                     category.apps = parseAppResults(categoryResult.app);
-                    category.chart = categoryChart;
-
+                    category.chart = categoryChart.apps;
 
                     return category;
                 });

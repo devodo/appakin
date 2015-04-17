@@ -211,8 +211,8 @@ exports.mappings = {
             "is_cat": {"type": "boolean", "index": "not_analyzed", "store": false},
             "suggest" : {
                 "type": "completion",
-                "analyzer": "simple",
-                "search_analyzer": "simple",
+                "analyzer": "standard",
+                "search_analyzer": "standard",
                 "payloads": false,
                 "preserve_separators": true,
                 "preserve_position_increments": true

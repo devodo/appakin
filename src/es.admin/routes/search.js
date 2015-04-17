@@ -3,6 +3,14 @@
 var appSearcher = require('../elasticsearch/appSearcher');
 var log = require('../logger');
 
+var parseFilters = function(req) {
+    return {
+        isIphone: req.query.isIphone === 'true',
+        isIPad: req.query.isIpad === 'true',
+        isFree: req.query.isFree === 'true'
+    };
+};
+
 exports.init = function init(app) {
     app.get('/search/main', function (req, res, next) {
         var startTime = process.hrtime();
@@ -42,7 +50,36 @@ exports.init = function init(app) {
             return res.status(400).json({error: 'Bad catAppSize parameter'});
         }
 
-        appSearcher.searchMain(query, appFrom, appSize, catFrom, catSize, catAppFrom, catAppSize, function(err, result) {
+        var filters = parseFilters(req);
+
+        appSearcher.searchMain(query, appFrom, appSize, catFrom, catSize, catAppFrom, catAppSize, filters, function(err, result) {
+            if (err) { return next(err); }
+
+            var diffTime = process.hrtime(startTime);
+
+            var took = (diffTime[0] * 1e9 + diffTime[1]) / 1000000;
+
+            res.json({
+                took: took,
+                result: result
+            });
+        });
+    });
+
+    app.get('/search/complete', function (req, res, next) {
+        var startTime = process.hrtime();
+
+        var query = req.query.q;
+        if (!query || query.trim() === '') {
+            return res.status(400).json({error: 'Bad query parameter'});
+        }
+
+        var size = req.query.size ? parseInt(req.query.size, 10) : 5;
+        if (isNaN(size) || size < 0) {
+            return res.status(400).json({error: 'Bad size parameter'});
+        }
+
+        appSearcher.searchComplete(query, size, function(err, result) {
             if (err) { return next(err); }
 
             var diffTime = process.hrtime(startTime);
