@@ -123,41 +123,88 @@ var categoryExpandSearch = function(query, categoryIds, appFrom, appSize, next) 
     });
 };
 
+var spellSuggest = function(query, size, next) {
+    var body = {
+        "text": query,
+        "simple_phrase": {
+            "phrase": {
+                "field": "spell",
+                "size": size,
+                "real_word_error_likelihood": 0.95,
+                "confidence": 1.0,
+                "max_errors": 1.0,
+                "direct_generator": [
+                    {
+                        "field": "name",
+                        "suggest_mode": "always",
+                        "min_word_length": 1
+                    }
+                ],
+                "highlight": {
+                    "pre_tag": "<em>",
+                    "post_tag": "</em>"
+                }
+            }
+        }
+    };
 
-var searchMain = function(query, appFrom, appSize, catFrom, catSize, next) {
+    esClient.suggest(indexAlias, body, function(err, resp) {
+        if (err) { return next(err); }
+
+        if (!resp.simple_phrase || resp.simple_phrase.length < 1) {
+            return next(new Error('Unexpected suggest response'));
+        }
+
+        next(null, resp.simple_phrase[0].options);
+    });
+};
+
+
+var searchMain = function(query, appFrom, appSize, catFrom, catSize, catAppFrom, catAppSize, next) {
     categoryFacetSearch(query, appFrom, appSize, catFrom, catSize, function(err, facetResult) {
         if (err) { return next(err); }
 
-        if (facetResult.category.categories.length > 0) {
-            var categoryIds = [];
-            var categoryMap = Object.create(null);
+        if (facetResult.category.categories.length === 0) {
 
-            facetResult.category.categories.forEach(function(category) {
-                categoryIds.push(category.id);
-                categoryMap[category.id] = category;
-            });
+            if (facetResult.category.total > 0) {
+                return next(null, facetResult);
+            }
 
-            categoryExpandSearch(query, categoryIds, 0, 12, function(err, expandCategories) {
+            return spellSuggest(query, 3, function(err, options) {
                 if (err) { return next(err); }
 
-                try {
-                    expandCategories.forEach(function (expandCategory) {
-                        var category = categoryMap[expandCategory.id];
-
-                        if (!category) {
-                            throw('Missing category from expand list: ' + expandCategory.id);
-                        }
-
-                        category.app = expandCategory.app;
-                    });
-                } catch(err) {
-                    return next(err);
-                }
-
+                facetResult.suggestions = options;
                 next(null, facetResult);
-
             });
         }
+
+        var categoryIds = [];
+        var categoryMap = Object.create(null);
+
+        facetResult.category.categories.forEach(function(category) {
+            categoryIds.push(category.id);
+            categoryMap[category.id] = category;
+        });
+
+        categoryExpandSearch(query, categoryIds, catAppFrom, catAppSize, function(err, expandCategories) {
+            if (err) { return next(err); }
+
+            try {
+                expandCategories.forEach(function (expandCategory) {
+                    var category = categoryMap[expandCategory.id];
+
+                    if (!category) {
+                        throw('Missing category from expand list: ' + expandCategory.id);
+                    }
+
+                    category.app = expandCategory.app;
+                });
+            } catch(err) {
+                return next(err);
+            }
+
+            next(null, facetResult);
+        });
     });
 };
 

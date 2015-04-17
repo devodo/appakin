@@ -35,6 +35,9 @@
                 "tempCorePrefix": "temp_",
                 "createTempCoreUrl": "http://localhost:3005/solr/admin/create_temp_core"
             },
+            "esAdmin": {
+              "url": "http://localhost:3006/"
+            },
             "stopwordFile": "domain/search/stopwords_en.txt"
         },
         "itunes": {

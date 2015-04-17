@@ -27,12 +27,22 @@ exports.init = function init(app) {
             return res.status(400).json({error: 'Bad catFrom parameter'});
         }
 
-        var catSize = req.query.catSize ? parseInt(req.query.catSize, 10) : 10;
+        var catSize = req.query.catSize ? parseInt(req.query.catSize, 10) : 5;
         if (isNaN(catSize) || catSize < 0) {
             return res.status(400).json({error: 'Bad catSize parameter'});
         }
 
-        appSearcher.searchMain(query, appFrom, appSize, catFrom, catSize, function(err, result) {
+        var catAppFrom = req.query.catAppFrom ? parseInt(req.query.catAppFrom, 10) : 0;
+        if (isNaN(catAppFrom) || catAppFrom < 0) {
+            return res.status(400).json({error: 'Bad catAppFrom parameter'});
+        }
+
+        var catAppSize = req.query.catAppSize ? parseInt(req.query.catAppSize, 10) : 5;
+        if (isNaN(catAppSize) || catAppSize < 0) {
+            return res.status(400).json({error: 'Bad catAppSize parameter'});
+        }
+
+        appSearcher.searchMain(query, appFrom, appSize, catFrom, catSize, catAppFrom, catAppSize, function(err, result) {
             if (err) { return next(err); }
 
             var diffTime = process.hrtime(startTime);

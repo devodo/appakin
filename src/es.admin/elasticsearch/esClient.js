@@ -118,6 +118,15 @@ exports.searchStoredTemplate = function(index, storedTemplate, params, next) {
     });
 };
 
+exports.suggest = function(index, body, next) {
+    client.suggest({
+        index: index,
+        body: body
+    }, function (err, resp) {
+        next(err, resp);
+    });
+};
+
 
 
 

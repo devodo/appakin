@@ -234,17 +234,21 @@ var getMultiCategoryApps = function(client, categoryIds, take, filters, next) {
     });
 };
 
-var getCategories = function(client, next) {
-    var queryStr =
-        "SELECT c.id, c.ext_id, c.name, c.description,\n" +
-        "c.date_created, c.date_modified, c.date_deleted, cp.popularity\n" +
-        "FROM category c\n" +
-        "LEFT JOIN category_popularity cp\n" +
-        "ON c.id = cp.category_id\n" +
-        "WHERE date_deleted is null\n" +
-        "ORDER BY name;";
+var getCategories = function(client, categoryIds, next) {
+    var queryParams = [];
+    var params = [];
+    categoryIds.forEach(function(categoryId, i) {
+        params.push('$'+ (i + 1));
+        queryParams.push(categoryId);
+    });
 
-    client.query(queryStr, [], function (err, result) {
+    var queryStr =
+        "SELECT c.id, c.ext_id, c.name, c.description\n" +
+        "FROM category c\n" +
+        "WHERE c.id in (" + params.join(',') + ")\n" +
+        "ORDER BY c.id;";
+
+    client.query(queryStr, queryParams, function (err, result) {
         if (err) {
             return next(err);
         }
@@ -254,11 +258,7 @@ var getCategories = function(client, next) {
                 id: item.id,
                 extId: item.ext_id,
                 name: item.name,
-                description: item.description,
-                dateCreated: item.date_created,
-                dateModified: item.date_modified,
-                dateDeleted: item.date_deleted,
-                popularity: item.popularity
+                description: item.description
             };
         });
 
@@ -762,13 +762,13 @@ exports.getMultiCategoryApps = function(categoryIds, take, filters, next) {
     });
 };
 
-exports.getCategories = function(next) {
+exports.getCategories = function(categoryIds, next) {
     connection.open(function(err, conn) {
         if (err) {
             return next(err);
         }
 
-        getCategories(conn.client, function(err, results) {
+        getCategories(conn.client, categoryIds, function(err, results) {
             conn.close(err, function(err) {
                 next(err, results);
             });
