@@ -336,9 +336,10 @@ var searchApps = function(queryStr, pageNum, extCategoryId, filters, next) {
                 log.error("No category chart found for category id: " + extCategoryId);
             }
 
-            categorySearcher.searchApps(queryStr, pageNum, extCategoryId, filters, function(err, searchResult) {
+            appSearcher.searchCategoryApps(queryStr, category.id, pageNum, filters, function(err, searchResult) {
                 if (err) { return next(err); }
 
+                delete searchResult.id;
                 searchResult.categoryId = extCategoryId;
                 searchResult.categoryName = category.name;
                 searchResult.categoryUrl = urlUtil.makeUrl(extCategoryId, category.name);

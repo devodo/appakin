@@ -42,6 +42,21 @@ var buildCategoriesUrlParams = function(query, pageNum, filters) {
     return queryParams;
 };
 
+var buildCategoryAppsUrlParams = function(query, categoryId, pageNum, filters) {
+    var appFrom = 0;
+    if (pageNum && pageNum > 1) {
+        appFrom = (pageNum - 1) * CAT_APP_PAGE_SIZE;
+    }
+
+    var queryParams = '?q=' + encodeURIComponent(query) +
+        '&categoryId=' + categoryId +
+        '&appFrom=' + appFrom +
+        '&appSize=' + CAT_APP_PAGE_SIZE +
+        buildFilterParams(filters);
+
+    return queryParams;
+};
+
 var buildAppsUrlParams = function(query, pageNum, filters) {
     var appFrom = 0;
     if (pageNum && pageNum > 1) {
@@ -163,7 +178,7 @@ var searchCategories = function(query, pageNum, filters, next) {
 
 var searchCategoryApps = function(query, categoryId, pageNum, filters, next) {
     var queryParams = buildCategoryAppsUrlParams(query, categoryId, pageNum, filters);
-    var queryUrl = config.search.esAdmin.url + 'search/main' + queryParams;
+    var queryUrl = config.search.esAdmin.url + 'search/category' + queryParams;
 
     request({url: queryUrl, pool: false, json: true}, function (err, resp, searchResult) {
         if (err) { return next(err); }
@@ -171,25 +186,14 @@ var searchCategoryApps = function(query, categoryId, pageNum, filters, next) {
 
         var result = {
             page: pageNum,
-            total: searchResult.result.category.total,
-            suggestions: []
+            total: 0
         };
 
-        if (searchResult.result.suggestions) {
-            result.suggestions = searchResult.result.suggestions.map(function (suggestion) {
-                return suggestion.text;
-            });
+        if (searchResult.result.length > 0) {
+            result.id = searchResult.result[0].id;
+            result.total = searchResult.result[0].app.total;
+            result.apps = parseAppResults(searchResult.result[0].app);
         }
-
-        result.categories = searchResult.result.category.categories.map(function (categoryResult) {
-            var category = {};
-
-            category.id = categoryResult.id;
-            category.totalApps = categoryResult.app.total;
-            category.apps = parseAppResults(categoryResult.app);
-
-            return category;
-        });
 
         next(null, result);
     });
@@ -232,6 +236,7 @@ var searchComplete = function(query, next) {
 
 exports.search = search;
 exports.searchCategories = searchCategories;
+exports.searchCategoryApps = searchCategoryApps;
 exports.searchApps = searchApps;
 exports.searchComplete = searchComplete;
 

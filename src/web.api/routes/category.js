@@ -131,11 +131,11 @@ exports.init = function init(app) {
                 return category.id;
             });
 
-            catViewProvider.getCategoryChartAppsMap(categoryIds, filters, function(err, categoryAppsMap) {
+            catViewProvider.getCategoriesCharts(categoryIds, filters, function(err, categoriesCharts) {
                 if (err) { return next(err); }
 
-                var relatedCategories = categories.map(function(category) {
-                    var categoryChart = categoryAppsMap[category.id];
+                var relatedCategories = categories.map(function(category, i) {
+                    var categoryChart = categoriesCharts[i];
 
                     if (!categoryChart) {
                         return log.error("No related category chart found for category id: " + category.id);
@@ -219,11 +219,11 @@ exports.init = function init(app) {
                 return category.id;
             });
 
-            catViewProvider.getCategoryChartAppsMap(categoryIds, filters, function(err, categoryAppsMap) {
+            catViewProvider.getCategoriesCharts(categoryIds, filters, function(err, categoriesCharts) {
                 if (err) { return next(err); }
 
-                var categories = pageResult.categories.map(function(category) {
-                    var categoryChart = categoryAppsMap[category.id];
+                var categories = pageResult.categories.map(function(category, i) {
+                    var categoryChart = categoriesCharts[i];
 
                     if (!categoryChart) {
                         return log.error("No related category chart found for category id: " + category.id);
