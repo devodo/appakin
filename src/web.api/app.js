@@ -150,5 +150,14 @@ function notFoundErrorHandler(err, req, res, next) {
 
 function serverErrorHandler(err, req, res, next) {
     log.error(err);
-    res.status(err.status || 500).json({error: err.message});
+
+    var error = {
+      error: "server error"
+    };
+
+    if (config.server.returnErrorDetail) {
+        error.detail = err;
+    }
+
+    res.status(err.status || 500).json(error);
 }

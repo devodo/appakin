@@ -1,7 +1,8 @@
 {
     "common": {
         "server": {
-            "port": 3002
+            "port": 3002,
+            "returnErrorDetail": false
         },
         "cluster": {
             "enabled": true,
@@ -59,10 +60,13 @@
         }
     },
     "development": {
-        "test": "test dev",
-        "log": {
-            "level": "debug"
-        }
+      "server": {
+        "returnErrorDetail": false
+      },
+      "test": "test dev",
+      "log": {
+          "level": "debug"
+      }
     },
     "production": {
         "test": "test production",
