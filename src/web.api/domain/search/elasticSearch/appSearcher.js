@@ -27,6 +27,24 @@ var buildFilterParams = function(filters) {
     return filterParam;
 };
 
+var buildMainUrlParams = function(query, pageNum, filters) {
+    var catFrom = 0;
+    if (pageNum && pageNum > 1) {
+        catFrom = (pageNum - 1) * CAT_PAGE_SIZE;
+    }
+
+    var appSize = pageNum > 1 ? 0 : CAT_APP_SIZE;
+
+    var queryParams = '?q=' + encodeURIComponent(query) +
+        '&appSize=' + appSize +
+        '&catFrom=' + catFrom +
+        '&catSize=' + CAT_PAGE_SIZE +
+        '&catAppSize=' + CAT_APP_SIZE +
+        buildFilterParams(filters);
+
+    return queryParams;
+};
+
 var buildCategoriesUrlParams = function(query, pageNum, filters) {
     var catFrom = 0;
     if (pageNum && pageNum > 1) {
@@ -108,8 +126,7 @@ var parseAppResultsMain = function(appResults) {
 };
 
 var search = function(query, pageNum, filters, next) {
-    var queryParams = '?q=' + encodeURIComponent(query);
-
+    var queryParams = buildMainUrlParams(query, pageNum, filters);
     var queryUrl = config.search.esAdmin.url + 'search/main' + queryParams;
 
     request({url: queryUrl, pool: false, json: true}, function (err, resp, searchResult) {

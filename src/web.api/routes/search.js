@@ -52,6 +52,30 @@ exports.init = function init(app) {
         });
     });
 
+    app.get('/ios/search/main', function (req, res, next) {
+        var query = req.query.q;
+        if (!query || query.trim() === '') {
+            return res.status(400).json({error: 'Bad query string'});
+        }
+
+        var pageNum = req.query.p ? parseInt(req.query.p, 10) : 1;
+        if (isNaN(pageNum) || pageNum < 1) {
+            return res.status(400).json({error: 'Bad page number'});
+        }
+
+        var filters = {
+            isIphone: req.query.is_iphone === 'true',
+            isIpad: req.query.is_ipad === 'true',
+            isFree: req.query.is_free === 'true'
+        };
+
+        catViewProvider.searchMain(query, pageNum, filters, function (err, result) {
+            if (err) { return next(err); }
+
+            res.json(result);
+        });
+    });
+
     app.get('/ios/search/cat_app', function (req, res, next) {
         var query = req.query.q;
         var pageNum = req.query.p ? parseInt(req.query.p, 10) : 1;

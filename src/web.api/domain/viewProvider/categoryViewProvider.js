@@ -227,7 +227,7 @@ var searchMain = function(queryStr, pageNum, filters, next) {
     appSearcher.search(queryStr, pageNum, filters, function(err, searchResult) {
         if (err) { return next(err); }
 
-        var categoryIds = searchResult.category.categories.map(function (categoryResult) {
+        var categoryIds = searchResult.categoryResults.categories.map(function (categoryResult) {
             return categoryResult.id;
         });
 
@@ -242,7 +242,7 @@ var searchMain = function(queryStr, pageNum, filters, next) {
             function (err, results) {
                 if (err) { return next(err); }
 
-                searchResult.category.categories.forEach(function (categoryResult, i) {
+                searchResult.categoryResults.categories.forEach(function (categoryResult, i) {
                     var category = results[1][i];
 
                     if (!category) {
@@ -353,9 +353,8 @@ var searchApps = function(queryStr, pageNum, extCategoryId, filters, next) {
 
 
 exports.searchCategories = searchCategories;
-exports.searchMain = searchCategories;
+exports.searchMain = searchMain;
 exports.searchApps = searchApps;
-exports.getCategoryChartAppsMap = null;
 exports.getCategoriesCharts = getCategoriesCharts;
 
 
