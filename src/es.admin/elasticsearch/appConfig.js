@@ -224,7 +224,7 @@ exports.mappings = {
             },
             "categories": {
                 "type": "nested",
-                "include_in_parent": true,
+                "include_in_parent": false,
                 "properties": {
                     "cat_id": {"type": "integer", "index": "not_analyzed"},
                     "position": {"type": "integer", "index": "not_analyzed"},

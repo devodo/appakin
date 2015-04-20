@@ -7,6 +7,7 @@ var log = require('../logger');
 var appRank = require('./../domain/appRank');
 var indexRepo = require('../repos/indexRepo');
 var unidecode = require('unidecode');
+var Q = require("q");
 
 var aliasName = appConfig.constants.appIndex.alias;
 var docType = appConfig.constants.appIndex.docType;
@@ -101,7 +102,39 @@ var createAppDoc = function(app, categoryFields, categoryNames) {
     };
 };
 
-var indexApps = function(tmpIndexName, batchSize, categoryApps, categories, next) {
+var createAppBatchLoader = function (startId, batchSize) {
+    var lastId = startId;
+
+    var nextPromise = function() {
+        var deferred = Q.defer();
+
+        log.debug("Loading next app batch from id: " + lastId);
+
+        indexRepo.getAppIndexBatch(lastId, batchSize, function(err, apps) {
+            if (err) { return deferred.reject(err); }
+
+            if (apps.length === 0) {
+                return deferred.resolve();
+            }
+
+            lastId = apps[apps.length - 1].id;
+            log.debug("Next app batch loaded ending id: " + lastId);
+
+            deferred.resolve({
+                lastId: lastId,
+                apps: apps
+            });
+        });
+
+        return deferred.promise;
+    };
+
+    return ({
+        nextPromise: nextPromise
+    });
+};
+
+var createAppBatchIndexer = function (tmpIndexName, categoryApps, categories) {
     var categoryAppIndex = 0;
 
     var categoriesMap = Object.create(null);
@@ -110,56 +143,86 @@ var indexApps = function(tmpIndexName, batchSize, categoryApps, categories, next
         categoriesMap[category.id] = category;
     });
 
-    var processBatch = function(lastId) {
-        log.debug("Adding batch from id: " + lastId);
+    var processBatchResult = function(batchResult) {
+        var deferred = Q.defer();
 
-        indexRepo.getAppIndexBatch(lastId, batchSize, function(err, apps) {
-            if (err) { return next(err); }
+        if (!batchResult) {
+            deferred.resolve(true);
 
-            if (apps.length === 0) {
-                return next();
-            }
+            return deferred.promise;
+        }
 
-            lastId = apps[apps.length - 1].id;
-            log.debug("Last app: " + apps[apps.length - 1].name);
+        try {
+            var appDocs = batchResult.apps.map(function (app) {
+                var categoryFields = [];
+                var categoryNames = [];
+                if (categoryAppIndex < categoryApps.length && categoryApps[categoryAppIndex].appId < app.id) {
+                    throw ("Category app index appId behind app batch appId");
+                }
 
-            try {
+                while (categoryAppIndex < categoryApps.length && categoryApps[categoryAppIndex].appId === app.id) {
+                    var category = categoriesMap[categoryApps[categoryAppIndex].categoryId];
 
-                var appDocs = apps.map(function (app) {
-                    var categoryFields = [];
-                    var categoryNames = [];
-                    if (categoryAppIndex < categoryApps.length && categoryApps[categoryAppIndex].appId < app.id) {
-                        throw ("Category app index appId behind app batch appId");
+                    if (!category) {
+                        throw ("No category found for category id: " + categoryApps[categoryAppIndex].categoryId);
                     }
 
-                    while (categoryAppIndex < categoryApps.length && categoryApps[categoryAppIndex].appId === app.id) {
-                        var category = categoriesMap[categoryApps[categoryAppIndex].categoryId];
+                    categoryNames.push(category.name);
+                    categoryFields.push(createCategoryField(categoryApps[categoryAppIndex], app.popularity));
+                    categoryAppIndex++;
+                }
 
-                        if (!category) {
-                            throw ("No category found for category id: " + categoryApps[categoryAppIndex].categoryId);
-                        }
+                return createAppDoc(app, categoryFields, categoryNames);
+            });
 
-                        categoryNames.push(category.name);
-                        categoryFields.push(createCategoryField(categoryApps[categoryAppIndex], app.popularity));
-                        categoryAppIndex++;
-                    }
+            esClient.bulkInsert(tmpIndexName, docType, appDocs, function (err) {
+                if (err) { return deferred.reject(err); }
 
-                    return createAppDoc(app, categoryFields, categoryNames);
-                });
+                deferred.resolve(false);
+            });
+        } catch(err) {
+            return deferred.reject(err);
+        }
 
-                esClient.bulkInsert(tmpIndexName, docType, appDocs, function(err){
-                    if(err){ return next(err); }
+        return deferred.promise;
+    };
 
-                    processBatch(lastId);
-                });
+    return ({
+        processBatchResult: processBatchResult
+    });
+};
 
-            } catch(err) {
-                return next(err);
-            }
+var indexApps = function(tmpIndexName, batchSize, categoryApps, categories, next) {
+    var appBatchLoader = createAppBatchLoader(0, batchSize);
+    var appBatchIndexer = createAppBatchIndexer(tmpIndexName, categoryApps, categories);
+    var nextBatchPromise = appBatchLoader.nextPromise();
+
+    var processBatch = function() {
+        nextBatchPromise
+            .then(function(batchResult) {
+                nextBatchPromise = appBatchLoader.nextPromise();
+
+                if (batchResult) {
+                    log.debug("Indexing batch ending at id: " + batchResult.lastId);
+                }
+
+                return batchResult;
+            })
+            .then(appBatchIndexer.processBatchResult)
+            .then(function(isDone) {
+                if (isDone) {
+                    log.debug("App batch loader completed");
+
+                    return next();
+                }
+
+                processBatch();
+        }, function(err) {
+            return next(err);
         });
     };
 
-    processBatch(0);
+    processBatch();
 };
 
 var indexCategories = function(tmpIndexName, categories, next) {
