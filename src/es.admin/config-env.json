@@ -1,7 +1,13 @@
 {
   "common": {
     "server": {
-      "port": 3006
+      "port": 3006,
+      "returnErrorDetail": true
+    },
+    "cluster": {
+      "enabled": true,
+      "workers": "cpu_count",
+      "watchFile": "./system/restart"
     },
     "log": {
       "level": "info"
@@ -26,5 +32,14 @@
     }
   },
   "production": {
+    "db": {
+      "index": {
+        "host": "localhost",
+        "port": 5432,
+        "username": "appakin",
+        "password": "password",
+        "database": "appakin"
+      }
+    }
   }
 }

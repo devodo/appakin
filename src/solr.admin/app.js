@@ -5,7 +5,6 @@ var path = require('path');
 var expressWinston = require('express-winston');
 var cookieParser = require('cookie-parser');
 var bodyParser = require('body-parser');
-var cors = require('cors');
 var http = require('http');
 var fs = require('fs');
 var log = require('./logger');
@@ -30,7 +29,6 @@ if (config.environment !== 'production') {
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded());
 app.use(cookieParser());
-configureCors(app);
 initApiRoutes(app);
 app.use(notFoundHandler);
 
@@ -84,15 +82,6 @@ function configureApp(app) {
 
     app.set('etag', false);
     app.set('x-powered-by', false);
-}
-
-function configureCors(app) {
-    var corsOptions = {
-        origin: config.environment === 'production' ? 'http://www.appakin.com' : true
-    };
-
-    app.use(cors(corsOptions));          // for regular requests
-    app.options('*', cors(corsOptions)); // for preflight requests
 }
 
 function initApiRoutes(app) {

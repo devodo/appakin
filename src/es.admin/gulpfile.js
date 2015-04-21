@@ -39,7 +39,10 @@ gulp.task('build:clean', ['jshint'], function() {
 
 gulp.task('build:copy', ['build:clean'], function() {
 	var filesToCopy = [
-		'./routes/**/*.*',
+		'./domain/**/*.*',
+        './elasticsearch/**/*.*',
+        './repos/**/*.*',
+        './routes/**/*.*',
 		'./*.*',
 		'!./gulpfile.js',
         '!./config-local.json'

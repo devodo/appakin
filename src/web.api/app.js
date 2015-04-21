@@ -89,7 +89,7 @@ function configureApp(app) {
 
 function configureCors(app) {
     var corsOptions = {
-        origin: config.environment === 'production' && !argv.no-cors ? 'http://www.appakin.com' : true
+        origin: config.environment === 'production' && !argv.no_cors ? 'http://www.appakin.com' : true
     };
 
     app.use(cors(corsOptions));          // for regular requests
@@ -150,6 +150,8 @@ function notFoundErrorHandler(err, req, res, next) {
 
 function serverErrorHandler(err, req, res, next) {
     log.error(err);
+
+    res.removeHeader("Cache-Control");
 
     var error = {
       error: "server error"

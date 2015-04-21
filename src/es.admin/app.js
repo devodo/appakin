@@ -5,7 +5,6 @@ var path = require('path');
 var expressWinston = require('express-winston');
 var cookieParser = require('cookie-parser');
 var bodyParser = require('body-parser');
-var cors = require('cors');
 var http = require('http');
 var fs = require('fs');
 var log = require('./logger');
@@ -30,7 +29,6 @@ if (config.environment !== 'production') {
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded());
 app.use(cookieParser());
-configureCors(app);
 initApiRoutes(app);
 app.use(notFoundHandler);
 
@@ -86,15 +84,6 @@ function configureApp(app) {
     app.set('x-powered-by', false);
 }
 
-function configureCors(app) {
-    var corsOptions = {
-        origin: config.environment === 'production' ? 'http://www.appakin.com' : true
-    };
-
-    app.use(cors(corsOptions));          // for regular requests
-    app.options('*', cors(corsOptions)); // for preflight requests
-}
-
 function initApiRoutes(app) {
     var getFilesSync = function(dir, recurse) {
         var results = [];
@@ -144,11 +133,21 @@ function notFoundErrorHandler(err, req, res, next) {
         return next(err);
     }
 
-    res.status(404);
-    res.send(err.message || '404');
+    res.status(404).json({error: err.message || '404'});
 }
 
 function serverErrorHandler(err, req, res, next) {
     log.error(err);
-    res.send(err.status || 500, {error: err.message});
+
+    res.removeHeader("Cache-Control");
+
+    var error = {
+        error: "server error"
+    };
+
+    if (config.server.returnErrorDetail) {
+        error.detail = err;
+    }
+
+    res.status(err.status || 500).json(error);
 }
