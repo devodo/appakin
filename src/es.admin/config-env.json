@@ -26,7 +26,7 @@
       "port": "9200",
       "maxSockets": 100
     },
-    "restoreSubscribers": []
+    "snapshotSubscribers": []
   },
   "development": {
     "log": {

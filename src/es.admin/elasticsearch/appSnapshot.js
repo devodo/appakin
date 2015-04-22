@@ -53,7 +53,7 @@ var deleteSnapshotPromise = function(snapshotName) {
     return deferred.promise;
 };
 
-var notifyRestoreSubscriberPromise = function(subscriberUrl) {
+var notifySnapshotSubscriberPromise = function(subscriberUrl) {
     var deferred = Q.defer();
 
     request({url: subscriberUrl, pool: false, json: true}, function (err, resp, result) {
@@ -71,15 +71,15 @@ var notifyRestoreSubscriberPromise = function(subscriberUrl) {
     return deferred.promise;
 };
 
-var notifyRestoreSubscribersPromise = function() {
+var notifySnapshotSubscribersPromise = function() {
     var deferred = Q.defer();
 
-    if (!config.restoreSubscribers) {
-        deferred.reject(new Error("No restore subscribers configured"));
+    if (!config.snapshotSubscribers) {
+        deferred.reject(new Error("No snapshot subscribers configured"));
     }
 
-    var promises = config.restoreSubscribers.map(function (subscriberUrl) {
-        return notifyRestoreSubscriberPromise(subscriberUrl);
+    var promises = config.snapshotSubscribers.map(function (subscriberUrl) {
+        return notifySnapshotSubscriberPromise(subscriberUrl);
     });
 
     Q.allSettled(promises)
@@ -131,7 +131,8 @@ exports.createSnapshotPromise = function(batchSize) {
                     log.debug("Deleting app index");
                     return appIndexAdmin.deleteSwapOutIndicesPromise()
                         .then(function() {
-                            return notifyRestoreSubscribersPromise();
+                            log.debug("Notify snapshot subscribers");
+                            return notifySnapshotSubscribersPromise();
                         })
                         .then(function (subscriberResponses) {
                             return {

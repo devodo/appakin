@@ -34,7 +34,7 @@ exports.getAppIndexBatch = function(lastId, limit, next) {
         "LEFT JOIN app_popularity ap on a.app_id = ap.app_id\n" +
         "LEFT JOIN app_analysis aa\n" +
         "ON a.app_id = aa.app_id\n" +
-        "WHERE a.app_id > $1 and a.app_id < 5000\n" +
+        "WHERE a.app_id > $1\n" +
         "AND a.name is not null\n" +
         "AND a.date_deleted is null\n" +
         "ORDER BY a.app_id\n" +
