@@ -155,10 +155,10 @@ exports.deleteSwapOutIndicesPromise = function() {
     return deleteIndexPromise(swapOutAliasName);
 };
 
-exports.getSnapshotsPromise = function() {
+var getSnapshotsInternalPromise = function(repo) {
     var deferred = Q.defer();
 
-    esClient.getSnapshots(snapshotRepo, function(err, resp) {
+    esClient.getSnapshots(repo, function(err, resp) {
         if (err) { return deferred.reject(err); }
 
         if (!resp || !resp.snapshots) {
@@ -177,4 +177,12 @@ exports.getSnapshotsPromise = function() {
     });
 
     return deferred.promise;
+};
+
+exports.getSnapshotsPromise = function() {
+    return getSnapshotsInternalPromise(snapshotRepo);
+};
+
+exports.getRestoreSnapshotsPromise = function() {
+    return getSnapshotsInternalPromise(restoreRepo);
 };

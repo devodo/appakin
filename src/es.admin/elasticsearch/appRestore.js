@@ -100,7 +100,7 @@ exports.restoreLatestSnapshotPromise = function() {
     log.debug("Restoring latest snapshot");
 
     log.debug("Getting snapshots list");
-    return appIndexAdmin.getSnapshotsPromise()
+    return appIndexAdmin.getRestoreSnapshotsPromise()
         .then(function (snapshotNames) {
             if (snapshotNames.length === 0) {
                 throw new Error("No snapshots found");
