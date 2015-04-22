@@ -42,6 +42,7 @@
         "password": "password",
         "database": "appakin"
       }
-    }
+    },
+    "snapshotSubscribers": [ "http://appakin-es1:3006/index/app/restore_latest"]
   }
 }
