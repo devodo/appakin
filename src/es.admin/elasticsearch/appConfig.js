@@ -3,7 +3,10 @@
 exports.constants = {
     appIndex: {
         alias: "appakin_app",
+        swapOutAlias: "appakin_app_inactive",
         docType: "app",
+        snapshotRepo: "appakin_repo",
+        restoreRepo: "appakin_url_repo",
         template: {
             categoryFacetSearch: "category_facet_search",
             categoryExpandSearch: "category_expand_search"

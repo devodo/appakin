@@ -8,6 +8,7 @@ var appRank = require('./../domain/appRank');
 var indexRepo = require('../repos/indexRepo');
 var unidecode = require('unidecode');
 var Q = require("q");
+var appIndexAdmin = require('./appIndexAdmin');
 
 var aliasName = appConfig.constants.appIndex.alias;
 var docType = appConfig.constants.appIndex.docType;
@@ -192,14 +193,14 @@ var createAppBatchIndexer = function (tmpIndexName, categoryApps, categories) {
     });
 };
 
-var indexApps = function(tmpIndexName, batchSize, categoryApps, categories, next) {
+var indexAppsPromise = function(tmpIndexName, batchSize, categoryApps, categories) {
     var appBatchLoader = createAppBatchLoader(0, batchSize);
     var appBatchIndexer = createAppBatchIndexer(tmpIndexName, categoryApps, categories);
     var nextBatchPromise = appBatchLoader.nextPromise();
 
-    var processBatch = function() {
-        nextBatchPromise
-            .then(function(batchResult) {
+    var processNextBatch = function() {
+        return nextBatchPromise
+            .then(function (batchResult) {
                 nextBatchPromise = appBatchLoader.nextPromise();
 
                 if (batchResult) {
@@ -209,23 +210,23 @@ var indexApps = function(tmpIndexName, batchSize, categoryApps, categories, next
                 return batchResult;
             })
             .then(appBatchIndexer.processBatchResult)
-            .then(function(isDone) {
+            .then(function (isDone) {
                 if (isDone) {
                     log.debug("App batch loader completed");
 
-                    return next();
+                    return;
                 }
 
-                processBatch();
-        }, function(err) {
-            return next(err);
-        });
+                return processNextBatch();
+            });
     };
 
-    processBatch();
+    return processNextBatch();
 };
 
-var indexCategories = function(tmpIndexName, categories, next) {
+var indexCategoriesPromise = function(tmpIndexName, categories) {
+    var deferred = Q.defer();
+
     var categoryIdOffset = 10000000;
 
     var categoryDocs = categories.map(function(category) {
@@ -252,113 +253,97 @@ var indexCategories = function(tmpIndexName, categories, next) {
     });
 
     esClient.bulkInsert(tmpIndexName, docType, categoryDocs, function(err){
-        if(err){ return next(err); }
+        if (err){ return deferred.reject(err); }
 
-        next();
+        deferred.resolve();
     });
+
+    return deferred.promise;
 };
 
-var createAppIndex = function(tmpAlias, next) {
-    var timestamp = (new Date()).getTime();
-    var newIndexName = aliasName + "-idx-" + timestamp;
-    var aliases = {};
-    aliases[tmpAlias] = {};
+var getCategoryAppsPromise = function() {
+    var deferred = Q.defer();
 
-    esClient.createIndex(newIndexName, appConfig.settings, appConfig.mappings, aliases, function(err) {
-        if (err) { return next(err); }
+    indexRepo.getCategoryApps(function(err, categoryApps) {
+        if (err) { return deferred.reject(err); }
 
-        next(null, newIndexName);
+        deferred.resolve(categoryApps);
     });
+
+    return deferred.promise;
 };
 
-var getCurrentIndex = function(next) {
-    esClient.existsAlias(aliasName, function(err, resp) {
-        if (err) { return next(err); }
+var getCategoriesPromise = function() {
+    var deferred = Q.defer();
 
-        if (resp === false) {
-            return next(null, null);
-        }
+    indexRepo.getCategories(function(err, categories) {
+        if (err) { return deferred.reject(err); }
 
-        esClient.getAliasIndexes(aliasName, function(err, resp) {
-            if (err) { return next(err); }
-
-            if (!resp) {
-                return next(null, null);
-            }
-
-            var indexes = [];
-
-            Object.keys(resp).forEach(function(key) {
-                if (key.indexOf(aliasName) === 0) {
-                    indexes.push(key);
-                }
-            });
-
-            if (indexes.length === 0) {
-                return next(null, null);
-            }
-
-            if (indexes.length > 1) {
-                return next('Multiple indexes found with alias: ' + aliasName);
-            }
-
-            next(null, indexes[0]);
-        });
+        deferred.resolve(categories);
     });
+
+    return deferred.promise;
 };
 
-exports.rebuild = function(batchSize, next) {
-    log.debug("Rebuilding app index");
+var optmiseIndexPromise = function(indexName) {
+    var deferred = Q.defer();
 
-    var tmpAlias = aliasName + "-idx-inactive";
+    esClient.optimize(indexName, function(err) {
+        if (err) { return deferred.reject(err); }
 
+        deferred.resolve();
+    });
+
+    return deferred.promise;
+};
+
+var rebuildPromise = function(batchSize) {
     log.debug("Creating new index");
-    createAppIndex(tmpAlias, function(err, tmpIndexName) {
-        if (err) { return next(err); }
 
-        log.debug("Retrieving category apps");
-        indexRepo.getCategoryApps(function(err, categoryApps) {
-            if (err) { return next(err); }
-
-            log.debug("Retrieving categories");
-            indexRepo.getCategories(function(err, categories) {
-                if (err) { return next(err); }
-
-                log.debug("Indexing apps");
-                indexApps(tmpIndexName, batchSize, categoryApps, categories, function(err) {
-                    if (err) { return next(err); }
-
-                    log.debug("Indexing categories");
-                    indexCategories(tmpIndexName, categories, function(err) {
-                        if (err) { return next(err); }
-
-                        log.debug("Optimising index");
-                        esClient.optimize(tmpIndexName, function(err) {
-                            if (err) { return next(err); }
-
-                            log.debug("Get current index");
-                            getCurrentIndex(function(err, currentIndex) {
-                                if (err) { return next(err); }
-
-                                log.debug("Swap in new index");
-                                esClient.activateIndex(currentIndex, tmpIndexName, aliasName, tmpAlias, function(err) {
-                                    if (err) { return next(err); }
-
-                                    if (!currentIndex) {
-                                        return next();
-                                    }
-
-                                    log.debug("Delete old index");
-                                    esClient.deleteIndex(tmpAlias, function(err) {
-                                        next(err);
-                                    });
+    return appIndexAdmin.createAppIndexPromise()
+        .then(function (newIndexName) {
+            log.debug("Retrieving category apps");
+            return getCategoryAppsPromise()
+                .then(function (categoryApps) {
+                    log.debug("Retrieving categories");
+                    return getCategoriesPromise()
+                        .then(function (categories) {
+                            log.debug("Indexing apps");
+                            return indexAppsPromise(newIndexName, batchSize, categoryApps, categories)
+                                .then(function () {
+                                    log.debug("Indexing categories");
+                                    return indexCategoriesPromise(newIndexName, categories);
                                 });
-                            });
                         });
-                    });
+                })
+                .then(function () {
+                    log.debug("Optimising index");
+                    return optmiseIndexPromise(newIndexName);
+                })
+                .then(function () {
+                    return newIndexName;
                 });
-            });
-
         });
-    });
+};
+
+exports.rebuildPromise = rebuildPromise;
+
+exports.rebuildAndSwapInPromise = function(batchSize) {
+    log.debug("Rebuilding and swapping in new app index");
+
+    return rebuildPromise(batchSize)
+        .then(function (newIndexName) {
+            log.debug("Get current index");
+            return appIndexAdmin.getCurrentIndexPromise()
+                .then(function (currentIndex) {
+                    log.debug("Swap in new index");
+                    return appIndexAdmin.swapInNewIndexPromise(currentIndex, newIndexName);
+                });
+        });
+};
+
+exports.deleteInactiveIndicesPromise = function() {
+    log.debug("Deleting inactive indices");
+
+    return appIndexAdmin.deleteSwapOutIndicesPromise();
 };

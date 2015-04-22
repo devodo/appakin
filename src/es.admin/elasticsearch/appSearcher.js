@@ -28,7 +28,7 @@ var addFiltersToParams = function(paramsObject, filterFlags) {
     }
 };
 
-var categoryFacetSearch = function(query, appFrom, appSize, catFrom, catSize, filters, next) {
+var categoryFacetSearchInternal = function(indexName, query, appFrom, appSize, catFrom, catSize, filters, next) {
     var bucketMergeTie = 0.1;
 
     var includeTopApps = appSize > 0;
@@ -48,7 +48,7 @@ var categoryFacetSearch = function(query, appFrom, appSize, catFrom, catSize, fi
 
     addFiltersToParams(params, filters);
 
-    esClient.searchStoredTemplate(indexAlias, storedTemplate, params, function(err, resp) {
+    esClient.searchStoredTemplate(indexName, storedTemplate, params, function(err, resp) {
         if (err) { return next(err); }
 
         var result = {};
@@ -113,7 +113,7 @@ var categoryFacetSearch = function(query, appFrom, appSize, catFrom, catSize, fi
     });
 };
 
-var categoryExpandSearch = function(query, categoryIds, appFrom, appSize, filters, next) {
+var categoryExpandSearchInternal = function(indexName, query, categoryIds, appFrom, appSize, filters, next) {
     var storedTemplate = appConfig.constants.appIndex.template.categoryExpandSearch;
     var params = {
         "from": appFrom,
@@ -124,7 +124,7 @@ var categoryExpandSearch = function(query, categoryIds, appFrom, appSize, filter
 
     addFiltersToParams(params, filters);
 
-    esClient.searchStoredTemplate(indexAlias, storedTemplate, params, function(err, resp) {
+    esClient.searchStoredTemplate(indexName, storedTemplate, params, function(err, resp) {
         if (err) { return next(err); }
 
         var categories = resp.aggregations.categories.app_categories.buckets.map(function(bucket) {
@@ -147,7 +147,7 @@ var categoryExpandSearch = function(query, categoryIds, appFrom, appSize, filter
     });
 };
 
-var spellSuggest = function(query, size, next) {
+var spellSuggest = function(indexName, query, size, next) {
     var body = {
         "text": query,
         "simple_phrase": {
@@ -172,7 +172,7 @@ var spellSuggest = function(query, size, next) {
         }
     };
 
-    esClient.suggest(indexAlias, body, function(err, resp) {
+    esClient.suggest(indexName, body, function(err, resp) {
         if (err) { return next(err); }
 
         if (!resp.simple_phrase || resp.simple_phrase.length < 1) {
@@ -184,8 +184,8 @@ var spellSuggest = function(query, size, next) {
 };
 
 
-var searchMain = function(query, appFrom, appSize, catFrom, catSize, catAppFrom, catAppSize, filters, next) {
-    categoryFacetSearch(query, appFrom, appSize, catFrom, catSize, filters, function(err, facetResult) {
+var searchMainInternal = function(indexName, query, appFrom, appSize, catFrom, catSize, catAppFrom, catAppSize, filters, next) {
+    categoryFacetSearchInternal(indexName, query, appFrom, appSize, catFrom, catSize, filters, function(err, facetResult) {
         if (err) { return next(err); }
 
         var noResults = true;
@@ -197,7 +197,7 @@ var searchMain = function(query, appFrom, appSize, catFrom, catSize, catAppFrom,
         }
 
         if (noResults) {
-            return spellSuggest(query, 3, function(err, options) {
+            return spellSuggest(indexName, query, 3, function(err, options) {
                 if (err) { return next(err); }
 
                 facetResult.suggestions = options;
@@ -217,7 +217,7 @@ var searchMain = function(query, appFrom, appSize, catFrom, catSize, catAppFrom,
             categoryMap[category.id] = category;
         });
 
-        categoryExpandSearch(query, categoryIds, catAppFrom, catAppSize, filters, function(err, expandCategories) {
+        categoryExpandSearchInternal(indexName, query, categoryIds, catAppFrom, catAppSize, filters, function(err, expandCategories) {
             if (err) { return next(err); }
 
             try {
@@ -239,15 +239,23 @@ var searchMain = function(query, appFrom, appSize, catFrom, catSize, catAppFrom,
     });
 };
 
-var searchCategory = function(query, categoryIds, appFrom, appSize, filters, next) {
-    categoryExpandSearch(query, categoryIds, appFrom, appSize, filters, function(err, expandCategories) {
+var searchMain = function(query, appFrom, appSize, catFrom, catSize, catAppFrom, catAppSize, filters, next) {
+    searchMainInternal(indexAlias, query, appFrom, appSize, catFrom, catSize, catAppFrom, catAppSize, filters, next);
+};
+
+var searchCategoryInternal = function(indexName, query, categoryIds, appFrom, appSize, filters, next) {
+    categoryExpandSearchInternal(indexName, query, categoryIds, appFrom, appSize, filters, function(err, expandCategories) {
         if (err) { return next(err); }
 
         next(null, expandCategories);
     });
+}
+
+var searchCategory = function(query, categoryIds, appFrom, appSize, filters, next) {
+    searchCategoryInternal(indexAlias, query, categoryIds, appFrom, appSize, filters, next)
 };
 
-var searchComplete = function(query, size, next) {
+var searchCompleteInternal = function(indexName, query, size, next) {
     var body = {
         "auto": {
             "text": query,
@@ -258,7 +266,7 @@ var searchComplete = function(query, size, next) {
         }
     };
 
-    esClient.suggest(indexAlias, body, function(err, resp) {
+    esClient.suggest(indexName, body, function(err, resp) {
         if (err) { return next(err); }
 
         if (!resp.auto || resp.auto.length < 1) {
@@ -269,6 +277,18 @@ var searchComplete = function(query, size, next) {
     });
 };
 
+var searchComplete = function(query, size, next) {
+    searchCompleteInternal(indexAlias, query, size, next);
+};
+
 exports.searchMain = searchMain;
 exports.searchCategory = searchCategory;
 exports.searchComplete = searchComplete;
+
+exports.warmupMain = function(index, query, next) {
+    searchMainInternal(index, query, 0, 12, 0, 10, 0, 12, {}, next);
+};
+
+exports.warmupComplete = function(index, query, next) {
+    searchCompleteInternal(index, query, 20, next);
+};

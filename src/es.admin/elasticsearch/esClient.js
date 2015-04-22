@@ -4,9 +4,10 @@ var config = require('../config');
 var elasticsearch = require('elasticsearch');
 
 var client = new elasticsearch.Client({
-        host: config.es.host + ':' + config.es.port,
-        log: 'error'
-    });
+    host: config.es.host + ':' + config.es.port,
+    log: 'error',
+    maxSockets: config.es.maxSockets
+});
 
 exports.bulkInsert = function (index, docType, docs, next) {
     var body = [];
@@ -52,17 +53,7 @@ exports.existsAlias = function(alias, next) {
     });
 };
 
-exports.activateIndex = function(currentIndex, newIndex, alias, swapAlias, next) {
-    var body = { actions: [
-        { add: { index: newIndex, alias:alias } },
-        { remove: { index: newIndex, alias:swapAlias } }
-    ]};
-
-    if (currentIndex) {
-        body.actions.push({ remove: { index: currentIndex, alias:alias } });
-        body.actions.push({ add: { index: currentIndex, alias:swapAlias } });
-    }
-
+exports.updateAliases = function(body, next) {
     client.indices.updateAliases({
         body: body
     }, function (err, resp) {
@@ -97,6 +88,58 @@ exports.createIndex = function(index, settings, mappings, aliases, next) {
     client.indices.create({
         index: index,
         body: body
+    }, function (err, resp) {
+        next(err, resp);
+    });
+};
+
+exports.createSnapshotWithWait = function(index, repository, snapshot, next) {
+    client.snapshot.create({
+        body: {
+            indices: index
+        },
+        repository: repository,
+        snapshot: snapshot,
+        waitForCompletion: true,
+        requestTimeout: Infinity
+    }, function (err, resp) {
+        next(err, resp);
+    });
+};
+
+exports.restoreSnapshotWithWait = function(repository, snapshot, next) {
+    client.snapshot.restore({
+        repository: repository,
+        snapshot: snapshot,
+        waitForCompletion: true,
+        requestTimeout: Infinity
+    }, function (err, resp) {
+        next(err, resp);
+    });
+};
+
+exports.getSnapshots = function(repository, next) {
+    client.snapshot.get({
+        repository: repository,
+        snapshot: '_all'
+    }, function (err, resp) {
+        next(err, resp);
+    });
+};
+
+exports.getSnapshot = function(repository, snapshot, next) {
+    client.snapshot.get({
+        repository: repository,
+        snapshot: snapshot
+    }, function (err, resp) {
+        next(err, resp);
+    });
+};
+
+exports.deleteSnapshot = function(repository, snapshot, next) {
+    client.snapshot.delete({
+        repository: repository,
+        snapshot: snapshot
     }, function (err, resp) {
         next(err, resp);
     });
