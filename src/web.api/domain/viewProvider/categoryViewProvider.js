@@ -293,17 +293,21 @@ var searchCategories = function(queryStr, pageNum, filters, next) {
                     return next(err);
                 }
 
+                var missingCategories = [];
+
                 searchResult.categories.forEach(function (categoryResult, i) {
                     var category = results[1][i];
 
                     if (!category) {
-                        return next(new Error('Category missing: ' + categoryResult.id));
+                        log.warn('Search result category not found: ' + categoryResult.id);
+                        return missingCategories.push(i);
                     }
 
                     var categoryChart = results[0][i];
 
                     if (!categoryChart) {
-                        return next(new Error('Category chart missing: ' + categoryResult.id));
+                        log.warn('Search result category chart not found: ' + categoryResult.id);
+                        return missingCategories.push(i);
                     }
 
                     categoryResult.id = category.extId;
@@ -311,6 +315,22 @@ var searchCategories = function(queryStr, pageNum, filters, next) {
                     categoryResult.url = category.url;
                     categoryResult.chart = categoryChart.apps;
                 });
+
+                if (missingCategories.length > 0) {
+                    var missingIndex = 0;
+                    searchResult.categories = searchResult.categories.filter(function (categoryResult, i) {
+                        if (missingIndex === missingCategories.length) {
+                            return true;
+                        }
+
+                        if (i !== missingCategories[missingIndex]) {
+                            return true;
+                        }
+
+                        missingIndex++;
+                        return false;
+                    });
+                }
 
                 next(null, searchResult);
             });
