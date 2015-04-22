@@ -40,6 +40,7 @@ exports.init = function init(app) {
         appSnapshot.createSnapshotPromise(batchSize)
             .then(function(result) {
                 log.info("Successfully create snapshot: " + result.snapshot + " of index: " + result.index);
+                log.info("Subscriber responses: " + JSON.stringify(result.subscribers));
 
                 var end = process.hrtime(start);
                 log.info("Completed app snapshot batch task in: " + prettyHrtime(end));
@@ -114,7 +115,7 @@ exports.init = function init(app) {
         res.json({ "status": "App restore task started" });
     });
 
-    app.post('/index/app/restore_latest', function (req, res) {
+    var restoreLatest = function(req, res) {
         log.info("Starting app restore latest batch task");
         var start = process.hrtime();
         appRestore.restoreLatestSnapshotPromise()
@@ -129,5 +130,13 @@ exports.init = function init(app) {
             });
 
         res.json({ "status": "App restore latest task started" });
+    };
+
+    app.post('/index/app/restore_latest', function (req, res) {
+        restoreLatest(req, res);
+    });
+
+    app.get('/index/app/restore_latest', function (req, res) {
+        restoreLatest(req, res);
     });
 };

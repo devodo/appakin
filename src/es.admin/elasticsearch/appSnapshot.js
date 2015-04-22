@@ -5,6 +5,7 @@ var appConfig = require('./appConfig');
 var esClient = require('./esClient');
 var log = require('../logger');
 var Q = require('q');
+var request = require('request');
 var appIndexAdmin = require('./appIndexAdmin');
 var appIndexer = require('./appIndexer');
 
@@ -52,6 +53,52 @@ var deleteSnapshotPromise = function(snapshotName) {
     return deferred.promise;
 };
 
+var notifyRestoreSubscriberPromise = function(subscriberUrl) {
+    var deferred = Q.defer();
+
+    request({url: subscriberUrl, pool: false, json: true}, function (err, resp, result) {
+        if (err) {
+            return deferred.reject(err);
+        }
+
+        if (resp.statusCode !== 200) {
+            return deferred.reject(new Error("Subscriber: " + subscriberUrl + " status code: " + resp.statusCode));
+        }
+
+        deferred.resolve(result);
+    });
+
+    return deferred.promise;
+};
+
+var notifyRestoreSubscribersPromise = function() {
+    var deferred = Q.defer();
+
+    if (!config.restoreSubscribers) {
+        deferred.reject(new Error("No restore subscribers configured"));
+    }
+
+    var promises = config.restoreSubscribers.map(function (subscriberUrl) {
+        return notifyRestoreSubscriberPromise(subscriberUrl);
+    });
+
+    Q.allSettled(promises)
+        .then(function (results) {
+            var responses = [];
+            results.forEach(function (result) {
+                if (result.state === "fulfilled") {
+                    responses.push(result.value);
+                } else {
+                    responses.push(result.reason);
+                }
+            });
+
+            deferred.resolve(responses);
+        });
+
+    return deferred.promise;
+};
+
 exports.deleteOldSnapshotsPromise = function(numToKeep) {
     log.debug("Get list of snapshots");
     return appIndexAdmin.getSnapshotsPromise()
@@ -83,10 +130,14 @@ exports.createSnapshotPromise = function(batchSize) {
 
                     log.debug("Deleting app index");
                     return appIndexAdmin.deleteSwapOutIndicesPromise()
-                        .then(function () {
+                        .then(function() {
+                            return notifyRestoreSubscribersPromise();
+                        })
+                        .then(function (subscriberResponses) {
                             return {
                                 snapshot: snapshotName,
-                                index: indexName
+                                index: indexName,
+                                subscribers: subscriberResponses
                             };
                         });
                 });
