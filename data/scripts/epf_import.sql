@@ -91,3 +91,42 @@ INSERT INTO appstore_version_history(app_id, version, itunes_version, date_creat
   select a.app_id, a.version, a.itunes_version, a.release_date
   from appstore_app a
   where a.date_deleted is null;
+
+
+
+
+-- Import nice prices
+WITH price_new AS (
+	INSERT INTO appstore_price(app_id, country_code, price, date_created, date_modified)
+	select a.app_id, pi.country_code, pi.price, now() at time zone 'utc', now() at time zone 'utc'
+	from appstore_app a
+	join appstore_price_import pi on a.store_app_id = pi.store_app_id
+	left join appstore_price p
+		on a.app_id = p.app_id
+		and pi.country_code = p.country_code
+	where p.price is null
+	returning app_id, country_code, price, date_created
+)
+INSERT INTO appstore_price_history(app_id, country_code, price, date_created)
+SELECT app_id, country_code, price, date_created
+FROM price_new;
+
+
+-- Update changed prices
+WITH price_change AS (
+	INSERT INTO appstore_price_history(app_id, country_code, price, date_created)
+	select a.app_id, pi.country_code, pi.price, now() at time zone 'utc'
+	from appstore_app a
+	join appstore_price_import pi on a.store_app_id = pi.store_app_id
+	join appstore_price p
+		on a.app_id = p.app_id
+		and pi.country_code = p.country_code
+	where p.price != pi.price
+	returning app_id, country_code, price, date_created
+)
+UPDATE appstore_price ap
+   SET price = pc.price,
+   date_modified = pc.date_created
+FROM price_change pc
+WHERE ap.app_id = pc.app_id
+AND ap.country_code = pc.country_code;
