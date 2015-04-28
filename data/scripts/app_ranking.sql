@@ -58,22 +58,18 @@ COST 100;
 
 -- DROP FUNCTION reset_app_popularity();
 
--- Function: reset_app_popularity()
-
--- DROP FUNCTION reset_app_popularity();
-
 CREATE OR REPLACE FUNCTION reset_app_popularity()
-  RETURNS boolean AS
-  $BODY$
+	RETURNS boolean AS
+	$BODY$
 DECLARE avg_rating double precision;
 DECLARE avg_rating_current double precision;
 BEGIN
 	delete from app_popularity;
 
 	INSERT INTO app_popularity(app_id, popularity)
-	select rating.app_id, GREATEST(rating_rank, chart_rank) as rank
+	select rating.app_id, rating.rank
 	from (
-		select a.app_id, score / max_score as rating_rank from
+		select a.app_id, score / max_score as rank from
 		(
 			select a.app_id, score, max(score) over() as max_score
 			from (
@@ -94,20 +90,15 @@ BEGIN
 			) a
 		) a
 	) rating
-	left join (
-		select a.app_id, 1 - (power(log(min(chart.position))/log(10000),2)) as chart_rank
-		from appstore_app a
-		join appstore_chart chart on a.store_app_id = chart.store_app_id
-		where chart.batch_id = (select max(batch_id) from appstore_chart)
-		group by a.app_id
-	) chart on rating.app_id = chart.app_id
-	order by rank desc;
+	order by rating.rank desc;
 
         RETURN true;
 END;
 $BODY$
 LANGUAGE plpgsql VOLATILE
 COST 100;
+ALTER FUNCTION reset_app_popularity()
+OWNER TO appakin;
 
 
 
