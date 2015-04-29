@@ -76,6 +76,7 @@ var createAppDoc = function(app, categoryFields, categoryNames) {
         "ext_id": app.extId.replace(/\-/g, ''),
         name: app.name,
         desc: app.description,
+        "desc_short": (app.description ? app.description.substring(0, 300) : null),
         "image_url" : app.imageUrl,
         price: app.price,
         is_free: app.price === 0,

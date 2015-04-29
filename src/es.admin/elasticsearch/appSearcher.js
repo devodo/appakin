@@ -42,6 +42,7 @@ var categoryFacetSearchInternal = function(indexName, query, appFrom, appSize, c
         "num_cats": catFrom + catSize,
         "top_apps": includeTopApps,
         "top_cats": includeTopCats,
+        "exclude_desc": includeTopCats,
         "comma_separator": commaSeparator,
         "query_string": query
     };
@@ -183,30 +184,38 @@ var spellSuggest = function(indexName, query, size, next) {
     });
 };
 
+var addSpellSuggest = function(indexName, query, facetResult, next) {
+    var doSuggest = true;
+
+    if (facetResult.app && facetResult.app.total > 0) {
+        doSuggest = false;
+    } else if (facetResult.category && facetResult.category.total > 0) {
+
+        if (facetResult.category.total > 10 ||
+            facetResult.category.categories[0].score >= 1.0) {
+            doSuggest = false;
+        }
+    }
+
+    if (!doSuggest) {
+        return next(null, facetResult);
+    }
+
+    spellSuggest(indexName, query, 3, function(err, options) {
+        if (err) { return next(err); }
+
+        facetResult.suggestions = options;
+        next(null, facetResult);
+    });
+};
+
 
 var searchMainInternal = function(indexName, query, appFrom, appSize, catFrom, catSize, catAppFrom, catAppSize, filters, next) {
     categoryFacetSearchInternal(indexName, query, appFrom, appSize, catFrom, catSize, filters, function(err, facetResult) {
         if (err) { return next(err); }
 
-        var noResults = true;
-
-        if (facetResult.category && facetResult.category.total > 0) {
-            noResults = false;
-        } else if (facetResult.app && facetResult.app.total > 0) {
-            noResults = false;
-        }
-
-        if (noResults) {
-            return spellSuggest(indexName, query, 3, function(err, options) {
-                if (err) { return next(err); }
-
-                facetResult.suggestions = options;
-                next(null, facetResult);
-            });
-        }
-
         if (!facetResult.category) {
-            return next(null, facetResult);
+            return addSpellSuggest(indexName, query, facetResult, next);
         }
 
         var categoryIds = [];
@@ -234,7 +243,7 @@ var searchMainInternal = function(indexName, query, appFrom, appSize, catFrom, c
                 return next(err);
             }
 
-            next(null, facetResult);
+            return addSpellSuggest(indexName, query, facetResult, next);
         });
     });
 };
@@ -249,10 +258,10 @@ var searchCategoryInternal = function(indexName, query, categoryIds, appFrom, ap
 
         next(null, expandCategories);
     });
-}
+};
 
 var searchCategory = function(query, categoryIds, appFrom, appSize, filters, next) {
-    searchCategoryInternal(indexAlias, query, categoryIds, appFrom, appSize, filters, next)
+    searchCategoryInternal(indexAlias, query, categoryIds, appFrom, appSize, filters, next);
 };
 
 var searchCompleteInternal = function(indexName, query, size, next) {

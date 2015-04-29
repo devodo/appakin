@@ -131,7 +131,8 @@ exports.settings = {
             },
             "bm25_title": {
                 "type": "BM25",
-                "b":    0.25
+                "b": 0.1,
+                "k1": 1.0
             }
         }
     }
@@ -147,6 +148,7 @@ exports.mappings = {
             "includes": [
                 "ext_id",
                 "name",
+                "desc_short",
                 "image_url",
                 "price",
                 "rating"
@@ -208,6 +210,7 @@ exports.mappings = {
             "price": {"type": "integer", "index": "no", "store": false},
             "rating": {"type": "float", "index": "no", "store": false},
             "image_url": {"type": "string", "index": "no", "store": false},
+            "desc_short": {"type": "string", "index": "no", "store": false},
             "is_free": {"type": "boolean", "index": "not_analyzed", "store": false},
             "is_iphone": {"type": "boolean", "index": "not_analyzed", "store": false},
             "is_ipad": {"type": "boolean", "index": "not_analyzed", "store": false},

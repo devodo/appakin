@@ -112,6 +112,10 @@ var parseAppResults = function(appResults) {
             }
         }
 
+        if (appResult.field.desc_short) {
+            app.desc = appResult.field.desc_short;
+        }
+
         return app;
     });
 
@@ -134,11 +138,18 @@ var search = function(query, pageNum, filters, next) {
         if (searchResult.error) { return next(new Error(searchResult.error)); }
 
         var result = {
-            page: pageNum
+            page: pageNum,
+            suggestions: []
         };
 
         if (searchResult.result.app) {
             result.appResults = parseAppResultsMain(searchResult.result.app);
+        }
+
+        if (searchResult.result.suggestions) {
+            result.suggestions = searchResult.result.suggestions.map(function (suggestion) {
+                return suggestion.text;
+            });
         }
 
         var categories = searchResult.result.category.categories.map(function(categoryResult) {
