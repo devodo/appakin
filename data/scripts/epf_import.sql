@@ -84,7 +84,8 @@ from (
 	on a.store_app_id = ai.store_app_id
 	where ai.store_app_id is null
 ) a_del
-where a.app_id = a_del.app_id;
+where a.app_id = a_del.app_id
+and a.date_deleted is null;
 
 -- Run this only once on deployment to init the version history table
 INSERT INTO appstore_version_history(app_id, version, itunes_version, date_created)
@@ -95,7 +96,7 @@ INSERT INTO appstore_version_history(app_id, version, itunes_version, date_creat
 
 
 
--- Import nice prices
+-- Import new prices
 WITH price_new AS (
 	INSERT INTO appstore_price(app_id, country_code, price, date_created, date_modified)
 	select a.app_id, pi.country_code, pi.price, now() at time zone 'utc', now() at time zone 'utc'
@@ -126,7 +127,24 @@ WITH price_change AS (
 )
 UPDATE appstore_price ap
    SET price = pc.price,
-   date_modified = pc.date_created
+   date_modified = pc.date_created,
+	 date_deleted = null
 FROM price_change pc
 WHERE ap.app_id = pc.app_id
 AND ap.country_code = pc.country_code;
+
+-- Delete removed prices
+update appstore_price p
+set
+    date_deleted = now() at time zone 'utc'
+from (
+	select p.id
+	from appstore_price p
+	join appstore_app a on p.app_id = a.app_id
+	left join appstore_price_import pi
+	on a.store_app_id = pi.store_app_id
+	and p.country_code = pi.country_code
+	where pi.store_app_id is null
+) p_del
+where p.id = p_del.id
+and p.date_deleted is null;

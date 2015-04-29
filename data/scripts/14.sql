@@ -57,7 +57,8 @@ CREATE TABLE appstore_version_history
 
 INSERT INTO appstore_price(app_id, country_code, price, date_created, date_modified)
   select app_id, 'USA', price::double precision / 100, now() at time zone 'utc', now() at time zone 'utc'
-  from appstore_app;
+  from appstore_app
+  where price is not null;
 
 insert into appstore_price_history(app_id, country_code, price, date_created)
   select app_id, country_code, price, date_created

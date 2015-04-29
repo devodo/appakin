@@ -86,19 +86,21 @@ FROM (
                JOIN epf_device_type dt ON adt.device_type_id = dt.device_type_id
              WHERE adt.application_id = a.application_id) AS supported_devices
        FROM epf_application a
-         JOIN epf_artist_application aa ON a.application_id = aa.application_id
-         JOIN epf_artist artist ON aa.artist_id = artist.artist_id
+         JOIN LATERAL (
+              SELECT artist.*
+              FROM epf_artist_application aa
+                JOIN epf_artist artist ON aa.artist_id = artist.artist_id
+              WHERE aa.application_id = a.application_id
+              ORDER BY aa.export_date DESC
+              LIMIT 1
+              ) artist ON TRUE
          JOIN LATERAL (
               SELECT *
               FROM epf_application_detail ad
               WHERE ad.application_id = a.application_id
-              ORDER BY ad.language_code = 'EN' DESC
+              ORDER BY ad.language_code = 'EN' DESC, ad.export_date DESC
               LIMIT 1
               ) ad ON TRUE
-       WHERE ad.release_notes IS NOT NULL
-       --WHERE a.application_id > 0
-       --and ad.language_code != 'EN'
-       --order by a.application_id
      ) t
 LIMIT 10
 ) TO STDOUT;
