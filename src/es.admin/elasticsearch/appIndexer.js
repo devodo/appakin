@@ -68,7 +68,6 @@ var createCategoryField = function(categoryApp, appPopularity) {
 };
 
 var createAppDoc = function(app, categoryFields, categoryNames) {
-
     var filterIncludes = categoryNames;
     filterIncludes.push(app.developerName);
 
@@ -78,8 +77,8 @@ var createAppDoc = function(app, categoryFields, categoryNames) {
         desc: app.description,
         "desc_short": (app.description ? app.description.substring(0, 300) : null),
         "image_url" : app.imageUrl,
-        price: app.price,
-        is_free: app.price === 0,
+        price: Math.floor(app.price * 100),
+        is_free: parseFloat(app.price) === 0,
         is_iphone: app.isIphone === true,
         is_ipad: app.isIpad === true,
         boost: calculateAppBoost(app.popularity),

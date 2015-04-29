@@ -2,19 +2,32 @@
 var async = require('async');
 var connection = require('./connection');
 
+var nullFilterArray = function(array) {
+    if (!array) {
+        return null;
+    }
+
+    return array.filter(function(item) {
+        return item;
+    });
+};
+
 var getAppByExtId = function (client, extId, next) {
     var queryStr =
-        "SELECT a.app_id, ext_id, store_app_id, name, censored_name, description, store_url,\n" +
-        "dev_id, dev_name, dev_url, features, supported_devices,\n" +
-        "is_game_center_enabled, screenshot_urls, ipad_screenshot_urls,\n" +
-        "artwork_small_url, artwork_medium_url, artwork_large_url, price,\n" +
-        "currency, version, primary_genre, genres, release_date, bundle_id,\n" +
-        "seller_name, release_notes, min_os_version, language_codes, file_size_bytes,\n" +
-        "advisory_rating, content_rating, user_rating_current, rating_count_current, user_rating,\n" +
-        "rating_count, is_iphone, is_ipad, a.date_created, a.date_modified,\n" +
+        "SELECT a.app_id, ext_id, name, description,\n" +
+        "screenshot_urls, screenshot_dimensions, ipad_screenshot_urls, ipad_screenshot_dimensions,\n" +
+        "artwork_small_url, artwork_large_url," +
+        "p.price,\n" +
+        "version, release_date,\n" +
+        "min_os_version, file_size_bytes,\n" +
+        "advisory_rating, dev_name," +
+        "r.user_rating_current, r.rating_count_current, r.user_rating, r.rating_count," +
+        "is_iphone, is_ipad, a.date_modified,\n" +
         "aa.is_globally_ambiguous, aa.ambiguous_dev_terms, aa.can_use_short_name\n" +
         "FROM appstore_app a\n" +
         "LEFT JOIN app_ambiguity aa on a.app_id = aa.app_id\n" +
+        "LEFT JOIN appstore_price p on a.app_id = p.app_id and p.country_code = 'USA'\n" +
+        "LEFT JOIN appstore_rating r on a.app_id = r.app_id and r.country_code = 'USA'\n" +
         "WHERE ext_id = $1;";
 
     client.query(queryStr, [extId], function (err, result) {
@@ -31,36 +44,21 @@ var getAppByExtId = function (client, extId, next) {
         var app = {
             id: item.app_id,
             extId: item.ext_id,
-            storeAppId: item.store_app_id,
             name: item.name,
-            censoredName: item.censored_name,
             description: item.description,
-            storeUrl: item.store_url,
-            devId: item.dev_id,
             devName: item.dev_name,
-            devUrl: item.dev_url,
-            features: item.features,
-            supportedDevices: item.supported_devices,
-            isGameCenterEnabled: item.is_game_center_enabled,
-            screenShotUrls: item.screenshot_urls,
-            ipadScreenShotUrls: item.ipad_screenshot_urls,
+            screenShotUrls: nullFilterArray(item.screenshot_urls),
+            screenShotDimensions: nullFilterArray(item.screenshot_dimensions),
+            ipadScreenShotUrls: nullFilterArray(item.ipad_screenshot_urls),
+            ipadScreenShotDimensions: nullFilterArray(item.ipad_screenshot_dimensions),
             artworkSmallUrl: item.artwork_small_url,
-            artworkMediumUrl: item.artwork_medium_url,
             artworkLargeUrl: item.artwork_large_url,
-            price: item.price,
-            currency: item.currency,
+            price: Math.floor(item.price * 100),
             version: item.version,
-            primaryGenre: item.primary_genre,
-            genres: item.genres,
             releaseDate: item.release_date,
-            bundleId: item.bundle_id,
-            sellerName: item.seller_name,
-            releaseNotes: item.release_notes,
             minOsVersion: item.min_os_version,
-            languageCodes: item.language_codes,
             fileSizeBytes: item.file_size_bytes,
             advisoryRating: item.advisory_rating,
-            contentRating: item.content_rating,
             userRatingCurrent: item.user_rating_current,
             ratingCountCurrent: item.rating_count_current,
             userRating: item.user_rating,
@@ -70,7 +68,6 @@ var getAppByExtId = function (client, extId, next) {
             excludeTerms: item.ambiguous_dev_terms,
             includeDevName: item.is_globally_ambiguous === true,
             canUseShortName: item.can_use_short_name === true,
-            dateCreated: item.date_created,
             dateModified: item.date_modified
         };
 
@@ -147,13 +144,14 @@ var getCategoryByExtId = function (client, extId, next) {
 
 var getCategoryApps = function(client, categoryId, filters, skip, take, next) {
     var queryStr =
-        "SELECT a.ext_id, a.name, a.artwork_small_url, a.price, a.is_iphone, a.is_ipad,\n" +
+        "SELECT a.ext_id, a.name, a.artwork_small_url, p.price, a.is_iphone, a.is_ipad,\n" +
         "substring(a.description from 0 for 300) as short_description, ca.position,\n" +
         "count(1) OVER() as total\n" +
         "FROM appstore_app a\n" +
         "JOIN category_app ca ON a.app_id = ca.app_id\n" +
+        "JOIN appstore_price p ON a.app_id = p.app_id and p.country_code = 'USA'\n" +
         "WHERE ca.category_id = $1\n" +
-        (filters.isFree === true ? "AND a.is_free\n" : "") +
+        (filters.isFree === true ? "AND p.price = 0\n" : "") +
         (filters.isIphone === true ? "AND a.is_iphone\n": "") +
         (filters.isIpad === true ? "AND a.is_ipad\n": "") +
         "ORDER BY ca.position\n" +
@@ -167,10 +165,10 @@ var getCategoryApps = function(client, categoryId, filters, skip, take, next) {
         }
 
         if (result.rows.length === 0) {
-            return {
+            return next(null, {
                 total: 0,
                 apps: []
-            };
+            });
         }
 
         var apps = result.rows.map(function(item) {
@@ -178,7 +176,7 @@ var getCategoryApps = function(client, categoryId, filters, skip, take, next) {
                 extId: item.ext_id,
                 name: item.name,
                 artworkSmallUrl: item.artwork_small_url,
-                price: item.price,
+                price: Math.floor(item.price * 100),
                 isIphone: item.is_iphone,
                 isIpad: item.is_ipad,
                 shortDescription: item.short_description,
@@ -200,12 +198,13 @@ var getMultiCategoryApps = function(client, categoryIds, take, filters, next) {
         "select t.*\n" +
         "FROM (SELECT unnest(ARRAY[" + categoryIds.join(',') + "]) as id) c\n" +
         "JOIN LATERAL (\n" +
-        "SELECT ca.category_id, a.ext_id, a.name, a.artwork_small_url, a.price,\n" +
+        "SELECT ca.category_id, a.ext_id, a.name, a.artwork_small_url, p.price,\n" +
         "substring(a.description from 0 for 2) as short_description, ca.position\n" +
         "FROM appstore_app a\n" +
+        "JOIN appstore_price p ON a.app_id = p.app_id and p.country_code = 'USA'\n" +
         "JOIN category_app ca ON a.app_id = ca.app_id\n" +
         "WHERE ca.category_id = c.id\n" +
-        (filters.isFree === true ? "AND a.is_free\n" : "") +
+        (filters.isFree === true ? "AND p.price = 0\n" : "") +
         (filters.isIphone === true ? "AND a.is_iphone\n" : "") +
         (filters.isIpad === true ? "AND a.is_ipad\n" : "") +
         "ORDER BY ca.category_id, ca.position\n" +
@@ -223,7 +222,7 @@ var getMultiCategoryApps = function(client, categoryIds, take, filters, next) {
                 extId: item.ext_id,
                 name: item.name,
                 artworkSmallUrl: item.artwork_small_url,
-                price: item.price,
+                price: Math.floor(item.price * 100),
                 shortDescription: item.short_description,
                 position: item.position
             };

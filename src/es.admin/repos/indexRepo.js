@@ -27,13 +27,14 @@ var executeQuery = function(queryFunc, next) {
 exports.getAppIndexBatch = function(lastId, limit, next) {
     var queryStr =
         "SELECT a.app_id, a.ext_id, a.name, COALESCE(aa.desc_cleaned, a.description) as description, a.store_url, a.supported_devices,\n" +
-        "a.artwork_small_url, a.price, a.is_iphone, a.is_ipad, a.dev_name,\n" +
-        "a.user_rating_current, a.rating_count_current, a.user_rating, a.rating_count,\n" +
+        "a.artwork_small_url, p.price, a.is_iphone, a.is_ipad, a.dev_name,\n" +
+        "r.user_rating_current, r.rating_count_current, r.user_rating, r.rating_count,\n" +
         "ap.popularity\n" +
         "FROM appstore_app a\n" +
+        "JOIN appstore_price p on a.app_id = p.app_id and p.country_code = 'USA'\n" +
+        "LEFT JOIN appstore_rating r on a.app_id = r.app_id and r.country_code = 'USA'\n" +
         "LEFT JOIN app_popularity ap on a.app_id = ap.app_id\n" +
-        "LEFT JOIN app_analysis aa\n" +
-        "ON a.app_id = aa.app_id\n" +
+        "LEFT JOIN app_analysis aa ON a.app_id = aa.app_id\n" +
         "WHERE a.app_id > $1\n" +
         "AND a.name is not null\n" +
         "AND a.date_deleted is null\n" +

@@ -76,22 +76,13 @@ function getAppByExtId(extId, req, res, highlightDescription) {
             app.rating = appRank.getRating(app);
 
             app.id = app.extId.replace(/\-/g, '');
+            app.artworkMediumUrl = app.artworkLargeUrl;
+
             delete app.extId;
-            delete app.storeAppId;
-            delete app.censoredName;
-            delete app.storeUrl;
-            delete app.devId;
-            delete app.devUrl;
-            delete app.dateCreated;
-            delete app.primaryGenre;
-            delete app.genres;
-            delete app.bundleId;
-            delete app.sellerName;
-            delete app.supportedDevices;
-            delete app.releaseNotes;
-            delete app.languageCodes;
-            delete app.features;
-            delete app.isGameCenterEnabled;
+            delete app.userRatingCurrent;
+            delete app.ratingCountCurrent;
+            delete app.userRating;
+            delete app.ratingCount;
 
             if (highlightDescription) {
                 appAnalyser.cleanDescription(appId, app.name, app.description, app.devName, false, function (err, cleanResult) {
