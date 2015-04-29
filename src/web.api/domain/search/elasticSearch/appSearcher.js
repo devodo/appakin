@@ -152,14 +152,18 @@ var search = function(query, pageNum, filters, next) {
             });
         }
 
-        var categories = searchResult.result.category.categories.map(function(categoryResult) {
-            var category = {
-                id: categoryResult.id,
-                app: parseAppResultsMain(categoryResult.app)
-            };
+        var categories = searchResult.result.category.categories.
+            filter(function(categoryResult) {
+                return categoryResult.app;
+            }).
+            map(function(categoryResult) {
+                var category = {
+                    id: categoryResult.id,
+                    app: parseAppResultsMain(categoryResult.app)
+                };
 
-            return category;
-        });
+                return category;
+            });
 
         result.categoryResults = {
             total: searchResult.result.category.total,
