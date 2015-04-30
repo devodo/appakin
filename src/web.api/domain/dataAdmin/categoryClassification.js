@@ -146,7 +146,7 @@ var getSeedCategoryAppsAndValidate = function(seedCategoryId, next) {
         if (err) { return next(err); }
 
         if (seedCategoryApps.length < MIN_SEED_CATEGORY_APPS) {
-            return next(new Error("Transfer failed due to not enough apps for seed category id: " + seedCategory.id));
+            return next(new Error("Transfer failed due to not enough apps for seed category id: " + seedCategoryId));
         }
 
         return next(null, seedCategoryApps);
