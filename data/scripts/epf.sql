@@ -104,3 +104,9 @@ FROM (
      ) t
 LIMIT 10
 ) TO STDOUT;
+
+
+CREATE INDEX epf_artist_application_idx
+ON epf_artist_application
+USING btree
+(application_id);

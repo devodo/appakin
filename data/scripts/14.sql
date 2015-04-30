@@ -33,6 +33,7 @@ CREATE TABLE appstore_price
   price numeric(8,3) NOT NULL,
   date_created timestamp without time zone NOT NULL,
   date_modified timestamp without time zone NOT NULL,
+  date_deleted timestamp without time zone,
   CONSTRAINT appstore_price_country_code_app_id_unique UNIQUE (country_code, app_id)
 );
 
