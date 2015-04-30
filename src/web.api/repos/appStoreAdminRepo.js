@@ -134,15 +134,11 @@ var insertAppStoreApp = function(conn, app, next) {
 var updateAppStoreApp = function(client, app, next) {
     var queryStr =
         "UPDATE appstore_app\n" +
-        "SET name=$2, censored_name=$3,\n" +
-        "description=$4, store_url=$5, dev_id=$6, dev_name=$7, dev_url=$8,\n" +
-        "features=$9, supported_devices=$10, is_game_center_enabled=$11, screenshot_urls=$12,\n" +
-        "ipad_screenshot_urls=$13, artwork_small_url=$14, artwork_medium_url=$15,\n" +
-        "artwork_large_url=$16, price=$17, currency=$18, version=$19, primary_genre=$20,\n" +
-        "genres=$21, release_date=$22, bundle_id=$23, seller_name=$24, release_notes=$25,\n" +
-        "min_os_version=$26, language_codes=$27, file_size_bytes=$28, advisory_rating=$29,\n" +
-        "content_rating=$30, user_rating_current=$31, rating_count_current=$32,\n" +
-        "user_rating=$33, rating_count=$34, is_free=$35, is_iphone=$36, is_ipad=$37,\n" +
+        "SET censored_name=$3,\n" +
+        "features=$9, is_game_center_enabled=$11,\n" +
+        "bundle_id=$23, min_os_version=$26, content_rating=$30,\n" +
+        "user_rating_current=$31, rating_count_current=$32, user_rating=$33, rating_count=$34,\n" +
+
         "date_modified=NOW() at time zone 'utc', date_deleted=NULL\n" +
         "WHERE store_app_id=$1;";
 
@@ -1054,6 +1050,49 @@ exports.updateAppStoreApp = function(app, next) {
         updateAppStoreApp(conn.client, app, function(err) {
             conn.close(err, function(err) {
                 next(err);
+            });
+        });
+    });
+};
+
+var refreshAppStoreApp = function(client, app, next) {
+    var queryStr = "SELECT refresh_appstore_app(" +
+        "$1, $2, $3, $4, $5, $6," +
+        "$7, $8, $9, $10, $11, $12);";
+
+    var queryParams = [
+        app.storeAppId,
+        'USA',
+        app.censoredName,
+        app.features,
+        app.isGameCenterEnabled,
+        app.bundleId,
+        app.minOsVersion,
+        app.contentRating,
+        app.userRatingCurrent,
+        app.ratingCountCurrent,
+        app.userRating,
+        app.ratingCount
+    ];
+
+    client.query(queryStr, queryParams, function (err, result) {
+        if (err) { return next(err); }
+
+        var ratingUpdated = result.rows[0].refresh_appstore_app;
+
+        next(null, ratingUpdated);
+    });
+};
+
+exports.refreshAppStoreApp = function(app, next) {
+    connection.open(function(err, conn) {
+        if (err) {
+            return next(err);
+        }
+
+        refreshAppStoreApp(conn.client, app, function(err, result) {
+            conn.close(err, function(err) {
+                next(err, result);
             });
         });
     });

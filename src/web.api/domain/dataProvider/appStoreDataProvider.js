@@ -188,20 +188,16 @@ var retrieveApps = function(ids, next) {
 
 var updateApps = function(ids, next) {
     getLookups(ids, function(err, results) {
-        if (err) {
-            return next(err);
-        }
+        if (err) { return next(err); }
 
         async.eachSeries(results, function(result, callback) {
             parseLookup(result, function(err, app) {
-                if (err) {
-                    return next(err);
-                }
+                if (err) { return next(err); }
 
-                appStoreAdminRepo.updateAppStoreApp(app, function(err) {
-                    if (err) {
-                        return callback(err);
-                    }
+                appStoreAdminRepo.refreshAppStoreApp(app, function(err, result) {
+                    if (err) { return callback(err); }
+
+                    log.debug("App store app: " + app.storeAppId + " rating updated: " + result);
 
                     callback();
                 });
