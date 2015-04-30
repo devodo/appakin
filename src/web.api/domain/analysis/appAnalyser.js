@@ -60,18 +60,6 @@ var getTokenizedMap = function(input) {
     return tokensMap;
 };
 
-var createHash = function(description, languageCodes) {
-    if (!description) {
-        return null;
-    }
-
-    return crypto
-        .createHash('md5')
-        .update(description)
-        .update(languageCodes ? languageCodes.toString() : '')
-        .digest('hex');
-};
-
 var processApp = function(app, forceAll, processAppCallback) {
     var i;
 
@@ -88,7 +76,7 @@ var processApp = function(app, forceAll, processAppCallback) {
         desc_cleaned: null
     };
 
-    var md5sum = createHash(app.description, app.language_codes);
+    var md5sum = app.app_checksum;
 
     if (!forceAll && md5sum && md5sum === app.desc_md5_checksum) {
         // description/language codes have not changed so no processing required.

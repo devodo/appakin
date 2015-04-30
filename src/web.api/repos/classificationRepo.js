@@ -308,10 +308,11 @@ var insertSeedCategoryApps = function(client, seedCategoryId, appExtIds, next) {
 
 var getSeedCategoryApps = function(client, seedCategoryId, next) {
     var queryStr =
-        "SELECT id, seed_category_id, app_id, position, date_created\n" +
-        "FROM seed_category_app\n" +
-        "WHERE seed_category_id = $1\n" +
-        "ORDER BY position;";
+        "SELECT s.id, s.seed_category_id, s.app_id, s.position, s.date_created\n" +
+        "FROM seed_category_app s\n" +
+        "JOIN appstore_price p on s.app_id = p.price AND p.country_code = 'USA'" +
+        "WHERE s.seed_category_id = $1\n" +
+        "ORDER BY s.position;";
 
     client.query(queryStr, [seedCategoryId], function (err, result) {
         if (err) { return next(err); }
@@ -380,7 +381,7 @@ var insertCategoryFromSeed = function(client, seedCategory, next) {
     });
 };
 
-var insertCategoryApp = function(client, categoryId, seedCategoryApp, next) {
+var insertCategoryApp = function(client, categoryId, seedCategoryApp, position, next) {
     var queryStr =
         "INSERT INTO category_app(category_id, app_id, position, date_created, old_position)\n" +
         "VALUES ($1, $2, $3, NOW() at time zone 'utc', $3)\n" +
@@ -389,7 +390,7 @@ var insertCategoryApp = function(client, categoryId, seedCategoryApp, next) {
     var queryParams = [
         categoryId,
         seedCategoryApp.appId,
-        seedCategoryApp.position
+        position
     ];
 
     client.query(queryStr, queryParams, function (err, result) {
@@ -428,8 +429,10 @@ var createCategoryFromSeed = function(conn, seedCategory, seedCategoryApps, next
             insertSeedCategoryMap(conn.client, categoryId, seedCategory.id, seedCategory.buildVersion, function(err) {
                 if (err) { return next(err); }
 
+                var position = 0;
                 async.eachSeries(seedCategoryApps, function(seedCategoryApp, callback) {
-                    insertCategoryApp(conn.client, categoryId, seedCategoryApp, function(err) {
+                    position++;
+                    insertCategoryApp(conn.client, categoryId, seedCategoryApp, position, function(err) {
                         return callback(err);
                     });
                 }, function(err) {
@@ -481,8 +484,10 @@ var resetCategoryFromSeed = function(conn, seedCategory, seedCategoryMap, seedCa
             deleteCategoryApps(conn.client, seedCategoryMap.categoryId, function(err) {
                 if (err) { return next(err); }
 
+                var position = 0;
                 async.eachSeries(seedCategoryApps, function(seedCategoryApp, callback) {
-                    insertCategoryApp(conn.client, seedCategoryMap.categoryId, seedCategoryApp, function(err) {
+                    position++;
+                    insertCategoryApp(conn.client, seedCategoryMap.categoryId, seedCategoryApp, position, function(err) {
                         return callback(err);
                     });
                 }, function(err) {

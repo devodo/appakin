@@ -141,6 +141,18 @@ var reloadSeedCategoryApps = function(seedCategoryId, next) {
     });
 };
 
+var getSeedCategoryAppsAndValidate = function(seedCategoryId, next) {
+    classificationRepo.getSeedCategoryApps(seedCategoryId, function(err, seedCategoryApps) {
+        if (err) { return next(err); }
+
+        if (seedCategoryApps.length < MIN_SEED_CATEGORY_APPS) {
+            return next(new Error("Transfer failed due to not enough apps for seed category id: " + seedCategory.id));
+        }
+
+        return next(null, seedCategoryApps);
+    });
+};
+
 var processTransferSeedCategoryApps = function(seedCategory, next) {
     log.debug("Transfering seed apps for category: " + seedCategory.id);
 
@@ -149,22 +161,18 @@ var processTransferSeedCategoryApps = function(seedCategory, next) {
         return next();
     }
 
-    classificationRepo.getSeedCategoryApps(seedCategory.id, function(err, seedCategoryApps) {
+    classificationRepo.getSeedCategoryMap(seedCategory.id, function(err, seedCategoryMap) {
         if (err) { return next(err); }
 
-        if (seedCategoryApps.length < MIN_SEED_CATEGORY_APPS) {
-            return next("Transfer failed due to not enough apps for seed category id: " + seedCategory.id);
+        if (seedCategoryMap && seedCategory.buildVersion === seedCategoryMap.buildVersion) {
+            log.debug("Skipping as category apps already at latest build version: " + seedCategory.buildVersion);
+            return next();
         }
 
-        classificationRepo.getSeedCategoryMap(seedCategory.id, function(err, seedCategoryMap) {
+        getSeedCategoryAppsAndValidate(seedCategory.id, function(err, seedCategoryApps) {
             if (err) { return next(err); }
 
             if (seedCategoryMap) {
-                if (seedCategory.buildVersion === seedCategoryMap.buildVersion) {
-                    log.debug("Skipping as category apps already at latest build version: " + seedCategory.buildVersion);
-                    return next();
-                }
-
                 log.debug("Resetting category apps for category: " + seedCategoryMap.categoryId);
                 classificationRepo.resetCategoryFromSeed(seedCategory, seedCategoryMap, seedCategoryApps, function(err) {
                     if (err) { return next(err); }

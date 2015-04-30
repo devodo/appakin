@@ -150,6 +150,14 @@ where p.id = p_del.id
 and p.date_deleted is null;
 
 
+-- Update analysis checksums
+update app_analysis aa
+set desc_md5_checksum = a.checksum
+from appstore_app a
+where aa.app_id = a.app_id
+and aa.desc_md5_checksum = md5(coalesce(a.description,'') || coalesce(array_to_string(a.language_codes,',',''), ''));
+
+
 
 CREATE OR REPLACE FUNCTION refresh_appstore_app(_store_app_id text, _country_code char(3), _censored_name text,
 						 _features text[], _is_game_center_enabled boolean,
