@@ -9,25 +9,34 @@ var log = require('../../logger');
 var Classifier = function() {
     var nodesvm = require('node-svm');
     this.svm = new nodesvm.CSVC({ // classification
-        kernelType: nodesvm.KernelTypes.RBF,
+        kernelType: nodesvm.kernelTypes.RBF,
         gamma: [0.5], // lower for more fuzzy classification
-        C: [10], // lower for smoother classification edge
+        c: [10], // lower for smoother classification edge
         //gamma: [0.1, 0.5, 0.8, 1, 10, 100],
         //C: [1,2,10,100,1000],
         reduce: false,
-        normalize: false
+        normalize: false,
+        kFold: 1
     });
 };
 
 Classifier.prototype.train = function(trainingData, next) {
-    this.svm.train(trainingData, function(report) {
-        log.debug('SVM trained. report :\n%s', JSON.stringify(report, null, '\t'));
-        next(null, report);
-    });
+    this.svm.train(trainingData)
+        .progress(function(progress){
+            log.debug('training progress: ' + Math.round(progress*100));
+        })
+        .spread(function (model, report) {
+            log.debug('SVM trained. report :\n%s', JSON.stringify(report, null, '\t'));
+
+            next(null, report);
+        })
+        .fail(function(err) {
+            next(err);
+        });
 };
 
 Classifier.prototype.predict = function(vector) {
-    return this.svm.predict(vector);
+    return this.svm.predictSync(vector);
 };
 
 // Maths
