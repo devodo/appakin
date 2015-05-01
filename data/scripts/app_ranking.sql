@@ -54,53 +54,48 @@ COST 100;
 --x^((5/5)* 0.2 * e^(-0.001x) + 0.2 * (1 - e^(-0.001x)))
 --http://fooplot.com/#W3sidHlwZSI6MCwiZXEiOiJ4XigoNS81KSowLjE1KmVeKC0wLjAwMXgpKzAuMTUqKDEtZV4oLTAuMDAxeCkpKSIsImNvbG9yIjoiI0VCMEUwRSJ9LHsidHlwZSI6MCwiZXEiOiJ4XigoNC81KSowLjE1KmVeKC0wLjAxeCkrMC4xNSooMS1lXigtMC4wMXgpKSkiLCJjb2xvciI6IiM0NUEzMjkifSx7InR5cGUiOjAsImVxIjoieF4oKDMvNSkqMC4xNSplXigtMC4wMXgpKzAuMTUqKDEtZV4oLTAuMDF4KSkpIiwiY29sb3IiOiIjQTkxMEU2In0seyJ0eXBlIjowLCJlcSI6InheKCgyLzUpKjAuMTUqZV4oLTAuMDF4KSswLjE1KigxLWVeKC0wLjAxeCkpKSIsImNvbG9yIjoiIzFFMjRENCJ9LHsidHlwZSI6MCwiZXEiOiJ4XigoMS81KSowLjE1KmV4cCgtMC4wMXgpKzAuMTUqKDEtZXhwKC0wLjAxeCkpKSIsImNvbG9yIjoiI0U4OTQzQSJ9LHsidHlwZSI6MTAwMCwid2luZG93IjpbIi0yIiwiMTAiLCItMiIsIjQiXX1d
 
--- Function: reset_app_popularity()
-
--- DROP FUNCTION reset_app_popularity();
 
 CREATE OR REPLACE FUNCTION reset_app_popularity()
 	RETURNS boolean AS
 	$BODY$
-DECLARE avg_rating double precision;
-DECLARE avg_rating_current double precision;
-BEGIN
-	delete from app_popularity;
+  DECLARE avg_rating double precision;
+          DECLARE avg_rating_current double precision;
+  BEGIN
+    delete from app_popularity;
 
-	INSERT INTO app_popularity(app_id, popularity)
-	select rating.app_id, rating.rank
-	from (
-		select a.app_id, score / max_score as rank from
-		(
-			select a.app_id, score, max(score) over() as max_score
-			from (
-				select a.app_id, ln(1 + (20 * GREATEST(rating_count * power(rating / 5.0, 2), 1) )/age_days) as score from
-				(
-					select a.app_id, (r1 * r1_count_root + r2 * r2_count)/(GREATEST(1, r1_count_root + r2_count)) as rating, rating_count, age_days
-					from (
-						select app_id,
-							coalesce(user_rating::double precision, 0) as r1,
-							coalesce(power(rating_count::double precision, 0.6), 0) as r1_count_root,
-							coalesce(rating_count::double precision, 0) as rating_count,
-							coalesce(user_rating_current::double precision, 0) as r2,
-							coalesce(rating_count_current::double precision, 0) as r2_count,
-							GREATEST(((EXTRACT(EPOCH FROM NOW() at time zone 'utc') - EXTRACT(EPOCH FROM release_date)) / 86400), 10) as age_days
-						from appstore_app
-					) a
-				) a
-			) a
-		) a
-	) rating
-	order by rating.rank desc;
+    INSERT INTO app_popularity(app_id, popularity)
+      select rating.app_id, rating.rank
+      from (
+             select a.app_id, score / max_score as rank from
+               (
+                 select a.app_id, score, max(score) over() as max_score
+                 from (
+                        select a.app_id, ln(1 + (20 * GREATEST(rating_count * power(rating / 5.0, 2), 1) )/age_days) as score from
+                          (
+                            select a.app_id, (r1 * r1_count_root + r2 * r2_count)/(GREATEST(1, r1_count_root + r2_count)) as rating, rating_count, age_days
+                            from (
+                                   select a.app_id,
+                                     coalesce(r.user_rating::double precision, 0) as r1,
+                                     coalesce(power(r.rating_count::double precision, 0.6), 0) as r1_count_root,
+                                     coalesce(r.rating_count::double precision, 0) as rating_count,
+                                     coalesce(r.user_rating_current::double precision, 0) as r2,
+                                     coalesce(r.rating_count_current::double precision, 0) as r2_count,
+                                     GREATEST(((EXTRACT(EPOCH FROM NOW() at time zone 'utc') - EXTRACT(EPOCH FROM a.release_date)) / 86400), 10) as age_days
+                                   from appstore_app a
+                                     join appstore_price p on a.app_id = p.app_id and p.country_code = 'USA'
+                                     left join appstore_rating r on a.app_id = r.app_id and r.country_code = 'USA'
+                                 ) a
+                          ) a
+                      ) a
+               ) a
+           ) rating
+      order by rating.rank desc;
 
-        RETURN true;
-END;
-$BODY$
+    RETURN true;
+  END;
+	$BODY$
 LANGUAGE plpgsql VOLATILE
 COST 100;
-ALTER FUNCTION reset_app_popularity()
-OWNER TO appakin;
-
-
 
 CREATE OR REPLACE FUNCTION reset_category_popularity()
 	RETURNS boolean AS
