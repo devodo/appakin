@@ -363,6 +363,7 @@ var getAppStoreIdBatch = function(client, lastId, limit, next) {
         "SELECT a.app_id, a.store_app_id\n" +
         "FROM appstore_app a\n" +
         "WHERE a.app_id > $1\n" +
+        "AND a.date_deleted is null\n" +
         "ORDER BY a.app_id\n" +
         "limit $2;";
 
