@@ -4,7 +4,7 @@ var request = require('request');
 var config = require('../../config');
 
 exports.triggerIndexSnapshot = function(batchSize, next) {
-    var queryUrl = config.search.esAdmin.url + '/index/app/snapshot';
+    var queryUrl = config.search.esAdmin.url + 'index/app/snapshot';
     var body = {
         batchSize: batchSize
     };
