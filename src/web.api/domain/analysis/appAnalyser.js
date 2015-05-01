@@ -79,6 +79,7 @@ var processApp = function(app, forceAll, processAppCallback) {
     var md5sum = app.app_checksum;
 
     if (!forceAll && md5sum && md5sum === app.desc_md5_checksum) {
+        log.debug("Skipping unchanged app: " + app.app_id);
         // description/language codes have not changed so no processing required.
         processAppCallback();
     } else {
@@ -86,7 +87,8 @@ var processApp = function(app, forceAll, processAppCallback) {
 
         appAnalysis.desc_md5_checksum = md5sum;
 
-        if (app.language_codes && app.language_codes.length > 0 && app.language_codes.indexOf('EN') === -1) {
+        // DN: Ignoring this check because there appear to be a lot of english apps with EN code missing
+        if (false && app.language_codes && app.language_codes.length > 0 && app.language_codes.indexOf('EN') === -1) {
             // Assume description is definitely not english if the app publisher says it's not.
 
             appAnalysis.desc_valid_term_count = -1;
@@ -184,7 +186,7 @@ var processApp = function(app, forceAll, processAppCallback) {
 };
 
 var analyse = function(batchSize, forceAll, next) {
-    log.warn('started analysis of 1000');
+    log.info('started analysis of apps');
 
     var processBatch = function(lastId) {
         log.debug("Adding batch from id: " + lastId);
