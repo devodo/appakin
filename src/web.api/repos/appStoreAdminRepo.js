@@ -507,7 +507,7 @@ var resetCategoryGenres = function(client, next) {
     client.query(queryStr, function (err, result) {
         if (err) { return next(err); }
 
-        next();
+        next(null, result);
     });
 };
 
@@ -517,7 +517,7 @@ var resetCategoryPopularities = function(client, next) {
     client.query(queryStr, function (err, result) {
         if (err) { return next(err); }
 
-        next();
+        next(null, result);
     });
 };
 
@@ -705,7 +705,7 @@ var insertXyoCategoryMap = function(client, categoryId, xyoCategoryId, next) {
     });
 };
 
-var getAppAnalysisBatch = function(client, lastId, limit, next) {
+var getAppAnalysisBatch = function(client, lastId, limit, forceAll, next) {
     var queryStr =
         "SELECT a.app_id, a.ext_id, a.name, a.description, a.dev_name, a.language_codes, a.checksum,\n" +
         "aa.desc_md5_checksum, aa.desc_cleaned\n" +
@@ -713,7 +713,7 @@ var getAppAnalysisBatch = function(client, lastId, limit, next) {
         "LEFT JOIN app_analysis aa on a.app_id = aa.app_id\n" +
         "WHERE a.app_id > $1\n" +
         "AND a.date_deleted is null\n" +
-        "AND (aa.desc_md5_checksum is null OR aa.desc_md5_checksum != a.checksum)" +
+        (forceAll ? "" : "AND (aa.desc_md5_checksum is null OR aa.desc_md5_checksum != a.checksum)\n") +
         "ORDER BY a.app_id\n" +
         "limit $2;";
 
@@ -1236,7 +1236,7 @@ exports.resetCategoryGenres = function(next) {
             return next(err);
         }
 
-        resetCategoryGenres(conn, function(err, results) {
+        resetCategoryGenres(conn.client, function(err, results) {
             conn.close(err, function(err) {
                 next(err, results);
             });
@@ -1250,7 +1250,7 @@ exports.resetCategoryPopularities = function(next) {
             return next(err);
         }
 
-        resetCategoryPopularities(conn, function(err, results) {
+        resetCategoryPopularities(conn.client, function(err, results) {
             conn.close(err, function(err) {
                 next(err, results);
             });
@@ -1362,13 +1362,13 @@ exports.insertCategoryAppExclude = function(categoryExtId, appExtId, next) {
     });
 };
 
-exports.getAppAnalysisBatch = function(lastId, limit, next) {
+exports.getAppAnalysisBatch = function(lastId, limit, forceAll, next) {
     connection.open(function(err, conn) {
         if (err) {
             return next(err);
         }
 
-        getAppAnalysisBatch(conn.client, lastId, limit, function(err, results) {
+        getAppAnalysisBatch(conn.client, lastId, limit, forceAll, function(err, results) {
             conn.close(err, function(err) {
                 next(err, results);
             });

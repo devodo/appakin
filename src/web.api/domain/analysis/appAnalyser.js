@@ -191,7 +191,7 @@ var analyse = function(batchSize, forceAll, next) {
     var processBatch = function(lastId) {
         log.debug("Adding batch from id: " + lastId);
 
-        appStoreAdminRepo.getAppAnalysisBatch(lastId, batchSize, function(err, apps) {
+        appStoreAdminRepo.getAppAnalysisBatch(lastId, batchSize, forceAll, function(err, apps) {
             if (err) {
                 return next(err);
             }
