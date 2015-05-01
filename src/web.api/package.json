@@ -24,7 +24,7 @@
     "morgan": "~1.0.0",
     "natural": "^0.1.29",
     "nlp_compromise": "^0.3.4",
-    "node-svm": "^2.1.4",
+    "node-svm": "git://github.com/devodo/node-svm.git#1.3.0",
     "node-uuid": "^1.4.1",
     "node.extend": "^1.1.2",
     "nodehun": "^2.0.4",
