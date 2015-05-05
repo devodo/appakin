@@ -110,10 +110,24 @@ exports.settings = {
                     "rule_stem"
                 ]
             },
-            "standard_text": {
+            "index_standard_text": {
+                "tokenizer": "standard",
+                "filter": [
+                    "lowercase",
+                    "index_common_grams"
+                ]
+            },
+            "search_standard_text": {
                 "tokenizer": "standard",
                 "filter": [
                     "lowercase"
+                ]
+            },
+            "search_standard_grams": {
+                "tokenizer": "standard",
+                "filter": [
+                    "lowercase",
+                    "search_common_grams"
                 ]
             },
             "shingle_text": {
@@ -131,7 +145,7 @@ exports.settings = {
             },
             "bm25_title": {
                 "type": "BM25",
-                "b": 0.1,
+                "b": 0.01,
                 "k1": 1.0
             }
         }
@@ -159,7 +173,8 @@ exports.mappings = {
             "ext_id": {"type": "string", "index": "no", "store": false},
             "name": {
                 "type": "string",
-                "analyzer": "standard_text",
+                "analyzer": "index_standard_text",
+                "search_analyzer": "search_standard_text",
                 "similarity": "bm25_title",
                 "copy_to": ["name_stem", "all", "spell"],
                 "store": false
@@ -174,14 +189,16 @@ exports.mappings = {
             },
             "name_alt": {
                 "type": "string",
-                "analyzer": "standard_text",
+                "analyzer": "index_standard_text",
+                "search_analyzer": "search_standard_text",
                 "similarity": "bm25_title",
                 "copy_to": "all",
                 "store": false
             },
             "desc": {
                 "type": "string",
-                "analyzer": "standard_text",
+                "analyzer": "index_standard_text",
+                "search_analyzer": "search_standard_text",
                 "copy_to": ["desc_stem", "all"],
                 "store": false
             },
