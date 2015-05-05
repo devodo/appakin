@@ -1,184 +1,277 @@
 'use strict';
-var solrCore = require('./solrCore').getAppSolrCore();
 var urlUtil = require('../urlUtil');
-var log = require('../../logger');
+var config = require('../../config');
+var request = require('request');
 
-var PAGE_SIZE = 10;
+var COMPLETE_SIZE = 6;
+var CAT_PAGE_SIZE = 10;
+var APP_PAGE_SIZE = 20;
+var CAT_APP_PAGE_SIZE = 20;
+var CAT_APP_SIZE = 12;
 
-var getHighlight = function(highlights, docId) {
-    if (!highlights) { return null; }
-
-    var hDoc = highlights[docId];
-    if (!hDoc) { return null; }
-
-    if (!hDoc.desc_split && !hDoc.name_split) { return null; }
-
-    if (hDoc.name_split) {
-        hDoc.name = hDoc.name_split;
-        delete hDoc.name_split;
-    }
-
-    if (hDoc.desc_split) {
-        hDoc.desc = hDoc.desc_split;
-        delete hDoc.desc_split;
-    }
-
-    return hDoc;
-};
-
-var buildFilterQuery = function(filters) {
-    var filterQuery = '&filter=';
+var buildFilterParams = function(filters) {
+    var filterParam = '';
 
     if (filters.isIphone === true) {
-        filterQuery += '+is_iphone:true';
-    } else if (filters.isIpad === true) {
-        filterQuery += '+is_ipad:true';
+        filterParam += '&isIphone=true';
+    }
+
+    if (filters.isIpad === true) {
+        filterParam += '&isIpad=true';
     }
 
     if (filters.isFree === true) {
-        filterQuery += '+is_free:true';
+        filterParam += '&isFree=true';
     }
 
-    return filterQuery;
+    return filterParam;
 };
 
-var search = function(queryStr, pageNum, filters, next) {
-    var q = encodeURIComponent(solrCore.escapeSolrParserChars(queryStr));
-    var filter = buildFilterQuery(filters);
-    var solrQuery = 'rows=' + PAGE_SIZE + '&qq=' + q + '&spellcheck.q=' + q + filter;
-
+var buildMainUrlParams = function(query, pageNum, filters) {
+    var catFrom = 0;
     if (pageNum && pageNum > 1) {
-        var start = (pageNum - 1) * PAGE_SIZE;
-        solrQuery += '&start=' + start;
+        catFrom = (pageNum - 1) * CAT_PAGE_SIZE;
     }
 
-    solrCore.client.get('custom', solrQuery, function (err, obj) {
-        if (err) {
-            return next(err);
-        }
+    var appSize = pageNum > 1 ? 0 : CAT_APP_SIZE;
 
-        if (!obj || !obj.response) {
-            return next("Unexpected response from search server");
-        }
+    var queryParams = '?q=' + encodeURIComponent(query) +
+        '&appSize=' + appSize +
+        '&catFrom=' + catFrom +
+        '&catSize=' + CAT_PAGE_SIZE +
+        '&catAppSize=' + CAT_APP_SIZE +
+        buildFilterParams(filters);
 
-        var highlights = obj.highlighting;
+    return queryParams;
+};
 
-        var apps = obj.response.docs.map(function(doc) {
+var buildCategoriesUrlParams = function(query, pageNum, filters) {
+    var catFrom = 0;
+    if (pageNum && pageNum > 1) {
+        catFrom = (pageNum - 1) * CAT_PAGE_SIZE;
+    }
 
-            var highlight = getHighlight(highlights, doc.id);
+    var queryParams = '?q=' + encodeURIComponent(query) +
+        '&catFrom=' + catFrom +
+        '&appSize=0&catSize=' + CAT_PAGE_SIZE +
+        '&catAppSize=' + CAT_APP_SIZE +
+        buildFilterParams(filters);
 
-            var app = {
-                id: doc.id,
-                name: doc.name_split,
-                url: urlUtil.makeUrl(doc.id, doc.name_split),
-                imageUrl: doc.img_url,
-                price: doc.price,
-                rating: doc.rating
-            };
+    return queryParams;
+};
 
-            if (highlight) {
-                app.highlight = highlight;
+var buildCategoryAppsUrlParams = function(query, categoryId, pageNum, filters) {
+    var appFrom = 0;
+    if (pageNum && pageNum > 1) {
+        appFrom = (pageNum - 1) * CAT_APP_PAGE_SIZE;
+    }
+
+    var queryParams = '?q=' + encodeURIComponent(query) +
+        '&categoryId=' + categoryId +
+        '&appFrom=' + appFrom +
+        '&appSize=' + CAT_APP_PAGE_SIZE +
+        buildFilterParams(filters);
+
+    return queryParams;
+};
+
+var buildAppsUrlParams = function(query, pageNum, filters) {
+    var appFrom = 0;
+    if (pageNum && pageNum > 1) {
+        appFrom = (pageNum - 1) * APP_PAGE_SIZE;
+    }
+
+    var queryParams = '?q=' + encodeURIComponent(query) +
+        '&catSize=0&appFrom=' + appFrom +
+        '&appSize=' + APP_PAGE_SIZE +
+        buildFilterParams(filters);
+
+    return queryParams;
+};
+
+var parseAppResults = function(appResults) {
+    var apps = appResults.apps.map(function(appResult) {
+        var app = {
+            id: appResult.field.ext_id,
+            name: appResult.field.name,
+            url: urlUtil.makeUrl(appResult.field.ext_id, appResult.field.name),
+            imageUrl: appResult.field.image_url,
+            price: appResult.field.price,
+            rating: appResult.field.rating
+        };
+
+        if (appResult.highlight) {
+            app.highlight = {};
+
+            if (appResult.highlight.name_stem) {
+                app.highlight.name = appResult.highlight.name_stem;
             }
 
-            return app;
-        });
-
-        var suggestions = solrCore.getSuggestions(obj.spellcheck);
-
-        var searchResult = {
-            total: obj.response.numFound,
-            page: pageNum,
-            apps: apps,
-            suggestions: suggestions
-        };
-
-        next(null, searchResult);
-    });
-};
-
-var searchDevAmbiguous = function(name, devName, next) {
-    var nameEncoded = encodeURIComponent(solrCore.escapeSolrParserChars(name));
-    var devNameEncoded = encodeURIComponent(solrCore.escapeSolrParserChars(devName));
-
-    var solrQuery =
-        'q=name:"' + nameEncoded + '"' +
-        '&fq=publisher:"' + devNameEncoded +'"' +
-        '&sort=popularity%20desc&q.op=AND&rows=100' +
-        '&fl=id,name_split,popularity';
-
-    solrCore.client.get('select', solrQuery, function (err, obj) {
-        if (err) {
-            return next(err);
+            if (appResult.highlight.desc_stem) {
+                app.highlight.desc = appResult.highlight.desc_stem;
+            }
         }
 
-        if (!obj || !obj.response) {
-            return next("Unexpected response from search server");
+        if (appResult.field.desc_short) {
+            app.desc = appResult.field.desc_short;
         }
 
-        var apps = obj.response.docs.map(function(doc) {
-
-            var app = {
-                id: doc.id,
-                name: doc.name_split,
-                popularity: doc.popularity
-            };
-
-            return app;
-        });
-
-        var searchResult = {
-            total: obj.response.numFound,
-            apps: apps
-        };
-
-        next(null, searchResult);
+        return app;
     });
+
+    return apps;
 };
 
-var searchGlobalAmbiguous = function(name, devName, next) {
-    var nameEncoded = encodeURIComponent(solrCore.escapeSolrParserChars(name));
-
-    var solrQuery =
-        'q=name:"' + nameEncoded + '"' +
-        '&sort=popularity%20desc&q.op=AND&rows=1' +
-        '&fl=id,popularity';
-
-    if (devName) {
-        var devNameEncoded = encodeURIComponent(solrCore.escapeSolrParserChars(devName));
-        solrQuery += '&fq=-publisher:"' + devNameEncoded +'"';
+var parseAppResultsMain = function(appResults) {
+    if (!appResults) {
+        return {};
     }
 
-    solrCore.client.get('select', solrQuery, function (err, obj) {
-        if (err) {
-            return next(err);
-        }
+    return {
+        total: appResults.total,
+        apps: parseAppResults(appResults)
+    };
+};
 
-        if (!obj || !obj.response) {
-            return next("Unexpected response from search server");
-        }
+var search = function(query, pageNum, filters, next) {
+    var queryParams = buildMainUrlParams(query, pageNum, filters);
+    var queryUrl = config.search.esAdmin.url + 'search/main' + queryParams;
 
-        var apps = obj.response.docs.map(function(doc) {
+    request({url: queryUrl, pool: false, json: true}, function (err, resp, searchResult) {
+        if (err) { return next(err); }
+        if (searchResult.error) { return next(new Error(searchResult.error)); }
 
-            var app = {
-                id: doc.id,
-                popularity: doc.popularity
-            };
-
-            return app;
-        });
-
-        var searchResult = {
-            total: obj.response.numFound,
-            apps: apps
+        var result = {
+            page: pageNum,
+            suggestions: []
         };
 
-        next(null, searchResult);
+        if (searchResult.result.app) {
+            result.appResults = parseAppResultsMain(searchResult.result.app);
+        }
+
+        if (searchResult.result.suggestions) {
+            result.suggestions = searchResult.result.suggestions.map(function (suggestion) {
+                return suggestion.text;
+            });
+        }
+
+        var categories = searchResult.result.category.categories.
+            map(function(categoryResult) {
+                var category = {
+                    id: categoryResult.id,
+                    app: parseAppResultsMain(categoryResult.app)
+                };
+
+                return category;
+            });
+
+        result.categoryResults = {
+            total: searchResult.result.category.total,
+            categories: categories
+        };
+
+        next(null, result);
+    });
+};
+
+var searchCategories = function(query, pageNum, filters, next) {
+    var queryParams = buildCategoriesUrlParams(query, pageNum, filters);
+    var queryUrl = config.search.esAdmin.url + 'search/main' + queryParams;
+
+    request({url: queryUrl, pool: false, json: true}, function (err, resp, searchResult) {
+        if (err) { return next(err); }
+        if (searchResult.error) { return next(new Error(searchResult.error)); }
+
+        var result = {
+            page: pageNum,
+            total: searchResult.result.category.total,
+            suggestions: []
+        };
+
+        if (searchResult.result.suggestions) {
+            result.suggestions = searchResult.result.suggestions.map(function (suggestion) {
+                return suggestion.text;
+            });
+        }
+
+        result.categories = searchResult.result.category.categories.map(function (categoryResult) {
+            var category = {};
+
+            category.id = categoryResult.id;
+            category.totalApps = categoryResult.app.total;
+            category.apps = parseAppResults(categoryResult.app);
+
+            return category;
+        });
+
+        next(null, result);
+    });
+};
+
+var searchCategoryApps = function(query, categoryId, pageNum, filters, next) {
+    var queryParams = buildCategoryAppsUrlParams(query, categoryId, pageNum, filters);
+    var queryUrl = config.search.esAdmin.url + 'search/category' + queryParams;
+
+    request({url: queryUrl, pool: false, json: true}, function (err, resp, searchResult) {
+        if (err) { return next(err); }
+        if (searchResult.error) { return next(new Error(searchResult.error)); }
+
+        var result = {
+            page: pageNum,
+            total: 0
+        };
+
+        if (searchResult.result.length > 0) {
+            result.id = searchResult.result[0].id;
+            result.total = searchResult.result[0].app.total;
+            result.apps = parseAppResults(searchResult.result[0].app);
+        }
+
+        next(null, result);
+    });
+};
+
+var searchApps = function(query, pageNum, filters, next) {
+    var queryParams = buildAppsUrlParams(query, pageNum, filters);
+    var queryUrl = config.search.esAdmin.url + 'search/main' + queryParams;
+
+    request({url: queryUrl, pool: false, json: true}, function (err, resp, searchResult) {
+        if (err) { return next(err); }
+        if (searchResult.error) { return next(new Error(searchResult.error)); }
+
+        var result = {
+            page: pageNum,
+            total: searchResult.result.app.total,
+            apps: parseAppResults(searchResult.result.app)
+        };
+
+        next(null, result);
+
+    });
+};
+
+var searchComplete = function(query, next) {
+    var queryParams = '?q=' + encodeURIComponent(query) + '&size=' + COMPLETE_SIZE;
+    var queryUrl = config.search.esAdmin.url + 'search/complete' + queryParams;
+
+    request({url: queryUrl, pool: false, json: true}, function (err, resp, body) {
+        if (err) { return next(err); }
+
+        var suggestions = body.result.map(function(option) {
+            return option.text;
+        });
+
+        next(null, suggestions);
+
     });
 };
 
 exports.search = search;
-exports.searchDevAmbiguous = searchDevAmbiguous;
-exports.searchGlobalAmbiguous = searchGlobalAmbiguous;
+exports.searchCategories = searchCategories;
+exports.searchCategoryApps = searchCategoryApps;
+exports.searchApps = searchApps;
+exports.searchComplete = searchComplete;
 
 
 

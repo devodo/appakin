@@ -2,8 +2,7 @@
 var log = require('../logger');
 var urlUtil = require('../domain/urlUtil');
 var appStoreRepo = require('../repos/appStoreRepo');
-var appRank = require('../domain/analysis/appRank');
-var appAnalyser = require('../domain/analysis/appAnalyser');
+var appRank = require('../domain/appRank');
 
 var MAX_CATEGORIES = 10;
 
@@ -15,7 +14,7 @@ exports.init = function init(app) {
             return;
         }
 
-        getAppByExtId(extId, req, res, false);
+        getAppByExtId(extId, req, res);
     });
 
     app.get('/ios/app-dev/:encodedId/:slug', function (req, res) {
@@ -24,7 +23,7 @@ exports.init = function init(app) {
             return;
         }
 
-        getAppByExtId(extId, req, res, true);
+        getAppByExtId(extId, req, res);
     });
 
     app.get('/ios/app/:extId', function (req, res, next) {
@@ -34,12 +33,12 @@ exports.init = function init(app) {
             return res.status(400).json({error: 'Bad query string'});
         }
 
-        getAppByExtId(extId, req, res, false);
+        getAppByExtId(extId, req, res);
     });
 
 };
 
-function getAppByExtId(extId, req, res, highlightDescription) {
+function getAppByExtId(extId, req, res) {
     appStoreRepo.getAppByExtId(extId, function(err, app) {
         if (err) {
             log.error(err);
@@ -84,19 +83,7 @@ function getAppByExtId(extId, req, res, highlightDescription) {
             delete app.userRating;
             delete app.ratingCount;
 
-            if (highlightDescription) {
-                appAnalyser.cleanDescription(appId, app.name, app.description, app.devName, false, function (err, cleanResult) {
-                    if (err) {
-                        log.error('Error cleaning description: ' + err);
-                        return res.status(500).json({error: 'Error cleaning description'});
-                    }
-
-                    app.description = cleanResult.html;
-                    res.json(app);
-                });
-            } else {
-                res.json(app);
-            }
+            res.json(app);
         });
     });
 }

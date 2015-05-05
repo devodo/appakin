@@ -1,7 +1,7 @@
 'use strict';
-var appStoreData = require("../../domain/dataProvider/appStoreDataProvider");
-var appStoreAdminRepo = require("../../repos/appStoreAdminRepo");
-var log = require('../../logger');
+var appStoreData = require("../domain/dataProvider/appStoreDataProvider");
+var appStoreAdminRepo = require("../repos/appStoreAdminRepo");
+var log = require('../logger');
 
 exports.init = function init(app) {
 

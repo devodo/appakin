@@ -1,8 +1,8 @@
 'use strict';
 
-var log = require('../../logger');
-var clusterSearcher = require('../../domain/search/clusterSearcher');
-var uuidUtil = require('../../domain/uuidUtil');
+var log = require('../logger');
+var clusterSearcher = require('../domain/search/clusterSearcher');
+var uuidUtil = require('../domain/uuidUtil');
 
 exports.init = function init(app) {
     app.get('/admin/cluster/search_seed_app/:seedId', function (req, res, next) {

@@ -7,7 +7,6 @@ var descriptionProcessors = require('./descriptionProcessors');
 var log = require('../../logger');
 var LanguageDetect = require('languagedetect');
 var lngDetector = new LanguageDetect();
-var crypto = require('crypto');
 var XRegExp = require('xregexp').XRegExp;
 
 var SpellCheck = require('spellcheck'),

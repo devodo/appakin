@@ -1,7 +1,7 @@
 'use strict';
 
-var log = require('../../logger');
-var categoryClassification = require('../../domain/dataAdmin/categoryClassification');
+var log = require('../logger');
+var categoryClassification = require('../domain/dataAdmin/categoryClassification');
 
 exports.init = function init(app) {
     app.post('/admin/data/reload_all_seed_category_apps', function (req, res, next) {

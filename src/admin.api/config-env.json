@@ -1,8 +1,8 @@
 {
     "common": {
         "server": {
-            "port": 3002,
-            "returnErrorDetail": false
+            "port": 3003,
+            "returnErrorDetail": true
         },
         "cluster": {
             "enabled": true,
@@ -15,40 +15,28 @@
         "log": {
             "level": "info"
         },
-        "cache": {
-            "redis": {
-                "enabled": false,
-                "host": "127.0.0.1",
-                "port": "6379",
-                "retryConnectionMs": 5000
-            }
-        },
         "search": {
+            "solr": {
+                "host": "localhost",
+                "port": "8983",
+                "cores": {
+                    "auto": "appakin_auto",
+                    "category": "appakin_cat",
+                    "app": "appakin_app",
+                    "cluster": "appakin_cluster"
+                },
+                "tempCorePrefix": "temp_",
+                "createTempCoreUrl": "http://localhost:3005/solr/admin/create_temp_core"
+            },
             "esAdmin": {
               "url": "http://localhost:3006/"
-            }
-        },
-        "itunes": {
-            "affiliateId": "10lNjB"
-        },
-        "featured": {
-            "homePage": {
-                "localCacheExpirySeconds": 30,
-                "remoteCacheExpirySeconds": 120,
-                "categories": 5,
-                "categoryBias": 2,
-                "apps": 8,
-                "appBias": 2
             },
-            "category": {
-                "apps": 5,
-                "appBias": 2
-            }
+            "stopwordFile": "domain/search/stopwords_en.txt"
         }
     },
     "development": {
       "server": {
-        "returnErrorDetail": false
+        "returnErrorDetail": true
       },
       "test": "test dev",
       "log": {
@@ -63,11 +51,6 @@
         "cluster": {
             "enabled": true,
             "workers": "cpu_count"
-        },
-        "cache": {
-            "redis": {
-                "enabled": true
-            }
         }
     }
 }

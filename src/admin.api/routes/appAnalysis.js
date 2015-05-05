@@ -1,7 +1,7 @@
 'use strict';
 
-var appAnalyser = require('../../domain/analysis/appAnalyser');
-var log = require('../../logger');
+var appAnalyser = require('../domain/analysis/appAnalyser');
+var log = require('../logger');
 
 exports.init = function init(app) {
 

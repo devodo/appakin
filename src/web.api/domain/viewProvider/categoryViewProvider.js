@@ -2,8 +2,7 @@
 
 var log = require("../../logger");
 var appStoreRepo = require("../../repos/appStoreRepo");
-var categorySearcher = require("../search/categorySearcher");
-var appSearcher = require("../search/elasticSearch/appSearcher");
+var appSearcher = require("../search/appSearcher");
 var redisCacheFactory = require("../cache/redisCache");
 var categoryChartCache = redisCacheFactory.createRedisCache(redisCacheFactory.dbPartitions.chart);
 var categoryCache = redisCacheFactory.createRedisCache(redisCacheFactory.dbPartitions.category);

@@ -1,5 +1,5 @@
 'use strict';
-var xyoData = require("../../domain/dataProvider/xyoDataProvider");
+var xyoData = require("../domain/dataProvider/xyoDataProvider");
 
 exports.init = function init(app) {
 

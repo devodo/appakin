@@ -1,8 +1,7 @@
 'use strict';
 
-var autoSearcher = require('../domain/search/autoSearcher');
 var catViewProvider = require('../domain/viewProvider/categoryViewProvider');
-var appSearcher = require('../domain/search/elasticSearch/appSearcher');
+var appSearcher = require('../domain/search/appSearcher');
 
 var MAX_CAT_APP_PAGES = 8;
 

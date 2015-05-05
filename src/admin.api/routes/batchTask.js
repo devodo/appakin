@@ -1,8 +1,8 @@
 'use strict';
 
 var prettyHrtime = require('pretty-hrtime');
-var log = require('../../logger');
-var batchTask = require('../../domain/admin/batchTask');
+var log = require('../logger');
+var batchTask = require('../domain/admin/batchTask');
 
 exports.init = function init(app) {
     app.post('/admin/task/rebuild_all', function (req, res, next) {
