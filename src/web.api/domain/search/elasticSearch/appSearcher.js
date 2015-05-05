@@ -125,7 +125,7 @@ var parseAppResults = function(appResults) {
 var parseAppResultsMain = function(appResults) {
     if (!appResults) {
         return {};
-    };
+    }
 
     return {
         total: appResults.total,
