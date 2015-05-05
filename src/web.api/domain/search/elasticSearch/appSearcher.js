@@ -123,6 +123,10 @@ var parseAppResults = function(appResults) {
 };
 
 var parseAppResultsMain = function(appResults) {
+    if (!appResults) {
+        return {};
+    };
+
     return {
         total: appResults.total,
         apps: parseAppResults(appResults)
@@ -154,6 +158,7 @@ var search = function(query, pageNum, filters, next) {
 
         var categories = searchResult.result.category.categories.
             filter(function(categoryResult) {
+                return true;
                 return categoryResult.app;
             }).
             map(function(categoryResult) {
