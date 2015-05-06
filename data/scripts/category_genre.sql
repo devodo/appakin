@@ -24,7 +24,7 @@ ON category_popularity (popularity);
 
 CREATE OR REPLACE FUNCTION fix_genres(text[])
   RETURNS text[] AS
-  $BODY$
+$BODY$
 DECLARE
   genre text;
   result_genres text[];
@@ -54,7 +54,11 @@ BEGIN
     CONTINUE WHEN genre = 'Sports';
     CONTINUE WHEN genre = 'Entertainment';
     CONTINUE WHEN genre = 'Music';
-    genre := replace(regexp_replace(replace(lower(genre), '&', 'and'), '[^a-z ]', ''), ' ','_');
+    IF genre = 'Book' THEN
+      genre := 'books';
+    ELSE
+      genre := replace(regexp_replace(replace(lower(genre), '&', 'and'), '[^a-z ]', ''), ' ','_');
+    END IF;
     result_genres := array_append(result_genres, genre);
   END LOOP;
 
@@ -97,8 +101,8 @@ BEGIN
   RETURN result_genres;
 END;
 $BODY$
-LANGUAGE plpgsql VOLATILE
-COST 100;
+  LANGUAGE plpgsql VOLATILE
+  COST 100;
 
 
 
