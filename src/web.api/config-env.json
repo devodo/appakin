@@ -58,7 +58,7 @@
     "production": {
         "test": "test production",
         "connectionString": {
-            "appakin": "postgres://appakin:password@localhost/appakin"
+            "appakin": "postgres://appakin:password@localhost/appakin_web"
         },
         "cluster": {
             "enabled": true,
