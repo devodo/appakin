@@ -10,7 +10,7 @@ var appAnalyser = require('../analysis/appAnalyser');
 var log = require('../../logger');
 
 var APP_BATCH_SIZE = 1000;
-var INDEX_BATCH_SIZE = 10000;
+var INDEX_BATCH_SIZE = 1000;
 var APP_ANALYSIS_BATCH_SIZE = 100;
 var CAT_POSITION_FACTOR = 0.3;
 var RELATED_CAT_POSITION_FACTOR = 0.3;

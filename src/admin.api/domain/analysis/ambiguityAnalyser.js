@@ -3,7 +3,7 @@
 var async = require('async');
 var appStoreAdminRepo = require('../../repos/appStoreAdminRepo');
 var log = require('../../logger');
-var appSearcher = require('../search/appSearcher');
+var clusterSearcher = require('../search/clusterSearcher');
 var uuidUtil = require('../uuidUtil');
 
 var ignoreTerms = {
@@ -111,16 +111,16 @@ var getStrippedAnalysis = function(input) {
 };
 
 var getAmbiguousDevTerms = function(strippedAnalysis, app, next) {
-    appSearcher.searchDevAmbiguous(strippedAnalysis.strippedName, app.devName, function(err, searchResult) {
+    clusterSearcher.searchDevAmbiguous(strippedAnalysis.strippedName, app.devId, function(err, searchResult) {
         if (err) { return next(err); }
 
         var appExtId = uuidUtil.stripDashes(app.extId);
 
         if (searchResult.total === 0) {
-            return next("No ambiguous dev search results for app:" + app.extId);
+            return next(new Error("No ambiguous dev search results for app:" + app.extId));
         } else if (searchResult.total === 1) {
             if (searchResult.apps[0].id !== appExtId) {
-                return next("Ambiguous dev search did not return source app:" + app.extId);
+                return next(new Error("Ambiguous dev search did not return source app:" + app.extId));
             }
         }
 
@@ -157,7 +157,7 @@ var getAmbiguousDevTerms = function(strippedAnalysis, app, next) {
 var getTopAmbiguousAppId = function(strippedAnalysis, app, next) {
     var deltaThreshold = 0.2;
 
-    appSearcher.searchGlobalAmbiguous(strippedAnalysis.strippedName, app.devName, function(err, searchResult) {
+    clusterSearcher.searchGlobalAmbiguous(strippedAnalysis.strippedName, app.devId, function(err, searchResult) {
         if (err) { return next(err); }
 
         if (searchResult.total === 0) {
@@ -191,11 +191,11 @@ var getTopAmbiguousAppId = function(strippedAnalysis, app, next) {
 };
 
 var getGlobalCanUseShortName = function(app, strippedAnalysis, next) {
-    appSearcher.searchGlobalAmbiguous(strippedAnalysis.strippedShortName, null, function(err, searchResult) {
+    clusterSearcher.searchGlobalAmbiguous(strippedAnalysis.strippedShortName, null, function(err, searchResult) {
         if (err) { return next(err); }
 
         if (searchResult.total === 0) {
-            return next("No short name search results for app:" + app.extId);
+            return next(new Error("No short name search results for app:" + app.extId));
         }
 
         if (searchResult.total > 1) {
@@ -203,7 +203,7 @@ var getGlobalCanUseShortName = function(app, strippedAnalysis, next) {
         }
 
         if (searchResult.apps[0].id !== uuidUtil.stripDashes(app.extId)) {
-            return next("Short name search result does not equal source app:" + app.extId);
+            return next(new Error("Short name search result does not equal source app:" + app.extId));
         }
 
         return next(null, true, searchResult.total);
@@ -211,16 +211,16 @@ var getGlobalCanUseShortName = function(app, strippedAnalysis, next) {
 };
 
 var getDevShortNameAmbiguousTerms = function(app, strippedAnalysis, globalTotal, next) {
-    appSearcher.searchDevAmbiguous(strippedAnalysis.strippedShortName, app.devName, function(err, searchResult) {
+    clusterSearcher.searchDevAmbiguous(strippedAnalysis.strippedShortName, app.devId, function(err, searchResult) {
         if (err) { return next(err); }
 
         var appExtId = uuidUtil.stripDashes(app.extId);
 
         if (searchResult.total === 0) {
-            return next("No short name dev search results for app:" + app.extId);
+            return next(new Error("No short name dev search results for app:" + app.extId));
         } else if (searchResult.total === 1) {
             if (searchResult.apps[0].id !== appExtId) {
-                return next("Dev short name search did not return source app:" + app.extId);
+                return next(new Error("Dev short name search did not return source app:" + app.extId));
             }
         }
 

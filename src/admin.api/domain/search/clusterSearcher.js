@@ -559,6 +559,87 @@ var deleteSeedTraining = function(seedCategoryId, appExtId, next) {
     });
 };
 
+var searchDevAmbiguous = function(name, devId, next) {
+    var nameEncoded = encodeURIComponent(solrClusterCore.escapeSolrParserChars(name));
+
+    var solrQuery =
+        'q=name:"' + nameEncoded + '"' +
+        '&fq=dev_id:"' + devId +'"' +
+        '&sort=popularity%20desc&q.op=AND&rows=100' +
+        '&fl=id,name,popularity';
+
+    solrClusterCore.client.get('select', solrQuery, function (err, obj) {
+        if (err) {
+            return next(err);
+        }
+
+        if (!obj || !obj.response) {
+            return next("Unexpected response from search server");
+        }
+
+        var apps = obj.response.docs.map(function(doc) {
+
+            var app = {
+                id: doc.id,
+                name: doc.name,
+                popularity: doc.popularity
+            };
+
+            return app;
+        });
+
+        var searchResult = {
+            total: obj.response.numFound,
+            apps: apps
+        };
+
+        next(null, searchResult);
+    });
+};
+
+var searchGlobalAmbiguous = function(name, devId, next) {
+    var nameEncoded = encodeURIComponent(solrClusterCore.escapeSolrParserChars(name));
+
+    var solrQuery =
+        'q=name:"' + nameEncoded + '"' +
+        '&sort=popularity%20desc&q.op=AND&rows=1' +
+        '&fl=id,popularity';
+
+    if (devId) {
+        solrQuery += '&fq=-dev_id:"' + devId +'"';
+    }
+
+    solrClusterCore.client.get('select', solrQuery, function (err, obj) {
+        if (err) {
+            return next(err);
+        }
+
+        if (!obj || !obj.response) {
+            return next("Unexpected response from search server");
+        }
+
+        var apps = obj.response.docs.map(function(doc) {
+
+            var app = {
+                id: doc.id,
+                popularity: doc.popularity
+            };
+
+            return app;
+        });
+
+        var searchResult = {
+            total: obj.response.numFound,
+            apps: apps
+        };
+
+        next(null, searchResult);
+    });
+};
+
+exports.searchDevAmbiguous = searchDevAmbiguous;
+exports.searchGlobalAmbiguous = searchGlobalAmbiguous;
+
 exports.getSeedApps = getSeedApps;
 exports.getCategorySearchSeedApps = getCategorySearchSeedApps;
 exports.getAppTopKeywords = getAppTopKeywords;

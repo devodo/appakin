@@ -1479,7 +1479,7 @@ exports.insertAppAmbiguity = function(appAmbiguity, next) {
 
 var getMissingAppAmbiguityBatch = function(client, lastId, limit, next) {
     var queryStr =
-        "SELECT a.app_id, a.ext_id, a.name, a.dev_name, ap.popularity\n" +
+        "SELECT a.app_id, a.ext_id, a.name, a.dev_id, ap.popularity\n" +
         "FROM appstore_app a\n" +
         "LEFT JOIN app_popularity ap on a.app_id = ap.app_id\n" +
         "LEFT JOIN app_ambiguity aa on a.app_id = aa.app_id\n" +
@@ -1504,7 +1504,7 @@ var getMissingAppAmbiguityBatch = function(client, lastId, limit, next) {
                 id: item.app_id,
                 extId: item.ext_id,
                 name: item.name,
-                devName: item.dev_name,
+                devId: item.dev_id,
                 popularity: item.popularity
             };
         });
