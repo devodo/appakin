@@ -310,7 +310,7 @@ var getSeedCategoryApps = function(client, seedCategoryId, next) {
     var queryStr =
         "SELECT s.id, s.seed_category_id, s.app_id, s.position, s.date_created\n" +
         "FROM seed_category_app s\n" +
-        "JOIN appstore_price p on s.app_id = p.price AND p.country_code = 'USA'" +
+        "JOIN appstore_price p on s.app_id = p.app_id AND p.country_code = 'USA'" +
         "WHERE s.seed_category_id = $1\n" +
         "ORDER BY s.position;";
 
@@ -318,7 +318,7 @@ var getSeedCategoryApps = function(client, seedCategoryId, next) {
         if (err) { return next(err); }
 
         if (result.rows.length === 0) {
-            return (next(null));
+            return (next(null, []));
         }
 
         var items = result.rows.map(function(item) {
