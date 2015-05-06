@@ -1,3 +1,28 @@
+--Export seed category training
+
+select 'select create_or_update_seed_category(''' || sc.name || ''', '
+       || s.max_take || ',' || chr(10) || '''' || s.query || ''');' ||
+       chr(10) || chr(10) ||
+       'select create_or_update_svm_training_data(''' || sc.name || ''',' || chr(10) ||
+       'array[' || chr(10) || '    ' ||
+       array_to_string(array(select '''' || st.app_ext_id || ''''
+                             from seed_training st
+                             where st.seed_category_id = sc.id
+                                   and include
+                             order by id), ',' || chr(10) || '    ') ||
+       chr(10) || ']::text[],' || chr(10) || 'array[' || chr(10) || '    ' ||
+       array_to_string(array(select '''' || st.app_ext_id || ''''
+                             from seed_training st
+                             where st.seed_category_id = sc.id
+                                   and not include
+                             order by id), ',' || chr(10) || '    ') ||
+       chr(10) || ']::text[]);' || chr(10) || chr(10)
+from seed_category_search s
+  join seed_category sc on s.seed_category_id = sc.id
+order by sc.id;
+
+
+
 -- Populate category_app table from xyo data
 -- Precondition: category_app table must be empty
 INSERT INTO category_app(category_id, app_id, "position", old_position, date_created)
