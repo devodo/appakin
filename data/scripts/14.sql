@@ -79,6 +79,7 @@ INSERT INTO appstore_rating_history(app_id, country_code, user_rating_current, r
   from appstore_rating;
 
 alter table appstore_app add column checksum text;
+alter table appstore_app add column analysis_checksum text;
 alter table appstore_app add column copyright text;
 alter table appstore_app add column itunes_version text;
 alter table appstore_app add column screenshot_dimensions text[];
@@ -90,6 +91,11 @@ alter table appstore_app alter column artwork_medium_url drop not null;
 alter table appstore_app alter column price drop not null;
 alter table appstore_app alter column currency drop not null;
 alter table appstore_app alter column is_game_center_enabled drop not null;
+
+update appstore_app
+set analysis_checksum = md5(coalesce(name, '') ||
+                            coalesce(description, '') ||
+                            coalesce(array_to_string(language_codes, ',', '-'), ''));
 
 select max(app_id) + 1 from appstore_app;
 CREATE SEQUENCE appstore_app_app_id_seq START 1204398;
