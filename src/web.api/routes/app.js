@@ -75,7 +75,7 @@ function getAppByExtId(extId, req, res) {
             app.rating = appRank.getRating(app);
 
             app.id = app.extId.replace(/\-/g, '');
-            app.artworkMediumUrl = app.artworkLargeUrl;
+            app.artworkMediumUrl = app.artworkLargeUrl.replace(/\.[0-1]+x[0-1]+-75/g, '');
 
             delete app.extId;
             delete app.userRatingCurrent;
