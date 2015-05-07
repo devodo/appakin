@@ -8,41 +8,42 @@ var MAX_CATEGORIES = 10;
 
 exports.init = function init(app) {
 
-    app.get('/ios/app/:encodedId/:slug', function (req, res) {
+    app.get('/ios/app/:encodedId/:slug', function (req, res, next) {
         var extId = decodeExtId(req, res);
         if (extId === null) {
             return;
         }
 
-        getAppByExtId(extId, req, res);
+        var expirySeconds = 600;
+        res.setHeader("Cache-Control", "public, max-age=" + expirySeconds);
+
+        getAppByExtId(extId, req, res, next);
     });
 
-    app.get('/ios/app-dev/:encodedId/:slug', function (req, res) {
+    app.get('/ios/app-dev/:encodedId/:slug', function (req, res, next) {
         var extId = decodeExtId(req, res);
         if (extId === null) {
             return;
         }
 
-        getAppByExtId(extId, req, res);
+        getAppByExtId(extId, req, res, next);
     });
 
     app.get('/ios/app/:extId', function (req, res, next) {
         var extId = req.params.extId;
-        if (!extId)
-        {
+        if (!extId) {
             return res.status(400).json({error: 'Bad query string'});
         }
 
-        getAppByExtId(extId, req, res);
+        getAppByExtId(extId, req, res, next);
     });
 
 };
 
-function getAppByExtId(extId, req, res) {
+function getAppByExtId(extId, req, res, next) {
     appStoreRepo.getAppByExtId(extId, function(err, app) {
         if (err) {
-            log.error(err);
-            return res.status(500).json({error: 'Error retrieving app data'});
+            return next(err);
         }
 
         if (!app) {
@@ -60,8 +61,6 @@ function getAppByExtId(extId, req, res) {
                 log.error(err);
                 return res.status(500).json({error: 'Error retrieving app category data'});
             }
-
-            var appId = app.id;
 
             cats.forEach(function(cat) {
                 cat.url = urlUtil.makeUrl(cat.extId, cat.name);

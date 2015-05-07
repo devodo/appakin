@@ -34,6 +34,9 @@ exports.init = function init(app) {
             return res.status(400).json({error: 'Bad page number'});
         }
 
+        var expirySeconds = 600;
+        res.setHeader("Cache-Control", "public, max-age=" + expirySeconds);
+
         var filters = {
             isIphone: req.query.is_iphone === 'true',
             isIpad: req.query.is_ipad === 'true',
@@ -118,6 +121,9 @@ exports.init = function init(app) {
             return res.status(400).json({error: 'Bad category id'});
         }
 
+        var expirySeconds = 600;
+        res.setHeader("Cache-Control", "public, max-age=" + expirySeconds);
+
         var filters = {
             isIphone: req.query.is_iphone === 'true',
             isIpad: req.query.is_ipad === 'true',
@@ -169,6 +175,9 @@ exports.init = function init(app) {
         if (pageNum > POPULAR_MAX_PAGES) {
             return res.status(404).json({error: 'Not found'});
         }
+
+        var expirySeconds = 600;
+        res.setHeader("Cache-Control", "public, max-age=" + expirySeconds);
 
         var filters = {
             isIphone: req.query.is_iphone === 'true',

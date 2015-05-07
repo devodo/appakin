@@ -106,6 +106,9 @@ exports.init = function init(app) {
         getFeaturedCached(function(err, categories) {
             if (err) { return next(err); }
 
+            var expirySeconds = 600;
+            res.setHeader("Cache-Control", "public, max-age=" + expirySeconds);
+
             res.json(categories);
         });
     });
