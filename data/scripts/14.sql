@@ -97,8 +97,10 @@ set analysis_checksum = md5(coalesce(name, '') ||
                             coalesce(description, '') ||
                             coalesce(array_to_string(language_codes, ',', '-'), ''));
 
+-- Get rid of the app table
 select max(app_id) + 1 from appstore_app;
-CREATE SEQUENCE appstore_app_app_id_seq START 1204398;
+CREATE SEQUENCE appstore_app_app_id_seq START [put result of previous query here];
+
 alter table appstore_app alter column app_id set default nextval('appstore_app_app_id_seq');
 alter sequence appstore_app_app_id_seq OWNED BY appstore_app.app_id;
 
