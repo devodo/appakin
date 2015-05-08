@@ -14,7 +14,7 @@ from (
 			join app_popularity ap on a.app_id = ap.app_id
 			join category_app ca on a.app_id = ca.app_id
 			where a.rating_count is not null
-			and a.release_date > '2013-01-01'
+			and a.release_date > '2014-01-01'
 			and a.date_deleted is null
 			order by ap.popularity desc
 			limit 5000
@@ -28,7 +28,7 @@ delete from featured_category_app
 where featured_app_type = 1;
 
 INSERT INTO featured_category_app(app_id, category_id, weight, featured_app_type, date_created, date_modified)
-select app_id, category_id, popularity, 1, NOW() at time zone 'utc', NOW() at time zone 'utc'
+select t.app_id, t.category_id, t.popularity, 1, NOW() at time zone 'utc', NOW() at time zone 'utc'
 from (
 	select category_id, app_id, popularity, num from (
 		select category_id, app_id, popularity, row_number() over(partition by category_id order by popularity desc) as num
@@ -38,7 +38,7 @@ from (
 			join app_popularity ap on a.app_id = ap.app_id
 			join category_app ca on a.app_id = ca.app_id
 			where a.rating_count is not null
-			and a.release_date > '2013-01-01'
+			and a.release_date > '2014-01-01'
 			and a.date_deleted is null
 			order by ap.popularity desc
 			limit 5000
@@ -46,7 +46,10 @@ from (
 	) t
 	where num <= 20
 	order by category_id, popularity desc
-) t;
+) t
+left join featured_category_app fa
+on t.app_id = fa.app_id and t.category_id = fa.category_id
+where fa.id is null;
 
 delete from featured_homepage_category;
 
@@ -66,7 +69,7 @@ join (
 				join app_popularity ap on a.app_id = ap.app_id
 				join category_app ca on a.app_id = ca.app_id
 				where a.rating_count is not null
-				and a.release_date > '2013-01-01'
+				and a.release_date > '2014-01-01'
 				and a.date_deleted is null
 				order by ap.popularity desc
 				limit 5000
@@ -86,7 +89,7 @@ commit;
 
 -- Insert single category
 INSERT INTO featured_category_app(app_id, category_id, weight, featured_app_type, date_created, date_modified)
-select app_id, category_id, popularity, 1, NOW() at time zone 'utc', NOW() at time zone 'utc'
+select t.app_id, t.category_id, t.popularity, 1, NOW() at time zone 'utc', NOW() at time zone 'utc'
 from (
 	select category_id, app_id, popularity, num from (
 		select category_id, app_id, popularity, row_number() over(partition by category_id order by popularity desc) as num
@@ -96,7 +99,7 @@ from (
 			join app_popularity ap on a.app_id = ap.app_id
 			join category_app ca on a.app_id = ca.app_id
 			where a.rating_count is not null
-			and a.release_date > '2013-01-01'
+			and a.release_date > '2014-01-01'
 			and a.date_deleted is null
 			order by ap.popularity desc
 			limit 5000
@@ -105,7 +108,10 @@ from (
 	where num <= 20
 	and category_id = 866
 	order by category_id, popularity desc
-) t;
+) t
+left join featured_category_app fa
+		on t.app_id = fa.app_id and t.category_id = fa.category_id
+where fa.id is null;
 
 
 INSERT INTO featured_category_app(app_id, category_id, weight, fixed_order, featured_app_type,
