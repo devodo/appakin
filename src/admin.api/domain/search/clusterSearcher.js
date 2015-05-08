@@ -206,6 +206,10 @@ var getSeedApps = function(seedSearchId, boostFactor, skip, take, next) {
     adminRepo.getSeedSearch(seedSearchId, function(err, seedSearch) {
         if (err) { return next(err); }
 
+        if (!seedSearch) {
+            return next(new Error("No seed search found with id:" + seedSearchId));
+        }
+
         searchSeedApps(seedSearch, boostFactor, true, skip, take, function(err, searchResult) {
             if (err) { return next(err); }
 
