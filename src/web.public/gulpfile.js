@@ -222,8 +222,6 @@ gulp.task('build:version', ['build:copy'], function() {
 });
 
 gulp.task('dev:watch', ['dev:stylesheets', 'dev:templates', 'dev:scripts'], function() {
-	plugins.livereload.listen();
-
 	gulp.watch(['./public/stylesheets/**/*.scss'], ['dev:stylesheets'])
         .on('error', handleError);
 
@@ -231,7 +229,6 @@ gulp.task('dev:watch', ['dev:stylesheets', 'dev:templates', 'dev:scripts'], func
         .on('error', handleError);
 
 	gulp.watch(['./index.html'])
-        .on('change', plugins.livereload.changed)
         .on('change', beep)
         .on('error', handleError);
 });
@@ -246,8 +243,7 @@ gulp.task('dev:stylesheets', function () {
                 path.basename = 'app-styles';
             }))
         .pipe(gulp.dest(publicGeneratedRoot + '/public/stylesheets/'))
-        .on('end', beep)
-        .on('end', plugins.livereload.changed);
+        .on('end', beep);
 });
 
 gulp.task('dev:templates', function() {
@@ -279,7 +275,6 @@ gulp.task('dev:scripts', ['dev:templates'], function() {
         .pipe(plugins.sourcemaps.write())
         .pipe(gulp.dest(publicGeneratedRoot + '/public/scripts/'))
         .on('end', beep)
-        .on('end', plugins.livereload.changed)
         .on('error', handleError);
 });
 
