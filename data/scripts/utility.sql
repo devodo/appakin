@@ -1,7 +1,8 @@
 --Export seed category training
 
-select 'select create_or_update_seed_category(''' || sc.name || ''', '
-       || s.max_take || ',' || chr(10) || '''' || s.query || ''');' ||
+select '-- ' || sc.id || chr(10) ||
+       'select create_or_update_seed_category(''' || sc.name || ''', '
+       || s.max_take || ',' || chr(10) || '''' || replace(s.query, '''', '''''') || ''');' ||
        chr(10) || chr(10) ||
        'select create_or_update_svm_training_data(''' || sc.name || ''',' || chr(10) ||
        'array[' || chr(10) || '    ' ||
