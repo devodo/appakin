@@ -89,7 +89,7 @@ function configureApp(app) {
 
 function configureCors(app) {
     var corsOptions = {
-        origin: config.environment === 'production' && !argv.no_cors ? 'http://www.appakin.com' : true
+        origin: true
     };
 
     app.use(cors(corsOptions));          // for regular requests
