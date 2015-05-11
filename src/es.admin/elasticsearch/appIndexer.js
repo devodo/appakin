@@ -10,7 +10,6 @@ var unidecode = require('unidecode');
 var Q = require("q");
 var appIndexAdmin = require('./appIndexAdmin');
 
-var aliasName = appConfig.constants.appIndex.alias;
 var docType = appConfig.constants.appIndex.docType;
 
 var calculateFacetBoost = function(position, popularity) {
