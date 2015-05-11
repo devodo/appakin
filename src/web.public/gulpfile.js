@@ -6,7 +6,7 @@
 
 var gulp = require('gulp');
 var gutil = require('gulp-util');
-var plugins = require('gulp-load-plugins')({config: '../../package.json'});
+//var plugins = require('gulp-load-plugins')({config: '../../package.json'});
 var path = require('path');
 var templateCache = require('gulp-angular-templatecache');
 var stylish = require('jshint-stylish');
@@ -14,6 +14,25 @@ var pkg = require('./package.json');
 var fs = require('fs');
 var sass = require('gulp-ruby-sass');
 var fsSync = require('fs-sync');
+
+//gulp plugins
+var plugins = {};
+plugins.jshint = require('gulp-jshint');
+plugins.rimraf = require('gulp-rimraf');
+plugins.ngConstant = require('gulp-ng-constant');
+plugins.size = require('gulp-size');
+plugins.concat = require('gulp-concat');
+plugins.ngAnnotate = require('gulp-ng-annotate');
+plugins.uglify = require('gulp-uglify');
+plugins.rev = require('gulp-rev');
+plugins.rename = require('gulp-rename');
+plugins.imagemin = require('gulp-imagemin');
+plugins.minifyCss = require('gulp-minify-css');
+plugins.cdnizer = require('gulp-cdnizer');
+plugins.plumber = require('gulp-plumber');
+plugins.sourcemaps = require('gulp-sourcemaps');
+plugins.inject = require('gulp-inject');
+
 
 var publicGeneratedRoot = path.resolve('./public-generated');
 var buildRoot = path.resolve('../../build-output/web.public');
