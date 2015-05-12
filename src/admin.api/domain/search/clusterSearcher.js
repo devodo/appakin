@@ -395,9 +395,13 @@ var iterateSeedSearches = function(seedSearches, visitor, next) {
             searchTermVectors(query, batchSize * batchIndex, batchSize, function(err, searchResult) {
                 if (err) { return callback(err); }
 
-                searchResult.docs.forEach(function(doc) {
-                    visitor(doc);
-                });
+                try {
+                    searchResult.docs.forEach(function (doc) {
+                        visitor(doc);
+                    });
+                } catch(err) {
+                    return callback(err);
+                }
 
                 if (searchResult.docs.length < batchSize) {
                     return callback();
