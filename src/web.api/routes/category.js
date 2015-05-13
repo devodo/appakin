@@ -12,6 +12,7 @@ var MAX_CAT_PAGES = 10;
 var MAX_RELATED = 5;
 var POPULAR_PAGE_SIZE = 10;
 var POPULAR_MAX_PAGES = 10;
+var MAX_CAT_APPS = PAGE_SIZE * MAX_CAT_PAGES;
 
 exports.init = function init(app) {
 
@@ -78,7 +79,7 @@ exports.init = function init(app) {
 
                 category.url = categoryUrl;
                 category.page = pageNum;
-                category.totalItems = result.total;
+                category.totalItems = Math.min(result.total, MAX_CAT_APPS);
                 category.apps = apps;
 
                 featuredRepo.getFeaturedApps(category.id, 2, 5, filters, function (err, fApps) {
