@@ -112,11 +112,9 @@ var getAppStoreLink = function (client, extAppId, extCatId, next) {
 
 var getCategoryByExtId = function (client, extId, next) {
     var queryStr =
-        "SELECT id, ext_id, name, description, date_created, date_modified,\n" +
-        "date_deleted\n" +
+        "SELECT id, ext_id, name, description, date_created, date_modified\n" +
         "FROM category\n" +
-        "WHERE ext_id = $1\n" +
-        "AND date_deleted is null;";
+        "WHERE ext_id = $1";
 
     client.query(queryStr, [extId], function (err, result) {
         if (err) {
