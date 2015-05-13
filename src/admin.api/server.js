@@ -8,6 +8,10 @@ var app = require('./app');
 var port = argv.port ? argv.port : config.server.port;
 app.set('port', port);
 
+process.on('uncaughtException', function (exception) {
+    log.error(exception);
+});
+
 var server = app.listen(app.get('port'), function() {
     log.info('Appakin admin.api server listening on port ' + server.address().port);
 });

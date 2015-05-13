@@ -96,30 +96,34 @@ var searchTermVectors = function(query, skip, take, next) {
         if (err) { return next(err); }
 
         if (!obj || !obj.response) {
-            return next("Unexpected response from search server");
+            return next(new Error("Unexpected response from search server"));
         }
 
         var total = (obj.termVectors.length - 2) / 2;
 
         var docs = [];
 
-        for (var i = 1; i <= total; i++) {
-            var index = i * 2;
-            var id = obj.termVectors[index];
+        try {
+            for (var i = 1; i <= total; i++) {
+                var index = i * 2;
+                var id = obj.termVectors[index];
 
-            var nameIndex = getTermVectorIndex(obj.termVectors[index+1], "name_shingle");
-            var nameTermVector = nameIndex > -1 ? parseTermVector(obj.termVectors[index+1][nameIndex]): [];
+                var nameIndex = getTermVectorIndex(obj.termVectors[index + 1], "name_shingle");
+                var nameTermVector = nameIndex > -1 ? parseTermVector(obj.termVectors[index + 1][nameIndex]) : [];
 
-            var descIndex = getTermVectorIndex(obj.termVectors[index+1], "desc_shingle");
-            var descTermVector = descIndex > -1 ? parseTermVector(obj.termVectors[index+1][descIndex]): [];
+                var descIndex = getTermVectorIndex(obj.termVectors[index + 1], "desc_shingle");
+                var descTermVector = descIndex > -1 ? parseTermVector(obj.termVectors[index + 1][descIndex]) : [];
 
-            var doc = {
-                id: id,
-                name: nameTermVector,
-                desc: descTermVector
-            };
+                var doc = {
+                    id: id,
+                    name: nameTermVector,
+                    desc: descTermVector
+                };
 
-            docs.push(doc);
+                docs.push(doc);
+            }
+        } catch(err) {
+            return next(err);
         }
 
         var searchResult = {
@@ -395,6 +399,8 @@ var iterateSeedSearches = function(seedSearches, visitor, next) {
             searchTermVectors(query, batchSize * batchIndex, batchSize, function(err, searchResult) {
                 if (err) { return callback(err); }
 
+                log.debug("Solr term vectors retrieved (batch:" + batchIndex +")");
+
                 try {
                     searchResult.docs.forEach(function (doc) {
                         visitor(doc);
@@ -468,7 +474,9 @@ var classifyTrainedSeedCategory = function(seedCategoryId, trainingSet, next) {
                     return;
                 }
 
+                log.debug("Getting doc term vector");
                 var termVector = classifierAnalyser.getIndexedTermVector(doc);
+                log.debug("Getting svm prediction");
                 var prediction = svm.predict(termVector);
 
                 results.push({
