@@ -165,11 +165,16 @@ gulp.task('build:index-html', ['build:scripts', 'build:stylesheets', 'build:temp
 
 gulp.task('build:minify-images', ['build:clean'], function() {
     return gulp
-	    .src('./public/images/**/*.*')
-        .pipe(plugins.imagemin())
+        .src([
+            './public/images/**/*.{gif,jpg,png}'
+        ])
+        .pipe(plugins.imagemin({
+            progressive: true//,
+            //svgoPlugins: [{removeViewBox: false}]
+        }))
         .pipe(plugins.size({ showFiles: true }))
         .pipe(gulp.dest(buildRoot + '/images'))
-		.on('error', handleError);
+        .on('error', handleError);
 });
 
 gulp.task('build:copy', ['build:clean'], function() {
@@ -177,6 +182,7 @@ gulp.task('build:copy', ['build:clean'], function() {
 	    [
             './public/fonts/*.*',
             './public/stylesheets/vendor/*.css',
+            './public/images/*.svg',
             '!./bower.json', '!./gulpfile.js', '!./index.html'
 		];
 

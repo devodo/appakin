@@ -1358,6 +1358,20 @@ h2 {
     margin-bottom: 24px;
   }
 
+  .filter-flags {
+    display: inline-block;
+    vertical-align: top;
+    padding: 3px;
+    border-radius: 10px 10px 10px 10px;
+    -moz-border-radius: 10px 10px 10px 10px;
+    -webkit-border-radius: 10px 10px 10px 10px;
+    border: 1px solid #000000;
+  }
+
+  .filter-flags span {
+    display: block;
+  }
+
   .screenshots-wrapper {
     img {
       width: 150px;
