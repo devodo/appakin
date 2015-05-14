@@ -98,9 +98,9 @@ gulp.task('build:config', ['build:clean'], function() {
             deps: [],
             constants: {
                 webApiUrl: 'http://prod.appakin:3003/',
-                cacheApiRequests: true,
+                cacheApiRequests: false,
                 angularDebugInfo: false,
-                googleAnalyticsTracking: true
+                googleAnalyticsTracking: false
             },
             wrap: ''
         }))
