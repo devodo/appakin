@@ -122,7 +122,10 @@ exports.init = function init(app) {
             return res.status(400).json({error: 'Bad include parameter'});
         }
 
-        clusterSearcher.getClassificationApps(seedCategoryId, isInclude, skip, take, function (err, result) {
+        var excludeTrained = req.query.exclude_trained === 'true';
+        var excludeUntrained = req.query.exclude_untrained === 'true';
+
+        clusterSearcher.getClassificationApps(seedCategoryId, isInclude, excludeTrained, excludeUntrained, skip, take, function (err, result) {
             if (err) {
                 return next(err);
             }

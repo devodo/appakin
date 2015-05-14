@@ -5,7 +5,7 @@ var connection = require('./connection');
 var getClusterIndexBatch = function(client, lastId, limit, next) {
     var queryStr =
         "SELECT a.app_id, a.ext_id, a.name, COALESCE(aa.desc_cleaned, a.description) as description, a.genres," +
-        "a.screenshot_urls, a.ipad_screenshot_urls, a.dev_id, " +
+        "a.screenshot_urls, a.ipad_screenshot_urls, a.dev_id, a.advisory_rating," +
         "ap.popularity, aa.desc_is_english\n" +
         "FROM appstore_app a\n" +
         "LEFT JOIN app_analysis aa\n" +
@@ -33,6 +33,7 @@ var getClusterIndexBatch = function(client, lastId, limit, next) {
                 extId: item.ext_id,
                 name: item.name,
                 devId: item.dev_id,
+                advisoryRating: item.advisory_rating,
                 description: item.description,
                 genres: item.genres,
                 screenShotUrls: item.screenshot_urls,

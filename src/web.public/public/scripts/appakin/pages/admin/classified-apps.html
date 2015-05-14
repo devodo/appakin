@@ -1,7 +1,11 @@
 <div id="classified-apps" class="main-wrapper" ng-cloak>
     <form ng-submit="submitForm()">
         Seed Category ID:<input type="number" ng-model="classifiedApps.seedCategoryId" name="seedCategoryId" min="1" max="99999999">
-        <input type="checkbox" ng-model="classifiedApps.include" name="include" value="true">Include
+        <div class="filter-flags">
+            <span><input type="checkbox" ng-model="classifiedApps.include" name="include" value="true">Include</span>
+            <span><input type="checkbox" ng-model="classifiedApps.untrained" name="untrained" value="true">Untrained</span>
+            <span><input type="checkbox" ng-model="classifiedApps.trained" name="trained" value="false">Trained</span>
+        </div>
         Skip:<input type="number" ng-model="classifiedApps.skip" name="skip" min="0" max="99999999">
         Take:<input type="number" ng-model="classifiedApps.take" name="take" min="1" max="99999999">
         Image Count:<input type="number" ng-model="classifiedApps.imageCount" name="imageCount" min="1" max="5">
@@ -23,16 +27,13 @@
                 <div ng-if="::classifiedApp.screenshotUrls.length === 0" class="screenshots-wrapper">
                     <img ng-repeat="screenshotUrl in ::classifiedApp.ipadScreenshotUrls.slice(0, classifiedApps.imageCount) track by $index" src="{{screenshotUrl}}">
                 </div>
-                <p class="actions">
-                    <button ng-if="!classifiedApp.include && !classifiedApp.updated" ng-click="::updateTrainingData(classifiedApp.extId, classifiedApps.seedCategoryId, true, classifiedApp)">Include</button>
-                    <span ng-if="classifiedApp.include && classifiedApp.updated">Included</span>
-                    <button ng-if="classifiedApp.include && !classifiedApp.updated" ng-click="::updateTrainingData(classifiedApp.extId, classifiedApps.seedCategoryId, true, classifiedApp)">Add to inclusions</button>
-
-                    <button ng-if="classifiedApp.include && !classifiedApp.updated" ng-click="::updateTrainingData(classifiedApp.extId, classifiedApps.seedCategoryId, false, classifiedApp)">Exclude</button>
-                    <span ng-if="!classifiedApp.include && classifiedApp.updated">Excluded</span>
-                    <button ng-if="!classifiedApp.include && !classifiedApp.updated" ng-click="::updateTrainingData(classifiedApp.extId, classifiedApps.seedCategoryId, false, classifiedApp)">Add to exclusions</button>
-
-                    <button ng-if="classifiedApp.updated" ng-click="::deleteTrainingData(classifiedApp.extId, classifiedApps.seedCategoryId, classifiedApp)">Remove from Training Data</button>
+                <p ng-if="!classifiedApp.isTrainingData" class="actions">
+                    <button ng-click="::updateTrainingData(classifiedApp.extId, classifiedApps.seedCategoryId, true, classifiedApp)">Include</button>
+                    <button ng-click="::updateTrainingData(classifiedApp.extId, classifiedApps.seedCategoryId, false, classifiedApp)">Exclude</button>
+                </p>
+                <p ng-if="classifiedApp.isTrainingData" class="actions">
+                    <em>{{classifiedApp.include ? 'Included' : 'Excluded'}}</em>
+                    <button ng-click="::deleteTrainingData(classifiedApp.extId, classifiedApps.seedCategoryId, classifiedApp)">Remove from Training Data</button>
                 </p>
             </li>
         </ul>

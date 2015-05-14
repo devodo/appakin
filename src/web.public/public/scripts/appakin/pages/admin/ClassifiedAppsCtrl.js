@@ -11,7 +11,7 @@
 
         $scope.submitForm = function() {
             classifiedAppsApi
-                .getClassifiedApps(classifiedApps.seedCategoryId, classifiedApps.include, classifiedApps.skip, classifiedApps.take)
+                .getClassifiedApps(classifiedApps.seedCategoryId, classifiedApps.include, !classifiedApps.trained, !classifiedApps.untrained, classifiedApps.skip, classifiedApps.take)
                 .then(function(data) {
                     if (data && !data.serverError) {
                         console.log('got data');
@@ -36,7 +36,7 @@
 
         $scope.updateTrainingData = function(extId, seedCategoryId, include, classifiedApp) {
             classifiedAppsApi.updateTrainingData(extId, seedCategoryId, include, function() {
-                classifiedApp.updated = true;
+                classifiedApp.isTrainingData = true;
                 classifiedApp.include = include;
             });
         };

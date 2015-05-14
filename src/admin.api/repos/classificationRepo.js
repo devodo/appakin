@@ -120,17 +120,18 @@ var setClassificationApps = function(conn, classificationResults, seedCategoryId
     });
 };
 
-var getClassificationApps = function(client, seedCategoryId, isInclude, skip, take, next) {
+var getClassificationApps = function(client, seedCategoryId, isInclude, excludeTrained, excludeUntrained, skip, take, next) {
     var queryStr =
         "SELECT a.ext_id, a.name, a.description, a.dev_name, a.store_url, a.release_date, a.genres,\n" +
         "a.user_rating_current, a.rating_count_current, a.user_rating,\n" +
-        "a.rating_count, a.screenshot_urls, a.ipad_screenshot_urls, ap.popularity, sca.include\n" +
+        "a.rating_count, a.screenshot_urls, a.ipad_screenshot_urls, ap.popularity, sca.include, st.include as training_include\n" +
         "from appstore_app a\n" +
         "join seed_classification_app sca on a.ext_id = sca.app_ext_id\n" +
         "left join app_popularity ap on a.app_id = ap.app_id\n" +
         "left join seed_training st on sca.seed_category_id = st.seed_category_id and a.ext_id = st.app_ext_id\n" +
         "where sca.seed_category_id = $1\n" +
-        "and st.id is null\n" +
+        (excludeTrained === true ? "and st.id is null\n" : "") +
+        (excludeUntrained === true ? "and st.id is not null\n" : "") +
         "and sca.include = $2\n" +
         "order by coalesce(ap.popularity,0) desc\n" +
         "offset $3 limit $4;";
@@ -163,7 +164,8 @@ var getClassificationApps = function(client, seedCategoryId, isInclude, skip, ta
                 screenshotUrls: item.screenshot_urls,
                 ipadScreenshotUrls: item.ipad_screenshot_urls,
                 popularity: item.popularity,
-                include: item.include
+                include: item.include,
+                isTrainingData: item.training_include || item.training_include === false
             };
         });
 
@@ -595,11 +597,11 @@ exports.setClassificationApps = function(classificationResults, seedCategoryId, 
     });
 };
 
-exports.getClassificationApps = function(seedCategoryId, isInclude, skip, take, next) {
+exports.getClassificationApps = function(seedCategoryId, isInclude, excludeTrained, excludeUntrained, skip, take, next) {
     connection.open(function(err, conn) {
         if (err) { return next(err); }
 
-        getClassificationApps(conn.client, seedCategoryId, isInclude, skip, take, function(err, id) {
+        getClassificationApps(conn.client, seedCategoryId, isInclude, excludeTrained, excludeUntrained, skip, take, function(err, id) {
             conn.close(err, function(err) {
                 next(err, id);
             });

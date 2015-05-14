@@ -8,6 +8,8 @@
             me.service = {
                 seedCategoryId: 1,
                 include: true,
+                trained: false,
+                untrained: true,
                 boost: 10,
                 skip: 0,
                 take: 400,

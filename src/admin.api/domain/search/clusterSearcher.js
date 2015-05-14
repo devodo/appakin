@@ -540,8 +540,8 @@ var testSeedCategoryTraining = function(seedCategoryId, next) {
     });
 };
 
-var getClassificationApps = function(seedCategoryId, isInclude, skip, take, next) {
-    classifierRepo.getClassificationApps(seedCategoryId, isInclude, skip, take, function(err, results) {
+var getClassificationApps = function(seedCategoryId, isInclude, excludeTrained, excludeUntrained, skip, take, next) {
+    classifierRepo.getClassificationApps(seedCategoryId, isInclude, excludeTrained, excludeUntrained, skip, take, function(err, results) {
         if (err) { return next(err); }
 
         return next(null, results);
