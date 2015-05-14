@@ -23,7 +23,8 @@ var createSolrDoc = function(app) {
         doc.age_rating = parseInt(app.advisoryRating.replace(/([0-9]+)/, '$1'), 10);
 
         if (isNaN(doc.age_rating)) {
-            throw new Error("Error parsing advisory rating: " + app.advisoryRating + " for app: " + app.id);
+            delete doc.age_rating;
+            log.warn("Error parsing advisory rating: " + app.advisoryRating + " for app: " + app.id);
         }
     }
 
