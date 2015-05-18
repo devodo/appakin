@@ -139,18 +139,23 @@ var getCategoryByExtId = function (client, extId, next) {
 
 var getCategoryApps = function(client, categoryId, filters, skip, take, next) {
     var queryStr =
-        "SELECT a.ext_id, a.name, a.artwork_small_url, p.price, a.is_iphone, a.is_ipad,\n" +
-        "substring(a.description from 0 for 300) as short_description, ca.position,\n" +
-        "count(1) OVER() as total\n" +
-        "FROM appstore_app a\n" +
-        "JOIN category_app ca ON a.app_id = ca.app_id\n" +
-        "JOIN appstore_price p ON a.app_id = p.app_id and p.country_code = 'USA'\n" +
-        "WHERE ca.category_id = $1\n" +
+        "SELECT t.ext_id, t.name, t.artwork_small_url, t.price, t.is_iphone, t.is_ipad,\n" +
+        "        substring(t.description from 0 for 300) as short_description, t.position,\n" +
+        "        count(1) OVER() as total\n" +
+        "FROM (\n" +
+        "	select a.*, ca.position\n" +
+        "	FROM appstore_app a\n" +
+        "	JOIN category_app ca ON a.app_id = ca.app_id\n" +
+        "	JOIN appstore_price p ON a.app_id = p.app_id and p.country_code = 'USA'\n" +
+        "	WHERE ca.category_id = $1\n" +
         (filters.isFree === true ? "AND p.price = 0\n" : "") +
         (filters.isIphone === true ? "AND a.is_iphone\n": "") +
         (filters.isIpad === true ? "AND a.is_ipad\n": "") +
-        "ORDER BY ca.position\n" +
-        "LIMIT $2 OFFSET $3;";
+        "	ORDER BY ca.position\n" +
+        "	limit 200\n" +
+        ") t\n" +
+        "ORDER BY t.position\n" +
+        "LIMIT $2 OFFSET $3";
 
     var queryParams = [categoryId, take, skip];
 
@@ -190,19 +195,24 @@ var getCategoryApps = function(client, categoryId, filters, skip, take, next) {
 
 var getCategoryAppsByExtId = function(client, categoryExtId, filters, skip, take, next) {
     var queryStr =
-        "SELECT a.ext_id, a.name, a.artwork_small_url, p.price, a.is_iphone, a.is_ipad,\n" +
-        "substring(a.description from 0 for 300) as short_description, ca.position,\n" +
-        "count(1) OVER() as total\n" +
-        "FROM appstore_app a\n" +
-        "JOIN category_app ca ON a.app_id = ca.app_id\n" +
-        "JOIN category c ON ca.category_id = c.id\n" +
-        "JOIN appstore_price p ON a.app_id = p.app_id and p.country_code = 'USA'\n" +
-        "WHERE c.ext_id = $1\n" +
+        "SELECT t.ext_id, t.name, t.artwork_small_url, t.price, t.is_iphone, t.is_ipad,\n" +
+        "        substring(t.description from 0 for 300) as short_description, t.position,\n" +
+        "        count(1) OVER() as total\n" +
+        "FROM (\n" +
+        "	select a.*, ca.position\n" +
+        "	FROM appstore_app a\n" +
+        "	JOIN category_app ca ON a.app_id = ca.app_id\n" +
+        "	JOIN category c ON ca.category_id = c.id\n" +
+        "	JOIN appstore_price p ON a.app_id = p.app_id and p.country_code = 'USA'\n" +
+        "	WHERE c.ext_id = $1\n" +
         (filters.isFree === true ? "AND p.price = 0\n" : "") +
         (filters.isIphone === true ? "AND a.is_iphone\n": "") +
         (filters.isIpad === true ? "AND a.is_ipad\n": "") +
-        "ORDER BY ca.position\n" +
-        "LIMIT $2 OFFSET $3;";
+        "	ORDER BY ca.position\n" +
+        "	limit 200\n" +
+        ") t\n" +
+        "ORDER BY t.position\n" +
+        "LIMIT $2 OFFSET $3";
 
     var queryParams = [categoryExtId, take, skip];
 
