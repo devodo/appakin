@@ -521,21 +521,26 @@ exports.getAppCategories = function(appId, skip, take, next) {
 
 var getRelatedCategoriesByExtId = function(client, extId, skip, take, next) {
     var queryStr =
-        "select c.id, c.ext_id, c.name, c.description\n" +
-        "from category c\n" +
-        "join (\n" +
-        "select related_category_id\n" +
-        "from related_category\n" +
-        "where category_id = (select id from category where ext_id = $1)\n" +
-        "order by position\n" +
-        "LIMIT $2 OFFSET $3\n" +
-        ") rc on c.id = rc.related_category_id\n" +
-        "where c.date_deleted is null;";
+        "select c.id, c.ext_id, c.name, count(1) OVER() as total\n" +
+        "from category c1\n" +
+        "join related_category rc on c1.id = rc.category_id\n" +
+        "join category c on rc.related_category_id = c.id\n" +
+        "where c1.ext_id = $1\n" +
+        "and c.date_deleted is null\n" +
+        "order by rc.position\n" +
+        "LIMIT $2 OFFSET $3";
 
     var queryParams = [extId, take, skip];
 
     client.query(queryStr, queryParams, function (err, result) {
         if (err) { return next(err); }
+
+        if (result.rows.length === 0) {
+            return next(null, {
+                total: 0,
+                categories: []
+            });
+        }
 
         var cats = result.rows.map(function(item) {
             return {
@@ -546,7 +551,12 @@ var getRelatedCategoriesByExtId = function(client, extId, skip, take, next) {
             };
         });
 
-        next(null, cats);
+        var pageResult = {
+            total: result.rows[0].total,
+            categories: cats
+        };
+
+        next(null, pageResult);
     });
 };
 
@@ -556,9 +566,9 @@ exports.getRelatedCategoriesByExtId = function(extId, skip, take, next) {
             return next(err);
         }
 
-        getRelatedCategoriesByExtId(conn.client, extId, skip, take, function(err, categories) {
+        getRelatedCategoriesByExtId(conn.client, extId, skip, take, function(err, result) {
             conn.close(err, function(err) {
-                next(err, categories);
+                next(err, result);
             });
         });
     });

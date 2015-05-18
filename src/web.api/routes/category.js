@@ -10,7 +10,9 @@ var appStoreCache = redisCacheFactory.createRedisCache(redisCacheFactory.dbParti
 
 var PAGE_SIZE = 20;
 var MAX_CAT_PAGES = 10;
-var MAX_RELATED = 5;
+var RELATED_PAGE_SIZE = 10;
+var OLD_MAX_RELATED = 5;
+var MAX_RELATED_PAGES = 5;
 var POPULAR_PAGE_SIZE = 10;
 var POPULAR_MAX_PAGES = 10;
 var MAX_CAT_APPS = PAGE_SIZE * MAX_CAT_PAGES;
@@ -162,7 +164,68 @@ exports.init = function init(app) {
         });
     });
 
-    app.get('/ios/related_categories/:encodedId/:slug?', function (req, res, next) {
+    app.get('/ios/related_categories/:extId', function (req, res, next) {
+        var categoryExtId = req.params.extId;
+        var pageNum = (req.query && req.query.p) ? parseInt(req.query.p, 10) : 1;
+
+        if (isNaN(pageNum) || pageNum < 1 || pageNum > MAX_RELATED_PAGES) {
+            return res.status(400).json({error: 'Bad page number'});
+        }
+
+        var expirySeconds = 600;
+        res.setHeader("Cache-Control", "public, max-age=" + expirySeconds);
+
+        var filters = {
+            isIphone: req.query.is_iphone === 'true',
+            isIpad: req.query.is_ipad === 'true',
+            isFree: req.query.is_free === 'true'
+        };
+
+        var skip = (pageNum - 1) * RELATED_PAGE_SIZE;
+
+        appStoreRepo.getRelatedCategoriesByExtId(categoryExtId, skip, RELATED_PAGE_SIZE, function (err, result) {
+            if (err) { return next(err); }
+
+            if (result.total === 0) {
+                return {
+                    page: pageNum,
+                    total: 0,
+                    relatedCategories: []
+                };
+            }
+
+            var categoryIds = result.categories.map(function(category) {
+                return category.id;
+            });
+
+            catViewProvider.getCategoriesCharts(categoryIds, filters, function(err, categoriesCharts) {
+                if (err) { return next(err); }
+
+                var relatedCategories = result.categories.map(function(category, i) {
+                    var categoryChart = categoriesCharts[i];
+
+                    if (!categoryChart) {
+                        return log.error("No related category chart found for category id: " + category.id);
+                    }
+
+                    return {
+                        id: category.extId.replace(/\-/g, ''),
+                        name: category.name,
+                        url: urlUtil.makeUrl(category.extId, category.name),
+                        chart: categoryChart.apps
+                    };
+                });
+
+                res.json({
+                    page: pageNum,
+                    totalPages: Math.min(MAX_RELATED_PAGES, Math.ceil(result.total / RELATED_PAGE_SIZE)),
+                    relatedCategories: relatedCategories
+                });
+            });
+        });
+    });
+
+    app.get('/ios/related_categories/:encodedId/:slug', function (req, res, next) {
         var encodedId = req.params.encodedId;
         if (!encodedId)
         {
@@ -184,17 +247,17 @@ exports.init = function init(app) {
             isFree: req.query.is_free === 'true'
         };
 
-        appStoreRepo.getRelatedCategoriesByExtId(extId, 0, MAX_RELATED, function (err, categories) {
+        appStoreRepo.getRelatedCategoriesByExtId(extId, 0, OLD_MAX_RELATED, function (err, result) {
             if (err) { return next(err); }
 
-            var categoryIds = categories.map(function(category) {
+            var categoryIds = result.categories.map(function(category) {
                 return category.id;
             });
 
             catViewProvider.getCategoriesCharts(categoryIds, filters, function(err, categoriesCharts) {
                 if (err) { return next(err); }
 
-                var relatedCategories = categories.map(function(category, i) {
+                var relatedCategories = result.categories.map(function(category, i) {
                     var categoryChart = categoriesCharts[i];
 
                     if (!categoryChart) {
