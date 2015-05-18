@@ -143,7 +143,8 @@ var getCategoryApps = function(client, categoryId, filters, skip, take, next) {
         "        substring(t.description from 0 for 300) as short_description, t.position,\n" +
         "        count(1) OVER() as total\n" +
         "FROM (\n" +
-        "	select a.*, ca.position\n" +
+        "	select a.ext_id, a.name, a.artwork_small_url, p.price, a.is_iphone," +
+        "          a.is_ipad, a.description, ca.position\n" +
         "	FROM appstore_app a\n" +
         "	JOIN category_app ca ON a.app_id = ca.app_id\n" +
         "	JOIN appstore_price p ON a.app_id = p.app_id and p.country_code = 'USA'\n" +
@@ -199,7 +200,8 @@ var getCategoryAppsByExtId = function(client, categoryExtId, filters, skip, take
         "        substring(t.description from 0 for 300) as short_description, t.position,\n" +
         "        count(1) OVER() as total\n" +
         "FROM (\n" +
-        "	select a.*, ca.position\n" +
+        "	select a.ext_id, a.name, a.artwork_small_url, p.price, a.is_iphone," +
+        "          a.is_ipad, a.description, ca.position\n" +
         "	FROM appstore_app a\n" +
         "	JOIN category_app ca ON a.app_id = ca.app_id\n" +
         "	JOIN category c ON ca.category_id = c.id\n" +
