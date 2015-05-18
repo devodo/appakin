@@ -191,6 +191,68 @@ var getCategoryApps = function(client, categoryId, filters, skip, take, next) {
     });
 };
 
+var getCategoryPriceDropAppsByExtId = function(client, categoryExtId, minPopularity, filters, skip, take, next) {
+    var queryStr =
+        "SELECT a.ext_id, a.name, a.artwork_small_url, a.is_iphone, a.is_ipad, a.release_date,\n" +
+        "a.user_rating, a.rating_count, a.user_rating_current, a.rating_count_current,\n" +
+        "substring(a.description from 0 for 300) as short_description, pc.price, pc.old_price, pc.change_date,\n" +
+        "count(1) OVER() as total\n" +
+        "FROM appstore_app a\n" +
+        "JOIN category_app ca ON a.app_id = ca.app_id\n" +
+        "JOIN category c ON ca.category_id = c.id\n" +
+        "JOIN appstore_price_change pc ON a.app_id = pc.app_id and pc.country_code = 'USA'\n" +
+        "LEFT JOIN app_popularity p on a.app_id = p.app_id\n" +
+        "WHERE c.ext_id = $1\n" +
+        "AND pc.price < pc.old_price\n" +
+        "AND coalesce(p.popularity, 0) >= $2\n" +
+        (filters.isFree === true ? "AND pc.price = 0\n" : "") +
+        (filters.isIphone === true ? "AND a.is_iphone\n": "") +
+        (filters.isIpad === true ? "AND a.is_ipad\n": "") +
+        "ORDER BY pc.change_date desc, coalesce(p.popularity, 0) desc\n" +
+        "LIMIT $3 OFFSET $4;";
+
+    var queryParams = [categoryExtId, minPopularity, take, skip];
+
+    client.query(queryStr, queryParams, function (err, result) {
+        if (err) {
+            return next(err);
+        }
+
+        if (result.rows.length === 0) {
+            return next(null, {
+                total: 0,
+                apps: []
+            });
+        }
+
+        var apps = result.rows.map(function(item) {
+            return {
+                extId: item.ext_id,
+                name: item.name,
+                artworkSmallUrl: item.artwork_small_url,
+                price: Math.floor(item.price * 100),
+                oldPrice: Math.floor(item.old_price * 100),
+                priceChangeDate: item.change_date,
+                isIphone: item.is_iphone,
+                isIpad: item.is_ipad,
+                shortDescription: item.short_description,
+                releaseDate: item.release_date,
+                userRatingCurrent: item.user_rating_current,
+                ratingCountCurrent: item.rating_count_current,
+                userRating: item.user_rating,
+                ratingCount: item.rating_count
+            };
+        });
+
+        var pageResult = {
+            total: result.rows[0].total,
+            apps: apps
+        };
+
+        next(null, pageResult);
+    });
+};
+
 var getMultiCategoryApps = function(client, categoryIds, take, filters, next) {
     var queryStr =
         "select t.*\n" +
@@ -380,6 +442,20 @@ exports.getCategoryApps = function(categoryId, filters, skip, take, next) {
         }
 
         getCategoryApps(conn.client, categoryId, filters, skip, take, function(err, result) {
+            conn.close(err, function(err) {
+                next(err, result);
+            });
+        });
+    });
+};
+
+exports.getCategoryPriceDropAppsByExtId = function(categoryExtId, minPopularity, filters, skip, take, next) {
+    connection.open(function(err, conn) {
+        if (err) {
+            return next(err);
+        }
+
+        getCategoryPriceDropAppsByExtId(conn.client, categoryExtId, minPopularity, filters, skip, take, function(err, result) {
             conn.close(err, function(err) {
                 next(err, result);
             });

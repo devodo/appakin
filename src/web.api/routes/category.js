@@ -5,6 +5,7 @@ var appStoreRepo = require('../repos/appStoreRepo');
 var featuredRepo = require('../repos/featuredRepo');
 var catViewProvider = require('../domain/viewProvider/categoryViewProvider');
 var redisCacheFactory = require("../domain/cache/redisCache");
+var appRank = require('../domain/appRank');
 var appStoreCache = redisCacheFactory.createRedisCache(redisCacheFactory.dbPartitions.appstore);
 
 var PAGE_SIZE = 20;
@@ -106,6 +107,58 @@ exports.init = function init(app) {
                     res.json(category);
                 });
             });
+        });
+    });
+
+    app.get('/ios/category_price_drops/:extId', function (req, res, next) {
+        var categoryExtId = req.params.extId;
+        var pageNum = (req.query && req.query.p) ? parseInt(req.query.p, 10) : 1;
+
+        if (isNaN(pageNum) || pageNum < 1 || pageNum > MAX_CAT_PAGES) {
+            return res.status(400).json({error: 'Bad page number'});
+        }
+
+        var expirySeconds = 600;
+        res.setHeader("Cache-Control", "public, max-age=" + expirySeconds);
+
+        var filters = {
+            isIphone: req.query.is_iphone === 'true',
+            isIpad: req.query.is_ipad === 'true',
+            isFree: req.query.is_free === 'true'
+        };
+
+        var minPopularity = 0;
+        if (req.query.popular === 'true') {
+            minPopularity = 0.1;
+        }
+
+        var skip = (pageNum - 1) * PAGE_SIZE;
+
+        appStoreRepo.getCategoryPriceDropAppsByExtId(categoryExtId, minPopularity, filters, skip, PAGE_SIZE, function (err, result) {
+            if (err) { return next(err); }
+
+            var dateNow = new Date();
+
+            result.apps.forEach(function (app) {
+                app.id = app.extId.replace(/\-/g, '');
+                app.url = urlUtil.makeUrl(app.extId, app.name);
+
+                app.popularity = appRank.getPopularity(app);
+                app.rating = appRank.getRating(app);
+
+                var daysDiff = Math.floor((dateNow - app.priceChangeDate) / 86400000);
+                app.changeAgeDays = Math.max(daysDiff, 0);
+
+                delete app.extId;
+                delete app.userRatingCurrent;
+                delete app.ratingCountCurrent;
+                delete app.userRating;
+                delete app.ratingCount;
+                delete app.releaseDate;
+                delete app.priceChangeDate;
+            });
+
+            res.json(result);
         });
     });
 
