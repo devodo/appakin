@@ -130,10 +130,7 @@ var getCategoryByExtId = function (client, extId, next) {
         var category = {
             id: item.id,
             extId: item.ext_id,
-            name: item.name,
-            description: item.description,
-            dateCreated: item.date_created,
-            dateModified: item.date_modified
+            name: item.name
         };
 
         next(null, category);
@@ -156,6 +153,58 @@ var getCategoryApps = function(client, categoryId, filters, skip, take, next) {
         "LIMIT $2 OFFSET $3;";
 
     var queryParams = [categoryId, take, skip];
+
+    client.query(queryStr, queryParams, function (err, result) {
+        if (err) {
+            return next(err);
+        }
+
+        if (result.rows.length === 0) {
+            return next(null, {
+                total: 0,
+                apps: []
+            });
+        }
+
+        var apps = result.rows.map(function(item) {
+            return {
+                extId: item.ext_id,
+                name: item.name,
+                artworkSmallUrl: item.artwork_small_url,
+                price: Math.floor(item.price * 100),
+                isIphone: item.is_iphone,
+                isIpad: item.is_ipad,
+                shortDescription: item.short_description,
+                position: item.position
+            };
+        });
+
+        var pageResult = {
+            total: result.rows[0].total,
+            apps: apps
+        };
+
+        next(null, pageResult);
+    });
+};
+
+var getCategoryAppsByExtId = function(client, categoryExtId, filters, skip, take, next) {
+    var queryStr =
+        "SELECT a.ext_id, a.name, a.artwork_small_url, p.price, a.is_iphone, a.is_ipad,\n" +
+        "substring(a.description from 0 for 300) as short_description, ca.position,\n" +
+        "count(1) OVER() as total\n" +
+        "FROM appstore_app a\n" +
+        "JOIN category_app ca ON a.app_id = ca.app_id\n" +
+        "JOIN category c ON ca.category_id = c.id\n" +
+        "JOIN appstore_price p ON a.app_id = p.app_id and p.country_code = 'USA'\n" +
+        "WHERE c.ext_id = $1\n" +
+        (filters.isFree === true ? "AND p.price = 0\n" : "") +
+        (filters.isIphone === true ? "AND a.is_iphone\n": "") +
+        (filters.isIpad === true ? "AND a.is_ipad\n": "") +
+        "ORDER BY ca.position\n" +
+        "LIMIT $2 OFFSET $3;";
+
+    var queryParams = [categoryExtId, take, skip];
 
     client.query(queryStr, queryParams, function (err, result) {
         if (err) {
@@ -442,6 +491,20 @@ exports.getCategoryApps = function(categoryId, filters, skip, take, next) {
         }
 
         getCategoryApps(conn.client, categoryId, filters, skip, take, function(err, result) {
+            conn.close(err, function(err) {
+                next(err, result);
+            });
+        });
+    });
+};
+
+exports.getCategoryAppsByExtId = function(categoryExtId, filters, skip, take, next) {
+    connection.open(function(err, conn) {
+        if (err) {
+            return next(err);
+        }
+
+        getCategoryAppsByExtId(conn.client, categoryExtId, filters, skip, take, function(err, result) {
             conn.close(err, function(err) {
                 next(err, result);
             });

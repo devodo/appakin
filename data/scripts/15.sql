@@ -1,10 +1,12 @@
 CREATE TABLE appstore_price_change
 (
-  app_id integer primary key references appstore_app(app_id),
+  id serial primary key,
+  app_id integer NOT NULL references appstore_app(app_id),
+  country_code character(3) NOT NULL,
   price numeric(8,3) NOT NULL,
   old_price numeric(8,3) NOT NULL,
-  country_code character(3) NOT NULL,
-  change_date timestamp without time zone NOT NULL
+  change_date timestamp without time zone NOT NULL,
+  CONSTRAINT appstore_price_change_country_code_app_id_unique UNIQUE (country_code, app_id)
 );
 
 CREATE OR REPLACE FUNCTION update_price_change() RETURNS TRIGGER AS
