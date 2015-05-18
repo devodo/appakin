@@ -28,6 +28,10 @@ var createSolrDoc = function(app) {
         }
     }
 
+    if (app.genres.length > 1) {
+        doc.secondary_genre = app.genres[1];
+    }
+
     return doc;
 };
 

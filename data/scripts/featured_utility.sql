@@ -113,7 +113,7 @@ left join featured_category_app fa
 		on t.app_id = fa.app_id and t.category_id = fa.category_id
 where fa.id is null;
 
-
+-- Insert Promoted featured category
 INSERT INTO featured_category_app(app_id, category_id, weight, fixed_order, featured_app_type,
 																	date_created, date_modified, date_deleted, start_date, end_date)
 VALUES (1133860, 865, 0, 1, 3, now(), now(), null, now(), null);
