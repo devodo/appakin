@@ -98,8 +98,8 @@ LANGUAGE plpgsql VOLATILE
 COST 100;
 
 CREATE OR REPLACE FUNCTION reset_category_popularity()
-	RETURNS boolean AS
-	$BODY$
+  RETURNS boolean AS
+  $BODY$
 BEGIN
 	delete from category_popularity;
 
@@ -108,10 +108,26 @@ BEGIN
 	from (
 		select category_id, score, max(score) over() as max_score
 		from (
-			select ca.category_id, ln(1 + sum(ap.popularity)) as score
-			from category_app ca
-			join app_popularity ap on ca.app_id = ca.app_id
-			group by ca.category_id
+			select t.category_id, ln(1 + t.popularity / power(t.length, 0.3)) * (CASE WHEN xm.id is null THEN 1.0 ELSE 0.1 END) as score
+			from (
+				select c.category_id, c.popularity, ca.length
+				from (
+					select ca.category_id, sum(ap.popularity) as popularity
+					from category_app ca
+					join app_popularity ap on ca.app_id = ap.app_id
+					join category c on ca.category_id = c.id
+					where c.date_deleted is null
+					and ap.popularity > 0
+					and ca.position <= 200
+					group by ca.category_id
+				) c
+				join (
+					select category_id, count(1) as length
+					from category_app
+					group by category_id
+				) ca on c.category_id = ca.category_id
+			) t
+			left join xyo_category_map xm on t.category_id = xm.category_id
 		) t
 	) t
 	order by category_id;
