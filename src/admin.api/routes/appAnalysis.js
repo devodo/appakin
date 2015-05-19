@@ -9,7 +9,7 @@ exports.init = function init(app) {
         var batchSize = 100;
         log.debug("Starting analysis of apps");
 
-        var forceAll = req.body.forceAll === 'true' || false;
+        var forceAll = req.body.forceAll === 'true';
 
         appAnalyser.analyse(batchSize, forceAll, function(err) {
             if (err) {

@@ -12,6 +12,12 @@ var appIndexAdmin = require('./appIndexAdmin');
 
 var docType = appConfig.constants.appIndex.docType;
 
+var optionalKeywords = [
+    "app",
+    "best",
+    "top"
+];
+
 var calculateFacetBoost = function(position, popularity) {
     /*
      Verhulst Function (resource depletion)
@@ -67,15 +73,18 @@ var createCategoryField = function(categoryApp, appPopularity) {
 };
 
 var createAppDoc = function(app, categoryFields, categoryNames) {
-    var filterIncludes = categoryNames;
-    filterIncludes.push(app.developerName);
+    var filterIncludes = [ app.developerName ];
+
+    optionalKeywords.forEach(function(keyword) {
+        categoryNames.push(keyword);
+    });
 
     var body = {
         "ext_id": app.extId.replace(/\-/g, ''),
         name: app.name,
         desc: app.description,
-        "desc_short": (app.description ? app.description.substring(0, 300) : null),
-        "image_url" : app.imageUrl,
+        desc_short: (app.description ? app.description.substring(0, 300) : null),
+        image_url : app.imageUrl,
         price: Math.floor(app.price * 100),
         is_free: parseFloat(app.price) === 0,
         is_iphone: app.isIphone === true,
@@ -83,10 +92,11 @@ var createAppDoc = function(app, categoryFields, categoryNames) {
         boost: calculateAppBoost(app.popularity),
         rating: appRank.getRating(app),
         categories: categoryFields,
+        optional_keywords: categoryNames,
         filter_include: filterIncludes,
-        "suggest" : {
-            "input": app.name,
-            "weight" : (app.popularity ? Math.floor(app.popularity * 1000) : 0)
+        suggest : {
+            input: app.name,
+            weight : (app.popularity ? Math.floor(app.popularity * 1000) : 0)
         }
     };
 
@@ -238,6 +248,7 @@ var indexCategoriesPromise = function(tmpIndexName, categories) {
             "ext_id": category.extId.replace(/\-/g, ''),
             name: category.name,
             categories: categoryField,
+            optional_keywords: optionalKeywords,
             "is_cat": true,
             "suggest" : {
                 "input": category.name,

@@ -195,6 +195,14 @@ exports.mappings = {
                 "copy_to": "all",
                 "store": false
             },
+            "optional_keywords": {
+                "type": "string",
+                "analyzer": "index_stem_text",
+                "search_analyzer": "search_stem_text",
+                "position_offset_gap": 100,
+                "copy_to": "all",
+                "store": false
+            },
             "desc": {
                 "type": "string",
                 "analyzer": "index_standard_text",
