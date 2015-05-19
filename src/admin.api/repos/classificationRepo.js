@@ -126,13 +126,24 @@ var getClassificationApps = function(client, seedCategoryId, isInclude, excludeT
         "a.user_rating_current, a.rating_count_current, a.user_rating,\n" +
         "a.rating_count, a.screenshot_urls, a.ipad_screenshot_urls, ap.popularity, sca.include, st.include as training_include\n" +
         "from appstore_app a\n" +
-        "join seed_classification_app sca on a.ext_id = sca.app_ext_id\n" +
+        "join (\n" +
+        "	select app_ext_id, include\n" +
+        "	from seed_classification_app\n" +
+        "	where seed_category_id = $1\n" +
+        "	and include = $2\n" +
+        "	union distinct\n" +
+        "	select app_ext_id, include\n" +
+        "	from seed_training\n" +
+        "	where seed_category_id = $1\n" +
+        "	and include = $2\n" +
+        ") sca on a.ext_id = sca.app_ext_id\n" +
         "left join app_popularity ap on a.app_id = ap.app_id\n" +
-        "left join seed_training st on sca.seed_category_id = st.seed_category_id and a.ext_id = st.app_ext_id\n" +
-        "where sca.seed_category_id = $1\n" +
-        (excludeTrained === true ? "and st.id is null\n" : "") +
-        (excludeUntrained === true ? "and st.id is not null\n" : "") +
-        "and sca.include = $2\n" +
+        "left join seed_training st on sca.app_ext_id = st.app_ext_id and st.seed_category_id = $1\n" +
+        "where true\n" +
+        (excludeTrained === true ? "and st.id is null\n" : "" ) +
+        (excludeUntrained === true ? "and st.id is not null\n" : "" ) +
+        "and st.id is not null\n" +
+        "and sca.include = false\n" +
         "order by coalesce(ap.popularity,0) desc\n" +
         "offset $3 limit $4;";
 
