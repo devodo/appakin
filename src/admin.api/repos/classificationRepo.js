@@ -142,8 +142,6 @@ var getClassificationApps = function(client, seedCategoryId, isInclude, excludeT
         "where true\n" +
         (excludeTrained === true ? "and st.id is null\n" : "" ) +
         (excludeUntrained === true ? "and st.id is not null\n" : "" ) +
-        "and st.id is not null\n" +
-        "and sca.include = false\n" +
         "order by coalesce(ap.popularity,0) desc\n" +
         "offset $3 limit $4;";
 
