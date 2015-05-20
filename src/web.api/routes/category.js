@@ -137,7 +137,7 @@ exports.init = function init(app) {
 
         var minPopularity = 0;
         if (req.query.popular === 'true') {
-            minPopularity = 0.1;
+            minPopularity = 0.15;
         }
 
         var skip = (pageNum - 1) * PAGE_SIZE;
@@ -196,12 +196,8 @@ exports.init = function init(app) {
         appStoreRepo.getRelatedCategoriesByExtId(categoryExtId, skip, RELATED_PAGE_SIZE, function (err, result) {
             if (err) { return next(err); }
 
-            if (result.total === 0) {
-                return {
-                    page: pageNum,
-                    total: 0,
-                    relatedCategories: []
-                };
+            if (!result) {
+                return res.status(404).json({error: 'No related categories found'});
             }
 
             var categoryIds = result.categories.map(function(category) {

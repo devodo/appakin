@@ -254,23 +254,28 @@ var getCategoryAppsByExtId = function(client, categoryExtId, filters, skip, take
 
 var getCategoryPriceDropAppsByExtId = function(client, categoryExtId, minPopularity, filters, skip, take, next) {
     var queryStr =
-        "SELECT a.ext_id, a.name, a.artwork_small_url, a.is_iphone, a.is_ipad, a.release_date,\n" +
-        "a.user_rating, a.rating_count, a.user_rating_current, a.rating_count_current,\n" +
-        "substring(a.description from 0 for 300) as short_description, pc.price, pc.old_price, pc.change_date,\n" +
-        "count(1) OVER() as total\n" +
-        "FROM appstore_app a\n" +
-        "JOIN category_app ca ON a.app_id = ca.app_id\n" +
-        "JOIN category c ON ca.category_id = c.id\n" +
-        "JOIN appstore_price_change pc ON a.app_id = pc.app_id and pc.country_code = 'USA'\n" +
-        "LEFT JOIN app_popularity p on a.app_id = p.app_id\n" +
-        "WHERE c.ext_id = $1\n" +
-        "AND pc.price < pc.old_price\n" +
-        "AND coalesce(p.popularity, 0) >= $2\n" +
+        "SELECT *\n" +
+        "FROM (\n" +
+        "	SELECT a.ext_id, a.name, a.artwork_small_url, a.is_iphone, a.is_ipad, a.release_date,\n" +
+        "	       r.user_rating, r.rating_count, r.user_rating_current, r.rating_count_current,\n" +
+        "               substring(a.description from 0 for 300) as short_description, pc.price, pc.old_price, pc.change_date,\n" +
+        "               count(1) OVER() as total\n" +
+        "        FROM appstore_app a\n" +
+        "        JOIN category_app ca ON a.app_id = ca.app_id\n" +
+        "        JOIN category c ON ca.category_id = c.id\n" +
+        "        JOIN appstore_price_change pc ON a.app_id = pc.app_id and pc.country_code = 'USA'\n" +
+        "        LEFT JOIN app_popularity p on a.app_id = p.app_id\n" +
+        "        LEFT JOIN appstore_rating r on a.app_id = r.app_id and r.country_code = 'USA'\n" +
+        "        WHERE c.ext_id = $1\n" +
+        "        AND pc.price < pc.old_price\n" +
+        "        AND coalesce(p.popularity, 0) >= $2\n" +
         (filters.isFree === true ? "AND pc.price = 0\n" : "") +
         (filters.isIphone === true ? "AND a.is_iphone\n": "") +
         (filters.isIpad === true ? "AND a.is_ipad\n": "") +
-        "ORDER BY pc.change_date desc, coalesce(p.popularity, 0) desc\n" +
-        "LIMIT $3 OFFSET $4;";
+        "        ORDER BY pc.change_date desc, coalesce(p.popularity, 0) desc, a.release_date desc\n" +
+        "        LIMIT 200\n" +
+        ") t\n" +
+        "LIMIT $3 OFFSET $4";
 
     var queryParams = [categoryExtId, minPopularity, take, skip];
 
@@ -611,10 +616,7 @@ var getRelatedCategoriesByExtId = function(client, extId, skip, take, next) {
         if (err) { return next(err); }
 
         if (result.rows.length === 0) {
-            return next(null, {
-                total: 0,
-                categories: []
-            });
+            return next(null);
         }
 
         var cats = result.rows.map(function(item) {
