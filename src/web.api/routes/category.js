@@ -105,7 +105,15 @@ exports.init = function init(app) {
             if (err) { return next(err); }
 
             if (!result) {
-                return res.status(404).json({error: 'No price chart apps found'});
+                if (pageNum > 1) {
+                    return res.status(404).json({error: 'No price chart apps found'});
+                }
+
+                return res.json({
+                    page: pageNum,
+                    totalPages: 0,
+                    apps: []
+                });
             }
 
             result.apps.forEach(function (app) {
@@ -150,7 +158,15 @@ exports.init = function init(app) {
             if (err) { return next(err); }
 
             if (!result) {
-                return res.status(404).json({error: 'No price drop apps found'});
+                if (pageNum > 1) {
+                    return res.status(404).json({error: 'No price drop apps found'});
+                }
+
+                return res.json({
+                    page: pageNum,
+                    totalPages: 0,
+                    apps: []
+                });
             }
 
             var dateNow = new Date();
@@ -205,7 +221,16 @@ exports.init = function init(app) {
             if (err) { return next(err); }
 
             if (!result) {
-                return res.status(404).json({error: 'No related categories found'});
+
+                if (pageNum > 1) {
+                    return res.status(404).json({error: 'No related categories found'});
+                }
+
+                return res.json({
+                    page: pageNum,
+                    totalPages: 0,
+                    categories: []
+                });
             }
 
             var categoryIds = result.categories.map(function(category) {
