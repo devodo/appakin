@@ -224,10 +224,7 @@ var getCategoryAppsByExtId = function(client, categoryExtId, filters, skip, take
         }
 
         if (result.rows.length === 0) {
-            return next(null, {
-                total: 0,
-                apps: []
-            });
+            return next(null);
         }
 
         var apps = result.rows.map(function(item) {
@@ -285,10 +282,7 @@ var getCategoryPriceDropAppsByExtId = function(client, categoryExtId, minPopular
         }
 
         if (result.rows.length === 0) {
-            return next(null, {
-                total: 0,
-                apps: []
-            });
+            return next(null);
         }
 
         var apps = result.rows.map(function(item) {

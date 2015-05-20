@@ -104,6 +104,10 @@ exports.init = function init(app) {
         appStoreRepo.getCategoryAppsByExtId(categoryExtId, filters, skip, PAGE_SIZE, function (err, result) {
             if (err) { return next(err); }
 
+            if (!result) {
+                return res.status(404).json({error: 'No price chart apps found'});
+            }
+
             result.apps.forEach(function (app) {
                 app.id = app.extId.replace(/\-/g, '');
                 app.url = urlUtil.makeUrl(app.extId, app.name);
@@ -144,6 +148,10 @@ exports.init = function init(app) {
 
         appStoreRepo.getCategoryPriceDropAppsByExtId(categoryExtId, minPopularity, filters, skip, PAGE_SIZE, function (err, result) {
             if (err) { return next(err); }
+
+            if (!result) {
+                return res.status(404).json({error: 'No price drop apps found'});
+            }
 
             var dateNow = new Date();
 
