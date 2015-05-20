@@ -204,9 +204,8 @@ var getCategoryAppsByExtId = function(client, categoryExtId, filters, skip, take
         "          a.is_ipad, a.description, ca.position\n" +
         "	FROM appstore_app a\n" +
         "	JOIN category_app ca ON a.app_id = ca.app_id\n" +
-        "	JOIN category c ON ca.category_id = c.id\n" +
         "	JOIN appstore_price p ON a.app_id = p.app_id and p.country_code = 'USA'\n" +
-        "	WHERE c.ext_id = $1\n" +
+        "	WHERE ca.category_id = (select id from category where ext_id = $1)\n" +
         (filters.isFree === true ? "AND p.price = 0\n" : "") +
         (filters.isIphone === true ? "AND a.is_iphone\n": "") +
         (filters.isIpad === true ? "AND a.is_ipad\n": "") +

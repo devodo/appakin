@@ -53,4 +53,8 @@ INSERT INTO appstore_price_change(app_id, price, old_price, country_code, change
            from price
            where pos = 2
          ) p2 on p1.app_id = p2.app_id and p1.country_code = p2.country_code and p1.price != p2.price
-  order by p1.date_created
+  order by p1.date_created;
+
+CREATE INDEX price_drop_idx
+ON appstore_price_change (change_date)
+  WHERE price < old_price;
