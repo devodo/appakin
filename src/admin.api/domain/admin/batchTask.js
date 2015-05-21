@@ -157,6 +157,18 @@ var rebuildAll = function(next) {
     });
 };
 
+var resetTrendingApps = function(next) {
+    var dayRange = 30;
+    var maxApps = 1000;
+
+    appStoreAdminRepo.resetTrendingApps(dayRange, maxApps, function(err) {
+        if (err) { return next(err); }
+
+        next();
+    });
+};
+
+
 exports.rebuildAll = rebuildAll;
 exports.rebuildAllSeedCategories = rebuildAllSeedCategories;
 exports.rebuildClusterIndex = rebuildClusterIndex;
@@ -172,4 +184,6 @@ exports.rebuildSeedCategory = rebuildSeedCategory;
 
 exports.analyseAmbiguity = analyseAmbiguity;
 exports.analyseApps = analyseApps;
+
+exports.resetTrendingApps = resetTrendingApps;
 

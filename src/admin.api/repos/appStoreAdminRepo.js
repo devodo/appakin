@@ -1061,11 +1061,12 @@ exports.updateAppStoreApp = function(app, next) {
 var refreshAppStoreApp = function(client, app, next) {
     var queryStr = "SELECT refresh_appstore_app(" +
         "$1, $2, $3, $4, $5, $6," +
-        "$7, $8, $9, $10, $11, $12);";
+        "$7, $8, $9, $10, $11, $12, $13, $14);";
 
     var queryParams = [
         app.storeAppId,
         'USA',
+        app.name,
         app.censoredName,
         app.features,
         app.isGameCenterEnabled,
@@ -1075,7 +1076,8 @@ var refreshAppStoreApp = function(client, app, next) {
         app.userRatingCurrent,
         app.ratingCountCurrent,
         app.userRating,
-        app.ratingCount
+        app.ratingCount,
+        app.price
     ];
 
     client.query(queryStr, queryParams, function (err, result) {
@@ -1566,3 +1568,76 @@ exports.getAppStoreSameDeveloperApps = function(appId, next) {
         });
     });
 };
+
+var getTrendingAppsCategoryId = function(client, next) {
+    var queryStr =
+        "select id\n" +
+        "from category\n" +
+        "where name = 'Trending Apps'";
+
+    client.query(queryStr, function (err, result) {
+        if (err) { return next(err); }
+
+        if (result.rows.length !== 1) {
+            return next(new Error('Could not find Trending Apps category'));
+        }
+
+        var categoryId = result.rows[0].id;
+
+        return next(null, categoryId);
+    });
+};
+
+var resetTrendingApps = function(conn, dayRange, maxApps, next) {
+    var queryStr =
+        "begin transaction;\n" +
+        "\n" +
+        "delete from category_app\n" +
+        "where category_id = (select id from category where name = 'Trending Apps');\n" +
+        "\n" +
+        "INSERT INTO category_app(category_id, app_id, position, date_created)\n" +
+        "select (select id from category where name = 'Trending Apps'),\n" +
+        "       t.app_id,\n" +
+        "       row_number() OVER(order by t.rating_count_diff desc) as position,\n" +
+        "       now() at time zone 'utc'\n" +
+        "from appstore_app a\n" +
+        "join (\n" +
+        "	select ar.app_id, ar.rating_count, arh.min_rating_count, ar.rating_count - arh.min_rating_count as rating_count_diff\n" +
+        "	from appstore_rating ar\n" +
+        "	join (\n" +
+        "	   select app_id, min(rating_count) as min_rating_count\n" +
+        "	   from appstore_rating_history\n" +
+        "	   where rating_count is not null\n" +
+        "	   and (date_created + INTERVAL '$1 days') >= now() at time zone 'utc'\n" +
+        "	   group by app_id\n" +
+        "	) arh on ar.app_id = arh.app_id\n" +
+        "	where ar.rating_count is not null\n" +
+        ") t on a.app_id = t.app_id\n" +
+        "where t.rating_count_diff >= 100\n" +
+        "and 'Games' != ALL(a.genres)\n" +
+        "order by t.rating_count_diff desc\n" +
+        "limit $2;\n" +
+        "\n" +
+        "commit;";
+
+    var queryParams = [dayRange, maxApps];
+
+    conn.client.query(queryStr, queryParams, function (err) {
+        return next(err);
+    });
+};
+
+exports.resetTrendingApps = function(dayRange, maxApps, next) {
+    connection.open(function(err, conn) {
+        if (err) { return next(err); }
+
+        resetTrendingApps(conn.client, dayRange, maxApps, function(err, results) {
+            conn.close(err, function(err) {
+                next(err, results);
+            });
+        });
+    });
+};
+
+
+

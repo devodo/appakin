@@ -117,7 +117,7 @@ var parseLookup = function(data, next) {
         artworkSmallUrl: data.artworkUrl60,
         artworkMediumUrl: data.artworkUrl100,
         artworkLargeUrl: data.artworkUrl512,
-        price: Math.round(data.price * 100),
+        price: data.price,
         currency: data.currency,
         version: data.version,
         primaryGenre: data.primaryGenreName,
