@@ -37,7 +37,7 @@ var getFeaturedCategoriesAndApps = function(client, cat_bias, cat_take, app_bias
     var queryStr =
         "SELECT t.ext_id, t.name, t.artwork_small_url, t.price, t.cat_ext_id, t.cat_name, t.is_iphone, t.is_ipad, t.desc\n" +
         "FROM (\n" +
-        "	SELECT a.ext_id, a.name, a.artwork_small_url, a.price, a.is_iphone, a.is_ipad, substring(a.description from 0 for 200) as desc,\n" +
+        "	SELECT a.ext_id, a.name, a.artwork_small_url, p.price, a.is_iphone, a.is_ipad, substring(a.description from 0 for 200) as desc,\n" +
         "	fa.category_id, fa.app_id, c.ext_id as cat_ext_id, c.name as cat_name, c.cat_num,\n" +
         "	row_number() over(partition by c.id order by fa.fixed_order is null, fa.fixed_order, random() * power(fa.weight, $3)) as num\n" +
         "	FROM featured_homepage_app fa\n" +
@@ -57,6 +57,7 @@ var getFeaturedCategoriesAndApps = function(client, cat_bias, cat_take, app_bias
         "	) c\n" +
         "	on fa.category_id = c.id\n" +
         "	JOIN appstore_app a on fa.app_id = a.app_id\n" +
+        "	JOIN appstore_price p on fa.app_id = p.app_id AND p.country_code = 'USA'\n" +
         "	where a.date_deleted is null\n" +
         "	and fa.date_deleted is null\n" +
         "	and (fa.start_date is null or fa.start_date <= NOW() at time zone 'utc')\n" +
@@ -77,7 +78,7 @@ var getFeaturedCategoriesAndApps = function(client, cat_bias, cat_take, app_bias
                 appExtId: item.ext_id,
                 appName: item.name,
                 appArtworkSmallUrl: item.artwork_small_url,
-                appPrice: item.price,
+                appPrice: Math.floor(item.price * 100),
                 appIsIphone: item.is_iphone,
                 appIsIpad: item.is_ipad,
                 appDesc: item.desc,
@@ -92,9 +93,10 @@ var getFeaturedCategoriesAndApps = function(client, cat_bias, cat_take, app_bias
 
 var getFeaturedApps = function(client, category_id, app_bias, app_take, filters, next) {
     var queryStr =
-        "SELECT a.ext_id, a.name, a.artwork_small_url, a.price, a.is_iphone, a.is_ipad\n" +
+        "SELECT a.ext_id, a.name, a.artwork_small_url, p.price, a.is_iphone, a.is_ipad\n" +
         "FROM appstore_app a\n" +
         "JOIN featured_category_app fa on a.app_id = fa.app_id\n" +
+        "JOIN appstore_price p on a.app_id = p.app_id AND p.country_code = 'USA'\n" +
         "where fa.category_id = $1\n" +
         "and fa.date_deleted is null\n" +
         "and (fa.start_date is null or fa.start_date <= NOW() at time zone 'utc')\n" +
@@ -118,7 +120,7 @@ var getFeaturedApps = function(client, category_id, app_bias, app_take, filters,
                 extId: item.ext_id,
                 name: item.name,
                 artworkSmallUrl: item.artwork_small_url,
-                price: item.price,
+                price: Math.floor(item.price * 100),
                 isIphone: item.is_iphone,
                 isIpad: item.is_ipad
             };
