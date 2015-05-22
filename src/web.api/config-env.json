@@ -32,6 +32,7 @@
             "affiliateId": "10lNjB"
         },
         "featured": {
+            "trendingCategories": [910, 911],
             "homePage": {
                 "localCacheExpirySeconds": 30,
                 "remoteCacheExpirySeconds": 120,

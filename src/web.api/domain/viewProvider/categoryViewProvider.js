@@ -1,6 +1,7 @@
 'use strict';
 
 var log = require("../../logger");
+var config = require("../../config");
 var appStoreRepo = require("../../repos/appStoreRepo");
 var appSearcher = require("../search/appSearcher");
 var redisCacheFactory = require("../cache/redisCache");
@@ -223,7 +224,7 @@ var getMultiCacheObjects = function(cache, ids, createKeyFunc, repoLookupFunc, e
 };
 
 var getTrendingCategories = function(next) {
-    var categoryIds = [908, 909];
+    var categoryIds = config.featured.trendingCategories;
 
     async.parallel([
             function (callback) {
