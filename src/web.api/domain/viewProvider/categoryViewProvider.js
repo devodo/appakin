@@ -222,6 +222,49 @@ var getMultiCacheObjects = function(cache, ids, createKeyFunc, repoLookupFunc, e
     });
 };
 
+var getTrendingCategories = function(next) {
+    var categoryIds = [908, 909];
+
+    async.parallel([
+            function (callback) {
+                getCategoriesCharts(categoryIds, {}, callback);
+            },
+            function (callback) {
+                getCategories(categoryIds, callback);
+            }
+        ],
+        function (err, results) {
+            if (err) { return next(err); }
+
+            try {
+                var trendingCategories = categoryIds.map(function (categoryId, i) {
+                    var category = results[1][i];
+
+                    if (!category) {
+                        throw new Error('Trending category missing: ' + categoryId);
+                    }
+
+                    var categoryChart = results[0][i];
+
+                    if (!categoryChart) {
+                        throw new Error('Trending category chart missing: ' + categoryId);
+                    }
+
+                    return {
+                        id: category.extId,
+                        name: category.name,
+                        url: category.url,
+                        chart: categoryChart.apps
+                    };
+                });
+
+                next(null, trendingCategories);
+            } catch(err) {
+                return next(err);
+            }
+        });
+};
+
 var searchMain = function(queryStr, pageNum, filters, next) {
     appSearcher.search(queryStr, pageNum, filters, function(err, searchResult) {
         if (err) { return next(err); }
@@ -375,6 +418,7 @@ exports.searchCategories = searchCategories;
 exports.searchMain = searchMain;
 exports.searchApps = searchApps;
 exports.getCategoriesCharts = getCategoriesCharts;
+exports.getTrendingCategories = getTrendingCategories;
 
 
 

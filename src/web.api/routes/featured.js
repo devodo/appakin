@@ -5,6 +5,7 @@ var config = require('../config');
 var urlUtil = require('../domain/urlUtil');
 var redisCacheFactory = require("../domain/cache/redisCache");
 var remoteCache = redisCacheFactory.createRedisCache(redisCacheFactory.dbPartitions.featured);
+var categoryViewProvider = require('../domain/viewProvider/categoryViewProvider');
 
 var localCache = null;
 
@@ -16,6 +17,43 @@ var remoteCacheExpirySeconds = config.featured.homePage.remoteCacheExpirySeconds
 var localCacheExpiryMs = config.featured.homePage.localCacheExpirySeconds * 1000;
 
 var cacheKey = "home_featured";
+
+var getFeaturedRepo = function(next) {
+    featuredRepo.getFeaturedCategoriesAndApps(catBias, catTake, appBias, appTake, function(err, results) {
+        if (err) { return next(err); }
+
+        var categories = [];
+        var currentCategory = null;
+
+        results.forEach(function (item) {
+            var itemId = item.catExtId.replace(/\-/g, '');
+            if (!currentCategory || currentCategory.id !== itemId) {
+                currentCategory = {
+                    id: itemId,
+                    name: item.catName,
+                    url: urlUtil.makeUrl(item.catExtId, item.catName),
+                    apps: []
+                };
+                categories.push(currentCategory);
+            }
+
+            var app = {
+                id: item.appExtId.replace(/\-/g, ''),
+                name: item.appName,
+                artworkUrl: item.appArtworkSmallUrl,
+                url: urlUtil.makeUrl(item.appExtId, item.appName),
+                price: item.appPrice,
+                isIphone: item.appIsIphone,
+                isIpad: item.appIsIpad,
+                desc: item.appDesc
+            };
+
+            currentCategory.apps.push(app);
+        });
+
+        next(null, categories);
+    });
+};
 
 var getFeatured = function(next) {
     remoteCache.getObject(cacheKey, function(err, cacheResult) {
@@ -37,37 +75,8 @@ var getFeatured = function(next) {
             return next(null, cacheResult);
         }
 
-        featuredRepo.getFeaturedCategoriesAndApps(catBias, catTake, appBias, appTake, function(err, results) {
+        getFeaturedRepo(function(err, categories) {
             if (err) { return next(err); }
-
-            var categories = [];
-            var currentCategory = null;
-
-            results.forEach(function (item) {
-                var itemId = item.catExtId.replace(/\-/g, '');
-                if (!currentCategory || currentCategory.id !== itemId) {
-                    currentCategory = {
-                        id: itemId,
-                        name: item.catName,
-                        url: urlUtil.makeUrl(item.catExtId, item.catName),
-                        apps: []
-                    };
-                    categories.push(currentCategory);
-                }
-
-                var app = {
-                    id: item.appExtId.replace(/\-/g, ''),
-                    name: item.appName,
-                    artworkUrl: item.appArtworkSmallUrl,
-                    url: urlUtil.makeUrl(item.appExtId, item.appName),
-                    price: item.appPrice,
-                    isIphone: item.appIsIphone,
-                    isIpad: item.appIsIpad,
-                    desc: item.appDesc
-                };
-
-                currentCategory.apps.push(app);
-            });
 
             remoteCache.setExNx(cacheKey, categories, remoteCacheExpirySeconds, function (err, result) {
                 if (err) { return next(err); }
@@ -110,6 +119,21 @@ exports.init = function init(app) {
             res.setHeader("Cache-Control", "public, max-age=" + expirySeconds);
 
             res.json(categories);
+        });
+    });
+};
+
+exports.init = function init(app) {
+    app.get('/ios/home', function (req, res, next) {
+        categoryViewProvider.getTrendingCategories(function(err, trendingCategories) {
+            if (err) { return next(err); }
+
+            var expirySeconds = 600;
+            res.setHeader("Cache-Control", "public, max-age=" + expirySeconds);
+
+            res.json({
+                trending: trendingCategories
+            });
         });
     });
 };
