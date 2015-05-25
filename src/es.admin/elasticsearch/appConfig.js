@@ -234,6 +234,7 @@ exports.mappings = {
             "boost": {"type": "float", "index": "not_analyzed"},
             "price": {"type": "integer", "index": "no", "store": false},
             "rating": {"type": "float", "index": "no", "store": false},
+            "popularity": {"type": "float", "index": "no", "store": false},
             "image_url": {"type": "string", "index": "no", "store": false},
             "desc_short": {"type": "string", "index": "no", "store": false},
             "is_free": {"type": "boolean", "index": "not_analyzed", "store": false},

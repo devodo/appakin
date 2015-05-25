@@ -27,7 +27,7 @@ var executeQuery = function(queryFunc, next) {
 exports.getAppIndexBatch = function(lastId, limit, next) {
     var queryStr =
         "SELECT a.app_id, a.ext_id, a.name, COALESCE(aa.desc_cleaned, a.description) as description, a.store_url, a.supported_devices,\n" +
-        "a.artwork_small_url, p.price, a.is_iphone, a.is_ipad, a.dev_name,\n" +
+        "a.artwork_small_url, p.price, a.is_iphone, a.is_ipad, a.dev_name, a.release_date,\n" +
         "r.user_rating_current, r.rating_count_current, r.user_rating, r.rating_count,\n" +
         "ap.popularity\n" +
         "FROM appstore_app a\n" +
@@ -38,6 +38,7 @@ exports.getAppIndexBatch = function(lastId, limit, next) {
         "WHERE a.app_id > $1\n" +
         "AND a.name is not null\n" +
         "AND a.date_deleted is null\n" +
+        "AND p.date_deleted is null\n" +
         "ORDER BY a.app_id\n" +
         "limit $2;";
 
@@ -62,6 +63,7 @@ exports.getAppIndexBatch = function(lastId, limit, next) {
                     isIphone: item.is_iphone,
                     isIpad: item.is_ipad,
                     developerName: item.dev_name,
+                    releaseDate: item.release_date,
                     userRatingCurrent: item.user_rating_current,
                     ratingCountCurrent: item.rating_count_current,
                     userRating: item.user_rating,

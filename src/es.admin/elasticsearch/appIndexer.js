@@ -91,6 +91,7 @@ var createAppDoc = function(app, categoryFields, categoryNames) {
         is_ipad: app.isIpad === true,
         boost: calculateAppBoost(app.popularity),
         rating: appRank.getRating(app),
+        popularity: appRank.getPopularity(app),
         categories: categoryFields,
         optional_keywords: categoryNames,
         filter_include: filterIncludes,
