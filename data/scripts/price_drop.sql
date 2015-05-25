@@ -24,3 +24,27 @@ from (
   join app_popularity ap on p1.app_id = ap.app_id
 --order by p1.date_created desc
 order by ap.popularity desc
+
+
+CREATE OR REPLACE FUNCTION update_price_change()
+  RETURNS trigger AS
+  $BODY$
+  BEGIN
+    IF NEW.date_deleted is not null THEN
+      DELETE FROM appstore_price_change
+      WHERE app_id = NEW.app_id
+      AND country_code = NEW.country_code;
+    ELSIF NEW.price <> OLD.price THEN
+      DELETE FROM appstore_price_change
+      WHERE app_id = NEW.app_id
+      AND country_code = NEW.country_code;
+
+      INSERT INTO appstore_price_change(app_id, price, old_price, country_code, change_date)
+      VALUES(NEW.app_id, NEW.price, OLD.price, NEW.country_code, NEW.date_modified);
+    END IF;
+
+    RETURN NULL; -- result is ignored since this is an AFTER trigger
+  END;
+$BODY$
+LANGUAGE plpgsql VOLATILE
+COST 100;
