@@ -22,7 +22,7 @@ VALUES (uuid_generate_v4(), 'Trending Apps', now() at time zone 'utc', now() at 
 begin transaction;
 
 delete from category_app
-where category_id = (select id from category where name = 'Trending Apps')
+where category_id = (select id from category where name = 'Trending Apps');
 
 INSERT INTO category_app(category_id, app_id, position, date_created)
   select (select id from category where name = 'Trending Apps'),
@@ -37,12 +37,12 @@ INSERT INTO category_app(category_id, app_id, position, date_created)
                     select app_id, min(rating_count) as min_rating_count
                     from appstore_rating_history
                     where rating_count is not null
-                          and (date_created + INTERVAL '30 days') >= now() at time zone 'utc'
+                          and (date_created + INTERVAL '20 days') >= now() at time zone 'utc'
                     group by app_id
                   ) arh on ar.app_id = arh.app_id
            where ar.rating_count is not null
          ) t on a.app_id = t.app_id
-  where t.rating_count_diff >= 100
+  where t.rating_count_diff >= 50
         and 'Games' != ALL(a.genres)
   order by t.rating_count_diff desc
   limit 1000;

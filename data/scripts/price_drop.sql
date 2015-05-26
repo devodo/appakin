@@ -23,7 +23,7 @@ from (
        ) p2 on p1.app_id = p2.app_id and p1.price < p2.price
   join app_popularity ap on p1.app_id = ap.app_id
 --order by p1.date_created desc
-order by ap.popularity desc
+order by ap.popularity desc;
 
 
 CREATE OR REPLACE FUNCTION update_price_change()
