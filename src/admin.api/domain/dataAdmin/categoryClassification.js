@@ -57,7 +57,8 @@ var getClassifiedOrSeedSearchCategoryAppExtIds = function(seedCategoryId, next) 
 };
 
 var processReloadSeedCategoryApps = function(seedCategory, next) {
-    log.debug("Reloading seed apps for category: " + seedCategory.id);
+    log.info("Reloading seed apps for category: " + seedCategory.id);
+
     getClassifiedOrSeedSearchCategoryAppExtIds(seedCategory.id, function(err, appExtIds) {
         if (err) { return next(err); }
 
@@ -154,7 +155,7 @@ var getSeedCategoryAppsAndValidate = function(seedCategoryId, next) {
 };
 
 var processTransferSeedCategoryApps = function(seedCategory, next) {
-    log.debug("Transfering seed apps for category: " + seedCategory.id);
+    log.info("Transfering seed apps for category: " + seedCategory.id);
 
     if (!seedCategory.buildVersion) {
         log.warn("Seed category does not have a valid build_version: " + seedCategory.id);
