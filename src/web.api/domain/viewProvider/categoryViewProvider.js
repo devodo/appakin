@@ -266,6 +266,37 @@ var getTrendingCategories = function(next) {
         });
 };
 
+var getPopularCategories = function(skip, take, filters, next) {
+    appStoreRepo.getPopularCategories(skip, take, function(err, categories) {
+        if (err) { return next(err); }
+
+        var categoryIds = categories.map(function(category) {
+            return category.id;
+        });
+
+        getCategoriesCharts(categoryIds, filters, function(err, categoriesCharts) {
+            if (err) { return next(err); }
+
+            var results = categories.map(function(category, i) {
+                var categoryChart = categoriesCharts[i];
+
+                if (!categoryChart) {
+                    return log.error("No related category chart found for category id: " + category.id);
+                }
+
+                return {
+                    id: category.extId.replace(/\-/g, ''),
+                    name: category.name,
+                    url: urlUtil.makeUrl(category.extId, category.name),
+                    chart: categoryChart.apps
+                };
+            });
+
+            next(null, results);
+        });
+    });
+};
+
 var searchMain = function(queryStr, pageNum, filters, next) {
     appSearcher.search(queryStr, pageNum, filters, function(err, searchResult) {
         if (err) { return next(err); }
@@ -420,6 +451,7 @@ exports.searchMain = searchMain;
 exports.searchApps = searchApps;
 exports.getCategoriesCharts = getCategoriesCharts;
 exports.getTrendingCategories = getTrendingCategories;
+exports.getPopularCategories = getPopularCategories;
 
 
 

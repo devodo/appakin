@@ -125,7 +125,9 @@ exports.init = function init(app) {
 
 exports.init = function init(app) {
     app.get('/ios/home', function (req, res, next) {
-        categoryViewProvider.getTrendingCategories(function(err, trendingCategories) {
+        var take = 5;
+
+        categoryViewProvider.getPopularCategories(0, take, {}, function(err, trendingCategories) {
             if (err) { return next(err); }
 
             var expirySeconds = 600;
