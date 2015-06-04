@@ -77,6 +77,21 @@ var resetRelatedCategory = function(categoryId, next) {
     appStoreAdminRepo.resetRelatedCategory(categoryId, CAT_POSITION_FACTOR, RELATED_CAT_POSITION_FACTOR, MAX_RELATED, next);
 };
 
+var resetTrendingCategories = function(next) {
+    log.info("Resetting trending categories");
+    appStoreAdminRepo.resetTrendingCategories(next);
+};
+
+var resetGenreCategories = function(next) {
+    log.info("Resetting genre categories");
+    appStoreAdminRepo.resetGenreCategories(next);
+};
+
+var resetFeaturedApps = function(next) {
+    log.info("Resetting featured apps");
+    appStoreAdminRepo.resetFeaturedApps(next);
+};
+
 var rebuildSeedCategory = function(seedCategoryId, next) {
     categoryClassification.reloadSeedCategoryApps(seedCategoryId, function(err) {
         if (err) { return next(err); }
@@ -117,6 +132,34 @@ var analyseApps = function(batchSize, forceAll, next) {
     });
 };
 
+var resetCategoryData = function(next) {
+    resetCategoryPopularity(function(err) {
+        if (err) { return next(err); }
+
+        resetRelatedCategories(function(err) {
+            if (err) { return next(err); }
+
+            resetCategoryGenres(function(err) {
+                if (err) { return next(err); }
+
+                resetTrendingCategories(function(err) {
+                    if (err) { return next(err); }
+
+                    resetGenreCategories(function(err) {
+                        if (err) { return next(err); }
+
+                        resetFeaturedApps(function(err) {
+                            if (err) { return next(err); }
+
+                            next();
+                        });
+                    });
+                });
+            });
+        });
+    });
+};
+
 var rebuildAll = function(next) {
     analyseApps(APP_ANALYSIS_BATCH_SIZE, false, function(err) {
         if (err) { return next(err); }
@@ -130,24 +173,16 @@ var rebuildAll = function(next) {
                 rebuildAllSeedCategories(function(err) {
                     if (err) { return next(err); }
 
-                    rebuildAppIndex(function(err) {
+                    resetCategoryData(function(err) {
                         if (err) { return next(err); }
 
-                        resetCategoryPopularity(function(err) {
+                        analyseAmbiguity(function(err) {
                             if (err) { return next(err); }
 
-                            resetRelatedCategories(function(err) {
+                            rebuildAppIndex(function(err) {
                                 if (err) { return next(err); }
 
-                                resetCategoryGenres(function(err) {
-                                    if (err) { return next(err); }
-
-                                    analyseAmbiguity(function(err) {
-                                        if (err) { return next(err); }
-
-                                        next();
-                                    });
-                                });
+                                next();
                             });
                         });
                     });
@@ -157,33 +192,24 @@ var rebuildAll = function(next) {
     });
 };
 
-var resetTrendingApps = function(next) {
-    var dayRange = 30;
-    var maxApps = 1000;
-
-    appStoreAdminRepo.resetTrendingApps(dayRange, maxApps, function(err) {
-        if (err) { return next(err); }
-
-        next();
-    });
-};
-
 
 exports.rebuildAll = rebuildAll;
 exports.rebuildAllSeedCategories = rebuildAllSeedCategories;
 exports.rebuildClusterIndex = rebuildClusterIndex;
 exports.clusterIndexChangedApps = clusterIndexChangedApps;
 exports.rebuildAppIndex = rebuildAppIndex;
+
 exports.resetAppPopularity = resetAppPopularity;
 exports.resetCategoryPopularity = resetCategoryPopularity;
 exports.resetCategoryGenres = resetCategoryGenres;
 exports.resetRelatedCategories = resetRelatedCategories;
 exports.resetRelatedCategory = resetRelatedCategory;
+exports.resetTrendingCategories = resetTrendingCategories;
+exports.resetGenreCategories = resetGenreCategories;
+exports.resetFeaturedApps = resetFeaturedApps;
 
 exports.rebuildSeedCategory = rebuildSeedCategory;
 
 exports.analyseAmbiguity = analyseAmbiguity;
 exports.analyseApps = analyseApps;
-
-exports.resetTrendingApps = resetTrendingApps;
 

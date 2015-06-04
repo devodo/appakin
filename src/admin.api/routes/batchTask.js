@@ -144,18 +144,5 @@ exports.init = function init(app) {
 
         res.json({ "status": "Analyse ambiguity task started" });
     });
-
-    app.post('/admin/task/reset_trending_apps', function (req, res, next) {
-        log.info("Starting reset trending apps task");
-        var start = process.hrtime();
-        batchTask.resetTrendingApps(function(err) {
-            if (err) { return log.error(err); }
-
-            var end = process.hrtime(start);
-            log.info("Completed reset trending apps task in: " + prettyHrtime(end));
-        });
-
-        res.json({ "status": "Reset trending apps task started" });
-    });
 };
 
