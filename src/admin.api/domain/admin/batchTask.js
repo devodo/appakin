@@ -7,6 +7,8 @@ var appStoreAdminRepo = require('../../repos/appStoreAdminRepo');
 var classificationRepo = require('../../repos/classificationRepo');
 var ambiguityAnalyser = require('../analysis/ambiguityAnalyser');
 var appAnalyser = require('../analysis/appAnalyser');
+var catAnalyser = require('./catAnalyser');
+
 var log = require('../../logger');
 
 var APP_BATCH_SIZE = 1000;
@@ -69,7 +71,8 @@ var resetCategoryGenres = function(next) {
 
 var resetRelatedCategories = function(next) {
     log.info("Resetting related categories");
-    appStoreAdminRepo.resetRelatedCategories(CAT_POSITION_FACTOR, RELATED_CAT_POSITION_FACTOR, MAX_RELATED, next);
+    //appStoreAdminRepo.resetRelatedCategories(CAT_POSITION_FACTOR, RELATED_CAT_POSITION_FACTOR, MAX_RELATED, next);
+    catAnalyser.resetRelated(next);
 };
 
 var resetRelatedCategory = function(categoryId, next) {
