@@ -167,8 +167,9 @@ var createAppBatchIndexer = function (tmpIndexName, categoryApps, categories) {
             var appDocs = batchResult.apps.map(function (app) {
                 var categoryFields = [];
                 var categoryNames = [];
-                if (categoryAppIndex < categoryApps.length && categoryApps[categoryAppIndex].appId < app.id) {
-                    throw ("Category app index appId behind app batch appId");
+                while (categoryAppIndex < categoryApps.length && categoryApps[categoryAppIndex].appId < app.id) {
+                    log.warn("Category app index appId behind app batch appId: " + categoryApps[categoryAppIndex].appId);
+                    categoryAppIndex++;
                 }
 
                 while (categoryAppIndex < categoryApps.length && categoryApps[categoryAppIndex].appId === app.id) {

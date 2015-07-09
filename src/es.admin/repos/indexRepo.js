@@ -86,9 +86,12 @@ exports.getCategoryApps = function(next) {
         "SELECT ca.category_id, ca.app_id, ca.position\n" +
         "FROM category_app ca\n" +
         "JOIN appstore_app a on ca.app_id = a.app_id\n" +
+        "JOIN appstore_price p on a.app_id = p.app_id and p.country_code = 'USA'\n" +
         "JOIN category c on ca.category_id = c.id\n" +
         "WHERE a.date_deleted is null\n" +
         "AND c.date_deleted is null\n" +
+        "AND p.date_deleted is null\n" +
+        "AND a.name is not null\n" +
         "order by a.app_id, ca.position;";
 
     var queryFunc = function(conn, next) {
