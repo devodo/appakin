@@ -59,6 +59,12 @@ var resetAppPopularity = function(next) {
     appStoreAdminRepo.resetAppPopularities(next);
 };
 
+var resetAppRanking = function(next) {
+    log.info("Resetting app rankings");
+
+    appStoreAdminRepo.resetAppRankings(next);
+};
+
 var resetCategoryPopularity = function(next) {
     log.info("Resetting category popularities");
     appStoreAdminRepo.resetCategoryPopularities(next);
@@ -167,7 +173,7 @@ var rebuildAll = function(next) {
     analyseApps(APP_ANALYSIS_BATCH_SIZE, false, function(err) {
         if (err) { return next(err); }
 
-        resetAppPopularity(function(err) {
+        resetAppRanking(function(err) {
             if (err) { return next(err); }
 
             rebuildClusterIndex(function(err) {
@@ -203,6 +209,7 @@ exports.clusterIndexChangedApps = clusterIndexChangedApps;
 exports.rebuildAppIndex = rebuildAppIndex;
 
 exports.resetAppPopularity = resetAppPopularity;
+exports.resetAppRanking = resetAppRanking;
 exports.resetCategoryPopularity = resetCategoryPopularity;
 exports.resetCategoryGenres = resetCategoryGenres;
 exports.resetRelatedCategories = resetRelatedCategories;

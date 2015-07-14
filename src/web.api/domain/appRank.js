@@ -39,5 +39,14 @@ var getPopularity = function(app) {
     return popularity;
 };
 
+var logBase = Math.log(10);
+var POPULARITY_NORM_FACTOR = 1/2.0;
+var normalisePopularity = function(appPopularity) {
+    var popularity = (Math.log(1 + appPopularity)/logBase) * POPULARITY_NORM_FACTOR;
+
+    return Math.min(popularity, 1.0);
+};
+
 exports.getRating = getRating;
 exports.getPopularity = getPopularity;
+exports.normalisePopularity = normalisePopularity;

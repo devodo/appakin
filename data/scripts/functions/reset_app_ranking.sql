@@ -10,7 +10,7 @@ $BODY$
   BEGIN
     min_age_days := 5;
     popularity_age_decay := 0.5;
-    ranking_age_decay := 1.0;
+    ranking_age_decay := 0.8;
     rating_rank_weight := 2.0;
     current_rating_weight := 0.6;
     
@@ -27,10 +27,12 @@ $BODY$
 				GREATEST(
 				  (
 				    coalesce(t.increase, t.rating_count + 1) * power(t.rating / 5.0, rating_rank_weight)
-				  ) / pow(t.age_days, ranking_age_decay), 0
+				  ) / pow(t.age_days - min_age_days + 1, ranking_age_decay), 0
 				) as ranking,
 				GREATEST(
-				  (coalesce(t.increase, t.rating_count + 1)) / pow(t.age_days, popularity_age_decay), 0
+				  (
+				    coalesce(t.increase, t.rating_count + 1)
+				  ) / pow(t.age_days - min_age_days + 1, popularity_age_decay), 0
 				) as popularity
 			from
 			(
@@ -40,7 +42,9 @@ $BODY$
 				    EXTRACT(EPOCH FROM NOW() at time zone 'utc') - EXTRACT(EPOCH FROM coalesce(date_from, release_date))
 				  ) / 86400, min_age_days
 				) as age_days,
-				(r1 * r1_count_root + r2 * r2_count)/(GREATEST(1, r1_count_root + r2_count)) as rating,
+				GREATEST(
+				  (r1 * r1_count_root + r2 * r2_count)/(GREATEST(1, r1_count_root + r2_count)), 1
+				) as rating,
 				increase,
 				rating_count
 				from (

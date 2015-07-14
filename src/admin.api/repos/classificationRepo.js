@@ -300,9 +300,9 @@ var insertSeedCategoryApps = function(client, seedCategoryId, appExtIds, next) {
 
     var queryStr =
         "INSERT INTO seed_category_app(seed_category_id, app_id, position, date_created)\n" +
-        "SELECT $1, a.app_id, row_number() OVER (ORDER BY coalesce(ap.popularity, 0) DESC, a.release_date DESC), NOW() at time zone 'utc'\n" +
+        "SELECT $1, a.app_id, row_number() OVER (ORDER BY coalesce(ar.ranking, 0) DESC, a.release_date DESC), NOW() at time zone 'utc'\n" +
         "FROM appstore_app a\n" +
-        "LEFT JOIN app_popularity ap on a.app_id = ap.app_id\n" +
+        "LEFT JOIN app_ranking ar on a.app_id = ar.app_id and ar.country_code = 'USA'\n" +
         "WHERE a.ext_id in (" + params.join(',') + ");";
 
     var queryParams = [seedCategoryId];

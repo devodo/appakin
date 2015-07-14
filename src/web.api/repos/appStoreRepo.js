@@ -23,11 +23,13 @@ var getAppByExtId = function (client, extId, next) {
         "advisory_rating, dev_name," +
         "r.user_rating_current, r.rating_count_current, r.user_rating, r.rating_count," +
         "is_iphone, is_ipad, a.date_modified,\n" +
+        "ar.popularity,\n" +
         "aa.is_globally_ambiguous, aa.ambiguous_dev_terms, aa.can_use_short_name\n" +
         "FROM appstore_app a\n" +
         "LEFT JOIN app_ambiguity aa on a.app_id = aa.app_id\n" +
         "LEFT JOIN appstore_price p on a.app_id = p.app_id and p.country_code = 'USA'\n" +
         "LEFT JOIN appstore_rating r on a.app_id = r.app_id and r.country_code = 'USA'\n" +
+        "LEFT JOIN app_ranking ar on a.app_id = ar.app_id and ar.country_code = 'USA'\n" +
         "WHERE ext_id = $1;";
 
     client.query(queryStr, [extId], function (err, result) {
@@ -63,6 +65,7 @@ var getAppByExtId = function (client, extId, next) {
             ratingCountCurrent: item.rating_count_current,
             userRating: item.user_rating,
             ratingCount: item.rating_count,
+            popularity: item.popularity,
             isIphone: item.is_iphone,
             isIpad: item.is_ipad,
             excludeTerms: item.ambiguous_dev_terms,

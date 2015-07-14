@@ -70,7 +70,7 @@ function getAppByExtId(extId, req, res, next) {
             app.url = appUrl;
             app.categories = cats;
 
-            app.popularity = appRank.getPopularity(app);
+            app.popularity = appRank.normalisePopularity(app.popularity);
             app.rating = appRank.getRating(app);
 
             app.id = app.extId.replace(/\-/g, '');

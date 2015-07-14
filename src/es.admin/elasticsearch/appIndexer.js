@@ -18,6 +18,8 @@ var optionalKeywords = [
     "top"
 ];
 
+var APP_RANK_SMOOTH = 0.5;
+
 var calculateFacetBoost = function(position, popularity) {
     /*
      Verhulst Function (resource depletion)
@@ -52,23 +54,23 @@ var calculateMaxBoost = function(position, popularity) {
     return result;
 };
 
-var calculateAppBoost = function(popularity) {
-    if (!popularity) {
+var calculateAppBoost = function(ranking) {
+    if (!ranking) {
         return 1;
     }
 
-    var result = Math.pow(1 + popularity * 2, 2);
+    var result = Math.pow(1 + ranking * 2, 2);
 
     return result;
 };
 
-var createCategoryField = function(categoryApp, appPopularity) {
+var createCategoryField = function(categoryApp, appRanking) {
     return {
         "cat_id": categoryApp.categoryId,
         "position": categoryApp.position,
-        "facet_boost": calculateFacetBoost(categoryApp.position, appPopularity),
-        "app_boost": calculateCategoryBoost(categoryApp.position, appPopularity),
-        "max_boost": calculateMaxBoost(categoryApp.position, appPopularity)
+        "facet_boost": calculateFacetBoost(categoryApp.position, appRanking),
+        "app_boost": calculateCategoryBoost(categoryApp.position, appRanking),
+        "max_boost": calculateMaxBoost(categoryApp.position, appRanking)
     };
 };
 
@@ -89,15 +91,15 @@ var createAppDoc = function(app, categoryFields, categoryNames) {
         is_free: parseFloat(app.price) === 0,
         is_iphone: app.isIphone === true,
         is_ipad: app.isIpad === true,
-        boost: calculateAppBoost(app.popularity),
+        boost: calculateAppBoost(app.ranking),
         rating: appRank.getRating(app),
-        popularity: appRank.getPopularity(app),
+        popularity: app.popularity,
         categories: categoryFields,
         optional_keywords: categoryNames,
         filter_include: filterIncludes,
         suggest : {
             input: app.name,
-            weight : (app.popularity ? Math.floor(app.popularity * 1000) : 0)
+            weight : (app.ranking ? Math.floor(app.ranking * 1000) : 0)
         }
     };
 
@@ -145,7 +147,7 @@ var createAppBatchLoader = function (startId, batchSize) {
     });
 };
 
-var createAppBatchIndexer = function (tmpIndexName, categoryApps, categories) {
+var createAppBatchIndexer = function (tmpIndexName, categoryApps, categories, maxAppRanking) {
     var categoryAppIndex = 0;
 
     var categoriesMap = Object.create(null);
@@ -153,6 +155,8 @@ var createAppBatchIndexer = function (tmpIndexName, categoryApps, categories) {
     categories.forEach(function(category) {
         categoriesMap[category.id] = category;
     });
+
+    var maxAppRankingLog = Math.log(1 + maxAppRanking) / Math.log(10);
 
     var processBatchResult = function(batchResult) {
         var deferred = Q.defer();
@@ -165,6 +169,12 @@ var createAppBatchIndexer = function (tmpIndexName, categoryApps, categories) {
 
         try {
             var appDocs = batchResult.apps.map(function (app) {
+                // Normalise app ranking
+                if (app.ranking > 0) {
+                    var appRankLog = Math.log(1 + app.ranking) / Math.log(10);
+                    app.ranking = Math.pow(appRankLog / maxAppRankingLog, APP_RANK_SMOOTH);
+                }
+
                 var categoryFields = [];
                 var categoryNames = [];
                 while (categoryAppIndex < categoryApps.length && categoryApps[categoryAppIndex].appId < app.id) {
@@ -180,7 +190,7 @@ var createAppBatchIndexer = function (tmpIndexName, categoryApps, categories) {
                     }
 
                     categoryNames.push(category.name);
-                    categoryFields.push(createCategoryField(categoryApps[categoryAppIndex], app.popularity));
+                    categoryFields.push(createCategoryField(categoryApps[categoryAppIndex], app.ranking));
                     categoryAppIndex++;
                 }
 
@@ -204,9 +214,9 @@ var createAppBatchIndexer = function (tmpIndexName, categoryApps, categories) {
     });
 };
 
-var indexAppsPromise = function(tmpIndexName, batchSize, categoryApps, categories) {
+var indexAppsPromise = function(tmpIndexName, batchSize, categoryApps, categories, maxAppRanking) {
     var appBatchLoader = createAppBatchLoader(0, batchSize);
-    var appBatchIndexer = createAppBatchIndexer(tmpIndexName, categoryApps, categories);
+    var appBatchIndexer = createAppBatchIndexer(tmpIndexName, categoryApps, categories, maxAppRanking);
     var nextBatchPromise = appBatchLoader.nextPromise();
 
     var processNextBatch = function() {
@@ -297,6 +307,18 @@ var getCategoriesPromise = function() {
     return deferred.promise;
 };
 
+var getMaxAppRankingPromise = function() {
+    var deferred = Q.defer();
+
+    indexRepo.getMaxAppRanking(function(err, ranking) {
+        if (err) { return deferred.reject(err); }
+
+        deferred.resolve(ranking);
+    });
+
+    return deferred.promise;
+};
+
 var optmiseIndexPromise = function(indexName) {
     var deferred = Q.defer();
 
@@ -320,11 +342,15 @@ var rebuildPromise = function(batchSize) {
                     log.debug("Retrieving categories");
                     return getCategoriesPromise()
                         .then(function (categories) {
-                            log.debug("Indexing apps");
-                            return indexAppsPromise(newIndexName, batchSize, categoryApps, categories)
-                                .then(function () {
-                                    log.debug("Indexing categories");
-                                    return indexCategoriesPromise(newIndexName, categories);
+                            log.debug("Retrieving max app ranking");
+                            return getMaxAppRankingPromise()
+                                .then(function (maxRanking) {
+                                    log.debug("Indexing apps");
+                                    return indexAppsPromise(newIndexName, batchSize, categoryApps, categories, maxRanking)
+                                        .then(function () {
+                                            log.debug("Indexing categories");
+                                            return indexCategoriesPromise(newIndexName, categories);
+                                        });
                                 });
                         });
                 })

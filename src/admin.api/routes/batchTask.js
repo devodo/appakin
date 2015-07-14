@@ -93,6 +93,19 @@ exports.init = function init(app) {
         res.json({ "status": "Reset app popularity task started" });
     });
 
+    app.post('/admin/task/reset_app_ranking', function (req, res, next) {
+        log.info("Starting reset app ranking batch task");
+        var start = process.hrtime();
+        batchTask.resetAppRanking(function(err) {
+            if (err) { return log.error(err); }
+
+            var end = process.hrtime(start);
+            log.info("Completed reset app ranking batch task in: " + prettyHrtime(end));
+        });
+
+        res.json({ "status": "Reset app ranking task started" });
+    });
+
     app.post('/admin/task/reset_category_popularity', function (req, res, next) {
         log.info("Starting reset category popularity batch task");
         var start = process.hrtime();

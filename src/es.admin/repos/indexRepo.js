@@ -29,11 +29,11 @@ exports.getAppIndexBatch = function(lastId, limit, next) {
         "SELECT a.app_id, a.ext_id, a.name, COALESCE(aa.desc_cleaned, a.description) as description, a.store_url, a.supported_devices,\n" +
         "a.artwork_small_url, p.price, a.is_iphone, a.is_ipad, a.dev_name, a.release_date,\n" +
         "r.user_rating_current, r.rating_count_current, r.user_rating, r.rating_count,\n" +
-        "ap.popularity\n" +
+        "ar.popularity, ar.ranking\n" +
         "FROM appstore_app a\n" +
         "JOIN appstore_price p on a.app_id = p.app_id and p.country_code = 'USA'\n" +
         "LEFT JOIN appstore_rating r on a.app_id = r.app_id and r.country_code = 'USA'\n" +
-        "LEFT JOIN app_popularity ap on a.app_id = ap.app_id\n" +
+        "LEFT JOIN app_ranking ar on a.app_id = ar.app_id and ar.country_code = 'USA'\n" +
         "LEFT JOIN app_analysis aa ON a.app_id = aa.app_id\n" +
         "WHERE a.app_id > $1\n" +
         "AND a.name is not null\n" +
@@ -68,11 +68,39 @@ exports.getAppIndexBatch = function(lastId, limit, next) {
                     ratingCountCurrent: item.rating_count_current,
                     userRating: item.user_rating,
                     ratingCount: item.rating_count,
-                    popularity: item.popularity
+                    popularity: item.popularity,
+                    ranking: item.ranking
                 };
             });
 
             next(null, items);
+        });
+    };
+
+    executeQuery(queryFunc, function(err, result) {
+        next(err, result);
+    });
+};
+
+exports.getMaxAppRanking = function(next) {
+    var queryStr =
+        "select ar.ranking\n" +
+        "from app_ranking ar\n" +
+        "join appstore_price ap on ar.app_id = ap.app_id\n" +
+        "where ar.country_code = 'USA' and ap.country_code = 'USA'\n" +
+        "and ap.date_deleted is null\n" +
+        "order by ar.id\n" +
+        "limit 1";
+
+    var queryFunc = function(conn, next) {
+        conn.client.query(queryStr, function (err, result) {
+            if (err) { return next(err); }
+
+            if (result.rows.length === 0) {
+                return next(new Error('Query returned empty result set'));
+            }
+
+            next(null, result.rows[0].ranking);
         });
     };
 

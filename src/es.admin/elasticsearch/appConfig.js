@@ -165,7 +165,8 @@ exports.mappings = {
                 "desc_short",
                 "image_url",
                 "price",
-                "rating"
+                "rating",
+                "popularity"
             ],
             "excludes": ["nothing"]
         },

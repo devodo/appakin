@@ -659,6 +659,16 @@ var resetAppPopularities = function(client, next) {
     });
 };
 
+var resetAppRankings = function(client, next) {
+    var queryStr = "select reset_app_ranking();";
+
+    client.query(queryStr, function (err, result) {
+        if (err) { return next(err); }
+
+        next();
+    });
+};
+
 var resetAppPopularitiesOld = function(conn, appStoreBatchId, next) {
     conn.beginTran(function(err) {
         if (err) { return next(err); }
@@ -1314,6 +1324,18 @@ exports.resetAppPopularities = function(next) {
         if (err) { return next(err); }
 
         resetAppPopularities(conn.client, function(err, results) {
+            conn.close(err, function(err) {
+                next(err, results);
+            });
+        });
+    });
+};
+
+exports.resetAppRankings = function(next) {
+    connection.open(function(err, conn) {
+        if (err) { return next(err); }
+
+        resetAppRankings(conn.client, function(err, results) {
             conn.close(err, function(err) {
                 next(err, results);
             });
