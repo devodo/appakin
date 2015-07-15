@@ -17,6 +17,8 @@ var POPULAR_PAGE_SIZE = 10;
 var POPULAR_MAX_PAGES = 10;
 var MAX_CAT_APPS = PAGE_SIZE * MAX_CAT_PAGES;
 
+var MIN_POPULARITY = appRank.denormalisePopularity(0.1);
+
 exports.init = function init(app) {
     app.get('/ios/category/2.0/:encodedId/:slug', function (req, res, next) {
         var encodedId = req.params.encodedId;
@@ -149,7 +151,7 @@ exports.init = function init(app) {
 
         var minPopularity = 0;
         if (req.query.popular === 'true') {
-            minPopularity = 0.15;
+            minPopularity = MIN_POPULARITY;
         }
 
         var skip = (pageNum - 1) * PAGE_SIZE;
@@ -169,17 +171,13 @@ exports.init = function init(app) {
                 });
             }
 
-            var dateNow = new Date();
-
             result.apps.forEach(function (app) {
                 app.id = app.extId.replace(/\-/g, '');
                 app.url = urlUtil.makeUrl(app.extId, app.name);
 
-                app.popularity = appRank.getPopularity(app);
+                app.popularity = appRank.normalisePopularity(app.popularity);
                 app.rating = appRank.getRating(app);
-
-                var daysDiff = Math.floor((dateNow - app.priceChangeDate) / 86400000);
-                app.changeAgeDays = Math.max(daysDiff, 0);
+                app.changeAgeDays = app.ageDays;
 
                 delete app.extId;
                 delete app.userRatingCurrent;

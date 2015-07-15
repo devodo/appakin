@@ -1,3 +1,7 @@
+-- Function: reset_app_ranking()
+
+-- DROP FUNCTION reset_app_ranking();
+
 CREATE OR REPLACE FUNCTION reset_app_ranking()
   RETURNS boolean AS
 $BODY$
@@ -9,12 +13,12 @@ $BODY$
   
   BEGIN
     min_age_days := 5;
-    popularity_age_decay := 0.5;
+    popularity_age_decay := 0.8;
     ranking_age_decay := 0.8;
     rating_rank_weight := 2.0;
     current_rating_weight := 0.6;
     
-    truncate table app_ranking;
+    delete from app_ranking;
 
     ALTER SEQUENCE app_ranking_id_seq RESTART WITH 1;
 
@@ -27,12 +31,12 @@ $BODY$
 				GREATEST(
 				  (
 				    coalesce(t.increase, t.rating_count + 1) * power(t.rating / 5.0, rating_rank_weight)
-				  ) / pow(t.age_days - min_age_days + 1, ranking_age_decay), 0
+				  ) / pow(t.age_days, ranking_age_decay), 0
 				) as ranking,
 				GREATEST(
 				  (
 				    coalesce(t.increase, t.rating_count + 1)
-				  ) / pow(t.age_days - min_age_days + 1, popularity_age_decay), 0
+				  ) / pow(t.age_days, popularity_age_decay), 0
 				) as popularity
 			from
 			(

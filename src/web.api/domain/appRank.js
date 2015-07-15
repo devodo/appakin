@@ -47,6 +47,14 @@ var normalisePopularity = function(appPopularity) {
     return Math.min(popularity, 1.0);
 };
 
+var denormalisePopularity = function(normalisedPopularity) {
+    var exponent = normalisedPopularity / POPULARITY_NORM_FACTOR;
+    var popularity = Math.pow(10, exponent) - 1;
+
+    return popularity;
+};
+
 exports.getRating = getRating;
 exports.getPopularity = getPopularity;
 exports.normalisePopularity = normalisePopularity;
+exports.denormalisePopularity = denormalisePopularity;

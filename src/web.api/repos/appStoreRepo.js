@@ -257,21 +257,23 @@ var getCategoryPriceDropAppsByExtId = function(client, categoryExtId, minPopular
         "FROM (\n" +
         "	SELECT a.ext_id, a.name, a.artwork_small_url, a.is_iphone, a.is_ipad, a.release_date,\n" +
         "	       r.user_rating, r.rating_count, r.user_rating_current, r.rating_count_current,\n" +
-        "               substring(a.description from 0 for 300) as short_description, pc.price, pc.old_price, pc.change_date,\n" +
-        "               count(1) OVER() as total\n" +
+        "          substring(a.description from 0 for 300) as short_description, pc.price, pc.old_price, pc.change_date,\n" +
+        "          coalesce(ar.popularity, 0) as popularity,\n" +
+        "          trunc(extract(epoch from now() at time zone 'UTC' - pc.change_date) / 86400) as age_days,\n" +
+        "          count(1) OVER() as total\n" +
         "        FROM appstore_app a\n" +
         "        JOIN category_app ca ON a.app_id = ca.app_id\n" +
         "        JOIN category c ON ca.category_id = c.id\n" +
         "        JOIN appstore_price_change pc ON a.app_id = pc.app_id and pc.country_code = 'USA'\n" +
-        "        LEFT JOIN app_popularity p on a.app_id = p.app_id\n" +
+        "        LEFT JOIN app_ranking ar on a.app_id = ar.app_id and ar.country_code = 'USA'\n" +
         "        LEFT JOIN appstore_rating r on a.app_id = r.app_id and r.country_code = 'USA'\n" +
         "        WHERE c.ext_id = $1\n" +
         "        AND pc.price < pc.old_price\n" +
-        "        AND coalesce(p.popularity, 0) >= $2\n" +
+        "        AND coalesce(ar.popularity, 0) >= $2\n" +
         (filters.isFree === true ? "AND pc.price = 0\n" : "") +
         (filters.isIphone === true ? "AND a.is_iphone\n": "") +
         (filters.isIpad === true ? "AND a.is_ipad\n": "") +
-        "        ORDER BY pc.change_date desc, coalesce(p.popularity, 0) desc, a.release_date desc\n" +
+        "        ORDER BY age_days, coalesce(ar.popularity, 0) desc, a.release_date desc\n" +
         "        LIMIT 200\n" +
         ") t\n" +
         "LIMIT $3 OFFSET $4";
@@ -302,7 +304,9 @@ var getCategoryPriceDropAppsByExtId = function(client, categoryExtId, minPopular
                 userRatingCurrent: item.user_rating_current,
                 ratingCountCurrent: item.rating_count_current,
                 userRating: item.user_rating,
-                ratingCount: item.rating_count
+                ratingCount: item.rating_count,
+                popularity: item.popularity,
+                ageDays: item.age_days
             };
         });
 
