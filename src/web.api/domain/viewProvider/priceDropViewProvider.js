@@ -118,9 +118,7 @@ var getPriceDropCategories = function(skip, take, filters, next) {
 };
 
 var getPopularPriceDrops = function(skip, take, filters, next) {
-    var filterMask = getFilterMask(filters);
-
-    getPriceDropCategories(skip, take, filterMask, function(err, result) {
+    getPriceDropCategories(skip, take, filters, function(err, result) {
         if (err) { return next(err); }
 
         if (!result) {
@@ -147,7 +145,18 @@ var getPopularPriceDrops = function(skip, take, filters, next) {
     });
 };
 
+var getCategoryPriceDrops = function(categoryExtId, skip, take, filters, isPopular, next) {
+    var minPopularity = isPopular === true ? MIN_POPULARITY : 0;
+
+    appStoreRepo.getCategoryPriceDropAppsByExtId(categoryExtId, minPopularity, MAX_DAYS, filters, skip, take, function(err, result) {
+        if (err) { return next(err); }
+
+        next(null, result);
+    });
+};
+
 exports.getPopularPriceDrops = getPopularPriceDrops;
+exports.getCategoryPriceDrops = getCategoryPriceDrops;
 
 
 

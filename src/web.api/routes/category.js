@@ -4,6 +4,7 @@ var urlUtil = require('../domain/urlUtil');
 var appStoreRepo = require('../repos/appStoreRepo');
 var featuredRepo = require('../repos/featuredRepo');
 var catViewProvider = require('../domain/viewProvider/categoryViewProvider');
+var priceDropViewProvider = require('../domain/viewProvider/priceDropViewProvider');
 var redisCacheFactory = require("../domain/cache/redisCache");
 var appRank = require('../domain/appRank');
 var appStoreCache = redisCacheFactory.createRedisCache(redisCacheFactory.dbPartitions.appstore);
@@ -149,14 +150,11 @@ exports.init = function init(app) {
             isFree: req.query.is_free === 'true'
         };
 
-        var minPopularity = 0;
-        if (req.query.popular === 'true') {
-            minPopularity = MIN_POPULARITY;
-        }
+        var isPopular = req.query.popular === 'true';
 
         var skip = (pageNum - 1) * PAGE_SIZE;
 
-        appStoreRepo.getCategoryPriceDropAppsByExtId(categoryExtId, minPopularity, filters, skip, PAGE_SIZE, function (err, result) {
+        priceDropViewProvider.getCategoryPriceDrops(categoryExtId, skip, PAGE_SIZE, filters, isPopular, function (err, result) {
             if (err) { return next(err); }
 
             if (!result) {

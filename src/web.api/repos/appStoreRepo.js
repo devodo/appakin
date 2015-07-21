@@ -251,7 +251,7 @@ var getCategoryAppsByExtId = function(client, categoryExtId, filters, skip, take
     });
 };
 
-var getCategoryPriceDropAppsByExtId = function(client, categoryExtId, minPopularity, filters, skip, take, next) {
+var getCategoryPriceDropAppsByExtId = function(client, categoryExtId, minPopularity, maxDays, filters, skip, take, next) {
     var queryStr =
         "SELECT *\n" +
         "FROM (\n" +
@@ -273,9 +273,9 @@ var getCategoryPriceDropAppsByExtId = function(client, categoryExtId, minPopular
         (filters.isFree === true ? "AND pc.price = 0\n" : "") +
         (filters.isIphone === true ? "AND a.is_iphone\n": "") +
         (filters.isIpad === true ? "AND a.is_ipad\n": "") +
-        "        ORDER BY age_days, coalesce(ar.popularity, 0) desc, a.release_date desc\n" +
-        "        LIMIT 200\n" +
+        "	     and pc.change_date > now() at time zone 'UTC' - interval '" + maxDays + "' day\n" +
         ") t\n" +
+        "ORDER BY log(1 + t.popularity) / power(t.age_days + 1, 0.5) desc, t.release_date desc\n" +
         "LIMIT $3 OFFSET $4";
 
     var queryParams = [categoryExtId, minPopularity, take, skip];
@@ -529,13 +529,13 @@ exports.getCategoryAppsByExtId = function(categoryExtId, filters, skip, take, ne
     });
 };
 
-exports.getCategoryPriceDropAppsByExtId = function(categoryExtId, minPopularity, filters, skip, take, next) {
+exports.getCategoryPriceDropAppsByExtId = function(categoryExtId, minPopularity, maxDays, filters, skip, take, next) {
     connection.open(function(err, conn) {
         if (err) {
             return next(err);
         }
 
-        getCategoryPriceDropAppsByExtId(conn.client, categoryExtId, minPopularity, filters, skip, take, function(err, result) {
+        getCategoryPriceDropAppsByExtId(conn.client, categoryExtId, minPopularity, maxDays, filters, skip, take, function(err, result) {
             conn.close(err, function(err) {
                 next(err, result);
             });

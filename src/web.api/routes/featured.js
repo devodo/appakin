@@ -164,9 +164,7 @@ exports.init = function init(app) {
         priceDropViewProvider.getPopularPriceDrops(skip, take, filters, function(err, priceDrops) {
             if (err) { return next(err); }
 
-            res.json({
-                priceDrops: priceDrops
-            });
+            res.json(priceDrops);
         });
     });
 };
