@@ -843,3 +843,69 @@ exports.getActiveAppStoreGenres = function(next) {
         });
     });
 };
+
+var getPopularPriceDrops = function(client, maxDays, minPopularity, filters, next) {
+    var queryStr =
+        "select *\n" +
+        "from (\n" +
+        "	select a.ext_id, a.name, a.artwork_small_url, a.is_iphone, a.is_ipad, a.release_date,\n" +
+        "	pc.price, pc.old_price, pc.change_date,\n" +
+        "	ar.popularity, r.user_rating, r.rating_count, r.user_rating_current, r.rating_count_current,\n" +
+        "	ARRAY(select ca.category_id from category_app ca where ca.app_id = pc.app_id) as categories,\n" +
+        "	trunc(extract(epoch from now() at time zone 'UTC' - pc.change_date) / 86400) as age_days\n" +
+        "	FROM appstore_price_change pc\n" +
+        "	join app_ranking ar on pc.app_id = ar.app_id and pc.country_code = ar.country_code\n" +
+        "	join appstore_rating r on pc.app_id = r.app_id and pc.country_code = r.country_code\n" +
+        "	join appstore_app a on pc.app_id = a.app_id\n" +
+        "	where pc.country_code = 'USA'\n" +
+        (filters.isFree === true ? "AND pc.price = 0\n" : "") +
+        (filters.isIphone === true ? "AND a.is_iphone\n": "") +
+        (filters.isIpad === true ? "AND a.is_ipad\n": "") +
+        "	and pc.price < pc.old_price\n" +
+        "	and pc.change_date > now() at time zone 'UTC' - interval '" + maxDays + "' day\n" +
+        "	and ar.popularity >= $1\n" +
+        ") t\n" +
+        "ORDER BY log(1 + t.popularity) / power(t.age_days + 1, 0.5) desc, t.release_date desc";
+
+    var queryParams = [minPopularity];
+
+    client.query(queryStr, queryParams, function (err, result) {
+        if (err) { return next(err); }
+
+        var priceDrops = result.rows.map(function(item) {
+            return {
+                extId: item.ext_id,
+                name: item.name,
+                artworkSmall: item.artwork_small_url,
+                isIphone: item.is_iphone,
+                isIpad: item.is_ipad,
+                price: item.price,
+                oldPrice: item.old_price,
+                changeDate: item.change_date,
+                ageDays: item.age_days,
+                popularity: item.popularity,
+                userRating: item.user_rating,
+                ratingCount: item.rating_count,
+                userRatingCurrent: item.user_rating_current,
+                ratingCountCurrent: item.rating_count_current,
+                categories: item.categories
+            };
+        });
+
+        next(null, priceDrops);
+    });
+};
+
+exports.getPopularPriceDrops = function(maxDays, minPopularity, filters, next) {
+    connection.open(function(err, conn) {
+        if (err) {
+            return next(err);
+        }
+
+        getPopularPriceDrops(conn.client, maxDays, minPopularity, filters, function(err, results) {
+            conn.close(err, function(err) {
+                next(err, results);
+            });
+        });
+    });
+};

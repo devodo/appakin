@@ -38,7 +38,10 @@ RedisCache.prototype.createClient = function(next) {
     self.client = redis.createClient(config.cache.redis.port, config.cache.redis.host);
     self.client.on("error", function(err) { self.onError(err); });
     self.client.select(self.db, function(err) {
-        if (err) { return next(err); }
+        if (err) {
+            log.error(err);
+            return next(null, null);
+        }
 
         return next(null, self.client);
     });
@@ -282,6 +285,106 @@ RedisCache.prototype.deleteKeys = function(keys, next) {
     });
 };
 
+RedisCache.prototype.createList = function(key, items, expirySeconds, next) {
+    var self = this;
+
+    self.getClient(function(err, client) {
+        if (err) { return next(err); }
+
+        if (!client) { return next(); }
+
+        var multi = client.multi();
+
+        multi.del(key);
+
+        if (items && items.length > 0) {
+            items.forEach(function(item) {
+                var redisValue;
+                if (typeof item === 'object') {
+                    redisValue = JSON.stringify(item);
+                } else {
+                    redisValue = item;
+                }
+
+                multi.rpush(key, redisValue);
+            });
+        }
+
+        multi.expire(key, expirySeconds);
+
+        multi.exec(function (err, replies) {
+            if (err) { return next(err); }
+
+            next(null, replies);
+        });
+    });
+};
+
+RedisCache.prototype.lRange = function(key, skip, take, next) {
+    var self = this;
+
+    self.getClient(function(err, client) {
+        if (err) { return next(err); }
+
+        if (!client) { return next(); }
+
+        client.lrange(key, skip, skip + take - 1, function(err, res) {
+            if (err) { return next(err); }
+
+            next(null, res);
+        });
+    });
+};
+
+RedisCache.prototype.lRangeObjects = function(key, skip, take, next) {
+    var self = this;
+
+    self.getClient(function(err, client) {
+        if (err) { return next(err); }
+
+        if (!client) { return next(); }
+
+        var multi = client.multi();
+
+        multi.lrange(key, skip, skip + take - 1);
+        multi.llen(key);
+
+        multi.exec(function(err, replies) {
+            if (err) { return next(err); }
+
+            if (replies === null || replies.length !== 2) {
+                return next(null, null);
+            }
+
+            var items = [];
+
+            try {
+                replies[0].forEach(function(reply, i) {
+                    if (reply === null) {
+                        return items.push(null);
+                    }
+
+                    try {
+                        items.push(JSON.parse(reply));
+                    } catch (ex) {
+                        log.error(ex, 'Error parsing redis list item: ' + i + ' on key: ' + key + ' in db: ' + self.db);
+                        throw ex;
+                    }
+                });
+            } catch (ex) {
+                return next(ex);
+            }
+
+            var result = {
+                total: replies[1],
+                items: items
+            };
+
+            return next(null, result);
+        });
+    });
+};
+
 RedisCache.prototype.scriptEval = function(script, keys, argv, next) {
     var self = this;
 
@@ -329,6 +432,103 @@ RedisCache.prototype.end = function(next) {
     });
 };
 
+RedisCache.prototype.getMultiCacheObjects = function(ids, createKeyFunc, repoLookupFunc, expirySeconds, next, retryCount) {
+    var self = this;
+
+    if (ids.length === 0) {
+        return next(null, []);
+    }
+
+    var cacheKeys = ids.map(function(id) {
+        return createKeyFunc(id);
+    });
+
+    self.getObjects(cacheKeys, function(err, cacheResults) {
+        if (err) {
+            log.error(err, "Error getting multi objects from redis cache.");
+
+            if (err.isParseError) {
+                log.warn(err, "Parse errors encountered. Will attempt to clear cache and retry.");
+
+                return self.deleteKeys(err.keys, function(err) {
+                    if (err) { return next(err); }
+
+                    //retry
+                    retryCount = retryCount ? retryCount + 1 : 1;
+                    if (retryCount > 2) {
+                        return next(new Error('Get multi objects stuck in retry loop'));
+                    }
+
+                    self.getMultiCacheObjects(ids, createKeyFunc, repoLookupFunc, expirySeconds, next, retryCount);
+                });
+            }
+        }
+
+        var missingIds;
+        var missingIdsIndex;
+        var results;
+
+        if (!cacheResults) {
+            missingIds = ids;
+            results = [];
+        }
+        else {
+            missingIds = [];
+            missingIdsIndex = [];
+            results = cacheResults;
+
+            cacheResults.forEach(function(cacheResult, i) {
+                if (cacheResult === null) {
+                    missingIds.push(ids[i]);
+                    missingIdsIndex.push(i);
+                }
+            });
+        }
+
+        if (missingIds.length === 0) {
+            return next(null, results);
+        }
+
+        repoLookupFunc(missingIds, function(err, repoResults) {
+            if (err) { return next(err); }
+
+            var repoResultsMap = Object.create(null);
+            var cacheKeyValuePairs = [];
+
+            repoResults.forEach(function(repoResult) {
+                repoResultsMap[repoResult.id] = repoResult;
+
+                if (cacheResults) {
+                    cacheKeyValuePairs.push({
+                        key: createKeyFunc(repoResult.id),
+                        value: repoResult
+                    });
+                }
+
+                delete repoResult.id;
+            });
+
+            if (cacheKeyValuePairs.length > 0) {
+                self.msetEx(cacheKeyValuePairs, expirySeconds, function (err) {
+                    if (err) {
+                        log.error(err);
+                    }
+                });
+            }
+
+            missingIds.forEach(function(missingId, i) {
+                if (cacheResults) {
+                    results[missingIdsIndex[i]] = repoResultsMap[missingId];
+                } else {
+                    results.push(repoResultsMap[missingId]);
+                }
+            });
+
+            next(null, results);
+        });
+    });
+};
+
 exports.createRedisCache = function(db) {
     if (!db || isNaN(db)) {
         throw "Invalid redis db: " + db;
@@ -347,6 +547,7 @@ exports.dbPartitions = {
     test: 15,
     chart: 1,
     category: 2,
+    pricedrop: 3,
     search: 4,
     featured: 8,
     appstore: 10,

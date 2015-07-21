@@ -77,8 +77,8 @@ var resetCategoryGenres = function(next) {
 
 var resetRelatedCategories = function(next) {
     log.info("Resetting related categories");
-    //appStoreAdminRepo.resetRelatedCategories(CAT_POSITION_FACTOR, RELATED_CAT_POSITION_FACTOR, MAX_RELATED, next);
-    catAnalyser.resetRelated(next);
+    appStoreAdminRepo.resetRelatedCategories(CAT_POSITION_FACTOR, RELATED_CAT_POSITION_FACTOR, MAX_RELATED, next);
+    //catAnalyser.resetRelated(next);
 };
 
 var resetRelatedCategory = function(categoryId, next) {

@@ -6,6 +6,7 @@ var urlUtil = require('../domain/urlUtil');
 var redisCacheFactory = require("../domain/cache/redisCache");
 var remoteCache = redisCacheFactory.createRedisCache(redisCacheFactory.dbPartitions.featured);
 var categoryViewProvider = require('../domain/viewProvider/categoryViewProvider');
+var priceDropViewProvider = require('../domain/viewProvider/priceDropViewProvider');
 
 var localCache = null;
 
@@ -121,20 +122,50 @@ exports.init = function init(app) {
             res.json(categories);
         });
     });
-};
 
-exports.init = function init(app) {
     app.get('/ios/home', function (req, res, next) {
         var take = 5;
 
-        categoryViewProvider.getPopularCategories(0, take, {}, function(err, trendingCategories) {
+        priceDropViewProvider.getPopularPriceDrops(0, take, {}, function(err, priceDropsResult) {
             if (err) { return next(err); }
 
-            var expirySeconds = 600;
-            res.setHeader("Cache-Control", "public, max-age=" + expirySeconds);
+            categoryViewProvider.getPopularCategories(0, take, {}, function(err, popularCategories) {
+                if (err) { return next(err); }
+
+                var expirySeconds = 600;
+                res.setHeader("Cache-Control", "public, max-age=" + expirySeconds);
+
+                res.json({
+                    priceDrops: priceDropsResult.categories,
+                    popular: popularCategories
+                });
+            });
+        });
+    });
+
+    app.get('/ios/price_drops', function (req, res, next) {
+        var pageNum = req.query.p ? parseInt(req.query.p, 10) : 1;
+        if (isNaN(pageNum) || pageNum < 1) {
+            return res.status(400).json({error: 'Bad page number'});
+        }
+
+        var take = 10;
+        var skip = (pageNum - 1) * take;
+
+        var filters = {
+            isIphone: req.query.is_iphone === 'true',
+            isIpad: req.query.is_ipad === 'true',
+            isFree: req.query.is_free === 'true'
+        };
+
+        var expirySeconds = 600;
+        res.setHeader("Cache-Control", "public, max-age=" + expirySeconds);
+
+        priceDropViewProvider.getPopularPriceDrops(skip, take, filters, function(err, priceDrops) {
+            if (err) { return next(err); }
 
             res.json({
-                trending: trendingCategories
+                priceDrops: priceDrops
             });
         });
     });

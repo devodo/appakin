@@ -122,105 +122,11 @@ var getCategoryChartsRepoFunc = function(filters) {
 var getCategoriesCharts = function(categoryIds, filters, next) {
     var createKeyFunc = getCreateCategoryChartKeyFunc(filters);
     var repoLookupFunc = getCategoryChartsRepoFunc(filters);
-    getMultiCacheObjects(categoryChartCache, categoryIds, createKeyFunc, repoLookupFunc, CHART_CACHE_EXPIRY_SECONDS, next);
+    categoryChartCache.getMultiCacheObjects(categoryIds, createKeyFunc, repoLookupFunc, CHART_CACHE_EXPIRY_SECONDS, next);
 };
 
 var getCategories = function(categoryIds, next) {
-    getMultiCacheObjects(categoryCache, categoryIds, getCategoryCacheKey, getCategoriesRepo, CATEGORY_CACHE_EXPIRY_SECONDS, next);
-};
-
-var getMultiCacheObjects = function(cache, ids, createKeyFunc, repoLookupFunc, expirySeconds, next, retryCount) {
-    if (ids.length === 0) {
-        return next(null, []);
-    }
-
-    var cacheKeys = ids.map(function(id) {
-        return createKeyFunc(id);
-    });
-
-    cache.getObjects(cacheKeys, function(err, cacheResults) {
-        if (err) {
-            log.error(err, "Error getting multi objects from redis cache.");
-
-            if (err.isParseError) {
-                log.warn(err, "Parse errors encountered. Will attempt to clear cache and retry.");
-
-                return cache.deleteKeys(err.keys, function(err) {
-                    if (err) { return next(err); }
-
-                    //retry
-                    retryCount = retryCount ? retryCount + 1 : 1;
-                    if (retryCount > 2) {
-                        return next(new Error('Get multi objects stuck in retry loop'));
-                    }
-
-                    getMultiCacheObjects(cache, ids, createKeyFunc, repoLookupFunc, expirySeconds, next, retryCount);
-                });
-            }
-        }
-
-        var missingIds;
-        var missingIdsIndex;
-        var results;
-
-        if (!cacheResults) {
-            missingIds = ids;
-            results = [];
-        }
-        else {
-            missingIds = [];
-            missingIdsIndex = [];
-            results = cacheResults;
-
-            cacheResults.forEach(function(cacheResult, i) {
-                if (cacheResult === null) {
-                    missingIds.push(ids[i]);
-                    missingIdsIndex.push(i);
-                }
-            });
-        }
-
-        if (missingIds.length === 0) {
-            return next(null, results);
-        }
-
-        repoLookupFunc(missingIds, function(err, repoResults) {
-            if (err) { return next(err); }
-
-            var repoResultsMap = Object.create(null);
-            var cacheKeyValuePairs = [];
-
-            repoResults.forEach(function(repoResult) {
-                repoResultsMap[repoResult.id] = repoResult;
-                delete repoResult.id;
-
-                if (cacheResults) {
-                    cacheKeyValuePairs.push({
-                        key: createKeyFunc(repoResult.id),
-                        value: repoResult
-                    });
-                }
-            });
-
-            if (cacheKeyValuePairs.length > 0) {
-                cache.msetEx(cacheKeyValuePairs, expirySeconds, function (err) {
-                    if (err) {
-                        log.error(err);
-                    }
-                });
-            }
-
-            missingIds.forEach(function(missingId, i) {
-                if (cacheResults) {
-                    results[missingIdsIndex[i]] = repoResultsMap[missingId];
-                } else {
-                    results.push(repoResultsMap[missingId]);
-                }
-            });
-
-            next(null, results);
-        });
-    });
+    categoryCache.getMultiCacheObjects(categoryIds, getCategoryCacheKey, getCategoriesRepo, CATEGORY_CACHE_EXPIRY_SECONDS, next);
 };
 
 var getTrendingCategories = function(next) {
@@ -451,6 +357,7 @@ exports.searchMain = searchMain;
 exports.searchApps = searchApps;
 exports.getCategoriesCharts = getCategoriesCharts;
 exports.getTrendingCategories = getTrendingCategories;
+exports.getCategories = getCategories;
 exports.getPopularCategories = getPopularCategories;
 
 
