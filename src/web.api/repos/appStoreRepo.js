@@ -851,7 +851,13 @@ var getPopularPriceDrops = function(client, maxDays, minPopularity, filters, nex
         "	select a.ext_id, a.name, a.artwork_small_url, a.is_iphone, a.is_ipad, a.release_date,\n" +
         "	pc.price, pc.old_price, pc.change_date,\n" +
         "	ar.popularity, r.user_rating, r.rating_count, r.user_rating_current, r.rating_count_current,\n" +
-        "	ARRAY(select ca.category_id from category_app ca where ca.app_id = pc.app_id) as categories,\n" +
+        "   ARRAY(\n" +
+        "     select ca.category_id\n" +
+        "     from category_app ca\n" +
+        "     join category c on ca.category_id = c.id\n" +
+        "     where ca.app_id = pc.app_id\n" +
+        "     and c.date_deleted is null\n" +
+        "   ) as categories,\n" +
         "	trunc(extract(epoch from now() at time zone 'UTC' - pc.change_date) / 86400) as age_days\n" +
         "	FROM appstore_price_change pc\n" +
         "	join app_ranking ar on pc.app_id = ar.app_id and pc.country_code = ar.country_code\n" +
