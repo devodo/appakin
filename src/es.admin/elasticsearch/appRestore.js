@@ -64,7 +64,7 @@ var warmupSearchPromise = function(indexName) {
     var mainQueries = ['racing game', 'listen to music', 'all the apps', 'kids apps', 'the', 'and'];
     var completeQueries = ['a', 't', 'b', 'ab', 'th', 'ap'];
 
-    var promise = Q();
+    var promise = Q(); // jshint ignore:line
 
     mainQueries.forEach(function(query) {
         promise = promise.then(function() {

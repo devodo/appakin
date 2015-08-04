@@ -21,7 +21,7 @@ gulp.task('build',
 // http://jshint.com/docs/options/
 gulp.task('jshint', function() {
     return gulp
-	    .src(['./routes/**/*.js'])
+		.src(['./routes/**/*.js', './repos/**/*.js', './domain/**/*.js', './elasticsearch/**/*.js'])
 	    .pipe(plugins.jshint({ globalstrict: true, node: true }))
 		.pipe(plugins.jshint.reporter(stylish))
 		.pipe(plugins.jshint.reporter('fail'))

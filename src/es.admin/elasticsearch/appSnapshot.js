@@ -103,7 +103,7 @@ exports.deleteOldSnapshotsPromise = function(numToKeep) {
     log.debug("Get list of snapshots");
     return appIndexAdmin.getSnapshotsPromise()
         .then(function(snapshotNames) {
-            var deleteSnapshotsPromise = Q();
+            var deleteSnapshotsPromise = Q(); // jshint ignore:line
             var deletedSnapshots = [];
             snapshotNames.slice(numToKeep).forEach(function(snapShotName) {
                 deleteSnapshotsPromise = deleteSnapshotsPromise.then(function() {
