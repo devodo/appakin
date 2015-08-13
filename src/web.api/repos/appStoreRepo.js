@@ -2,6 +2,8 @@
 var async = require('async');
 var connection = require('./connection');
 
+var PRICE_DROP_AGE_FACTOR = 0.6;
+
 var nullFilterArray = function(array) {
     if (!array) {
         return null;
@@ -275,7 +277,7 @@ var getCategoryPriceDropAppsByExtId = function(client, categoryExtId, minPopular
         (filters.isIpad === true ? "AND a.is_ipad\n": "") +
         "	     and pc.change_date > now() at time zone 'UTC' - interval '" + maxDays + "' day\n" +
         ") t\n" +
-        "ORDER BY log(1 + t.popularity) / power(t.age_days + 1, 0.5) desc, t.release_date desc\n" +
+        "ORDER BY log(1 + t.popularity) / power(t.age_days + 1, " + PRICE_DROP_AGE_FACTOR + ") desc, t.release_date desc\n" +
         "LIMIT $3 OFFSET $4";
 
     var queryParams = [categoryExtId, minPopularity, take, skip];
@@ -871,7 +873,7 @@ var getPopularPriceDrops = function(client, maxDays, minPopularity, filters, nex
         "	and pc.change_date > now() at time zone 'UTC' - interval '" + maxDays + "' day\n" +
         "	and ar.popularity >= $1\n" +
         ") t\n" +
-        "ORDER BY log(1 + t.popularity) / power(t.age_days + 1, 0.5) desc, t.release_date desc";
+        "ORDER BY log(1 + t.popularity) / power(t.age_days + 1, " + PRICE_DROP_AGE_FACTOR + ") desc, t.release_date desc";
 
     var queryParams = [minPopularity];
 
