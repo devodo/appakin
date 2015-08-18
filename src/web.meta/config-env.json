@@ -1,0 +1,24 @@
+{
+  "common": {
+    "server": {
+      "port": 3008,
+      "returnErrorDetail": true
+    },
+    "cluster": {
+      "enabled": true,
+      "workers": "cpu_count",
+      "watchFile": "./system/restart"
+    },
+    "log": {
+      "level": "info"
+    },
+    "domain": "www.appakin.com"
+  },
+  "development": {
+    "log": {
+      "level": "debug"
+    }
+  },
+  "production": {
+  }
+}

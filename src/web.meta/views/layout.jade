@@ -1,0 +1,23 @@
+doctype html
+html
+  head
+      title= title
+      meta(name='description' content= description)
+      <!-- Twitter Card data -->
+      meta(name='twitter:card' content='summary')
+      meta(name='twitter:site' content='@appakin')
+      meta(name='twitter:title' content= title)
+      meta(name='twitter:description' content= description)
+      meta(name='twitter:creator' content='@appakin')
+      <!-- Open Graph data -->
+      meta(name='og:type' content='article')
+      meta(name='og:title' content= title)
+      meta(name='og:description' content= description)
+      meta(name='og:url' content= url)
+      if image
+          meta(name='og:image' content= image)
+      meta(name='og:site_name' content='App Akin')
+      meta(name='article:publisher' content='https://www.facebook.com/appakin.ltd')
+      meta(name='fb:admins' content='691191429')
+  body
+    block content
