@@ -42,6 +42,10 @@ var getPopularity = function(app) {
 var logBase = Math.log(10);
 var POPULARITY_NORM_FACTOR = 1/2.0;
 var normalisePopularity = function(appPopularity) {
+    if (!appPopularity) {
+        return 0;
+    }
+
     var popularity = (Math.log(1 + appPopularity)/logBase) * POPULARITY_NORM_FACTOR;
 
     return Math.min(popularity, 1.0);

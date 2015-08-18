@@ -1,6 +1,7 @@
 'use strict';
 var urlUtil = require('../urlUtil');
 var config = require('../../config');
+var appRank = require('../../domain/appRank');
 var request = require('request');
 
 var COMPLETE_SIZE = 6;
@@ -97,7 +98,8 @@ var parseAppResults = function(appResults) {
             url: urlUtil.makeUrl(appResult.field.ext_id, appResult.field.name),
             imageUrl: appResult.field.image_url,
             price: appResult.field.price,
-            rating: appResult.field.rating
+            rating: appResult.field.rating,
+            popularity: appRank.normalisePopularity(appResult.field.popularity)
         };
 
         if (appResult.highlight) {
