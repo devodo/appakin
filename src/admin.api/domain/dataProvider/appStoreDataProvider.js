@@ -97,7 +97,7 @@ var getLookups = function(ids, next) {
 
 var parseLookup = function(data, next) {
     if (data.kind !== "software") {
-        return next("iTunes item is not an app");
+        return next(new Error("iTunes item is not an app"));
     }
 
     var result = {
@@ -192,7 +192,10 @@ var updateApps = function(ids, next) {
 
         async.eachSeries(results, function(result, callback) {
             parseLookup(result, function(err, app) {
-                if (err) { return next(err); }
+                if (err) {
+                    log.error(err);
+                    return callback();
+                }
 
                 appStoreAdminRepo.refreshAppStoreApp(app, function(err, result) {
                     if (err) { return callback(err); }
