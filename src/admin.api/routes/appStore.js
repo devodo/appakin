@@ -93,7 +93,7 @@ exports.init = function init(app) {
                 return log.error(err);
             }
 
-            log.info("Successfully refreshed apps batch to last app id: " + lastAppId);
+            log.debug("Successfully refreshed apps batch to last app id: " + lastAppId);
         });
 
         res.json({status: 'ack'});
