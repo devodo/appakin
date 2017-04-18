@@ -1,5 +1,11 @@
 # App Akin
 
+A unique approach to app search and discovery combining:
+* An app classification system using text feature extraction and supervised machine learning with support vector machines.
+* A search system that displays results within ranked categories using Elasticsearch aggregations.
+
+[App Akin Website](http://www.appakin.com/)
+
 ## Developer setup
 
 1. Install Ruby and SASS: http://sass-lang.com/install
